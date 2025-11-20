@@ -57,8 +57,8 @@ export default function ProyectoEstrategico() {
           {/* LADO DERECHO: TEXTO */}
           <div className="w-full lg:w-2/3 text-lg font-sans text-left self-center">
             <p className="text-gray-800 leading-relaxed text-2xl mb-4">
-              Desarrollar modelos para implementar y escalar estrategias para el
-              fortalecimiento de la economía circular con enfoque en residuos
+              Desarrollar modelos para <strong>implementar y escalar estrategias</strong> para el
+              fortalecimiento de la <strong>economía circular</strong> con enfoque en residuos
               sólidos aprovechables.
             </p>
 
@@ -76,9 +76,9 @@ export default function ProyectoEstrategico() {
           </h2>
 
           <p className="text-xl text-gray-700 leading-relaxed mb-6">
-            Esta línea de acción impulsa proyectos piloto y estrategias
-            territoriales que permiten validar y escalar modelos de economía
-            circular en diferentes sectores productivos y regiones del país.
+            Esta línea de acción impulsa <strong>proyectos piloto y estrategias
+            territoriales</strong> que permiten validar y escalar modelos de economía
+            circular en diferentes sectores <strong>productivos y regiones del país</strong>.
           </p>
         </section>
       </div>

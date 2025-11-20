@@ -53,9 +53,9 @@ export default function InclusionSocialProductiva() {
           {/* Lado Derecho */}
           <div className="w-full lg:w-2/3 text-lg font-sans text-left self-center">
             <p className="text-gray-800 leading-relaxed text-2xl mb-4">
-              Impulsar estrategias y acciones dirigidas a cerrar brechas de los
+              Impulsar <strong>estrategias y acciones</strong> dirigidas a cerrar brechas de los
               actores de la cadena, para mejorar el impacto de los modelos de
-              economía circular con énfasis en REP.
+              economía circular con <strong>énfasis en REP</strong>.
             </p>
 
           </div>
@@ -73,7 +73,7 @@ export default function InclusionSocialProductiva() {
           <p className="text-xl text-gray-700 leading-relaxed mb-6">
             Esta línea se enfoca en el desarrollo de capacidades, la inclusión
             productiva y el cierre de brechas dentro de la cadena de valor,
-            garantizando que los beneficios de la economía circular lleguen a
+            garantizando que <strong>los beneficios de la economía circular</strong> lleguen a
             todos los actores.
           </p>
         </section>

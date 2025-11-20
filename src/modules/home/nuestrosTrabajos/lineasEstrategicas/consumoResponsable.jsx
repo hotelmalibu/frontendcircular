@@ -54,7 +54,7 @@ export default function ConsumoResponsable() {
           {/* Derecha */}
           <div className="w-full lg:w-2/3 text-lg font-sans text-left self-center">
             <p className="text-gray-800 leading-relaxed text-2xl mb-4">
-              Sensibilizar y contribuir al cambio de hábitos y comportamiento
+              <strong>Sensibilizar y contribuir</strong> al cambio de hábitos y comportamiento
               del consumidor fomentando la correcta separación en la fuente.
             </p>
           </div>
@@ -70,8 +70,8 @@ export default function ConsumoResponsable() {
           </h2>
 
           <p className="text-xl text-gray-700 leading-relaxed mb-6">
-            Esta línea estratégica busca formar consumidores conscientes,
-            promoviendo prácticas de separación adecuada de residuos que aporten
+            Esta línea estratégica busca formar consumidores conscientes, 
+            <strong> promoviendo prácticas de separación</strong> adecuada de residuos que aporten
             al ciclo de la economía circular.
           </p>
         </section>

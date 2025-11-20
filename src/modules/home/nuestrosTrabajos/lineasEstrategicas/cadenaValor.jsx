@@ -55,8 +55,8 @@ export default function CadenaValor() {
           {/* Lado Derecho: Descripción */}
           <div className="w-full lg:w-2/3 text-lg font-sans text-left self-center">
             <p className="text-gray-800 leading-relaxed text-2xl mb-4">
-              Implementar un modelo de articulación y fortalecimiento de gestores y transformadores que
-              permita el cumplimiento normativo de REP y PUSU, y que responda a estrategias corporativas y
+              Implementar <strong>un modelo de articulación y fortalecimiento</strong> de gestores y transformadores que
+              permita el cumplimiento normativo de <strong>REP</strong> y <strong>PUSU</strong>, y que responda a estrategias corporativas y
               legales.
             </p>
           </div>
@@ -68,8 +68,8 @@ export default function CadenaValor() {
             Enfoque y Alcance de la Línea
           </h2>
           <p className="text-xl text-gray-700 leading-relaxed mb-6">
-            Esta línea estratégica busca cerrar el ciclo de vida de los envases y empaques,
-            promoviendo la colaboración entre todos los actores de la cadena de valor, desde el
+            Esta línea estratégica busca cerrar <strong>el ciclo de vida de los envases y empaques</strong>,
+            promoviendo la colaboración entre todos <strong>los actores de la cadena de valor</strong>, desde el
             productor hasta el transformador final.
           </p>
         </section>

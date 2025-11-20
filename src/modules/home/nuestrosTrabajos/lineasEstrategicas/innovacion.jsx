@@ -53,9 +53,9 @@ export default function Innovacion() {
           {/* Lado Derecho */}
           <div className="w-full lg:w-2/3 text-lg font-sans text-left self-center">
             <p className="text-gray-800 leading-relaxed text-2xl mb-4">
-              Dinamizar el ecosistema de innovación para el cierre de ciclo de
+              Dinamizar el <strong>ecosistema de innovación</strong> para el cierre de ciclo de
               envases y empaques, promoviendo la tecnificación en toda la cadena de
-              valor y fortaleciendo la capacidad para la atracción de recursos.
+              valor y fortaleciendo <strong>la capacidad para la atracción de recursos</strong>.
             </p>
           </div>
         </div>
@@ -70,9 +70,9 @@ export default function Innovacion() {
           </h2>
 
           <p className="text-xl text-gray-700 leading-relaxed mb-6">
-            Esta línea de acción impulsa la búsqueda, adopción y transferencia de
+            Esta línea de acción impulsa la <strong>búsqueda, adopción y transferencia</strong> de
             nuevas tecnologías y metodologías que permitan optimizar procesos,
-            incrementar la eficiencia y fortalecer la circularidad en toda la cadena
+            incrementar <strong>bla eficiencia y fortalecer</strong> la circularidad en toda la cadena
             de valor.
           </p>
         </section>
