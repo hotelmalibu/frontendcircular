@@ -1,6 +1,7 @@
 import React from "react";
 // CORRECCIÓN DE RUTA: Apunta a assets/marconormativo/1.png
 import imgHeader from "../../../../assets/marconormativo/1.png"; 
+import fondos_submenus from "../../../../assets/fondos_submenus.jpg";
 
 // --- IMPORTAR ACTIVOS (PDFs) ---
 import pdfENEC from "../../../../assets/marconormativo/planes/ENEC.pdf"; 
@@ -51,8 +52,8 @@ const PlanCard = ({ title, description, pdf, color }) => {
 
   return (
     <div 
-        className="w-full text-left bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg border-t-4" 
-        style={{ borderColor: color }}
+        className="w-full text-left bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg border-t-4"
+        
     >
       <h3 className="text-lg font-sans font-semibold mb-1" style={{ color: COLOR_AZUL_PRINCIPAL }}>
         {title}
@@ -79,7 +80,7 @@ const PlanCard = ({ title, description, pdf, color }) => {
 
 export default function Index() {
   return (
-    <div className="mt-24 font-sans min-h-screen" style={{ backgroundColor: COLOR_FONDO_CLARO }}>
+    <div className="mt-24 font-sans min-h-screen" style={{ backgroundImage: `url(${fondos_submenus})`, backgroundSize: "cover", backgroundPosition: "center" }}>
       
       {/* 1. IMAGEN DE CABECERA - CENTRADA Y LIMITADA */}
       <div className="w-full h-auto mb-10 overflow-hidden">

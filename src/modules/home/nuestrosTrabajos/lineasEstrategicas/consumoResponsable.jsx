@@ -1,4 +1,5 @@
 import React from "react";
+import fondos_submenus from "../../../../assets/fondos_submenus.jpg";
 // Importamos el componente Index
 import Index from "../../../../components/home/nuestrosTrabajos/lineasEstrategicas/consumoResponsable/index.jsx";
 
@@ -16,7 +17,7 @@ const COLOR_FONDO_CLARO = '#f9f9f9';
 export default function ConsumoResponsable() {
   return (
     // Contenedor principal con padding superior para el Navbar fijo y fondo claro
-    <div className="mt-24 font-sans min-h-screen" style={{ backgroundColor: COLOR_FONDO_CLARO }}>
+    <div className="mt-24 font-sans min-h-screen" style={{ backgroundImage: `url(${fondos_submenus})`, backgroundSize: "cover", backgroundPosition: "center" }}>
       
       {/* 1. IMAGEN DE CABECERA (CENTRADA Y LIMITADA) */}
       <div className="w-full h-auto mb-10 overflow-hidden">

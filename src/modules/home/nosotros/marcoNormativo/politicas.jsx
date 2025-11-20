@@ -1,6 +1,7 @@
 import React from "react";
 // CORRECCIÓN DE RUTA: Apunta a assets/marconormativo/1.png
 import imgHeader from "../../../../assets/marconormativo/1.png";
+import fondos_submenus from "../../../../assets/fondos_submenus.jpg";
 
 // --- IMPORTAR ACTIVOS (PDFs) ---
 import pdfGestionResiduos from "../../../../assets/marconormativo/politicas/Política_para_la_gestión_integral_de_ residuos.pdf"; 
@@ -81,7 +82,7 @@ const PoliticaCard = ({ title, description, pdf, color }) => {
 
 export default function Index() {
   return (
-    <div className="mt-24 font-sans min-h-screen" style={{ backgroundColor: COLOR_FONDO_CLARO }}>
+    <div className="mt-24 font-sans min-h-screen" style={{ backgroundImage: `url(${fondos_submenus})`, backgroundSize: "cover", backgroundPosition: "center" }}>
       
       {/* 1. IMAGEN DE CABECERA - CENTRADA Y LIMITADA */}
       <div className="w-full h-auto mb-10 overflow-hidden">

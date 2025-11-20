@@ -1,5 +1,5 @@
 import React from "react";
-
+import fondos_submenus from "../../../../assets/fondos_submenus.jpg";
 // --- IMPORTACIONES DE LIBRERÍAS ---
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -71,7 +71,7 @@ export default function Index() {
   };
 
   return (
-    <div className="mt-24 font-sans min-h-screen" style={{ backgroundColor: COLOR_FONDO_CLARO }}>
+    <div className="mt-24 font-sans min-h-screen" style={{ backgroundImage: `url(${fondos_submenus})`, backgroundSize: "cover", backgroundPosition: "center" }}>
       
       {/* 1. IMAGEN DE CABECERA */}
       <div className="w-full h-auto mb-10 overflow-hidden">

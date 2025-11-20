@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Base URL for API requests; adjust if backend runs elsewhere
-const API_BASE = "http://localhost:8030/api";
+const API_BASE = "https://api-ecocircular.creativostecnologicosit.com/api";
 
 const api = axios.create({
   baseURL: API_BASE,

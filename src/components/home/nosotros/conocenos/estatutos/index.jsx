@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, Building2, ScrollText, Users, Gavel } from "lucide-react";
-
+import fondos_submenus from "../../../../../assets/fondos_submenus.jpg";
 export default function Index() {
   const [openChapter, setOpenChapter] = useState(null);
 
@@ -102,7 +102,7 @@ export default function Index() {
   ];
 
   return (
-    <section className="bg-gradient-to-b from-white via-emerald-50 to-green-50 py-20 px-6 md:px-12 lg:px-20">
+    <section className="bg-gradient-to-b from-white  py-20 px-6 md:px-12 lg:px-20" style={{ backgroundImage: `url(${fondos_submenus})`, backgroundSize: "cover", backgroundPosition: "center" }}>
       <div className="max-w-5xl mx-auto">
         {/* Título principal */}
         <motion.div

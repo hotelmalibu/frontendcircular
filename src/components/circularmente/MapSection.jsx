@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { Search, MapPin, Mail, Phone, Globe, User as UserIcon, X } from 'lucide-react';
+import { 
+  Search, MapPin, Mail, Phone, Globe, User as UserIcon, X, 
+  Package, Wrench, ShoppingCart,
+  AlertCircle, CheckCircle2, Sparkles
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import fondoMapa from '../../assets/fondo_mapaC.jpg';
 import PyrcomLogo from '../../assets/empresaLogos/Pyrcom.png';
@@ -16,22 +20,24 @@ import DpwateringLogo from '../../assets/empresaLogos/DPWatering.png';
 import EsenttiaLogo from '../../assets/empresaLogos/Esenttia.png';
 import LatpackLogo from '../../assets/empresaLogos/Latinpack.png';
 import LaycoLogo from '../../assets/empresaLogos/Layco.png';
-import ProcesadosMargaLogo from '../../assets/empresaLogos/Procesados.jpg';
+import ProcesadosMargaLogo from '../../assets/empresaLogos/Procesados.png';
 import PlastypetLogo from '../../assets/empresaLogos/Plastypetco.png';
 import RecicleneLogo from '../../assets/empresaLogos/Reciclene.png';
-import RedpackLogo from '../../assets/empresaLogos/Redpack.jpg';
+import RedpackLogo from '../../assets/empresaLogos/Redpack.png';
 import EmpacorLogo from '../../assets/empresaLogos/Empacor.png';
 import RmiReciclajeLogo from '../../assets/empresaLogos/RMI.png';
 import RecuperacionDccLogo from '../../assets/empresaLogos/RCP.png';
 import SonocoLogo from '../../assets/empresaLogos/Sonoco.png';
 
-// --- DATOS DE EMPRESAS REALES DE LA MAQUETA ---
+
+// --- DATOS DE EMPRESAS REALES ---
 const allEmpresas = [
   // VENDEN PRODUCTOS
   {
     id: 1,
     name: 'PYRCOM',
     region: 'Bogotá',
+    departamento: 'Cundinamarca',
     tipo: 'Plástico Rígido',
     descripcion: 'Resina PP y PET reciclada, Aceite de pirólisis',
     logo: PyrcomLogo,
@@ -46,6 +52,7 @@ const allEmpresas = [
     id: 2,
     name: 'APROPET',
     region: 'Bogotá',
+    departamento: 'Cundinamarca',
     tipo: 'Plástico Rígido',
     descripcion: 'Resina PET reciclada, Materiales posindustriales',
     logo: AropetLogo,
@@ -60,6 +67,7 @@ const allEmpresas = [
     id: 3,
     name: 'BioCirculo',
     region: 'Medellín',
+    departamento: 'Antioquia',
     tipo: 'Plástico Rígido',
     descripcion: 'Venta de resinas, Productos plásticos',
     logo: BiocirculoLogo,
@@ -74,6 +82,7 @@ const allEmpresas = [
     id: 4,
     name: 'Barr Plastic',
     region: 'Barranquilla',
+    departamento: 'Atlántico',
     tipo: 'Plástico Flexible',
     descripcion: 'Plásticos rígidos y flexibles de baja densidad',
     logo: BarrplasticLogo,
@@ -88,6 +97,7 @@ const allEmpresas = [
     id: 5,
     name: 'CajaPlast FE',
     region: 'Bogotá',
+    departamento: 'Cundinamarca',
     tipo: 'Plástico Rígido',
     descripcion: 'Resina reciclada de alta y baja densidad',
     logo: CajaplastLogo,
@@ -102,6 +112,7 @@ const allEmpresas = [
     id: 6,
     name: 'LayCo',
     region: 'Cali',
+    departamento: 'Valle del Cauca',
     tipo: 'Madera Plástica',
     descripcion: 'Productos en madera plástica',
     logo: LaycoLogo,
@@ -116,6 +127,7 @@ const allEmpresas = [
     id: 7,
     name: 'PlastyPet',
     region: 'Medellín',
+    departamento: 'Antioquia',
     tipo: 'Plástico Rígido',
     descripcion: 'Resinas peletizadas PCR, bolsas de polietileno',
     logo: PlastypetLogo,
@@ -130,6 +142,7 @@ const allEmpresas = [
     id: 8,
     name: 'RedPack',
     region: 'Guadalajara de Buga',
+    departamento: 'Valle del Cauca',
     tipo: 'Cartón',
     descripcion: 'Cartón y sacos de papel, Resinas peletizadas PCR',
     logo: RedpackLogo,
@@ -141,11 +154,13 @@ const allEmpresas = [
     categoria: 'venden_productos'
   },
 
+
   // OFRECEN SERVICIOS
   {
     id: 9,
     name: 'ArtePop',
     region: 'Bogotá',
+    departamento: 'Cundinamarca',
     tipo: 'Consultoría',
     descripcion: 'Diseño, protección de marca, proyectos de economía circular',
     logo: ArtepopLogo,
@@ -160,6 +175,7 @@ const allEmpresas = [
     id: 10,
     name: 'DP Watering',
     region: 'Bogotá',
+    departamento: 'Cundinamarca',
     tipo: 'Servicios Agua',
     descripcion: 'Sistemas para producción de agua potable, pura y ultrapura',
     logo: DpwateringLogo,
@@ -174,6 +190,7 @@ const allEmpresas = [
     id: 11,
     name: 'CartoXA',
     region: 'Cali',
+    departamento: 'Valle del Cauca',
     tipo: 'Servicios Papel',
     descripcion: 'Papel kraft, cartón corrugado, embalajes especializados',
     logo: CartoneyapelLogo,
@@ -188,6 +205,7 @@ const allEmpresas = [
     id: 12,
     name: 'ACEBRI',
     region: 'Bogotá',
+    departamento: 'Cundinamarca',
     tipo: 'Manufactura',
     descripcion: 'Fabricación de empaques, aditivos biodegradables, madera plástica',
     logo: AaroLogo,
@@ -202,6 +220,7 @@ const allEmpresas = [
     id: 13,
     name: 'Esenttia',
     region: 'Bogotá',
+    departamento: 'Cundinamarca',
     tipo: 'Manufactura',
     descripcion: 'Empaques y bienes para transporte, textiles, alimentos y construcción',
     logo: EsenttiaLogo,
@@ -216,6 +235,7 @@ const allEmpresas = [
     id: 14,
     name: 'LatiPack',
     region: 'Medellín',
+    departamento: 'Antioquia',
     tipo: 'Manufactura',
     descripcion: 'Elaboración de cajas para empaques, embalaje de alimentos',
     logo: LatpackLogo,
@@ -230,6 +250,7 @@ const allEmpresas = [
     id: 15,
     name: 'Procesados Margarita',
     region: 'Barranquilla',
+    departamento: 'Atlántico',
     tipo: 'Manufactura',
     descripcion: 'Cabos de plástico, empaques de huevos, fibras para escobas',
     logo: ProcesadosMargaLogo,
@@ -244,6 +265,7 @@ const allEmpresas = [
     id: 16,
     name: 'Reciclene',
     region: 'Cali',
+    departamento: 'Valle del Cauca',
     tipo: 'Gestión Residuos',
     descripcion: 'Protección de marca, manejo de residuos',
     logo: RecicleneLogo,
@@ -255,11 +277,13 @@ const allEmpresas = [
     categoria: 'ofrecen_servicios'
   },
 
-  // COMERCIALIZACIÓN DE MATERIALES - NUEVAS EMPRESAS
+
+  // COMERCIALIZACIÓN DE MATERIALES
   {
     id: 17,
     name: 'Empacor',
     region: 'Bogotá',
+    departamento: 'Cundinamarca',
     tipo: 'Comercialización',
     descripcion: 'Papel chip, conversión de cintas y hojas, tubos core',
     logo: EmpacorLogo,
@@ -274,6 +298,7 @@ const allEmpresas = [
     id: 18,
     name: 'Recuperación DCC',
     region: 'Bogotá',
+    departamento: 'Cundinamarca',
     tipo: 'Comercialización',
     descripcion: 'Protección de marca, manejo de residuos, comercialización de materiales',
     logo: RecuperacionDccLogo,
@@ -288,6 +313,7 @@ const allEmpresas = [
     id: 19,
     name: 'RMI Reciclaje',
     region: 'Guadalajara de Buga',
+    departamento: 'Valle del Cauca',
     tipo: 'Comercialización',
     descripcion: 'Plásticos, cartón, papel, vidrio, metales y chatarra',
     logo: RmiReciclajeLogo,
@@ -302,6 +328,7 @@ const allEmpresas = [
     id: 20,
     name: 'Sonoco',
     region: 'Cali',
+    departamento: 'Valle del Cauca',
     tipo: 'Comercialización',
     descripcion: 'Cartón y sacos de papel kraft, productos de papel',
     logo: SonocoLogo,
@@ -314,39 +341,95 @@ const allEmpresas = [
   }
 ];
 
-const categoriasFiltro = [
-  { id: 'todos', nombre: 'Todos', color: '#00AB6D' },
-  { id: 'venden_productos', nombre: 'Venden Productos', color: '#2C67B0' },
-  { id: 'ofrecen_servicios', nombre: 'Ofrecen Servicios', color: '#00AB6D' },
-  { id: 'comercializacion', nombre: 'Comercialización', color: '#B1D357' }
-];
+
+// --- FUZZY SEARCH ---
+const fuzzySearch = (searchTerm, text) => {
+  if (!text) return false;
+  const search = searchTerm.toLowerCase();
+  const compare = text.toLowerCase();
+  
+  if (compare.includes(search)) return true;
+  
+  let searchIndex = 0;
+  for (let i = 0; i < compare.length && searchIndex < search.length; i++) {
+    if (compare[i] === search[searchIndex]) {
+      searchIndex++;
+    }
+  }
+  return searchIndex === search.length;
+};
+
 
 // --- COMPONENTE PRINCIPAL ---
 export default function MapSection() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todos');
-  const [empresasFiltradas, setEmpresasFiltradas] = useState(user ? allEmpresas : []);
+  
   const [searchTerm, setSearchTerm] = useState('');
+  const [empresasFiltradas, setEmpresasFiltradas] = useState(user ? allEmpresas : []);
   const [selectedEmpresa, setSelectedEmpresa] = useState(null);
+  const [isFocused, setIsFocused] = useState(false);
 
+
+  // Filtrado con un solo buscador
   useEffect(() => {
     if (!user) {
       setEmpresasFiltradas([]);
       return;
     }
-    let filtradas = allEmpresas;
-    if (categoriaSeleccionada !== 'todos') {
-      filtradas = filtradas.filter(e => e.categoria === categoriaSeleccionada);
+
+
+    if (!searchTerm.trim()) {
+      setEmpresasFiltradas(allEmpresas);
+      return;
     }
-    if (searchTerm.trim()) {
-      filtradas = filtradas.filter(e =>
-        e.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        e.region.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+
+
+    const search = searchTerm.toLowerCase();
+    const filtradas = allEmpresas.filter(e =>
+      fuzzySearch(search, e.name) ||
+      fuzzySearch(search, e.region) ||
+      fuzzySearch(search, e.departamento) ||
+      fuzzySearch(search, e.descripcion) ||
+      fuzzySearch(search, e.contacto) ||
+      fuzzySearch(search, e.email) ||
+      fuzzySearch(search, e.tipo) ||
+      e.servicios.some(s => fuzzySearch(search, s))
+    );
+
+
     setEmpresasFiltradas(filtradas);
-  }, [categoriaSeleccionada, user, searchTerm]);
+  }, [searchTerm, user]);
+
+
+  // Icono dinámico por categoría
+  const getCategoryIcon = (categoria) => {
+    switch(categoria) {
+      case 'venden_productos':
+        return <Package size={16} className="inline mr-1" />;
+      case 'ofrecen_servicios':
+        return <Wrench size={16} className="inline mr-1" />;
+      case 'comercializacion':
+        return <ShoppingCart size={16} className="inline mr-1" />;
+      default:
+        return null;
+    }
+  };
+
+
+  const getCategoryLabel = (categoria) => {
+    switch(categoria) {
+      case 'venden_productos':
+        return 'Productos';
+      case 'ofrecen_servicios':
+        return 'Servicios';
+      case 'comercializacion':
+        return 'Comercialización';
+      default:
+        return '';
+    }
+  };
+
 
   return (
     <div
@@ -357,11 +440,8 @@ export default function MapSection() {
         backgroundPosition: "center"
       }}
     >
-      
-      {/* Contenido Principal */}
       <div className="relative z-10 w-full min-h-screen flex flex-col">
-        
-        {/* SECCIÓN 1: Acceso Requerido (sin login) */}
+        {/* SECCIÓN: Acceso Requerido (sin login) */}
         {!user && (
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-20">
             <motion.div
@@ -376,7 +456,6 @@ export default function MapSection() {
                 Inicia sesión para ver el directorio de empresas aliadas.
               </p>
             </motion.div>
-
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -396,7 +475,6 @@ export default function MapSection() {
                 Registrarse →
               </button>
             </motion.div>
-
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -414,50 +492,114 @@ export default function MapSection() {
           </div>
         )}
 
-        {/* SECCIÓN 2: Directorio de Empresas (con login) */}
+
+        {/* SECCIÓN: Directorio de Empresas (con login) */}
         {user && (
           <div className="flex-1 flex flex-col py-8 px-6 md:px-12 lg:px-20">
-            
-            {/* Búsqueda y Filtros */}
+            {/* BUSCADOR MEJORADO */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="mb-8"
+              className="mb-8 space-y-4"
             >
-              {/* Búsqueda */}
-              <div className="mb-6 relative">
-                <Search size={18} className="absolute left-4 top-3.5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Buscar empresa por nombre o región..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#00AB6D] focus:ring-2 focus:ring-[#00AB6D]/20 text-sm bg-white/95 backdrop-blur-md"
-                />
+              {/* Búsqueda con icono mejorado */}
+              <div className={`relative transition-all duration-300 ${isFocused ? 'scale-105' : 'scale-100'}`}>
+                {/* Sombra dinámica */}
+                <div className={`absolute inset-0 bg-gradient-to-r from-[#00AB6D]/20 to-[#2C67B0]/20 rounded-2xl blur-xl transition-all duration-300 ${isFocused ? 'opacity-100 shadow-2xl' : 'opacity-0'}`} />
+                
+                {/* Container del input */}
+                <div className="relative flex items-center">
+                  {/* Icono animado */}
+                  <motion.div
+                    animate={{ rotate: isFocused ? 15 : 0 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                    className="absolute left-5 pointer-events-none"
+                  >
+                    <Search 
+                      size={22} 
+                      className={`transition-colors duration-300 ${
+                        isFocused 
+                          ? 'text-[#00AB6D] stroke-[3]' 
+                          : 'text-gray-400 stroke-[1.5]'
+                      }`}
+                    />
+                  </motion.div>
+
+                  {/* Input */}
+                  <input
+                    type="text"
+                    placeholder="Buscar empresas, servicios, productos, región, departamento..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    className={`w-full pl-16 pr-12 py-4 text-base rounded-2xl border-2 transition-all duration-300 focus:outline-none font-medium ${
+                      isFocused
+                        ? 'border-[#00AB6D] ring-4 ring-[#00AB6D]/10 bg-white shadow-2xl'
+                        : 'border-gray-300/80 bg-white/95 shadow-lg hover:shadow-xl hover:border-gray-400'
+                    }`}
+                  />
+
+                  {/* Botón Clear con animación */}
+                  {searchTerm && (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.7 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.7 }}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setSearchTerm('')}
+                      className="absolute right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <X size={20} strokeWidth={2.5} />
+                    </motion.button>
+                  )}
+
+                  {/* Icono sparkles en lado derecho cuando hay resultados */}
+                  {!searchTerm && isFocused && (
+                    <motion.div
+                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                      className="absolute right-4 pointer-events-none"
+                    >
+                      <Sparkles size={20} className="text-[#00AB6D]/40" />
+                    </motion.div>
+                  )}
+                </div>
               </div>
 
-              {/* Filtros por Categoría */}
-              <div className="flex flex-wrap gap-3">
-                {categoriasFiltro.map(cat => (
-                  <motion.button
-                    key={cat.id}
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => setCategoriaSeleccionada(cat.id)}
-                    className={`px-4 py-2 rounded-full font-bold transition-all duration-300 text-sm ${
-                      categoriaSeleccionada === cat.id
-                        ? 'text-white shadow-lg scale-105'
-                        : 'bg-white/70 text-gray-700 hover:bg-white/90'
-                    }`}
-                    style={{
-                      backgroundColor: categoriaSeleccionada === cat.id ? cat.color : undefined
-                    }}
-                  >
-                    {cat.nombre}
-                  </motion.button>
-                ))}
-              </div>
+
+              {/* Indicador de Resultados */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className={`text-sm font-medium p-3 rounded-lg flex items-center gap-2 transition-all ${
+                  empresasFiltradas.length > 0
+                    ? 'bg-green-50 text-green-700 border border-green-200'
+                    : 'bg-red-50 text-red-700 border border-red-200'
+                }`}
+              >
+                {empresasFiltradas.length > 0 ? (
+                  <>
+                    <CheckCircle2 size={18} className="text-green-600 flex-shrink-0" />
+                    <span>
+                      Mostrando <span className="font-bold">{empresasFiltradas.length}</span> de{' '}
+                      <span className="font-bold">{allEmpresas.length}</span> empresas
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle size={18} className="text-red-600 flex-shrink-0" />
+                    <span>
+                      {searchTerm.trim() ? 'No se encontraron empresas' : 'Todas las empresas disponibles'}
+                    </span>
+                  </>
+                )}
+              </motion.div>
             </motion.div>
+
 
             {/* Grid de Empresas */}
             <div className="flex-1">
@@ -489,16 +631,12 @@ export default function MapSection() {
                           className="max-w-full max-h-full object-contain"
                         />
                       </div>
-
                       {/* Contenido */}
                       <div className="p-3">
-                        {/* Nombre */}
                         <h4 className="font-bold text-[#1E305D] text-sm mb-1 line-clamp-2">{empresa.name}</h4>
-
-                        {/* Badge Categoría */}
                         <div className="mb-2">
                           <span
-                            className="px-2 py-1 rounded-full text-xs font-bold text-white inline-block"
+                            className="px-2 py-1 rounded-full text-xs font-bold text-white inline-flex items-center gap-1"
                             style={{
                               backgroundColor: empresa.categoria === 'venden_productos' 
                                 ? '#2C67B0' 
@@ -507,20 +645,21 @@ export default function MapSection() {
                                 : '#B1D357'
                             }}
                           >
-                            {empresa.categoria === 'venden_productos' ? '📦 Productos' : empresa.categoria === 'ofrecen_servicios' ? '🔧 Servicios' : '🛒 Comercialización'}
+                            {getCategoryIcon(empresa.categoria)}
+                            {getCategoryLabel(empresa.categoria)}
                           </span>
                         </div>
-
-                        {/* Región */}
-                        <p className="text-xs text-gray-600 mb-2 flex items-center gap-1">
-                          <MapPin size={12} className="flex-shrink-0" />
-                          {empresa.region}
-                        </p>
-
-                        {/* Descripción */}
+                        {/* Región y Departamento */}
+                        <div className="text-xs text-gray-600 mb-2">
+                          <p className="flex items-center gap-1 mb-0.5">
+                            <MapPin size={12} className="flex-shrink-0" />
+                            {empresa.region}
+                          </p>
+                          <p className="text-xs text-gray-500 ml-4">
+                            {empresa.departamento}
+                          </p>
+                        </div>
                         <p className="text-xs text-gray-600 line-clamp-2 mb-2">{empresa.descripcion}</p>
-
-                        {/* Botón Ver Detalles */}
                         <button className="w-full bg-gradient-to-r from-[#00AB6D] to-[#008A5C] hover:from-[#009B5F] hover:to-[#007A4E] text-white font-bold py-2 rounded-lg text-xs transition-all duration-300 hover:shadow-lg">
                           Ver Detalles
                         </button>
@@ -530,13 +669,14 @@ export default function MapSection() {
                 </motion.div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-96 text-center">
-                  <MapPin size={48} className="text-gray-300 mb-4" />
+                  <AlertCircle size={48} className="text-gray-300 mb-4" />
                   <p className="text-gray-500 font-medium text-lg">
-                    {searchTerm ? 'No se encontraron empresas' : 'No hay empresas disponibles'}
+                    {searchTerm.trim() ? 'No se encontraron empresas' : 'Cargando empresas...'}
                   </p>
                 </div>
               )}
             </div>
+
 
             {/* ENCABEZADO ABAJO */}
             <motion.div
@@ -556,6 +696,7 @@ export default function MapSection() {
           </div>
         )}
 
+
         {/* MODAL DETALLE EMPRESA */}
         {selectedEmpresa && user && (
           <div 
@@ -568,7 +709,7 @@ export default function MapSection() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[calc(100vh-120px)] overflow-hidden flex flex-col"
             >
-              {/* Header con Close Button */}
+              {/* Header */}
               <div className="flex items-start justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
                 <div className="flex gap-4 flex-1">
                   <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center flex-shrink-0 p-2">
@@ -579,7 +720,10 @@ export default function MapSection() {
                     />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-[#1E305D] mb-1">{selectedEmpresa.name}</h3>
+                    <h3 className="text-xl font-bold text-[#1E305D] mb-1 flex items-center gap-2">
+                      {getCategoryIcon(selectedEmpresa.categoria)}
+                      {selectedEmpresa.name}
+                    </h3>
                     <p className="text-sm text-gray-600">{selectedEmpresa.descripcion}</p>
                   </div>
                 </div>
@@ -590,19 +734,17 @@ export default function MapSection() {
                   <X size={24} />
                 </button>
               </div>
-
-              {/* Contenido - Sin Scroll */}
+              {/* Contenido */}
               <div className="p-6 overflow-y-auto flex-1">
-                {/* Información de Contacto */}
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
                     <MapPin size={18} className="text-[#00AB6D] flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-gray-500 font-semibold">Región</p>
+                      <p className="text-xs text-gray-500 font-semibold">Ubicación</p>
                       <p className="text-sm font-semibold text-gray-800">{selectedEmpresa.region}</p>
+                      <p className="text-xs text-gray-500">{selectedEmpresa.departamento}</p>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
                     <UserIcon size={18} className="text-[#2C67B0] flex-shrink-0" />
                     <div>
@@ -610,7 +752,6 @@ export default function MapSection() {
                       <p className="text-sm font-semibold text-gray-800">{selectedEmpresa.contacto}</p>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
                     <Phone size={18} className="text-[#00AB6D] flex-shrink-0" />
                     <div>
@@ -620,7 +761,6 @@ export default function MapSection() {
                       </a>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
                     <Mail size={18} className="text-[#2C67B0] flex-shrink-0" />
                     <div>
@@ -630,7 +770,6 @@ export default function MapSection() {
                       </a>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-3">
                     <Globe size={18} className="text-[#B1D357] flex-shrink-0" />
                     <div>
@@ -639,11 +778,11 @@ export default function MapSection() {
                     </div>
                   </div>
                 </div>
-
-                {/* Productos/Servicios */}
+                {/* Servicios */}
                 <div>
-                  <p className="text-sm font-bold text-gray-800 mb-3">
-                    {selectedEmpresa.categoria === 'venden_productos' ? '📦 Productos:' : selectedEmpresa.categoria === 'ofrecen_servicios' ? '🔧 Servicios:' : '🛒 Materiales:'}
+                  <p className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    {getCategoryIcon(selectedEmpresa.categoria)}
+                    {selectedEmpresa.categoria === 'venden_productos' ? 'Productos' : selectedEmpresa.categoria === 'ofrecen_servicios' ? 'Servicios' : 'Materiales'}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {selectedEmpresa.servicios.map((servicio, idx) => (
@@ -658,7 +797,6 @@ export default function MapSection() {
           </div>
         )}
       </div>
-
       <style>{`
         @media (max-width: 1024px) {
           .grid {
