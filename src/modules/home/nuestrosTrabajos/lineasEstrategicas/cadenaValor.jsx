@@ -41,7 +41,7 @@ export default function CadenaValor() {
         </h1>
 
         {/* 2. CONTENIDO PRINCIPAL: Tarjeta de Fortalecimiento (Diseño original) */}
-        <div className="flex flex-col lg:flex-row items-start gap-8 bg-white p-6 md:p-10 rounded-xl shadow-xl border-t-4" style={{ borderColor: COLOR_VERDE_PRINCIPAL }}>
+        <div className="flex flex-col lg:flex-row items-start gap-8 bg-transparent p-6 md:p-10 rounded-xl">
           
           {/* Lado Izquierdo: Logo circular y Título */}
           <div className="w-full lg:w-1/3 flex flex-col items-center justify-center p-4">
@@ -59,24 +59,18 @@ export default function CadenaValor() {
               permita el cumplimiento normativo de REP y PUSU, y que responda a estrategias corporativas y
               legales.
             </p>
-            {/* El Index genérico queda aquí */}
-            <Index />
           </div>
         </div>
 
         {/* 3. --- SECCIÓN DE TEXTO ADICIONAL CENTRADA EN CAJÓN --- */}
-        <section 
-          className="mt-16 text-center max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-lg border-t-4" // <-- Estilo de cajón aplicado
-          style={{ borderColor: COLOR_AZUL_SECUNDARIO }} // <-- Borde superior azul
-        >
+        <section className="mt-6 text-center max-w-4xl mx-auto p-8 bg-transparent">
           <h2 className="text-3xl font-sans font-bold mb-4" style={{ color: COLOR_AZUL_SECUNDARIO }}>
             Enfoque y Alcance de la Línea
           </h2>
           <p className="text-xl text-gray-700 leading-relaxed mb-6">
-             Esta línea estratégica busca cerrar el ciclo de vida de los envases y empaques, promoviendo la colaboración entre todos los actores de la cadena de valor, desde el productor hasta el transformador final.
-          </p>
-          <p className="text-lg text-gray-500 italic">
-            El fortalecimiento de la cadena garantiza la eficiencia, trazabilidad y el cumplimiento de las metas nacionales de aprovechamiento.
+            Esta línea estratégica busca cerrar el ciclo de vida de los envases y empaques,
+            promoviendo la colaboración entre todos los actores de la cadena de valor, desde el
+            productor hasta el transformador final.
           </p>
         </section>
 
