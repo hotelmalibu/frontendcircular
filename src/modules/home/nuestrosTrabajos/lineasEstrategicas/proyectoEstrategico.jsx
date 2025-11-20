@@ -1,19 +1,16 @@
 import React from "react";
 import fondos_submenus from "../../../../assets/fondos_submenus.jpg";
 
-// Importamos el componente Index
-import Index from "../../../../components/home/nuestrosTrabajos/lineasEstrategicas/proyectoEstrategico/index.jsx";
-
 // --- IMPORTAR ACTIVOS ---
 import imgHeader from "../../../../assets/lineasestrategicas/1.png";
 import imgLogo from "../../../../assets/lineasestrategicas/proyectos/proyectos.png";
 
 // Colores del manual de marca (MISMA PALETA)
 const COLOR_AZUL_PRINCIPAL = "#1E305D";
-const COLOR_VERDE_PRINCIPAL = "#00AB6D";
+// const COLOR_VERDE_PRINCIPAL = "#00AB6D";
 const COLOR_AZUL_SECUNDARIO = "#2C67B0"; // Borde superior de sección
-const COLOR_GRIS_TEXTO = "#333333";
-const COLOR_FONDO_CLARO = "#f9f9f9";
+// const COLOR_GRIS_TEXTO = "#333333";
+// const COLOR_FONDO_CLARO = "#f9f9f9";
 
 export default function ProyectoEstrategico() {
   return (

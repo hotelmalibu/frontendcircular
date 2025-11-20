@@ -1,6 +1,5 @@
 import React from "react";
 import fondos_submenus from "../../../../assets/fondos_submenus.jpg";
-import Index from "../../../../components/home/nuestrosTrabajos/lineasEstrategicas/inclusionSocialProductiva/index.jsx";
 
 // --- IMPORTAR ACTIVOS ---
 import imgHeader from "../../../../assets/lineasestrategicas/1.png";
@@ -9,7 +8,7 @@ import imgLogo from "../../../../assets/lineasestrategicas/inclusion/inclusion.p
 // Colores del manual de marca
 const COLOR_AZUL_PRINCIPAL = "#1E305D";
 const COLOR_AZUL_SECUNDARIO = "#2C67B0";
-const COLOR_GRIS_TEXTO = "#333333";
+// const COLOR_GRIS_TEXTO = "#333333";
 
 export default function InclusionSocialProductiva() {
   return (
