@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { GraduationCap, HeartHandshake, Building2, Globe, Award, Briefcase, Users, TrendingUp, BookOpen } from "lucide-react";
+import { GraduationCap, HeartHandshake, Building2, Globe, Briefcase, BookOpen } from "lucide-react";
 import Presidencia from "../../../../../assets/presidente/presidente.jpg";
 
 export default function BruceMacMaster() {

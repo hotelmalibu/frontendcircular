@@ -6,7 +6,7 @@ import proyecto3 from "../../assets/home/Proyectos/proyecto3.png";
 import proyecto4 from "../../assets/home/Proyectos/proyecto4.png";
 import proyecto5 from "../../assets/home/Proyectos/proyecto5.png";
 import proyecto6 from "../../assets/home/Proyectos/proyecto6.png";
-import fondoProyecto from "../../assets/home/Proyectos/fondo_proyecto.jpg";
+import fondoProyecto from "../../assets/home/Proyectos/fondo_proyecto.png";
 
 const projects = [
   { id: 1, title: "Fortalecimiento de Recicladores de Oficio", type: "FORTALECIMIENTO", color: "#1E305D", image: proyecto1, description: "Programa de inclusión y formalización de recicladores con capacitación, equipamiento y vinculación a la cadena de valor." },

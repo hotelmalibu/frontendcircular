@@ -8,7 +8,7 @@ import imgLogo from "../../../../assets/lineasestrategicas/consumoresponsable/co
 // Colores del manual de marca
 const COLOR_AZUL_PRINCIPAL = "#1E305D";
 // const COLOR_AMARILLO_CONSUMO = "#E8AD00";
-const COLOR_AZUL_SECUNDARIO = "#2C67B0"; // Igual que CadenaValor
+const COLOR_AZUL_SECUNDARIO = "#00AB6D"; // Igual que CadenaValor
 // const COLOR_GRIS_TEXTO = "#333333";
 
 export default function ConsumoResponsable() {
@@ -38,6 +38,10 @@ export default function ConsumoResponsable() {
         >
           Líneas Estratégicas: Consumo Responsable
         </h1>
+        <div
+          className="w-[60%] h-1 mx-auto mb-8"
+          style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}
+        ></div>
 
         {/* 2. TARJETA PRINCIPAL */}
         <div className="flex flex-col lg:flex-row items-start gap-8 bg-transparent p-6 md:p-10 rounded-xl">
