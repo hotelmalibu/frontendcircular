@@ -8,7 +8,7 @@ import imgLogo from "../../../../assets/lineasestrategicas/proyectos/proyectos.p
 // Colores del manual de marca (MISMA PALETA)
 const COLOR_AZUL_PRINCIPAL = "#1E305D";
 // const COLOR_VERDE_PRINCIPAL = "#00AB6D";
-const COLOR_AZUL_SECUNDARIO = "#2C67B0"; // Borde superior de sección
+const COLOR_AZUL_SECUNDARIO = "#00AB6D"; // Borde superior de sección
 // const COLOR_GRIS_TEXTO = "#333333";
 // const COLOR_FONDO_CLARO = "#f9f9f9";
 
@@ -39,6 +39,10 @@ export default function ProyectoEstrategico() {
         >
           Líneas Estratégicas: Proyectos Estratégicos
         </h1>
+        <div
+          className="w-[65%] h-1 mx-auto mb-8"
+          style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}
+        ></div>
 
         {/* 2. TARJETA PRINCIPAL (MISMA ESTRUCTURA QUE CADENA VALOR) */}
         <div className="flex flex-col lg:flex-row items-start gap-8 p-6 md:p-10 rounded-xl bg-transparent">

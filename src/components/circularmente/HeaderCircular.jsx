@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Recycle } from "lucide-react"; 
+import { ArrowRight } from "lucide-react"; 
 import fondoCircularmente from "../../assets/fondo_circularmente.jpg";
 import { useNavigate } from "react-router-dom";
 
@@ -22,18 +22,7 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         
-        <motion.div
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
-          className="mb-6"
-        >
-          <Recycle
-            size={48}
-            strokeWidth={2.5}
-            className="text-[#b9e31b] mx-auto"
-          />
-        </motion.div>
+        
 
         {/* Título Principal */}
         <motion.h1

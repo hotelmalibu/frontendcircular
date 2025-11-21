@@ -7,7 +7,7 @@ import proyecto3 from "../../assets/home/Proyectos/proyecto3.png";
 import proyecto4 from "../../assets/home/Proyectos/proyecto4.png";
 import proyecto5 from "../../assets/home/Proyectos/proyecto5.png";
 import proyecto6 from "../../assets/home/Proyectos/proyecto6.png";
-import fondoProyecto from "../../assets/home/Proyectos/fondo_proyecto.jpg";
+import fondoProyecto from "../../assets/home/Proyectos/fondo_proyecto.png";
 
 const projects = [
   { id: 1, title: "Fortalecimiento de Recicladores de Oficio", type: "FORTALECIMIENTO", color: "#1E305D", image: proyecto1, description: "Programa de inclusión y formalización de recicladores con capacitación, equipamiento y vinculación a la cadena de valor." },
@@ -20,10 +20,17 @@ const projects = [
 
 export default function ProjectsSection() {
   return (
-    <section
-  className="relative py-20 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center"
-  style={{ backgroundImage: `url(${fondoProyecto})` }}
+  <section
+  className="relative py-20 px-6 md:px-12 text-center overflow-hidden"
+  style={{
+    backgroundColor: "#d0e8da",             // color de fondo
+    backgroundImage: `url(${fondoProyecto})`, // imagen de fondo
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "left bottom",      // esquina inferior izquierda
+    backgroundSize: "250px auto",           // tamaño pequeño de la imagen
+  }}
 >
+
 
 
       {/* === CONTENIDO === */}

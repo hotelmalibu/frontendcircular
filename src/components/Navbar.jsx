@@ -303,7 +303,7 @@ function MegaMenuDropdown({ label, sections = [], showWhiteBg, showHover, showWh
           </div>
         </div>
 
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#00AB6D]/5 to-[#2C67B0]/5 rounded-full -z-10 pointer-events-none"></div>
+       
       </div>
     </div>
   );
@@ -416,6 +416,7 @@ export default function Navbar({ onMenuClick }) {
   const [isHovered, setIsHovered] = useState(false);
   const [hasOpenDropdown, setHasOpenDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [scrollDirection, setScrollDirection] = useState("up");
   const [searchQuery, setSearchQuery] = useState("");
   const [notificationCount] = useState(23);
@@ -423,9 +424,10 @@ export default function Navbar({ onMenuClick }) {
 
 const hideMenus = false;
 const isPublicPage = location.pathname === '/';
-const isDashboardView = user && isPublicPage && !scrolled && !isHovered && !hasOpenDropdown;
+const isDashboardView = (user && isPublicPage && !scrolled && !isHovered && !hasOpenDropdown);
 const isLogin = location.pathname === "/login";
 const isRegister = location.pathname === "/register";
+// eslint-disable-next-line no-unused-vars
 const isDashboard = location.pathname.startsWith("/dashboard");
 
 // Mostrar estilos hover solo en la vista welcome (/)
@@ -440,9 +442,10 @@ const isAuthPage = isLogin || isRegister;
 
 const showWhiteBg = isAuthPage
   ? true
-  : (user && isPublicPage && !scrolled && !isHovered && !hasOpenDropdown
+  : ((user && isPublicPage && !scrolled && !isHovered && !hasOpenDropdown)
     ? false
     : (isDashboardView ? false : (user ? true : (scrolled || isHovered || hasOpenDropdown))));
+
 
 // Si estamos en /circularmente y la navbar está transparente (no showWhiteBg), forzamos texto blanco y logo blanco
 const isCircularPath = location.pathname.startsWith('/circularmente');

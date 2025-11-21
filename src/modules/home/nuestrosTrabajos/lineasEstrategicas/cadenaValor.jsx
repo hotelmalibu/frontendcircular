@@ -9,7 +9,7 @@ import imgLogo from "../../../../assets/lineasestrategicas/cadenasdevalor/cadena
 // Colores del manual de marca
 const COLOR_AZUL_PRINCIPAL = '#1E305D';
 // const COLOR_VERDE_PRINCIPAL = '#00AB6D';
-const COLOR_AZUL_SECUNDARIO = '#2C67B0'; // Usado para el borde de la nueva sección
+const COLOR_AZUL_SECUNDARIO = '#00AB6D'; // Usado para el borde de la nueva sección
 // const COLOR_GRIS_TEXTO = '#333333';
 // const COLOR_FONDO_CLARO = '#f9f9f9';
 
@@ -37,6 +37,11 @@ export default function CadenaValor() {
         >
           Líneas Estratégicas: Cadenas de Valor
         </h1>
+       <div
+          className="w-[60%] h-1 mx-auto mb-8"
+          style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}
+        ></div>
+
 
         {/* 2. CONTENIDO PRINCIPAL: Tarjeta de Fortalecimiento (Diseño original) */}
         <div className="flex flex-col lg:flex-row items-start gap-8 bg-transparent p-6 md:p-10 rounded-xl">
