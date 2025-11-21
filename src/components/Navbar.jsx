@@ -795,26 +795,7 @@ const currentLogo = isAuthPage
           ) : (
             <>
               {/* CUANDO NO ESTÁ LOGUEADO */}
-              <Link
-                to="/login"
-                className={`px-2 md:px-4 py-2 text-xs md:text-sm rounded-full transition-all font-medium ${
-                  showWhiteBg
-                    ? "bg-[#004b72] text-white hover:bg-[#003a54]"
-                    : "bg-[#004b72] text-white hover:bg-[#005d8a]"
-                }`}
-              >
-                Iniciar Sesión
-              </Link>
-              <Link
-                to="/register"
-                className={`px-2 md:px-4 py-2 rounded-full text-xs md:text-sm transition-all font-semibold hover:scale-105 duration-300 ${
-                  showColoredRegister
-                    ? "bg-[#00AB6D] text-white hover:bg-[#009a5e]"
-                    : "bg-white text-[#00AB6D] hover:shadow-lg"
-                }`}
-              >
-                Registrarse
-              </Link>
+              
             </>
           )}
 

@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import Card from "./Card";
 import noticia1 from "../../assets/home/NoticiasYRecursos/A.jpg";
 import noticia2 from "../../assets/home/NoticiasYRecursos/B.jpg";
 import noticia3 from "../../assets/home/NoticiasYRecursos/C.jpg";
@@ -9,37 +8,29 @@ import fondoPortal from "../../assets/home/NoticiasYRecursos/fondo_portal.jpg";
 const cards = [
   {
     img: noticia1,
-    date: "15 de Octubre, 2025",
     title: "Nueva estrategia de reciclaje alcanza el 75% de aprovechamiento",
     text: "El programa logra cifras récord en la recuperación de envases y empaques en Colombia.",
-    link: "#",
     tag: "Reciclaje",
     color: "#00AB6D",
   },
   {
     img: noticia2,
-    date: "15 de Octubre, 2025",
     title: "Alianza con 50 empresas transformadoras para cerrar el ciclo",
     text: "Visión Circular fortalece su red de aliados estratégicos en economía circular.",
-    link: "#",
     tag: "Colaboración",
     color: "#00AB6D",
   },
   {
     img: noticia3,
-    date: "15 de Octubre, 2025",
     title: "Programa de pedagogía alcanza 2 millones de consumidores",
     text: "Capacitación ciudadana en separación y disposición correcta de residuos.",
-    link: "#",
     tag: "Educación",
     color: "#00AB6D",
   },
   {
     img: noticia4,
-    date: "16 de Octubre, 2025",
     title: "Nuevas tecnologías reducen los desechos industriales en un 40%",
     text: "Innovaciones en procesos productivos permiten optimizar recursos y minimizar impacto ambiental.",
-    link: "#",
     tag: "Innovación",
     color: "#00AB6D",
   },
@@ -56,10 +47,10 @@ const fadeUp = {
 
 export default function CardsSection() {
   return (
-    <section className="relative py-20 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center" style={{ backgroundImage: `url(${fondoPortal})` }}>
-
-
-      {/* === CONTENIDO PRINCIPAL === */}
+    <section
+      className="relative py-20 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center"
+      style={{ backgroundImage: `url(${fondoPortal})` }}
+    >
       <motion.div
         className="relative z-10"
         initial="hidden"
@@ -82,46 +73,41 @@ export default function CardsSection() {
         </motion.p>
 
         {/* === TARJETAS === */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 justify-items-center mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center mb-12">
           {cards.map((c, idx) => (
             <motion.div
               key={idx}
               variants={fadeUp}
               custom={idx * 0.2}
               whileHover={{ scale: 1.03 }}
-              transition={{ type: "spring", stiffness: 150 }}
-              className="relative w-full max-w-[290px] flex flex-col items-center rounded-xl overflow-hidden shadow-md bg-white"
+              transition={{ type: "spring", stiffness: 120 }}
+              className="relative w-full max-w-[300px] aspect-square rounded-xl overflow-hidden shadow-lg"
             >
-              {/* Imagen con etiqueta */}
-              <div className="relative w-full h-48 overflow-hidden">
-                <img src={c.img} alt={c.title} className="w-full h-full object-cover" />
-                <div
-                  className="absolute top-3 left-3 text-white text-xs font-semibold px-4 py-1 rounded-full shadow-md"
+              {/* Imagen grande cuadrada */}
+              <img
+                src={c.img}
+                alt={c.title}
+                className="w-full h-full object-cover"
+              />
+
+              {/* Overlay con título y texto */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 flex flex-col justify-end">
+                <span
+                  className="self-start text-white text-xs font-semibold px-3 py-1 rounded-full mb-2"
                   style={{ backgroundColor: c.color }}
                 >
                   {c.tag}
-                </div>
-              </div>
+                </span>
 
-              {/* Contenido */}
-              <div className="p-4 text-left">
-                <p className="text-sm text-gray-500 mb-1">{c.date}</p>
-                <h3 className="font-semibold text-gray-800 mb-2 text-[15px] leading-tight">
+                <h3 className="text-white font-bold text-xl leading-tight mb-2">
                   {c.title}
                 </h3>
-                <p className="text-gray-600 text-sm mb-4">{c.text}</p>
-                <a
-                  href={c.link}
-                  className="text-[#2C67B0] text-sm font-semibold hover:underline"
-                >
-                  Leer más →
-                </a>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* === BOTÓN FINAL === */}
+        {/* Botón final se mantiene igual */}
         <motion.a
           href="#"
           className="inline-block border-2 text-white font-semibold px-6 py-3 rounded-lg bg-[#B1D357] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md"
