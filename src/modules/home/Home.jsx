@@ -1,9 +1,7 @@
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import IndexImagen from "../../components/home/IndexImagen";
-import CardsSection from "../../components/home/CardsSection";
 import ProjectsSection from "../../components/home/ProjectsSection";
-import ImpactSection from "../../components/home/FeaturedSection";
 import FeaturedSection from "../../components/home/FeaturedSection";
 export default function Home() {
   const { user } = useContext(AuthContext);
@@ -19,7 +17,7 @@ export default function Home() {
         </div>
       )}
       <IndexImagen />
-      <FeaturedSection/>
+      <FeaturedSection />
       <ProjectsSection />
     </div>
   );
