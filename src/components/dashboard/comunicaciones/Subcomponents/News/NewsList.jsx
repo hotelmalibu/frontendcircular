@@ -5,7 +5,6 @@ import {
   Trash2,
   Eye,
   Search,
-  Filter,
   Calendar,
   User,
   Tag,
@@ -30,12 +29,10 @@ export default function NewsList() {
   const [selectedNews, setSelectedNews] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Load news on component mount
   useEffect(() => {
     loadNews();
   }, []);
 
-  // Filter news when search or filters change
   useEffect(() => {
     filterNewsData();
   }, [searchTerm, filterType, filterStatus, news]);
@@ -46,46 +43,31 @@ export default function NewsList() {
       setError(null);
       const response = await getAllNews();
       
-      // Debug: Log the response to see its structure
-      console.log("API Response:", response);
-      console.log("Response type:", typeof response);
-      console.log("Is Array:", Array.isArray(response));
-      
-      // Handle different response formats
       let newsArray = [];
       if (Array.isArray(response)) {
         newsArray = response;
       } else if (response?.data?.news && Array.isArray(response.data.news)) {
-        // API format: { data: { news: [...] } }
         newsArray = response.data.news;
       } else if (response?.data && Array.isArray(response.data)) {
-        // Alternative format: { data: [...] }
         newsArray = response.data;
       } else if (response?.news && Array.isArray(response.news)) {
         newsArray = response.news;
       } else if (typeof response === 'object' && response !== null) {
-        // If response is an object, try to find an array property
         const possibleArrays = Object.values(response).filter(val => Array.isArray(val));
         if (possibleArrays.length > 0) {
           newsArray = possibleArrays[0];
         }
       }
-      
-      console.log("Processed news array:", newsArray);
-      console.log("News count:", newsArray.length);
-      
       setNews(newsArray);
     } catch (err) {
       setError(err.response?.data?.message || "Error al cargar las noticias");
-      console.error("Error loading news:", err);
-      setNews([]); // Set empty array on error
+      setNews([]);
     } finally {
       setLoading(false);
     }
   };
 
   const filterNewsData = () => {
-    // Ensure news is always an array before filtering
     if (!Array.isArray(news)) {
       setFilteredNews([]);
       return;
@@ -93,7 +75,6 @@ export default function NewsList() {
     
     let filtered = [...news];
 
-    // Search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (item) =>
@@ -104,12 +85,9 @@ export default function NewsList() {
       );
     }
 
-    // Type filter
     if (filterType !== "all") {
       filtered = filtered.filter((item) => item.type === filterType);
     }
-
-    // Status filter
     if (filterStatus !== "all") {
       filtered = filtered.filter((item) => item.status === filterStatus);
     }
@@ -142,10 +120,9 @@ export default function NewsList() {
     try {
       await deleteNews(newsId);
       await loadNews();
-      alert("Noticia eliminada exitosamente");
+
     } catch (err) {
       alert(err.response?.data?.message || "Error al eliminar la noticia");
-      console.error("Error deleting news:", err);
     }
   };
 
@@ -154,45 +131,19 @@ export default function NewsList() {
     loadNews();
   };
 
+  // --- STYLES HELPERS ---
+
   const getStatusBadge = (status) => {
-    const statusConfig = {
-      published: {
-        color: "bg-green-100 text-green-800",
-        icon: <CheckCircle size={14} />,
-        label: "Publicado",
-      },
-      draft: {
-        color: "bg-yellow-100 text-yellow-800",
-        icon: <Clock size={14} />,
-        label: "Borrador",
-      },
-    };
-
-    const config = statusConfig[status] || statusConfig.draft;
-
+    const isPublished = status === 'published';
     return (
-      <span
-        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
-      >
-        {config.icon}
-        {config.label}
-      </span>
-    );
-  };
-
-  const getTypeBadge = (type) => {
-    const typeConfig = {
-      news: { color: "bg-blue-100 text-blue-800", label: "Noticia" },
-    };
-
-    const config = typeConfig[type] || typeConfig.news;
-
-    return (
-      <span
-        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
-      >
-        {config.label}
-      </span>
+      <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${
+        isPublished 
+          ? "bg-green-50 text-green-600 border-green-100" 
+          : "bg-yellow-50 text-yellow-600 border-yellow-100"
+      }`}>
+        {isPublished ? <CheckCircle size={12} /> : <Clock size={12} />}
+        <span>{isPublished ? "Publicado" : "Borrador"}</span>
+      </div>
     );
   };
 
@@ -200,197 +151,162 @@ export default function NewsList() {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
     return date.toLocaleDateString("es-CO", {
-      year: "numeric",
-      month: "short",
       day: "numeric",
-    });
+      month: "short",
+      year: "numeric",
+    }); // Devuelve formato tipo: 22 de nov de 2025
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando noticias...</p>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          Gestión de Noticias
-        </h1>
-        <p className="text-gray-600">
-          Administra las noticias y eventos de la plataforma
-        </p>
+    <div className="p-6 bg-gray-50 min-h-screen font-sans">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Gestión de Noticias</h1>
+          <p className="text-gray-500 mt-1">Administra el contenido de la plataforma</p>
+        </div>
+        <button
+          onClick={handleCreate}
+          className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all shadow-sm font-medium"
+        >
+          <Plus size={18} />
+          Nueva Noticia
+        </button>
       </div>
 
-      {/* Error Message */}
+      {/* Search & Filter Bar */}
+      <div className="bg-white p-4 rounded-2xl shadow-sm mb-8 border border-gray-100 flex flex-col md:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="Buscar por título, autor o contenido..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white border focus:border-green-500 rounded-xl outline-none transition-all text-gray-700"
+          />
+        </div>
+        <div className="flex gap-3">
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-4 py-2.5 bg-gray-50 border-transparent hover:bg-gray-100 rounded-xl outline-none text-gray-700 cursor-pointer"
+          >
+            <option value="all">Todos los estados</option>
+            <option value="published">Publicados</option>
+            <option value="draft">Borradores</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Error Display */}
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-800">
+        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-700">
           <AlertCircle size={20} />
           <span>{error}</span>
         </div>
       )}
 
-      {/* Filters and Actions */}
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          {/* Search */}
-          <div className="relative flex-1 w-full md:w-auto">
-            <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              size={20}
-            />
-            <input
-              type="text"
-              placeholder="Buscar noticias..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
-            />
+      {/* News Grid - CARD DESIGN START */}
+      {filteredNews.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+          <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Search className="text-gray-400" size={24} />
           </div>
-
-          {/* Filters */}
-          <div className="flex gap-2 w-full md:w-auto">
-
-
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
-            >
-              <option value="all">Todos los estados</option>
-              <option value="published">Publicados</option>
-              <option value="draft">Borradores</option>
-            </select>
-          </div>
-
-          {/* Create Button */}
-          <button
-            onClick={handleCreate}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
-          >
-            <Plus size={20} />
-            Nueva Noticia
-          </button>
+          <h3 className="text-lg font-medium text-gray-900">No se encontraron noticias</h3>
+          <p className="text-gray-500">Intenta ajustar los filtros de búsqueda</p>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredNews.map((item) => (
+            <div
+              key={item.id}
+              className="group bg-white rounded-2xl p-5 shadow-sm hover:shadow-md border border-transparent hover:border-gray-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
+            >
+              {/* Card Header */}
+              <div className="flex justify-between items-start gap-3 mb-3">
+                <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2">
+                  {item.title}
+                </h3>
+                <div className="flex-shrink-0">
+                  {getStatusBadge(item.status)}
+                </div>
+              </div>
 
-      {/* News Table */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        {filteredNews.length === 0 ? (
-          <div className="text-center py-12">
-            <AlertCircle className="mx-auto text-gray-400 mb-4" size={48} />
-            <p className="text-gray-600">No se encontraron noticias</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Título
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Tipo
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Categoría
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Autor
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Fecha Publicación
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredNews.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {item.title}
-                      </div>
-                      <div className="text-sm text-gray-500 truncate max-w-xs">
-                        {item.description?.substring(0, 60)}
-                        {item.description?.length > 60 ? "..." : ""}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getTypeBadge(item.type)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <Tag size={14} />
-                        {item.category || "Sin categoría"}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <User size={14} />
-                        {item.author || "Anónimo"}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <Calendar size={14} />
-                        {formatDate(item.published_at)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(item.status)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleView(item)}
-                          className="text-blue-600 hover:text-blue-900 transition-colors"
-                          title="Ver detalles"
-                        >
-                          <Eye size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleEdit(item)}
-                          className="text-green-600 hover:text-green-900 transition-colors"
-                          title="Editar"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          className="text-red-600 hover:text-red-900 transition-colors"
-                          title="Eliminar"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+              {/* Description */}
+              <p className="text-gray-500 text-sm mb-5 line-clamp-2 flex-grow">
+                {item.description || "Sin descripción disponible..."}
+              </p>
 
-      {/* Results Count */}
-      <div className="mt-4 text-sm text-gray-600">
-        Mostrando {filteredNews.length} de {news.length} noticias
+              {/* Tags Row */}
+              <div className="flex items-center gap-3 mb-5">
+                {/* Type Badge (Blue Pill) */}
+                <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold">
+                  {item.type === 'news' ? 'Noticia' : item.type || 'Evento'}
+                </span>
+                
+                {/* Category Tag */}
+                <div className="flex items-center gap-1.5 text-gray-500">
+                  <Tag size={14} className="stroke-2" />
+                  <span className="text-sm font-medium">{item.category || "General"}</span>
+                </div>
+              </div>
+
+              {/* Author & Date */}
+              <div className="space-y-2 mb-5">
+                <div className="flex items-center gap-2 text-gray-500">
+                  <User size={16} className="text-gray-400" />
+                  <span className="text-sm text-gray-600 font-medium truncate">
+                    {item.author || "Autor Desconocido"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-500">
+                  <Calendar size={16} className="text-gray-400" />
+                  <span className="text-sm text-gray-600">
+                    {formatDate(item.published_at)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Actions Footer (Divider + Icons) */}
+              <div className="pt-4 border-t border-gray-100 flex justify-end items-center gap-3 mt-auto">
+                <button
+                  onClick={() => handleView(item)}
+                  className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                  title="Ver detalle"
+                >
+                  <Eye size={20} className="stroke-[1.5]" />
+                </button>
+                <button
+                  onClick={() => handleEdit(item)}
+                  className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                  title="Editar"
+                >
+                  <Edit size={20} className="stroke-[1.5]" />
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Eliminar"
+                >
+                  <Trash2 size={20} className="stroke-[1.5]" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-6 text-center text-sm text-gray-400">
+        Mostrando {filteredNews.length} resultados
       </div>
 
       {/* Modals */}
@@ -416,3 +332,4 @@ export default function NewsList() {
     </div>
   );
 }
+
