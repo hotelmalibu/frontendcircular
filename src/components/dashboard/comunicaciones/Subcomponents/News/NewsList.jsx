@@ -257,14 +257,7 @@ export default function NewsList() {
 
           {/* Filters */}
           <div className="flex gap-2 w-full md:w-auto">
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
-            >
-              <option value="all">Todos los tipos</option>
-              <option value="news">Noticias</option>
-            </select>
+
 
             <select
               value={filterStatus}
