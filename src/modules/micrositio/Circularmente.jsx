@@ -3,7 +3,6 @@ import { AuthContext } from "../../context/AuthContext";
 import HeaderCircular from "../../components/circularmente/HeaderCircular";
 import MapSection from "../../components/circularmente/MapSection";
 import DirectorySection from "../../components/circularmente/DirectorySection";
-import AdminPanel from "../../components/circularmente/AdminPanel";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Circularmente() {
