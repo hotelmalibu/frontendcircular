@@ -183,7 +183,6 @@ export default function NewsList() {
   const getTypeBadge = (type) => {
     const typeConfig = {
       news: { color: "bg-blue-100 text-blue-800", label: "Noticia" },
-      event: { color: "bg-purple-100 text-purple-800", label: "Evento" },
     };
 
     const config = typeConfig[type] || typeConfig.news;
@@ -265,7 +264,6 @@ export default function NewsList() {
             >
               <option value="all">Todos los tipos</option>
               <option value="news">Noticias</option>
-              <option value="event">Eventos</option>
             </select>
 
             <select

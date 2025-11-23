@@ -56,10 +56,6 @@ export default function NewsDetailModal({ newsData, onClose, onEdit }) {
         color: "bg-blue-100 text-blue-800 border-blue-200",
         label: "Noticia",
       },
-      event: {
-        color: "bg-purple-100 text-purple-800 border-purple-200",
-        label: "Evento",
-      },
     };
 
     const config = typeConfig[type] || typeConfig.news;

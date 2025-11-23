@@ -11,7 +11,6 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     author: "",
     start_date: "",
     end_date: "",
-    published_at: "",
     status: "draft",
   });
 
@@ -28,7 +27,6 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         author: newsData.author || "",
         start_date: newsData.start_date ? formatDateForInput(newsData.start_date) : "",
         end_date: newsData.end_date ? formatDateForInput(newsData.end_date) : "",
-        published_at: newsData.published_at ? formatDateForInput(newsData.published_at) : "",
         status: newsData.status || "draft",
       });
     }
@@ -37,7 +35,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toISOString().slice(0, 16);
+    // Use date-only for inputs (`YYYY-MM-DD`)
+    return date.toISOString().slice(0, 10);
   };
 
   const handleChange = (e) => {
@@ -62,10 +61,6 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       newErrors.title = "El título es requerido";
     }
 
-    if (!formData.type) {
-      newErrors.type = "El tipo es requerido";
-    }
-
     if (!formData.status) {
       newErrors.status = "El estado es requerido";
     }
@@ -75,6 +70,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         newErrors.end_date = "La fecha de fin debe ser posterior a la fecha de inicio";
       }
     }
+
+    // published_at is automated; no client-side input required
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -90,13 +87,45 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     setLoading(true);
 
     try {
-      // Prepare data for API
+      // Prepare data for API: convert date-only inputs to ISO-like date-times
+      const toIsoDate = (value) => {
+        if (!value) return null;
+        // If value is YYYY-MM-DD (from <input type="date">), append time to avoid timezone shifts
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+          return `${value}T00:00:00`;
+        }
+        try {
+          const d = new Date(value);
+          if (isNaN(d.getTime())) return value;
+          return d.toISOString();
+        } catch (e) {
+          return value;
+        }
+      };
+
+      // If the user didn't provide a published_at, and status is 'published', set today's date
+      const todayDate = () => {
+        const d = new Date();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}T00:00:00`;
+      };
+
+      let publishedAt = null;
+      // If formData includes published_at (for legacy), respect it; otherwise automate when publishing
+      if (formData.published_at) publishedAt = toIsoDate(formData.published_at);
+      if (formData.status === "published" && !publishedAt) publishedAt = todayDate();
+
       const dataToSend = {
         ...formData,
-        start_date: formData.start_date || null,
-        end_date: formData.end_date || null,
-        published_at: formData.published_at || null,
+        start_date: toIsoDate(formData.start_date),
+        end_date: toIsoDate(formData.end_date),
+        published_at: publishedAt,
       };
+
+      // Debug: log payload sent to backend
+      console.log("NewsFormModal - payload to send:", dataToSend);
 
       if (isEditing && newsData?.id) {
         await updateNews(newsData.id, dataToSend);
@@ -108,7 +137,20 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
       onSuccess();
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Error al guardar la noticia";
+      // Map server validation errors to form fields if available
+      const serverMessage = err.response?.data?.message;
+      const serverErrors = err.response?.data?.errors;
+      if (serverErrors && typeof serverErrors === "object") {
+        const mapped = {};
+        Object.keys(serverErrors).forEach((key) => {
+          // serverErrors[key] may be an array of messages
+          const val = serverErrors[key];
+          mapped[key] = Array.isArray(val) ? val.join(" ") : String(val);
+        });
+        setErrors((prev) => ({ ...prev, ...mapped }));
+      }
+
+      const errorMessage = serverMessage || err.response?.data?.message || "Error al guardar la noticia";
       alert(errorMessage);
       console.error("Error saving news:", err);
     } finally {
@@ -136,34 +178,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
           <div className="space-y-4">
-            {/* Type and Status Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tipo <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none ${
-                    errors.type ? "border-red-500" : "border-gray-300"
-                  }`}
-                  disabled={loading}
-                >
-                  <option value="news">Noticia</option>
-                  <option value="event">Evento</option>
-                </select>
-                {errors.type && (
-                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                    <AlertCircle size={14} />
-                    {errors.type}
-                  </p>
-                )}
-              </div>
-
-              {/* Status */}
+            {/* Status Row (type is fixed to 'news' by default) */}
+            <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Estado <span className="text-red-500">*</span>
@@ -237,15 +253,25 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                   <Tag size={16} />
                   Categoría
                 </label>
-                <input
-                  type="text"
+                <select
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  placeholder="Ej: Medio Ambiente, Reciclaje"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
                   disabled={loading}
-                />
+                >
+                  <option value="">-- Seleccione categoría --</option>
+                  <option value="Medio Ambiente">Medio Ambiente</option>
+                  <option value="Reciclaje">Reciclaje</option>
+                  <option value="Biodiversidad">Biodiversidad</option>
+                  <option value="Cambio Climático">Cambio Climático</option>
+                  <option value="Gestión de Residuos">Gestión de Residuos</option>
+                  <option value="Energías Renovables">Energías Renovables</option>
+                  <option value="Conservación">Conservación</option>
+                  <option value="Agua y Saneamiento">Agua y Saneamiento</option>
+                  <option value="Educación Ambiental">Educación Ambiental</option>
+                  <option value="Políticas Públicas">Políticas Públicas</option>
+                </select>
               </div>
 
               {/* Author */}
@@ -280,7 +306,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                     Fecha de Inicio
                   </label>
                   <input
-                    type="datetime-local"
+                    type="date"
                     name="start_date"
                     value={formData.start_date}
                     onChange={handleChange}
@@ -295,7 +321,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                     Fecha de Fin
                   </label>
                   <input
-                    type="datetime-local"
+                    type="date"
                     name="end_date"
                     value={formData.end_date}
                     onChange={handleChange}
@@ -312,19 +338,14 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                   )}
                 </div>
 
-                {/* Published At */}
+                {/* Published At is automated; not requested from the form */}
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">
                     Fecha de Publicación
                   </label>
-                  <input
-                    type="datetime-local"
-                    name="published_at"
-                    value={formData.published_at}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
-                    disabled={loading}
-                  />
+                  <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600">
+                    Se asigna automáticamente al cambiar a "Publicado"
+                  </div>
                 </div>
               </div>
             </div>
