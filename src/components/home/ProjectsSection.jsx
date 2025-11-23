@@ -20,7 +20,7 @@ const projects = [
 export default function ProjectsSection() {
   return (
     <section
-      className="relative py-20 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center"
+      className="relative py-12 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center"
       style={{ backgroundImage: `url(${fondoProyecto})` }}
     >
       <div className="relative z-10 max-w-7xl mx-auto">
