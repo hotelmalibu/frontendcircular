@@ -1,16 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 // Ajusta la ruta "../data/mockContent" o "../../data/mockContent" según tu estructura exacta
-import { allContentData, contentTypeConfig } from "../../data/mockContent"; 
+import { contentTypeConfig } from "../../data/mockContent"; 
+import { getAllNews } from "../../api/newsApi";
 
 export default function FeaturedSection() {
-  const [filter, setFilter] = useState("Todos");
+  const [newsItems, setNewsItems] = useState([]);
 
-  // Filtrar y tomar solo los primeros 4 elementos para el Home
-  const filteredItems = (filter === "Todos" 
-    ? allContentData 
-    : allContentData.filter(item => item.type === filter)).slice(0, 4);
+  // Traer noticias publicadas desde la API y mapearlas al formato del mock
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        const response = await getAllNews();
+            if (!mounted) return;
+
+            // Normalize possible response shapes (array, { data: [...] }, { data: { news: [...] } }, etc.)
+            let newsArray = [];
+            if (Array.isArray(response)) {
+              newsArray = response;
+            } else if (response?.data?.news && Array.isArray(response.data.news)) {
+              newsArray = response.data.news;
+            } else if (response?.data && Array.isArray(response.data)) {
+              newsArray = response.data;
+            } else if (response?.news && Array.isArray(response.news)) {
+              newsArray = response.news;
+            } else if (typeof response === 'object' && response !== null) {
+              const possibleArrays = Object.values(response).filter(val => Array.isArray(val));
+              if (possibleArrays.length > 0) {
+                newsArray = possibleArrays[0];
+              }
+            }
+
+            const mapped = newsArray.map(n => ({
+                id: n.id || n._id || n.uid || Math.random(),
+                type: "Noticias",
+                topic: n.category || n.topic || "General",
+                title: n.title || n.name || "Sin título",
+                excerpt: n.description || n.excerpt || "",
+              image: n.image || n.thumbnail || n.cover || "",
+                date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
+                slug: n.slug || (`noticia-${n.id || n._id || ''}`),
+                status: n.status || ""
+              }));
+
+            setNewsItems(mapped);
+      } catch (err) {
+        // Silenciar errores aquí; podríamos agregar estado de error si se desea
+        console.error("Error cargando noticias:", err);
+      }
+    };
+
+    load();
+    return () => { mounted = false };
+  }, []);
+
+  // Mostrar únicamente las noticias traídas desde la API
+  const filteredItems = newsItems;
 
   return (
     <section className="py-20 bg-white border-t border-gray-100">
@@ -23,24 +70,8 @@ export default function FeaturedSection() {
               Actualidad y Destacados
             </h2>
             <p className="text-gray-600 max-w-1xl mb-4">
-              Mantente al día con nuestras últimas noticias, accede a documentos clave y consulta recursos de gestión.
+              Últimas noticias publicadas en la plataforma.
             </p>
-            {/* Filtros rápidos */}
-            <div className="flex flex-wrap gap-6 text-sm font-bold">
-              {["Todos", "Noticias", "Documentos de interés", "Gestión documental"].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setFilter(cat)}
-                  className={`pb-2 transition-all ${
-                    filter === cat 
-                      ? "text-[#00AB6D] border-b-2 border-[#00AB6D]" 
-                      : "text-gray-400 hover:text-[#1E305D]"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
           </div>
           
           {/* Link a Explorar */}
@@ -60,11 +91,13 @@ export default function FeaturedSection() {
             const Icon = config.icon;
 
             return (
-              <Link 
-                key={item.id}
-                to={`/contenido/${item.slug}`}
-                className="group block h-full flex flex-col"
-              >
+              <a 
+                  key={item.id}
+                  href={window.location.origin + `/contenido/${item.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block h-full flex flex-col"
+                >
                 {/* 1. ÁREA VISUAL (Imagen o Color Sólido) */}
                 <div className={`rounded-xl overflow-hidden mb-5 aspect-[16/10] relative shadow-sm transition-transform duration-500 group-hover:-translate-y-2 ${config.isSolid ? config.bgColor : 'bg-gray-100'}`}>
                   
@@ -81,15 +114,25 @@ export default function FeaturedSection() {
                     </div>
                   ) : (
                     // DISEÑO FOTOGRÁFICO (Para Noticias)
-                    <>
-                      <img 
-                        src={item.image} 
-                        alt={item.title} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                      {/* Overlay oscuro al hacer hover */}
-                      <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"></div>
-                    </>
+                    item.image ? (
+                      <>
+                        <img 
+                          src={item.image} 
+                          alt={item.title} 
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        {/* Overlay oscuro al hacer hover */}
+                        <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"></div>
+                      </>
+                    ) : (
+                      // Fallback: mostrar icono en lugar de imagen
+                      <div className="w-full h-full flex items-center justify-center relative p-6 bg-gray-50">
+                        <Icon strokeWidth={1} size={110} className="absolute text-gray-200 opacity-80 rotate-6 transition-transform duration-700" />
+                        <div className="w-16 h-16 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 z-10 bg-white">
+                          <Icon size={28} />
+                        </div>
+                      </div>
+                    )
                   )}
                 </div>
 
@@ -114,7 +157,7 @@ export default function FeaturedSection() {
                   
                   
                 </div>
-              </Link>
+              </a>
             );
           })}
         </div>

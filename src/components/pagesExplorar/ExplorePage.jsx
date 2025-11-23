@@ -1,27 +1,48 @@
 // UBICACIÓN: src/pages/ExplorePage.jsx
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, ChevronDown, FilterX } from "lucide-react";
 // Asegúrate que la ruta a mockContent sea correcta según tu estructura
 import { allContentData, contentTypeConfig } from "../../data/mockContent"; 
+import { getAllNews } from "../../api/newsApi";
 
-const allTopics = [...new Set(allContentData.map(item => item.topic))];
-const allTypes = Object.keys(contentTypeConfig);
 
 export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
   const [selectedType, setSelectedType] = useState("");
+  const [newsItems, setNewsItems] = useState([]);
+  const [loadingNews, setLoadingNews] = useState(true);
+
+  // Combine noticias desde API con el contenido estático
+  const combinedData = useMemo(() => {
+    // Map news items to the same shape as allContentData
+    const mappedNews = (newsItems || []).map(n => ({
+      id: n.id || n._id || Math.random(),
+      type: "Noticias",
+      topic: n.category || n.topic || "General",
+      title: n.title || n.name || "Sin título",
+      excerpt: n.description || n.excerpt || "",
+      image: n.image || n.thumbnail || n.cover || "",
+      date: n.published_at ? new Date(n.published_at).toLocaleDateString() : (n.publishedAt ? new Date(n.publishedAt).toLocaleDateString() : ""),
+      slug: n.slug || (`noticia-${n.id || n._id || ''}`),
+    }));
+
+    return [...mappedNews, ...allContentData];
+  }, [newsItems]);
+
+  const allTopics = useMemo(() => [...new Set(combinedData.map(item => item.topic))], [combinedData]);
+  const allTypes = useMemo(() => Object.keys(contentTypeConfig), []);
 
   const filteredResults = useMemo(() => {
-    return allContentData.filter(item => {
-      const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            item.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    return combinedData.filter(item => {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch = item.title?.toLowerCase().includes(q) || item.excerpt?.toLowerCase().includes(q);
       const matchesTopic = selectedTopic ? item.topic === selectedTopic : true;
       const matchesType = selectedType ? item.type === selectedType : true;
       return matchesSearch && matchesTopic && matchesType;
     });
-  }, [searchQuery, selectedTopic, selectedType]);
+  }, [combinedData, searchQuery, selectedTopic, selectedType]);
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -29,8 +50,43 @@ export default function ExplorePage() {
     setSelectedType("");
   };
 
+  // Load news from API on mount
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        setLoadingNews(true);
+        const response = await getAllNews();
+
+        // Normalize response similar to dashboard component
+        let newsArray = [];
+        if (Array.isArray(response)) {
+          newsArray = response;
+        } else if (response?.data?.news && Array.isArray(response.data.news)) {
+          newsArray = response.data.news;
+        } else if (response?.data && Array.isArray(response.data)) {
+          newsArray = response.data;
+        } else if (response?.news && Array.isArray(response.news)) {
+          newsArray = response.news;
+        } else if (typeof response === 'object' && response !== null) {
+          const possibleArrays = Object.values(response).filter(val => Array.isArray(val));
+          if (possibleArrays.length > 0) newsArray = possibleArrays[0];
+        }
+
+        if (mounted) setNewsItems(newsArray);
+      } catch (err) {
+        console.error('Error loading news for ExplorePage:', err);
+      } finally {
+        if (mounted) setLoadingNews(false);
+      }
+    };
+
+    load();
+    return () => { mounted = false };
+  }, []);
+
   return (
-   
+    
     <div className="min-h-screen bg-white ">
       
       {/* --- HERO SECTION (IMAGEN DE FONDO COMPLETA) --- */}
@@ -102,7 +158,7 @@ export default function ExplorePage() {
           ))}
         </div>
 
-        {filteredResults.length === 0 && (
+        {!loadingNews && filteredResults.length === 0 && (
           <div className="text-center py-24 bg-gray-50 rounded-2xl mt-8 border border-gray-100">
             <div className="mb-4 text-gray-300 flex justify-center"><Search size={48} /></div>
             <h3 className="text-xl font-bold text-gray-700 mb-2">No encontramos coincidencias</h3>
@@ -140,7 +196,7 @@ function MinimalistCard({ item }) {
   const Icon = config.icon;
 
   return (
-    <Link to={`/contenido/${item.slug}`} className="group block h-full flex flex-col">
+    <a href={window.location.origin + `/contenido/${item.slug}`} target="_blank" rel="noopener noreferrer" className="group block h-full flex flex-col">
       <div className={`rounded-xl overflow-hidden mb-5 aspect-[16/10] relative shadow-sm transition-transform duration-500 group-hover:-translate-y-1 ${config.isSolid ? config.bgColor : 'bg-gray-100'}`}>
         {config.isSolid ? (
           <div className="w-full h-full flex items-center justify-center relative p-6">
@@ -150,10 +206,19 @@ function MinimalistCard({ item }) {
             </div>
           </div>
         ) : (
-          <>
-             <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-             <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"></div>
-          </>
+          item.image ? (
+            <>
+               <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+               <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"></div>
+            </>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center relative p-6 bg-gray-50">
+              <Icon strokeWidth={1} size={110} className="absolute text-gray-200 opacity-80 rotate-6 transition-transform duration-700" />
+              <div className="w-16 h-16 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 z-10 bg-white">
+                <Icon size={28} />
+              </div>
+            </div>
+          )
         )}
       </div>
 
@@ -170,6 +235,6 @@ function MinimalistCard({ item }) {
             {item.excerpt}
         </p>
       </div>
-    </Link>
+    </a>
   );
 }

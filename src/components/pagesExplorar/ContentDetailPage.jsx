@@ -1,18 +1,118 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Facebook, Twitter, Linkedin, Mail, Calendar, ArrowLeft, Share2 } from 'lucide-react';
 import { allContentData, contentTypeConfig } from '../../data/mockContent'; 
+import { getAllNews, getNewsById } from '../../api/newsApi';
 
 export default function ContentDetailPage() {
   const { slug } = useParams();
-  
-  // Buscar el contenido basado en el slug (URL)
-  const content = allContentData.find(item => item.slug === slug);
+  const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Try to find content in static mock first, or fetch from API when needed
+  useEffect(() => {
+    let mounted = true;
+
+    const findContent = async () => {
+      // 1) Try static mock
+      const fromMock = allContentData.find(item => item.slug === slug);
+      if (fromMock) {
+        if (mounted) {
+          // Ensure mock has a `body` field for full content rendering
+          setContent({
+            ...fromMock,
+            body: fromMock.body || fromMock.description || fromMock.excerpt || "",
+            author: fromMock.author || "",
+          });
+          setLoading(false);
+        }
+        return;
+      }
+
+      // 2) Fetch all news and try to match by slug
+      try {
+        const response = await getAllNews();
+        let newsArray = [];
+        if (Array.isArray(response)) newsArray = response;
+        else if (response?.data?.news && Array.isArray(response.data.news)) newsArray = response.data.news;
+        else if (response?.data && Array.isArray(response.data)) newsArray = response.data;
+        else if (response?.news && Array.isArray(response.news)) newsArray = response.news;
+        else if (typeof response === 'object' && response !== null) {
+          const possibleArrays = Object.values(response).filter(val => Array.isArray(val));
+          if (possibleArrays.length > 0) newsArray = possibleArrays[0];
+        }
+
+        // If links were generated as `noticia-{id}` on the cards, extract id
+        const idFromSlug = typeof slug === 'string' && slug.startsWith('noticia-') ? slug.replace('noticia-', '') : null;
+        const searchKeys = { slug, idFromSlug };
+        console.debug('ContentDetailPage: searching newsArray with keys', searchKeys);
+
+        let found = newsArray.find(n => n.slug === slug || String(n.id) === slug || String(n._id) === slug || (idFromSlug && (String(n.id) === idFromSlug || String(n._id) === idFromSlug)));
+        // If not found in the batch, try to fetch by id directly when we have idFromSlug
+        if (!found && idFromSlug) {
+          try {
+            const byId = await getNewsById(idFromSlug);
+            if (byId) found = byId;
+            console.debug('ContentDetailPage: fetched by id', byId);
+          } catch (err) {
+            console.warn('ContentDetailPage: getNewsById failed', err);
+          }
+        }
+        if (found && mounted) {
+          // Normalize API object into the shape expected by the detail page
+          const mapped = {
+            id: found.id || found._id || found.uid,
+            title: found.title || found.name || "Sin título",
+            excerpt: found.excerpt || (found.description ? (String(found.description).slice(0, 250) + (String(found.description).length > 250 ? '...' : '')) : ""),
+            body: found.description || found.content || found.body || "",
+            image: found.image || found.thumbnail || found.cover || "",
+            date: found.published_at || found.publishedAt || found.created_at || found.createdAt || "",
+            type: found.type ? (found.type === 'news' ? 'Noticias' : found.type) : 'Noticias',
+            topic: found.category || found.topic || "General",
+            author: found.author || found.by || "",
+            slug: found.slug || null,
+            status: found.status || "",
+          };
+
+          // Format date to match mock format (simple localized string)
+          if (mapped.date) {
+            try {
+              mapped.date = new Date(mapped.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' });
+            } catch (e) {
+              // leave as-is if invalid
+            }
+          }
+
+          setContent(mapped);
+        } else if (mounted) {
+          setContent(null);
+        }
+      } catch (err) {
+        console.error('Error fetching news for content detail:', err);
+        if (mounted) setContent(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    findContent();
+    return () => { mounted = false };
+  }, [slug]);
+  // Si aún no cargó el contenido, mostrar loader o mensaje
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando contenido...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!content) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
-    
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Contenido no encontrado</h2>
         <Link to="/explorar" className="text-[#00AB6D] hover:underline font-semibold">
           ← Volver a explorar
@@ -21,13 +121,12 @@ export default function ContentDetailPage() {
     );
   }
 
-  // Obtener configuración de estilo (colores, iconos)
   const config = contentTypeConfig[content.type] || {};
-  const Icon = config.icon;
+  const Icon = config.icon || (() => null);
 
   // URLs para compartir (dinámicas)
   const currentUrl = encodeURIComponent(window.location.href);
-  const shareTitle = encodeURIComponent(content.title);
+  const shareTitle = encodeURIComponent(content?.title || '');
 
   return (
     <div className="min-h-screen bg-white fontfamily-montserrat">
@@ -47,14 +146,22 @@ export default function ContentDetailPage() {
              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
           </div>
         ) : (
-          // Versión Imagen (Noticias)
+          // Versión Imagen (Noticias) o fallback icon
           <>
-            <img 
-              src={content.image} 
-              alt={content.title} 
-              className="absolute inset-0 w-full h-full object-cover opacity-80"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#1E305D]/90 via-[#1E305D]/40 to-transparent"></div>
+            {content.image ? (
+              <>
+                <img 
+                  src={content.image} 
+                  alt={content.title} 
+                  className="absolute inset-0 w-full h-full object-cover opacity-80"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1E305D]/90 via-[#1E305D]/40 to-transparent"></div>
+              </>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-[#1E305D] to-[#16324a]">
+                <Icon size={160} strokeWidth={1} className="text-white/20" />
+              </div>
+            )}
           </>
         )}
 
@@ -110,35 +217,20 @@ export default function ContentDetailPage() {
               {content.excerpt}
             </p>
 
-            {/* Cuerpo del texto (Simulado con HTML) */}
+            {/* Cuerpo del texto: usar `content.body` o `content.description` */}
             <div className="prose prose-lg prose-headings:text-[#1E305D] prose-a:text-[#00AB6D] text-gray-600">
-              <p>
-                La transición hacia modelos más sostenibles dejó de ser una tendencia para convertirse en una necesidad estratégica. Hoy, las empresas que integran principios de economía circular en sus cadenas de valor no solo reducen impactos ambientales, sino que también mejoran su competitividad, fortalecen su reputación y abren nuevas oportunidades de negocio
-              </p>
-              <br />
-              <h3><strong>¿Por qué transformar la cadena de valor?</strong></h3>
-              <br />
-              <p>
-                Adoptar prácticas circulares permite repensar procesos, materiales y relaciones con proveedores para crear sistemas más eficientes y resilientes. Esto implica pasar de un modelo lineal —extraer, producir y desechar— a uno regenerativo, donde cada recurso mantiene su valor el mayor tiempo posible.
-              </p>
-              <br />
-              <p> <strong>Entre los impactos más destacados:</strong></p>
-              <br />
-              <ul>
-                <li>Reducción de residuos industriales en un 40%.</li>
-                <li>Optimización de la cadena de suministro inversa.</li>
-                <li>Generación de nuevos empleos verdes.</li>
-              </ul>
-                <br />
-              <p>
-                Estas mejoras no solo fortalecen la sostenibilidad ambiental, sino que también elevan la rentabilidad operativa al disminuir pérdidas y aumentar el valor recuperado.
-              </p>
-                <br />
-              <em>
-                "La economía circular no es solo una opción ambiental, es una estrategia de negocio resiliente para el futuro."
-              </em>
-              <br />
-              
+              {content.body ? (
+                // Si el body contiene HTML, renderizar como HTML; si es texto plano, dividir en párrafos
+                /<[a-z][\s\S]*>/i.test(content.body) ? (
+                  <div dangerouslySetInnerHTML={{ __html: content.body }} />
+                ) : (
+                  content.body.split(/\n\s*\n/).map((paragraph, idx) => (
+                    <p key={idx}>{paragraph}</p>
+                  ))
+                )
+              ) : (
+                <p>{content.excerpt || 'No hay contenido disponible.'}</p>
+              )}
             </div>
 
             {/* Footer del artículo: Tema */}
