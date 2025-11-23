@@ -19,7 +19,6 @@ export default function Home() {
         </div>
       )}
       <IndexImagen />
-      <CardsSection />
       <FeaturedSection/>
       <ProjectsSection />
     </div>
