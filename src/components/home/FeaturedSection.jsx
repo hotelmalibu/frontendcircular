@@ -1,169 +1,122 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, FileText, Newspaper, FolderOpen, Calendar } from "lucide-react";
-
-// Datos de ejemplo (Simulando tu base de datos o CMS)
-const DATA_ITEMS = [
-  {
-    id: 1,
-    category: "Noticias",
-    title: "La economía circular como motor de cambio en 2025",
-    excerpt: "Descubre cómo las nuevas políticas están transformando los modelos de negocio tradicionales hacia sistemas regenerativos.",
-    image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=800&auto=format&fit=crop",
-    link: "/noticias/economia-circular-2025",
-    date: "22 Nov 2024",
-  },
-  {
-    id: 2,
-    category: "Documentos de interés",
-    title: "Informe Anual de Sostenibilidad y Metas Cumplidas",
-    excerpt: "Descarga el reporte completo con las métricas de impacto ambiental y social logradas durante el último periodo fiscal.",
-    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=800&auto=format&fit=crop",
-    link: "/documentos/informe-anual",
-    date: "15 Oct 2024",
-  },
-  {
-    id: 3,
-    category: "Gestión documental",
-    title: "Guía técnica para la clasificación de residuos industriales",
-    excerpt: "Manual actualizado para empresas aliadas sobre el correcto manejo y disposición final de materiales aprovechables.",
-    image: "https://images.unsplash.com/photo-1605600659908-0ef719419d41?q=80&w=800&auto=format&fit=crop",
-    link: "/gestion/guia-tecnica",
-    date: "10 Sep 2024",
-  },
-  {
-    id: 4,
-    category: "Noticias",
-    title: "Alianza estratégica para la recuperación de plásticos",
-    excerpt: "Firmamos un nuevo acuerdo con líderes del sector para aumentar la tasa de recolección en zonas costeras.",
-    image: "https://images.unsplash.com/photo-1621451537084-482c73073a0f?q=80&w=800&auto=format&fit=crop",
-    link: "/noticias/alianza-plasticos",
-    date: "05 Sep 2024",
-  }
-];
+import { ArrowRight } from "lucide-react";
+// Asegúrate de que esta ruta sea correcta según tu estructura
+import { allContentData, contentTypeConfig } from "../../data/mockContent"; 
 
 export default function FeaturedSection() {
   const [filter, setFilter] = useState("Todos");
 
-  // Filtrar los items según la selección
-  const filteredItems = filter === "Todos" 
-    ? DATA_ITEMS 
-    : DATA_ITEMS.filter(item => item.category === filter);
-
-  // Mapeo de categorías a colores/iconos para UI dinámica
-  const getCategoryStyle = (cat) => {
-    switch(cat) {
-      case "Noticias": return { color: "text-[#00AB6D]", icon: <Newspaper size={14} /> };
-      case "Documentos de interés": return { color: "text-[#2C67B0]", icon: <FileText size={14} /> };
-      case "Gestión documental": return { color: "text-[#E8AD00]", icon: <FolderOpen size={14} /> };
-      default: return { color: "text-gray-500", icon: <Calendar size={14} /> };
-    }
-  };
+  // Filtrar y mostrar solo los primeros 4 elementos para el Home
+  const filteredItems = (filter === "Todos" 
+    ? allContentData 
+    : allContentData.filter(item => item.type === filter)).slice(0, 4);
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-20 bg-white border-t border-gray-100">
       <div className="container mx-auto px-4 md:px-8">
         
-        {/* --- HEADER DE LA SECCIÓN --- */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-12 gap-4">
+        {/* --- HEADER --- */}
+        <div className="flex flex-col md:flex-row justify-between items-end mb-10 pb-6 border-b border-gray-100">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1E305D] mb-2 fontfamily-montserrat">
-              Actualidad y Destacados
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1E305D] mb-4 fontfamily-montserrat">
+              Actualidad y Recursos
             </h2>
-            <p className="text-gray-600 max-w-2xl">
-              Mantente al día con nuestras últimas noticias, accede a documentos clave y consulta recursos de gestión.
-            </p>
+            
+            {/* Filtros rápidos en el Home */}
+            <div className="flex flex-wrap gap-4 text-sm font-medium">
+              {["Todos", "Noticias", "Documentos de interés", "Gestión documental"].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setFilter(cat)}
+                  className={`pb-1 transition-colors ${
+                    filter === cat 
+                      ? "text-[#00AB6D] border-b-2 border-[#00AB6D]" 
+                      : "text-gray-400 hover:text-[#1E305D]"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
           
-          {/* Botón "Ver más" Global */}
+          {/* BOTÓN PRINCIPAL "VER MÁS" -> Redirige a Página Explorar */}
           <Link 
-            to="/actualidad" 
-            className="group flex items-center gap-2 text-[#00AB6D] font-semibold hover:text-[#1E305D] transition-colors whitespace-nowrap"
+            to="/explorar" 
+            className="hidden md:flex items-center gap-2 text-sm font-bold text-[#1E305D] hover:text-[#00AB6D] transition-colors mt-4 md:mt-0"
           >
-            Ver todo el contenido
-            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            Ver más
+            <ArrowRight size={16} />
           </Link>
         </div>
 
-        {/* --- FILTROS  --- */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {["Todos", "Noticias", "Documentos de interés", "Gestión documental"].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border ${
-                filter === cat
-                  ? "bg-[#1E305D] text-white border-[#1E305D]"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-[#00AB6D] hover:text-[#00AB6D]"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* --- GRID DE TARJETAS  --- */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        {/* --- GRID DE TARJETAS --- */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredItems.map((item) => {
-            const style = getCategoryStyle(item.category);
-            
+            const config = contentTypeConfig[item.type] || {};
+            const Icon = config.icon;
+
             return (
-              <article key={item.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full border border-gray-100">
+              <Link 
+                key={item.id}
+                // AQUÍ DEFINIMOS A DÓNDE LLEVA EL CLICK EN LA TARJETA/IMAGEN
+                // Opción A (Recomendada): Lleva al detalle del artículo
+                to={`/contenido/${item.slug}`}
                 
-                {/* Imagen */}
-                <div className="relative overflow-hidden aspect-[16/10]">
-                  <img 
-                    src={item.image} 
-                    alt={item.title} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  {/* Overlay sutil al hover */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                // Opción B (Si quieres que vaya a explorar): 
+                // to="/explorar"
+                
+                className="group flex flex-col h-full hover:-translate-y-1 transition-transform duration-300"
+              >
+                {/* Imagen / Fondo Sólido */}
+                <div className={`rounded-xl overflow-hidden aspect-[16/10] mb-4 relative shadow-sm ${config.isSolid ? config.bgColor : 'bg-gray-100'}`}>
+                  {config.isSolid ? (
+                    // Diseño Sólido (Documentos)
+                    <div className="w-full h-full flex items-center justify-center relative p-6">
+                      <Icon strokeWidth={1} size={100} className="absolute -right-4 -bottom-4 text-white opacity-20 rotate-12" />
+                      <div className="w-16 h-16 rounded-full border-2 border-white/30 flex items-center justify-center text-white backdrop-blur-sm">
+                        <Icon size={32} />
+                      </div>
+                    </div>
+                  ) : (
+                    // Diseño Imagen (Noticias)
+                    <>
+                      <img 
+                        src={item.image} 
+                        alt={item.title} 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                    </>
+                  )}
                 </div>
 
-                {/* Contenido */}
-                <div className="p-5 flex flex-col flex-1">
-                  
-                  {/* Categoría */}
-                  <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3 ${style.color}`}>
-                    {style.icon}
-                    <span>{item.category}</span>
+                {/* Texto */}
+                <div className="flex flex-col flex-1">
+                  <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider mb-2 text-gray-400">
+                     <span className={config.color}>{item.type}</span>
                   </div>
 
-                  {/* Título */}
-                  <h3 className="text-lg font-bold text-gray-900 leading-tight mb-3 group-hover:text-[#00AB6D] transition-colors line-clamp-3">
-                    <Link to={item.link}>
-                      {item.title}
-                    </Link>
+                  <h3 className="text-lg font-bold text-[#1E305D] leading-tight mb-2 group-hover:text-[#00AB6D] transition-colors">
+                    {item.title}
                   </h3>
 
-                  {/* Extracto */}
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-3 flex-1">
+                  <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
                     {item.excerpt}
                   </p>
-
-                  {/* Footer de la tarjeta (Fecha o leer más) */}
-                  <div className="pt-4 border-t border-gray-100 mt-auto flex justify-between items-center">
-                    <span className="text-xs text-gray-400 font-medium">{item.date}</span>
-                    <Link 
-                      to={item.link} 
-                      className="text-sm font-semibold text-[#1E305D] group-hover:underline decoration-2 underline-offset-4"
-                    >
-                      Leer más
-                    </Link>
-                  </div>
                 </div>
-              </article>
+              </Link>
             );
           })}
         </div>
-
-        {/* Mensaje si no hay resultados */}
-        {filteredItems.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No hay contenidos destacados en esta categoría por el momento.</p>
-          </div>
-        )}
+        
+        {/* Botón "Ver más" para móvil */}
+        <div className="mt-8 md:hidden text-center">
+            <Link to="/explorar" className="inline-flex items-center gap-2 text-sm font-bold text-[#00AB6D] px-6 py-3 border border-[#00AB6D] rounded-full hover:bg-[#00AB6D] hover:text-white transition-all">
+                Explorar todo <ArrowRight size={16} />
+            </Link>
+        </div>
 
       </div>
     </section>

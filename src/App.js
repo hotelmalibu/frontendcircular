@@ -40,6 +40,8 @@ import Cursos from "./modules/home/nuestrosTrabajos/E-Learning/cursos";
 import FinanciamientoReciclaje from "./modules/home/nuestrosTrabajos/E-Learning/financiamentoReciclaje";
 import Profile from "./modules/dashboard/Profile";
 
+import ExplorePage from "./components/pagesExplorar/ExplorePage";
+import ContentDetailPage from "./components/pagesExplorar/ContentDetailPage";
 
 export default function App() {
   return (
@@ -91,6 +93,10 @@ export default function App() {
           <Route path="/integracion" element={<PrivateRoute><Integracion /></PrivateRoute>} />
           <Route path="/portal" element={<PrivateRoute><Portal /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+
+          {/* Rutas para explorar contenido */}
+          <Route path="/explorar" element={<ExplorePage />} />
+          <Route path="/contenido/:slug" element={<ContentDetailPage />} />
         </Routes>
       </main>
 

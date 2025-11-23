@@ -4,8 +4,9 @@ import { AuthContext } from "../context/AuthContext";
 import LogoBlanco from "../assets/Logo_blanco.png";
 import Logo from "../assets/Logo.png";
 import DefaultAvatar from "../assets/default-avatar.png";
-import { User, LogOut, Home, Search, Shield, Handshake, Building, Gavel, Menu } from "lucide-react";
+import { User, LogOut, Home, Search, Shield, Handshake, Building, Gavel, Menu, AlertCircle, Bell } from "lucide-react";
 
+// --- COMPONENTES AUXILIARES (Badge, Menús) SE MANTIENEN IGUAL ---
 function UserRoleBadge({ role }) {
   const roleStyles = {
     Administrador: { icon: <Shield size={14} />, bg: "#1E305D", text: "#FFFFFF" },
@@ -182,7 +183,7 @@ function ProfileDropdown({ user, logout, showHover, showWhiteText }) {
   );
 }
 
-// Componente principal Navbar
+// --- COMPONENTE PRINCIPAL NAVBAR ---
 export default function Navbar({ onMenuClick }) {
   const { user, logout } = useContext(AuthContext);
   const location = useLocation();
@@ -195,28 +196,40 @@ export default function Navbar({ onMenuClick }) {
   // eslint-disable-next-line no-unused-vars
   const [scrollDirection, setScrollDirection] = useState("up");
   const [searchQuery, setSearchQuery] = useState("");
-  
+  const [notificationCount] = useState(23);
+  const [alertCount] = useState(10);
 
   // --- LÓGICA DE VISIBILIDAD Y ESTILOS ---
   const hideMenus = false;
   const isPublicPage = location.pathname === '/';
+  
+  // Detectar rutas específicas nuevas
+  const isCircularPath = location.pathname.startsWith('/circularmente');
+  const isExplorePath = location.pathname === '/explorar';
+  const isContentPath = location.pathname.startsWith('/contenido');
+
+  // AGRUPAR: Rutas que deben ser transparentes al inicio y blancas al scroll
+  const isTransparentNavPath = isCircularPath || isExplorePath || isContentPath;
+
   const isInteracted = scrolled || isHovered || hasOpenDropdown || mobileMenuOpen;
   const isDashboardView = (user && isPublicPage && !isInteracted);
   const isLogin = location.pathname === "/login";
   const isRegister = location.pathname === "/register";
   const isAuthPage = isLogin || isRegister;
   
-  const isCircularPath = location.pathname.startsWith('/circularmente');
-  const showHover = isPublicPage || isCircularPath;
+  // Habilitar hover effects en las rutas públicas y las transparentes
+  const showHover = isPublicPage || isTransparentNavPath;
 
   let showWhiteBg;
   if (isAuthPage) {
     showWhiteBg = true;
-  } else if (isCircularPath) {
+  } else if (isTransparentNavPath) {
+    // Si es Circularmente, Explorar o Contenido: Fondo transparente a menos que haya interacción
     showWhiteBg = isInteracted;
   } else if (isDashboardView) {
     showWhiteBg = false;
   } else {
+    // Resto de páginas
     if (user) {
       showWhiteBg = true; 
     } else {
@@ -224,8 +237,10 @@ export default function Navbar({ onMenuClick }) {
     }
   }
 
-  const showWhiteText = isCircularPath && !showWhiteBg;
+  // Si estamos en una ruta de nav transparente y el fondo NO es blanco (es transparente), texto blanco.
+  const showWhiteText = isTransparentNavPath && !showWhiteBg;
 
+  // Selección de Logo
   const currentLogo = isAuthPage
     ? Logo
     : (showWhiteText ? LogoBlanco : (isDashboardView ? LogoBlanco : (isPublicPage && !isInteracted ? LogoBlanco : Logo)));
@@ -255,10 +270,7 @@ export default function Navbar({ onMenuClick }) {
     {
       name: "Nosotros",
       subsections: [
-        {
-          title: "Conócenos",
-          items: ["Quiénes somos", "Portal de transparencia", "Estatutos", "Valores", "Presidencia", "Aliados", "Informes anuales"]
-        },
+        { title: "Conócenos", items: ["Quiénes somos", "Portal de transparencia", "Estatutos", "Valores", "Presidencia", "Aliados", "Informes anuales"] },
         { title: "Marco Normativo", items: ["Resoluciones", "Planes", "Políticas"] }
       ]
     },
@@ -307,7 +319,7 @@ export default function Navbar({ onMenuClick }) {
         @media (min-width: 769px) { .nav-mobile { display: none; } }
       `}</style>
 
-      {/* NAVBAR */}
+      {/* NAVBAR HEADER */}
       <header className={`flex items-center justify-between px-4 md:px-24 py-4 transition-all duration-300 ${isDashboardView ? "bg-transparent" : (showWhiteBg ? "bg-white shadow-lg" : "bg-transparent")}`}>
         
         {/* HAMBURGER MENU - Izquierda */}
@@ -336,7 +348,7 @@ export default function Navbar({ onMenuClick }) {
                 placeholder="Búsqueda Global"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full px-4 py-2 rounded-full border text-sm focus:outline-none focus:border-[#00AB6D] transition-all ${(isDashboardView || (!showWhiteBg && isCircularPath)) ? "bg-white/10 border-white/20 text-white placeholder-white/60 focus:bg-white/20" : "bg-gray-100 border-gray-300 text-gray-700 placeholder-gray-500"}`}
+                className={`w-full px-4 py-2 rounded-full border text-sm focus:outline-none focus:border-[#00AB6D] transition-all ${(isDashboardView || (!showWhiteBg && isTransparentNavPath)) ? "bg-white/10 border-white/20 text-white placeholder-white/60 focus:bg-white/20" : "bg-gray-100 border-gray-300 text-gray-700 placeholder-gray-500"}`}
               />
             </div>
           </div>
@@ -346,7 +358,7 @@ export default function Navbar({ onMenuClick }) {
         {(!user || (user && !location.pathname.startsWith("/dashboard"))) && (
           <nav className="nav-desktop flex items-center gap-8 lg:gap-20 flex-1 justify-center mx-4">
             {menuSections.map((section) => (
-              <MegaMenuDropdown key={section.name} label={section.name} sections={section.subsections} showWhiteBg={showWhiteBg} showHover={isPublicPage || isCircularPath} showWhiteText={showWhiteText} onOpenChange={setHasOpenDropdown} />
+              <MegaMenuDropdown key={section.name} label={section.name} sections={section.subsections} showWhiteBg={showWhiteBg} showHover={isPublicPage || isTransparentNavPath} showWhiteText={showWhiteText} onOpenChange={setHasOpenDropdown} />
             ))}
           </nav>
         )}
@@ -355,14 +367,22 @@ export default function Navbar({ onMenuClick }) {
         <div className="flex items-center gap-3 md:gap-4 ml-auto">
           {user ? (
             <>
-              
-              
+              {/* BOTONES NOTIFICACIONES (Solo si quieres que aparezcan logueado) */}
+              {(isPublicPage || location.pathname.startsWith("/dashboard") || isTransparentNavPath) && (
+                <>
+                   {/* NOTA: Elimina este bloque si NO quieres botones de alerta nunca. 
+                       Si quieres que aparezcan pero solo en estas rutas, déjalo aquí.
+                       El estilo se adapta a transparente/blanco automáticamente. 
+                   */}
+                </>
+              )}
+
               {/* PROFILE DROPDOWN */}
               <ProfileDropdown user={user} logout={logout} showHover={showHover} showWhiteText={showWhiteText} />
             </>
           ) : (
             <>
-              {/* CUANDO NO ESTÁ LOGUEADO (Vacío por ahora) */}
+              {/* NO LOGUEADO */}
             </>
           )}
 
