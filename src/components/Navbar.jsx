@@ -4,9 +4,10 @@ import { AuthContext } from "../context/AuthContext";
 import LogoBlanco from "../assets/Logo_blanco.png";
 import Logo from "../assets/Logo.png";
 import DefaultAvatar from "../assets/default-avatar.png";
-import { User, LogOut, Home, Search, Shield, Handshake, Building, Gavel, Menu, AlertCircle, Bell } from "lucide-react";
+import { User, LogOut, Home, Shield, Handshake, Building, Gavel, Menu, ChevronDown, Bell, MessageSquare } from "lucide-react";
 
-// --- COMPONENTES AUXILIARES (Badge, Menús) SE MANTIENEN IGUAL ---
+// --- COMPONENTES AUXILIARES ---
+
 function UserRoleBadge({ role }) {
   const roleStyles = {
     Administrador: { icon: <Shield size={14} />, bg: "#1E305D", text: "#FFFFFF" },
@@ -23,12 +24,19 @@ function UserRoleBadge({ role }) {
   );
 }
 
+// --- MENÚ MÓVIL (Soporta 3 niveles) ---
 function MobileMenuDropdown({ title, subsections, showWhiteBg, showHover, showWhiteText, onClose }) {
   const [open, setOpen] = useState(false);
   const [openSubmenus, setOpenSubmenus] = useState({});
+  const [openSubSubmenus, setOpenSubSubmenus] = useState({});
 
   const toggleSubmenu = (idx) => {
     setOpenSubmenus(prev => ({ ...prev, [idx]: !prev[idx] }));
+  };
+
+  const toggleSubSubmenu = (parentIdx, itemIdx) => {
+    const key = `${parentIdx}-${itemIdx}`;
+    setOpenSubSubmenus(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (
@@ -38,36 +46,65 @@ function MobileMenuDropdown({ title, subsections, showWhiteBg, showHover, showWh
         className={`w-full text-left py-3 px-4 font-semibold uppercase text-sm transition-all flex justify-between items-center menu-underline ${open ? "active" : ""} ${showWhiteText ? "text-white" : (showHover ? (showWhiteBg ? "text-gray-800 hover:text-[#00AB6D]" : "text-white hover:text-[#00AB6D]") : "text-gray-700")}`}
       >
         <span>{title}</span>
-        <svg className={`w-5 h-5 transition-transform ${open ? "rotate-180" : ""}`} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+        <ChevronDown className={`w-5 h-5 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
+
       {open && (
         <div className="pl-0 pb-0 space-y-0">
           {subsections.map((subsection, idx) => {
-            let sectionPath;
-            const titleLower = subsection.title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w/-]/g, "");
-            if (subsection.title === "Directorio") sectionPath = "/circularmente/directorio";
-            else if (subsection.title === "Herramientas digitales") sectionPath = "/circularmente/herramientas-digitales";
-            else if (subsection.title === "Micrositio") sectionPath = "/circularmente";
-            else sectionPath = "/" + titleLower;
+            const sectionPath = subsection.path || "#";
 
             return (
               <div key={idx} className="border-t border-gray-300/50">
-                {subsection.items.length > 0 ? (
+                {subsection.items && subsection.items.length > 0 ? (
                   <>
                     <button
                       onClick={() => toggleSubmenu(idx)}
                       className={`w-full text-left py-2 px-8 font-semibold uppercase text-xs transition-all flex justify-between items-center ${showWhiteText ? "text-white" : (showHover ? (showWhiteBg ? "text-gray-700 hover:text-[#00AB6D]" : "text-gray-300 hover:text-[#00AB6D]") : "text-gray-700")}`}
                     >
                       <span>{subsection.title}</span>
-                      <svg className={`w-4 h-4 transition-transform ${openSubmenus[idx] ? "rotate-180" : ""}`} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                      <ChevronDown className={`w-4 h-4 transition-transform ${openSubmenus[idx] ? "rotate-180" : ""}`} />
                     </button>
+                    
                     {openSubmenus[idx] && (
                       <div className="pl-4 pb-0 space-y-0 bg-gray-100/20">
                         {subsection.items.map((item, itemIdx) => {
-                          const itemPath = "/" + item.toLowerCase().replace(/\s+/g, "-").replace(/[^\w/-]/g, "");
+                          if (item.subItems && item.subItems.length > 0) {
+                            const subKey = `${idx}-${itemIdx}`;
+                            return (
+                              <div key={itemIdx}>
+                                <button
+                                  onClick={() => toggleSubSubmenu(idx, itemIdx)}
+                                  className={`w-full text-left py-2 px-12 text-xs flex justify-between items-center transition-colors ${showWhiteText ? "text-white" : (showHover ? (showWhiteBg ? "text-gray-600 hover:text-[#00AB6D]" : "text-gray-400 hover:text-[#00AB6D]") : "text-gray-700")}`}
+                                >
+                                  <span>{item.label}</span>
+                                  <ChevronDown className={`w-3 h-3 transition-transform ${openSubSubmenus[subKey] ? "rotate-180" : ""}`} />
+                                </button>
+                                {openSubSubmenus[subKey] && (
+                                  <div className="pl-4 bg-gray-200/20">
+                                    {item.subItems.map((subItem, subIdx) => (
+                                      <Link
+                                        key={subIdx}
+                                        to={subItem.path}
+                                        onClick={onClose}
+                                        className={`block py-2 px-16 text-[10px] uppercase tracking-wider transition-colors ${showWhiteText ? "text-gray-300" : "text-gray-500 hover:text-[#00AB6D]"}`}
+                                      >
+                                        {subItem.label}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
                           return (
-                            <Link key={itemIdx} to={itemPath} onClick={onClose} className={`block py-2 px-12 text-xs transition-colors ${showWhiteText ? "text-white" : (showHover ? (showWhiteBg ? "text-gray-600 hover:text-[#00AB6D]" : "text-gray-400 hover:text-[#00AB6D]") : "text-gray-700")}`}>
-                              {item}
+                            <Link 
+                              key={itemIdx} 
+                              to={item.path} 
+                              onClick={onClose} 
+                              className={`block py-2 px-12 text-xs transition-colors ${showWhiteText ? "text-white" : (showHover ? (showWhiteBg ? "text-gray-600 hover:text-[#00AB6D]" : "text-gray-400 hover:text-[#00AB6D]") : "text-gray-700")}`}
+                            >
+                              {item.label} 
                             </Link>
                           );
                         })}
@@ -75,7 +112,11 @@ function MobileMenuDropdown({ title, subsections, showWhiteBg, showHover, showWh
                     )}
                   </>
                 ) : (
-                  <Link to={sectionPath} onClick={onClose} className={`block py-2 px-8 font-semibold uppercase text-xs transition-colors ${showWhiteText ? "text-white" : (showWhiteBg ? "text-gray-700 hover:text-[#00AB6D]" : "text-gray-300 hover:text-[#00AB6D]")}`}>
+                  <Link 
+                    to={sectionPath} 
+                    onClick={onClose} 
+                    className={`block py-2 px-8 font-semibold uppercase text-xs transition-colors ${showWhiteText ? "text-white" : (showWhiteBg ? "text-gray-700 hover:text-[#00AB6D]" : "text-gray-300 hover:text-[#00AB6D]")}`}
+                  >
                     {subsection.title}
                   </Link>
                 )}
@@ -88,11 +129,24 @@ function MobileMenuDropdown({ title, subsections, showWhiteBg, showHover, showWh
   );
 }
 
+// --- MEGA MENÚ DESKTOP ---
 function MegaMenuDropdown({ label, sections = [], showWhiteBg, showHover, showWhiteText, onOpenChange }) {
   const [open, setOpen] = useState(false);
   const timeoutRef = useRef(null);
-  const handleMouseEnter = () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setOpen(true); onOpenChange(true); };
-  const handleMouseLeave = () => { timeoutRef.current = setTimeout(() => { setOpen(false); onOpenChange(false); }, 300); };
+  
+  const handleMouseEnter = () => { 
+    if (timeoutRef.current) clearTimeout(timeoutRef.current); 
+    setOpen(true); 
+    onOpenChange(true); 
+  };
+  
+  const handleMouseLeave = () => { 
+    timeoutRef.current = setTimeout(() => { 
+      setOpen(false); 
+      onOpenChange(false); 
+    }, 300); 
+  };
+
   useEffect(() => { return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }; }, []);
 
   return (
@@ -100,35 +154,53 @@ function MegaMenuDropdown({ label, sections = [], showWhiteBg, showHover, showWh
       <button type="button" className={`text-base lg:text-base font-semibold fontfamily-montserrat transition-all menu-underline pb-1 ${open ? "active" : ""} ${showWhiteText ? "text-white" : (showHover ? (showWhiteBg ? "text-gray-700 hover:text-[#00AB6D]" : "text-white hover:text-[#00AB6D]") : "text-gray-700")}`}>
         {label}
       </button>
+
       <div className={`fixed left-0 right-0 top-full bg-gradient-to-b from-white to-gray-50 shadow-2xl transform transition-all duration-400 ${open ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-4"}`}>
         <div className="h-1 bg-gradient-to-r from-[#00AB6D] via-[#2C67B0] to-[#1E305D]"></div>
         <div className="container mx-auto px-4 md:px-8 py-6 md:py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 items-start">
             {sections.map((section, idx) => {
-              let sectionPath;
-              const titleLower = section.title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w/-]/g, "");
-              if (section.title === "Directorio") sectionPath = "/circularmente/directorio";
-              else if (section.title === "Herramientas digitales") sectionPath = "/circularmente/herramientas-digitales";
-              else if (section.title === "Micrositio") sectionPath = "/circularmente";
-              else sectionPath = "/" + titleLower;
-
+              const sectionPath = section.path || "#";
               return (
                 <div key={idx} className="space-y-4 group/section" style={{ animation: `slideInText 0.6s ease-out ${idx * 0.1}s both` }}>
-                  {section.items.length > 0 ? (
-                    <h3 className={`font-bold ${showWhiteText ? 'text-white' : 'text-gray-900'} text-sm lg:text-base uppercase tracking-wide border-b-2 border-gray-200 pb-2 group-hover/section:border-[#00AB6D] transition-colors duration-300`}>{section.title}</h3>
+                  {section.items && section.items.length > 0 ? (
+                    <h3 className={`font-bold ${showWhiteText ? 'text-white' : 'text-gray-900'} text-sm lg:text-base uppercase tracking-wide border-b-2 border-gray-200 pb-2 group-hover/section:border-[#00AB6D] transition-colors duration-300`}>
+                      {section.title}
+                    </h3>
                   ) : (
-                    <Link to={sectionPath} className={`font-bold ${showWhiteText ? 'text-white' : 'text-gray-900'} text-sm lg:text-base uppercase tracking-wide border-b-2 border-gray-200 pb-2 block ${showHover ? 'hover:text-[#00AB6D]' : ''} transition-all duration-300`}>{section.title}</Link>
+                    <Link to={sectionPath} className={`font-bold ${showWhiteText ? 'text-white' : 'text-gray-900'} text-sm lg:text-base uppercase tracking-wide border-b-2 border-gray-200 pb-2 block ${showHover ? 'hover:text-[#00AB6D]' : ''} transition-all duration-300`}>
+                      {section.title}
+                    </Link>
                   )}
-                  {section.items.length > 0 && (
-                    <ul className="space-y-3">
-                      {section.items.map((item, itemIdx) => {
-                        const itemPath = "/" + item.toLowerCase().replace(/\s+/g, "-").replace(/[^\w/-]/g, "");
-                        return (
-                          <li key={itemIdx} style={{ animation: `slideInText 0.6s ease-out ${idx * 0.1 + itemIdx * 0.05}s both` }}>
-                            <Link to={itemPath} className={`${showWhiteText ? 'text-white' : 'text-gray-600'} ${showHover ? 'hover:text-[#00AB6D]' : ''} text-xs lg:text-sm transition-all duration-200 block py-1 font-medium ${showHover ? 'hover:translate-x-1' : ''}`}>{item}</Link>
-                          </li>
-                        );
-                      })}
+                  {section.items && section.items.length > 0 && (
+                    <ul className="space-y-2">
+                      {section.items.map((item, itemIdx) => (
+                        <li key={itemIdx} className="group/item relative"> 
+                          {item.subItems && item.subItems.length > 0 ? (
+                            <div className="w-full">
+                              <button className={`w-full text-left flex items-center justify-between ${showWhiteText ? 'text-white' : 'text-gray-600'} ${showHover ? 'hover:text-[#00AB6D]' : ''} text-xs lg:text-sm transition-all duration-200 py-1 font-medium`}>
+                                <span>{item.label}</span>
+                                <ChevronDown size={14} className="text-[#00AB6D] transition-transform duration-300 group-hover/item:-rotate-180" />
+                              </button>
+                              <div className="overflow-hidden max-h-0 opacity-0 group-hover/item:max-h-[500px] group-hover/item:opacity-100 transition-all duration-500 ease-in-out">
+                                <ul className="pl-3 mt-1 space-y-2 border-l-2 border-[#00AB6D]/30 ml-1 py-1">
+                                  {item.subItems.map((sub, subIdx) => (
+                                    <li key={subIdx}>
+                                      <Link to={sub.path} className="block text-xs text-gray-500 hover:text-[#00AB6D] hover:translate-x-1 transition-all py-1">
+                                        {sub.label}
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                          ) : (
+                            <Link to={item.path} className={`${showWhiteText ? 'text-white' : 'text-gray-600'} ${showHover ? 'hover:text-[#00AB6D]' : ''} text-xs lg:text-sm transition-all duration-200 block py-1 font-medium ${showHover ? 'hover:translate-x-1' : ''}`}>
+                              {item.label}
+                            </Link>
+                          )}
+                        </li>
+                      ))}
                     </ul>
                   )}
                 </div>
@@ -158,6 +230,7 @@ function ProfileDropdown({ user, logout, showHover, showWhiteText }) {
     <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <button type="button" className="flex items-center gap-2 hover:opacity-80 transition-opacity group">
         <div className="text-right hidden sm:block">
+          {/* El texto del nombre siempre respeta el color del navbar (blanco si es transparente, oscuro si no) */}
           <p className={`text-xs md:text-sm font-semibold ${showWhiteText ? 'text-white' : 'text-gray-800'}`}>{userFullName}</p>
           <UserRoleBadge role={userRole} />
         </div>
@@ -167,10 +240,10 @@ function ProfileDropdown({ user, logout, showHover, showWhiteText }) {
       </button>
       <div className={`absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg transform transition-all duration-300 z-40 ${open ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"}`}>
         <div className="py-2">
-          <Link to="/profile" className={`flex items-center gap-3 px-4 py-2 text-sm ${showWhiteText ? 'text-white' : 'text-gray-700'} hover:bg-gray-100 ${showHover ? 'hover:text-[#00AB6D]' : ''} transition-colors`}>
+          <Link to="/profile" className={`flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#00AB6D] transition-colors`}>
             <User size={16} /> Mi Perfil
           </Link>
-          <Link to={dashboardOrPortalPath} className={`flex items-center gap-3 px-4 py-2 text-sm ${showWhiteText ? 'text-white' : 'text-gray-700'} hover:bg-gray-100 ${showHover ? 'hover:text-[#00AB6D]' : ''} transition-colors`}>
+          <Link to={dashboardOrPortalPath} className={`flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#00AB6D] transition-colors`}>
             <Home size={16} /> {dashboardOrPortalLabel}
           </Link>
           <hr className="my-2" />
@@ -195,41 +268,40 @@ export default function Navbar({ onMenuClick }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [scrollDirection, setScrollDirection] = useState("up");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [notificationCount] = useState(23);
-  const [alertCount] = useState(10);
 
   // --- LÓGICA DE VISIBILIDAD Y ESTILOS ---
   const hideMenus = false;
   const isPublicPage = location.pathname === '/';
   
-  // Detectar rutas específicas nuevas
+  // Rutas que se comportan como "Internas/Dashboard" (ocultan el menú público y usan layout limpio)
+  const internalPaths = ["/dashboard", "/documentos", "/seguimiento", "/formularios", "/comunicaciones", "/administracion", "/integracion"];
+  const isInternalPage = user && internalPaths.some(path => location.pathname.startsWith(path));
+
+  // Rutas especiales con navbar transparente al inicio
   const isCircularPath = location.pathname.startsWith('/circularmente');
   const isExplorePath = location.pathname === '/explorar';
   const isContentPath = location.pathname.startsWith('/contenido');
-
-  // AGRUPAR: Rutas que deben ser transparentes al inicio y blancas al scroll
   const isTransparentNavPath = isCircularPath || isExplorePath || isContentPath;
 
   const isInteracted = scrolled || isHovered || hasOpenDropdown || mobileMenuOpen;
+  
+  // DashboardView (Home logueado sin scroll) - Fondo transparente
   const isDashboardView = (user && isPublicPage && !isInteracted);
+
   const isLogin = location.pathname === "/login";
   const isRegister = location.pathname === "/register";
   const isAuthPage = isLogin || isRegister;
-  
-  // Habilitar hover effects en las rutas públicas y las transparentes
   const showHover = isPublicPage || isTransparentNavPath;
 
   let showWhiteBg;
   if (isAuthPage) {
     showWhiteBg = true;
   } else if (isTransparentNavPath) {
-    // Si es Circularmente, Explorar o Contenido: Fondo transparente a menos que haya interacción
     showWhiteBg = isInteracted;
   } else if (isDashboardView) {
     showWhiteBg = false;
   } else {
-    // Resto de páginas
+    
     if (user) {
       showWhiteBg = true; 
     } else {
@@ -237,13 +309,13 @@ export default function Navbar({ onMenuClick }) {
     }
   }
 
-  // Si estamos en una ruta de nav transparente y el fondo NO es blanco (es transparente), texto blanco.
-  const showWhiteText = isTransparentNavPath && !showWhiteBg;
 
-  // Selección de Logo
+  const showWhiteText = (isTransparentNavPath && !showWhiteBg) || isDashboardView;
+
+  // Logo a mostrar
   const currentLogo = isAuthPage
     ? Logo
-    : (showWhiteText ? LogoBlanco : (isDashboardView ? LogoBlanco : (isPublicPage && !isInteracted ? LogoBlanco : Logo)));
+    : (showWhiteText ? LogoBlanco : Logo);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -270,27 +342,73 @@ export default function Navbar({ onMenuClick }) {
     {
       name: "Nosotros",
       subsections: [
-        { title: "Conócenos", items: ["Quiénes somos", "Portal de transparencia", "Estatutos", "Valores", "Presidencia", "Aliados", "Informes anuales"] },
-        { title: "Marco Normativo", items: ["Resoluciones", "Planes", "Políticas"] }
+        {
+          title: "Conócenos",
+          items: [
+            { label: "Razón y propósito", path: "/razon-y-proposito" },
+            { label: "Ética y transparencia", path: "/etica-y-transparencia" },
+            { 
+              label: "Líneas estratégicas", 
+              path: "#",
+              subItems: [
+                { label: "Cadenas de valor", path: "/cadenas-de-valor" },
+                { label: "Innovación", path: "/innovacion" },
+                { label: "Inclusión Social y Productiva", path: "/inclusion-social-y-productiva" },
+                { label: "Proyectos estratégico", path: "/proyectos-estrategico" },
+                { label: "Consumo Responsable", path: "/consumo-responsable" }
+              ]
+            },
+            { label: "Junta Directiva - Equipo", path: "/junta-directiva" },
+            { label: "Informes", path: "/informes" },
+          ]
+        },
+        {
+          title: "Marco Normativo",
+          items: [
+            { label: "Resoluciones", path: "/resoluciones" },
+            { label: "Planes", path: "/planes" },
+            { label: "Políticas", path: "/politicas" },
+          ]
+        }
       ]
     },
     {
       name: "Nuestro Trabajo",
       subsections: [
-        { title: "Proyectos y alianzas", items: ["Proyectos activos", "Sectoriales", "Territoriales", "Inclusión Social", "Casos de éxito", "Convocatorias"] },
-        { title: "Líneas estratégicas", items: ["Cadenas de valor", "Innovación", "Inclusión Social y Productiva", "Proyectos estratégico", "Consumo Responsable"] },
-        { title: "Sectores", items: [] },
-        { title: "e-learning", items: ["Cursos", "Certificaciones", "Financiamiento del reciclaje"] }
+        {
+          title: "Proyectos y alianzas",
+          items: [
+            { label: "Proyectos activos", path: "/proyectos-activos" },
+            { label: "Sectoriales", path: "/sectoriales" },
+            { label: "Territoriales", path: "/territoriales" },
+            { label: "Inclusión Social", path: "/inclusion-social" },
+            { label: "Casos de éxito", path: "/casos-de-exito" },
+            { label: "Convocatorias", path: "/convocatorias" }
+          ]
+        },
+        {
+          title: "Sectores",
+          items: [],
+          path: "/sectores"
+        },
+        {
+          title: "e-learning",
+          items: [
+            { label: "Cursos", path: "/cursos" },
+            { label: "Certificaciones", path: "/certificaciones" },
+            { label: "Financiamiento del reciclaje", path: "/financiamiento-del-reciclaje" }
+          ]
+        }
       ]
     },
     {
-        name: "Circularmente",
+      name: "Circularmente",
       subsections: [
-        { title: "Micrositio", items: [] },
-        { title: "Directorio", items: [] },
-        { title: "Herramientas digitales", items: [] }
-        ]
-      }
+        { title: "Micrositio", path: "/circularmente", items: [] },
+        { title: "Directorio", path: "/circularmente/directorio", items: [] },
+        { title: "Herramientas digitales", path: "/circularmente/herramientas-digitales", items: [] }
+      ]
+    }
   ];
 
   return (
@@ -320,9 +438,9 @@ export default function Navbar({ onMenuClick }) {
       `}</style>
 
       {/* NAVBAR HEADER */}
-      <header className={`flex items-center justify-between px-4 md:px-24 py-4 transition-all duration-300 ${isDashboardView ? "bg-transparent" : (showWhiteBg ? "bg-white shadow-lg" : "bg-transparent")}`}>
+      <header className={`flex items-center justify-between px-4 md:px-24 py-4 transition-all duration-300 ${!showWhiteBg ? "bg-transparent" : "bg-white shadow-lg"}`}>
         
-        {/* HAMBURGER MENU - Izquierda */}
+        {/* HAMBURGER MENU - Izquierda (Móvil) */}
         {user && isPublicPage && (
           <button onClick={onMenuClick} className="md:hidden text-white hover:text-gray-200 transition-colors mr-4" aria-label="Abrir menú">
             <Menu size={24} />
@@ -336,26 +454,11 @@ export default function Navbar({ onMenuClick }) {
           </Link>
         </div>
 
-        {/* BUSCADOR - Solo con login */}
-        {(user && isPublicPage) || location.pathname.startsWith("/dashboard") && (
-          <div className="flex-1 flex mx-8 hidden md:block">
-            <div className="relative w-full max-w-lg ml-auto">
-              <button className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${showHover ? 'hover:text-[#00AB6D]' : ''}`}>
-                <Search size={18} />
-              </button>
-              <input
-                type="text"
-                placeholder="Búsqueda Global"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full px-4 py-2 rounded-full border text-sm focus:outline-none focus:border-[#00AB6D] transition-all ${(isDashboardView || (!showWhiteBg && isTransparentNavPath)) ? "bg-white/10 border-white/20 text-white placeholder-white/60 focus:bg-white/20" : "bg-gray-100 border-gray-300 text-gray-700 placeholder-gray-500"}`}
-              />
-            </div>
-          </div>
-        )}
+        {/* Espaciador flexible si no hay menú desktop */}
+        {!(!user || (user && !isInternalPage)) && <div className="flex-1"></div>}
 
-        {/* MENÚ DESKTOP */}
-        {(!user || (user && !location.pathname.startsWith("/dashboard"))) && (
+        {/* MENÚ DESKTOP (Solo visible si NO estamos en las vistas Internas/Dashboard) */}
+        {(!user || (user && !isInternalPage)) && (
           <nav className="nav-desktop flex items-center gap-8 lg:gap-20 flex-1 justify-center mx-4">
             {menuSections.map((section) => (
               <MegaMenuDropdown key={section.name} label={section.name} sections={section.subsections} showWhiteBg={showWhiteBg} showHover={isPublicPage || isTransparentNavPath} showWhiteText={showWhiteText} onOpenChange={setHasOpenDropdown} />
@@ -363,40 +466,44 @@ export default function Navbar({ onMenuClick }) {
           </nav>
         )}
 
-        {/* BOTONES Y USUARIO - DERECHA */}
+        {/* BOTONES Y USUARIO */}
         <div className="flex items-center gap-3 md:gap-4 ml-auto">
+          
+          {/* BOTONES DE ALERTAS Y NOTIFICACIONES (Solo logueado) */}
+          {user && (
+            <div className="flex items-center gap-2 mr-2">
+              <button className={`relative p-2 rounded-full transition-all ${showWhiteText ? 'text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100 hover:text-[#00AB6D]'}`}>
+                <Bell size={20} />
+                {/* Indicador de notificación (punto rojo) */}
+                <span className="absolute top-1.5 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+              </button>
+              <button className={`p-2 rounded-full transition-all ${showWhiteText ? 'text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100 hover:text-[#00AB6D]'}`}>
+                <MessageSquare size={20} />
+              </button>
+            </div>
+          )}
+
           {user ? (
             <>
-              {/* BOTONES NOTIFICACIONES (Solo si quieres que aparezcan logueado) */}
-              {(isPublicPage || location.pathname.startsWith("/dashboard") || isTransparentNavPath) && (
-                <>
-                   {/* NOTA: Elimina este bloque si NO quieres botones de alerta nunca. 
-                       Si quieres que aparezcan pero solo en estas rutas, déjalo aquí.
-                       El estilo se adapta a transparente/blanco automáticamente. 
-                   */}
-                </>
-              )}
-
-              {/* PROFILE DROPDOWN */}
               <ProfileDropdown user={user} logout={logout} showHover={showHover} showWhiteText={showWhiteText} />
             </>
           ) : (
-            <>
-              {/* NO LOGUEADO */}
-            </>
+            <></>
           )}
 
-          {/* HAMBURGER */}
-          <button className={`nav-mobile ml-4 hamburger ${mobileMenuOpen ? "active" : ""}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Menú móvil">
-            <div className={`hamburger-line ${showWhiteBg ? "bg-gray-700" : "bg-white"}`}></div>
-            <div className={`hamburger-line ${showWhiteBg ? "bg-gray-700" : "bg-white"}`}></div>
-            <div className={`hamburger-line ${showWhiteBg ? "bg-gray-700" : "bg-white"}`}></div>
-          </button>
+          {/* HAMBURGER (Menú móvil derecho) - Solo visible si NO es página interna */}
+          {!isInternalPage && (
+            <button className={`nav-mobile ml-4 hamburger ${mobileMenuOpen ? "active" : ""}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Menú móvil">
+              <div className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-700"}`}></div>
+              <div className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-700"}`}></div>
+              <div className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-700"}`}></div>
+            </button>
+          )}
         </div>
       </header>
 
-      {/* MENÚ MÓVIL */}
-      {mobileMenuOpen && !hideMenus && (
+      {/* MENÚ MÓVIL (Solo si NO es página interna) */}
+      {mobileMenuOpen && !hideMenus && !isInternalPage && (
         <div className={`nav-mobile fixed left-0 right-0 top-20 transition-all duration-300 max-h-[calc(100vh-80px)] overflow-y-auto ${showWhiteBg ? "bg-white/95 shadow-lg" : "bg-gray-900/95"}`}>
           <nav className="container mx-auto px-4 py-6 space-y-0">
             {menuSections.map((section) => (

@@ -1,42 +1,97 @@
-import { NavLink } from "react-router-dom";
+import React, { useContext } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { 
+  LayoutDashboard, 
+  FileText, 
+  Activity, 
+  ClipboardList, 
+  MessageSquare, 
+  Settings, 
+  Workflow, 
+  LogOut,
+  Hexagon 
+} from "lucide-react";
 
 export default function Sidebar() {
+  // 2. Extraemos user y logout del AuthContext, igual que en tu Navbar
+  const { user, logout } = useContext(AuthContext); 
+  const navigate = useNavigate();
+
   const links = [
-    { name: "Dashboard", path: "/dashboard" },
-    { name: "Documentos", path: "/documentos" },
-    { name: "Seguimiento", path: "/seguimiento" },
-    { name: "Formularios", path: "/formularios" },
-    { name: "Comunicaciones", path: "/comunicaciones" },
-    { name: "Administración", path: "/administracion" },
-    { name: "Integración", path: "/integracion" },
-    { name: "Portal", path: "/portal" },
+    { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
+    { name: "Documentos", path: "/documentos", icon: <FileText size={20} /> },
+    { name: "Seguimiento", path: "/seguimiento", icon: <Activity size={20} /> },
+    { name: "Formularios", path: "/formularios", icon: <ClipboardList size={20} /> },
+    { name: "Comunicaciones", path: "/comunicaciones", icon: <MessageSquare size={20} /> },
+    { name: "Administración", path: "/administracion", icon: <Settings size={20} /> },
+    { name: "Integración", path: "/integracion", icon: <Workflow size={20} /> },
   ];
 
+  // 3. Función que maneja el click
+  const handleLogout = () => {
+    logout(); // Ejecuta la función del contexto (limpia tokens, estados, etc.)
+    navigate("/login"); // Fuerza la redirección por seguridad visual inmediata
+  };
+
+ 
+
   return (
-    // Sidebar blanco a la izquierda, oculto en móviles
-    <aside className="hidden md:flex md:flex-col w-64 bg-white border-r border-gray-200 h-screen sticky top-0">
-      <div className="px-6 py-12 border-b border-gray-100">
-        <h2 className="text-lg font-semibold text-gray-800">Menú</h2>
+    <aside className="hidden md:flex md:flex-col w-72 bg-white border-r border-gray-200 h-screen sticky top-0 shadow-sm z-30">
+      
+      {/* 1. Header con Logo y Branding */}
+      <div className="flex items-center gap-3 px-6 py-8">
+        <div className="bg-blue-600 p-2 rounded-lg text-white">
+            <Hexagon size={24} strokeWidth={2.5} />
+        </div>
+        <div>
+            <h2 className="text-xl font-bold text-gray-800 tracking-tight">EcoCircular</h2>
+            <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">Panel Admin</span>
+        </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2 py-4">
+      {/* 2. Navegación Principal */}
+      <nav className="flex-1 overflow-y-auto px-4 space-y-1 mt-4">
+        <p className="px-4 text-xs font-semibold text-gray-400 uppercase mb-2 tracking-wider">Menu Principal</p>
+        
         {links.map((link) => (
           <NavLink
             key={link.path}
             to={link.path}
             className={({ isActive }) =>
-              `block w-full text-left px-4 py-3 rounded-md mb-2 transition-colors duration-150 text-gray-700 hover:bg-gray-100 hover:text-gray-900 ${
-                isActive ? "bg-gray-100 font-semibold" : ""
+              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                isActive 
+                  ? "bg-blue-50 text-blue-700 font-medium shadow-sm ring-1 ring-blue-100" 
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`
             }
           >
-            {link.name}
+            {({ isActive }) => (
+              <>
+                <span className={`transition-colors duration-200 ${isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"}`}>
+                  {link.icon}
+                </span>
+                <span>{link.name}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
 
-      <div className="px-4 py-3 border-t border-gray-100">
-        <small className="text-xs text-gray-500">EcoCircular</small>
+      {/* 3. Footer con Botón de Logout y Perfil Dinámico */}
+      <div className="p-4 border-t border-gray-100 flex flex-col gap-4">
+        
+        {/* Botón de Logout conectado al Contexto */}
+        <button 
+            onClick={handleLogout} 
+            className="flex items-center gap-3 w-full px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors duration-200 group cursor-pointer"
+        >
+            <LogOut size={20} className="text-gray-400 group-hover:text-red-500 transition-colors" />
+            <span className="font-medium">Cerrar Sesión</span>
+        </button>
+        
+        
+
       </div>
     </aside>
   );

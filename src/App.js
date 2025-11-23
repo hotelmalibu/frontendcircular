@@ -10,7 +10,7 @@ import Formularios from "./modules/dashboard/Formularios";
 import Comunicaciones from "./modules/dashboard/Comunicaciones";
 import Administracion from "./modules/dashboard/Administracion";
 import Integracion from "./modules/dashboard/Integracion";
-import Portal from "./modules/dashboard/Portal";
+
 import PrivateRoute from "./components/PrivateRoute";
 import Footer from "./components/Footer";
 import Circularmente from "./modules/micrositio/Circularmente";
@@ -91,7 +91,6 @@ export default function App() {
           <Route path="/comunicaciones" element={<PrivateRoute><Comunicaciones /></PrivateRoute>} />
           <Route path="/administracion" element={<PrivateRoute><Administracion /></PrivateRoute>} />
           <Route path="/integracion" element={<PrivateRoute><Integracion /></PrivateRoute>} />
-          <Route path="/portal" element={<PrivateRoute><Portal /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
 
           {/* Rutas para explorar contenido */}
