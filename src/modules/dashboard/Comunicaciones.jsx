@@ -6,6 +6,7 @@ import Contenido from "../../components/dashboard/comunicaciones/Contenido";
 import Dashboard from "../../components/dashboard/comunicaciones/Dashboard";
 import Eventos from "../../components/dashboard/comunicaciones/Eventos";
 import Newsletter from "../../components/dashboard/comunicaciones/Newsletter";
+import News from "../../components/dashboard/comunicaciones/News";
 import RedesSociales from "../../components/dashboard/comunicaciones/RedesSociales";
 import Seo from "../../components/dashboard/comunicaciones/Seo";
 
@@ -15,6 +16,7 @@ export default function Comunicaciones() {
 
   const tabs = [
     { name: "Dashboard", component: <Dashboard /> },
+    { name: "Noticias", component: <News /> },
     { name: "Eventos", component: <Eventos /> },
     { name: "Contenido", component: <Contenido /> },
     { name: "Biblioteca", component: <Biblioteca /> },
