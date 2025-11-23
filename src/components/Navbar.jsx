@@ -195,7 +195,7 @@ export default function Navbar({ onMenuClick }) {
   // eslint-disable-next-line no-unused-vars
   const [scrollDirection, setScrollDirection] = useState("up");
   const [searchQuery, setSearchQuery] = useState("");
-  // Estados de notificaciones eliminados
+  
 
   // --- LÓGICA DE VISIBILIDAD Y ESTILOS ---
   const hideMenus = false;
@@ -355,7 +355,7 @@ export default function Navbar({ onMenuClick }) {
         <div className="flex items-center gap-3 md:gap-4 ml-auto">
           {user ? (
             <>
-              {/* AQUÍ SE HAN ELIMINADO LOS BOTONES DE ALERTAS Y NOTIFICACIONES */}
+              
               
               {/* PROFILE DROPDOWN */}
               <ProfileDropdown user={user} logout={logout} showHover={showHover} showWhiteText={showWhiteText} />

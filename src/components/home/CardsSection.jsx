@@ -3,7 +3,6 @@ import noticia1 from "../../assets/home/NoticiasYRecursos/A.jpg";
 import noticia2 from "../../assets/home/NoticiasYRecursos/B.jpg";
 import noticia3 from "../../assets/home/NoticiasYRecursos/C.jpg";
 import noticia4 from "../../assets/home/NoticiasYRecursos/D.png";
-import fondoPortal from "../../assets/home/NoticiasYRecursos/fondo_portal.jpg";
 
 const cards = [
   {
@@ -49,7 +48,7 @@ export default function CardsSection() {
   return (
     <section
       className="relative py-20 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center"
-      style={{ backgroundImage: `url(${fondoPortal})` }}
+      
     >
       <motion.div
         className="relative z-10"
