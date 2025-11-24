@@ -301,7 +301,7 @@ export default function Navbar({ onMenuClick }) {
   } else if (isDashboardView) {
     showWhiteBg = false;
   } else {
-    
+    // Para Home Page público sin usuario: si no hay interacción, es transparente.
     if (user) {
       showWhiteBg = true; 
     } else {
@@ -309,8 +309,9 @@ export default function Navbar({ onMenuClick }) {
     }
   }
 
-
-  const showWhiteText = (isTransparentNavPath && !showWhiteBg) || isDashboardView;
+  // --- CORRECCIÓN AQUÍ ---
+  // Ahora incluye isPublicPage para asegurar que el Home use blanco cuando no tiene fondo
+  const showWhiteText = ((isTransparentNavPath || isPublicPage) && !showWhiteBg);
 
   // Logo a mostrar
   const currentLogo = isAuthPage
