@@ -113,9 +113,16 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       };
 
       let publishedAt = null;
-      // If formData includes published_at (for legacy), respect it; otherwise automate when publishing
+      // If the form included a published_at (from a previously published news), convert it.
+      // If the status is 'published', ensure we set published_at to an ISO or today's date.
+      // If the status is not 'published', explicitly clear published_at to avoid server-side validation errors.
       if (formData.published_at) publishedAt = toIsoDate(formData.published_at);
-      if (formData.status === "published" && !publishedAt) publishedAt = todayDate();
+      if (formData.status === "published") {
+        if (!publishedAt) publishedAt = todayDate();
+      } else {
+        // When switching to draft, remove any published_at value to avoid inconsistent state on server
+        publishedAt = null;
+      }
 
       const dataToSend = {
         ...formData,
@@ -123,6 +130,11 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         end_date: toIsoDate(formData.end_date),
         published_at: publishedAt,
       };
+
+      // If we explicitly cleared published_at (for draft), remove the key to avoid backend validation issues
+      if (publishedAt === null) {
+        delete dataToSend.published_at;
+      }
 
       // Debug: log payload sent to backend
       console.log("NewsFormModal - payload to send:", dataToSend);
