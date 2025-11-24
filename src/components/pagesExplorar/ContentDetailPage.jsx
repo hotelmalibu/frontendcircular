@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Facebook, Twitter, Linkedin, Mail, Calendar, ArrowLeft, Share2 } from 'lucide-react';
 import { allContentData, contentTypeConfig } from '../../data/mockContent'; 
+import { AuthContext } from '../../context/AuthContext';
 import { getAllNews, getNewsById } from '../../api/newsApi';
 
 export default function ContentDetailPage() {
@@ -10,6 +11,8 @@ export default function ContentDetailPage() {
   const [loading, setLoading] = useState(true);
 
   // Try to find content in static mock first, or fetch from API when needed
+  const { isAuthenticated } = useContext(AuthContext);
+
   useEffect(() => {
     let mounted = true;
 
@@ -59,6 +62,12 @@ export default function ContentDetailPage() {
           }
         }
         if (found && mounted) {
+          // If the found content is not published, only allow displaying it for authenticated users (dashboard/editor).
+          if (String(found.status).toLowerCase() !== 'published' && !isAuthenticated) {
+            setContent(null);
+            setLoading(false);
+            return;
+          }
           // Normalize API object into the shape expected by the detail page
           const mapped = {
             id: found.id || found._id || found.uid,

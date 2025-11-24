@@ -17,7 +17,9 @@ export default function ExplorePage() {
   // Combine noticias desde API con el contenido estático
   const combinedData = useMemo(() => {
     // Map news items to the same shape as allContentData
-    const mappedNews = (newsItems || []).map(n => ({
+    const mappedNews = (newsItems || [])
+      .filter(n => String(n.status).toLowerCase() === 'published')
+      .map(n => ({
       id: n.id || n._id || Math.random(),
       type: "Noticias",
       topic: n.category || n.topic || "General",

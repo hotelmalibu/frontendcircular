@@ -33,7 +33,9 @@ export default function FeaturedSection() {
               }
             }
 
-            const mapped = newsArray.map(n => ({
+            const mapped = newsArray
+              .filter(n => String(n.status).toLowerCase() === 'published')
+              .map(n => ({
                 id: n.id || n._id || n.uid || Math.random(),
                 type: "Noticias",
                 topic: n.category || n.topic || "General",
