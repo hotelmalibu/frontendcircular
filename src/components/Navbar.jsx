@@ -346,8 +346,8 @@ export default function Navbar({ onMenuClick }) {
         {
           title: "Conócenos",
           items: [
-            { label: "Razón y propósito", path: "/razon-y-proposito" },
-            { label: "Ética y transparencia", path: "/etica-y-transparencia" },
+            { label: "Razón y propósito", path: "/quines-somos" },
+            { label: "Ética y transparencia", path: "/valores" },
             { 
               label: "Líneas estratégicas", 
               path: "#",
@@ -359,8 +359,8 @@ export default function Navbar({ onMenuClick }) {
                 { label: "Consumo Responsable", path: "/consumo-responsable" }
               ]
             },
-            { label: "Junta Directiva - Equipo", path: "/junta-directiva" },
-            { label: "Informes", path: "/informes" },
+            { label: "Junta Directiva - Equipo", path: "/presidencia" },
+            { label: "Informes", path: "/informes-anuales" },
           ]
         },
         {
