@@ -117,6 +117,7 @@ export default function ContentDetailPage() {
     findContent();
     return () => { mounted = false };
   }, [slug]);
+  
   // Si aún no cargó el contenido, mostrar loader o mensaje
   if (loading) {
     return (
@@ -143,29 +144,42 @@ export default function ContentDetailPage() {
   const config = contentTypeConfig[content.type] || {};
   const Icon = config.icon || (() => null);
 
-  // URLs para compartir (dinámicas)
-  const currentUrl = encodeURIComponent(window.location.href);
-  const shareTitle = encodeURIComponent(content?.title || '');
+  // --- CÁLCULO DE URLS DE COMPARTIR (IMPLEMENTACIÓN NUEVA) ---
+  const currentUrl = window.location.href;
+  const rawTitle = content?.title || '';
+  
+  // Codificamos los valores para que sean seguros en una URL
+  const encodedUrl = encodeURIComponent(currentUrl);
+  const encodedTitle = encodeURIComponent(rawTitle);
+  const encodedTextAndUrl = encodeURIComponent(`${rawTitle} ${currentUrl}`); // Para LinkedIn y Mail
+
+  // Definimos las URLs finales
+  // 1. Facebook: Solo permite URL. No permite pre-rellenar texto.
+  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+  
+  // 2. X (Twitter): Permite URL y Texto.
+  const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+  
+  // 3. LinkedIn: Usamos el endpoint 'feed' con 'text' para simular el comportamiento de X.
+  const linkedinShareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedTextAndUrl}`;
+  
+  // 4. Mail
+  const mailShareUrl = `mailto:?subject=${encodedTitle}&body=${encodedTextAndUrl}`;
+
 
   return (
     <div className="min-h-screen bg-white fontfamily-montserrat">
-     
-      {/* --- HERO HEADER --- 
-          Detecta si debe mostrar imagen o color sólido (igual que las tarjetas) 
-      */}
+      
+      {/* --- HERO HEADER --- */}
       <div className={`relative w-full h-[70vh] md:h-[80vh] flex items-end overflow-hidden ${config.isSolid ? config.bgColor : 'bg-gray-900'}`}>
 
-        
         {/* FONDO: Imagen o Color Sólido */}
         {config.isSolid ? (
-          // Versión Sólida (Documentos)
           <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-             {/* Icono gigante decorativo */}
              <Icon size={400} strokeWidth={0.5} className="text-white opacity-10 absolute -right-20 -bottom-20 rotate-12" />
              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
           </div>
         ) : (
-          // Versión Imagen (Noticias) o fallback icon
           <>
             {content.image ? (
               <>
@@ -187,7 +201,6 @@ export default function ContentDetailPage() {
         {/* TÍTULO Y DATOS EN HERO */}
         <div className="container mx-auto px-4 md:px-8 relative z-10 pb-16 md:pb-20">
           <div className="max-w-4xl">
-            {/* Breadcrumb / Tipo */}
             <Link to="/explorar" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 text-sm font-semibold transition-colors">
               <ArrowLeft size={16} /> Volver a explorar
             </Link>
@@ -222,25 +235,25 @@ export default function ContentDetailPage() {
                 <SocialButton
                   icon={Facebook}
                   color="#1877F2"
-                  url={`https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`}
+                  url={facebookShareUrl}
                 />
 
                 <SocialButton
                   icon={X}
                   color="#000000"
-                  url={`https://twitter.com/intent/tweet?url=${currentUrl}&text=${shareTitle}`}
+                  url={xShareUrl}
                 />
 
                 <SocialButton
                   icon={Linkedin}
                   color="#0A66C2"
-                  url={`https://www.linkedin.com/shareArticle?mini=true&url=${currentUrl}&title=${shareTitle}`}
+                  url={linkedinShareUrl}
                 />
 
                 <SocialButton
                   icon={Mail}
                   color="#444444"
-                  url={`mailto:?subject=${shareTitle}&body=${currentUrl}`}
+                  url={mailShareUrl}
                 />
 
 
@@ -284,7 +297,7 @@ export default function ContentDetailPage() {
   );
 }
 
-// Sub-componente Botón Social
+// Sub-componente Botón Social (ESTÁTICO)
 function SocialButton({ icon: Icon, url, color }) {
   return (
     <a 
@@ -296,11 +309,12 @@ function SocialButton({ icon: Icon, url, color }) {
         rounded-xl
         bg-white/20 backdrop-blur-md
         border border-white/30
+        text-white
       "
+      // Aquí aplicamos el color fijo directamente al estilo
+      style={{ color: color }}
     >
       <Icon size={26} strokeWidth={2} />
     </a>
   );
 }
-
-
