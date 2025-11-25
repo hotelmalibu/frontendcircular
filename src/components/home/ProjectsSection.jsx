@@ -1,8 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom"; // 1. IMPORTAR LINK
+import { Link } from "react-router-dom"; 
 import fondoProyecto from "../../assets/home/Proyectos/fondo_proyecto.png";
-import { projectsData } from "../../data/mockContentData"; // 2. IMPORTAR LOS DATOS
+import { projectsData } from "../../data/mockContentData";
 
 // Icono SVG simple
 const ArrowIcon = () => (

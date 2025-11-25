@@ -6,7 +6,8 @@ import Logo from "../assets/Logo.png";
 import DefaultAvatar from "../assets/default-avatar.png";
 import { User, LogOut, Home, Shield, Handshake, Building, Gavel, Menu, ChevronDown, Bell, MessageSquare } from "lucide-react";
 
-// --- COMPONENTES AUXILIARES ---
+// --- COMPONENTES AUXILIARES (Badge, Menús) ---
+// (Se mantienen igual que antes, los comprimo para enfocarme en la lógica principal)
 
 function UserRoleBadge({ role }) {
   const roleStyles = {
@@ -24,7 +25,6 @@ function UserRoleBadge({ role }) {
   );
 }
 
-// --- MENÚ MÓVIL (Soporta 3 niveles) ---
 function MobileMenuDropdown({ title, subsections, showWhiteBg, showHover, showWhiteText, onClose }) {
   const [open, setOpen] = useState(false);
   const [openSubmenus, setOpenSubmenus] = useState({});
@@ -129,24 +129,11 @@ function MobileMenuDropdown({ title, subsections, showWhiteBg, showHover, showWh
   );
 }
 
-// --- MEGA MENÚ DESKTOP ---
 function MegaMenuDropdown({ label, sections = [], showWhiteBg, showHover, showWhiteText, onOpenChange }) {
   const [open, setOpen] = useState(false);
   const timeoutRef = useRef(null);
-  
-  const handleMouseEnter = () => { 
-    if (timeoutRef.current) clearTimeout(timeoutRef.current); 
-    setOpen(true); 
-    onOpenChange(true); 
-  };
-  
-  const handleMouseLeave = () => { 
-    timeoutRef.current = setTimeout(() => { 
-      setOpen(false); 
-      onOpenChange(false); 
-    }, 300); 
-  };
-
+  const handleMouseEnter = () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setOpen(true); onOpenChange(true); };
+  const handleMouseLeave = () => { timeoutRef.current = setTimeout(() => { setOpen(false); onOpenChange(false); }, 300); };
   useEffect(() => { return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }; }, []);
 
   return (
@@ -154,7 +141,6 @@ function MegaMenuDropdown({ label, sections = [], showWhiteBg, showHover, showWh
       <button type="button" className={`text-base lg:text-base font-semibold fontfamily-montserrat transition-all menu-underline pb-1 ${open ? "active" : ""} ${showWhiteText ? "text-white" : (showHover ? (showWhiteBg ? "text-gray-700 hover:text-[#00AB6D]" : "text-white hover:text-[#00AB6D]") : "text-gray-700")}`}>
         {label}
       </button>
-
       <div className={`fixed left-0 right-0 top-full bg-gradient-to-b from-white to-gray-50 shadow-2xl transform transition-all duration-400 ${open ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-4"}`}>
         <div className="h-1 bg-gradient-to-r from-[#00AB6D] via-[#2C67B0] to-[#1E305D]"></div>
         <div className="container mx-auto px-4 md:px-8 py-6 md:py-8">
@@ -230,7 +216,6 @@ function ProfileDropdown({ user, logout, showHover, showWhiteText }) {
     <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <button type="button" className="flex items-center gap-2 hover:opacity-80 transition-opacity group">
         <div className="text-right hidden sm:block">
-          {/* El texto del nombre siempre respeta el color del navbar (blanco si es transparente, oscuro si no) */}
           <p className={`text-xs md:text-sm font-semibold ${showWhiteText ? 'text-white' : 'text-gray-800'}`}>{userFullName}</p>
           <UserRoleBadge role={userRole} />
         </div>
@@ -277,11 +262,16 @@ export default function Navbar({ onMenuClick }) {
   const internalPaths = ["/dashboard", "/documentos", "/seguimiento", "/formularios", "/comunicaciones", "/administracion", "/integracion"];
   const isInternalPage = user && internalPaths.some(path => location.pathname.startsWith(path));
 
-  // Rutas especiales con navbar transparente al inicio
-  const isCircularPath = location.pathname.startsWith('/circularmente');
-  const isExplorePath = location.pathname === '/explorar';
-  const isContentPath = location.pathname.startsWith('/contenido');
-  const isTransparentNavPath = isCircularPath || isExplorePath || isContentPath;
+ 
+  const transparentPaths = [
+    '/circularmente',
+    '/explorar',
+    '/contenido',
+    '/proyectos/'
+  ];
+
+  // Comprobamos si la ruta actual empieza con alguna de las definidas arriba
+  const isTransparentNavPath = transparentPaths.some(path => location.pathname.startsWith(path));
 
   const isInteracted = scrolled || isHovered || hasOpenDropdown || mobileMenuOpen;
   
@@ -309,8 +299,6 @@ export default function Navbar({ onMenuClick }) {
     }
   }
 
-  // --- CORRECCIÓN AQUÍ ---
-  // Ahora incluye isPublicPage para asegurar que el Home use blanco cuando no tiene fondo
   const showWhiteText = ((isTransparentNavPath || isPublicPage) && !showWhiteBg);
 
   // Logo a mostrar
@@ -475,7 +463,6 @@ export default function Navbar({ onMenuClick }) {
             <div className="flex items-center gap-2 mr-2">
               <button className={`relative p-2 rounded-full transition-all ${showWhiteText ? 'text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100 hover:text-[#00AB6D]'}`}>
                 <Bell size={20} />
-                {/* Indicador de notificación (punto rojo) */}
                 <span className="absolute top-1.5 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
               </button>
               <button className={`p-2 rounded-full transition-all ${showWhiteText ? 'text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100 hover:text-[#00AB6D]'}`}>

@@ -36,12 +36,10 @@ export default function ContentDetailProject() {
   }
 
   return (
-    
+    <div className="bg-[#F6F6F6] min-h-screen font-sans selection:bg-[#00AB6D]/30">
       
-    <div className="bg-[#F6F6F6] min-h-screen font-sans selection:bg-[#00AB6D]/30 pt-28">
-      
-      {/* --- HERO SECTION --- */}
-      <div className="relative h-[60vh] w-full overflow-hidden">
+     
+      <div className="relative h-[85vh] w-full overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={project.image}
@@ -51,7 +49,7 @@ export default function ContentDetailProject() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#1E305D]/60 via-[#1E305D]/80 to-[#1E305D]" />
         </div>
 
-        <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col justify-center">
+        <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col justify-center pt-8">
           <Link
             to="/"
             className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-8 transition-colors w-fit group"
@@ -84,7 +82,7 @@ export default function ContentDetailProject() {
       </div>
 
       {/* --- CONTENIDO PRINCIPAL --- */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 md:py-24">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Columna Izquierda: Historia */}

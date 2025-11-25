@@ -1,7 +1,4 @@
 // src/data/mockContentData.js
-
-// Importa tus imágenes aquí si están en src/assets
-// Si usas Vite/Webpack, esto es necesario para que funcionen en el build
 import proyecto1 from "../assets/home/Proyectos/proyecto1.png";
 import proyecto2 from "../assets/home/Proyectos/proyecto2.png";
 import proyecto3 from "../assets/home/Proyectos/proyecto3.png";
