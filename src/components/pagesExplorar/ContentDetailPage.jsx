@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import DOMPurify from 'dompurify';
 import { useParams, Link } from 'react-router-dom';
-import { Facebook, Twitter, Linkedin, Mail, Calendar, ArrowLeft, Share2 } from 'lucide-react';
+import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, Share2 } from 'lucide-react';
 import { allContentData, contentTypeConfig } from '../../data/mockContent'; 
 import { AuthContext } from '../../context/AuthContext';
 import { getAllNews, getNewsById } from '../../api/newsApi';
@@ -215,12 +215,35 @@ export default function ContentDetailPage() {
           {/* COLUMNA IZQUIERDA (Social Share Sticky) */}
           <div className="lg:w-24 flex-shrink-0">
              <div className="sticky top-32 flex lg:flex-col gap-4 items-center lg:items-start">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest hidden lg:block mb-2">Compartir</span>
-                <SocialButton icon={Facebook} url={`https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`} color="hover:bg-blue-600" />
-                <SocialButton icon={Twitter} url={`https://twitter.com/intent/tweet?url=${currentUrl}&text=${shareTitle}`} color="hover:bg-sky-500" />
-                <SocialButton icon={Linkedin} url={`https://www.linkedin.com/shareArticle?mini=true&url=${currentUrl}&title=${shareTitle}`} color="hover:bg-blue-700" />
-                <SocialButton icon={Mail} url={`mailto:?subject=${shareTitle}&body=${currentUrl}`} color="hover:bg-gray-600" />
-                
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest hidden lg:block mb-2">
+                  Compartir
+                </span>
+
+                <SocialButton
+                  icon={Facebook}
+                  color="#1877F2"
+                  url={`https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`}
+                />
+
+                <SocialButton
+                  icon={X}
+                  color="#000000"
+                  url={`https://twitter.com/intent/tweet?url=${currentUrl}&text=${shareTitle}`}
+                />
+
+                <SocialButton
+                  icon={Linkedin}
+                  color="#0A66C2"
+                  url={`https://www.linkedin.com/shareArticle?mini=true&url=${currentUrl}&title=${shareTitle}`}
+                />
+
+                <SocialButton
+                  icon={Mail}
+                  color="#444444"
+                  url={`mailto:?subject=${shareTitle}&body=${currentUrl}`}
+                />
+
+
                 {/* Móvil: Etiqueta compartir */}
                 <div className="lg:hidden flex items-center gap-2 text-gray-400 text-sm font-bold ml-auto">
                     <Share2 size={16} /> Compartir
@@ -230,9 +253,6 @@ export default function ContentDetailPage() {
 
           {/* COLUMNA DERECHA (Texto del Artículo) */}
           <div className="flex-1 max-w-3xl">
-            
-            {/* Extracto destacado */}
-            
 
             {/* Cuerpo del texto: usar `content.body` o `content.description` */}
             <div className="prose prose-lg prose-headings:text-[#1E305D] prose-a:text-[#00AB6D] text-gray-600">
@@ -257,7 +277,6 @@ export default function ContentDetailPage() {
                   {content.topic}
                </Link>
             </div>
-
           </div>
         </div>
       </div>
@@ -269,12 +288,19 @@ export default function ContentDetailPage() {
 function SocialButton({ icon: Icon, url, color }) {
   return (
     <a 
-      href={url} 
-      target="_blank" 
+      href={url}
+      target="_blank"
       rel="noopener noreferrer"
-      className={`w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 transition-all duration-300 hover:text-white hover:border-transparent hover:-translate-y-1 ${color}`}
+      className="
+        w-12 h-12 flex items-center justify-center
+        rounded-xl
+        bg-white/20 backdrop-blur-md
+        border border-white/30
+      "
     >
-      <Icon size={20} />
+      <Icon size={26} strokeWidth={2} />
     </a>
   );
 }
+
+
