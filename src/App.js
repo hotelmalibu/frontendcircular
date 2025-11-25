@@ -42,6 +42,7 @@ import Profile from "./modules/dashboard/Profile";
 
 import ExplorePage from "./components/pagesExplorar/ExplorePage";
 import ContentDetailPage from "./components/pagesExplorar/ContentDetailPage";
+import ContentDetailProject from "./components/pagesProyectos/ContentDetailProject";
 
 export default function App() {
   return (
@@ -96,6 +97,10 @@ export default function App() {
           {/* Rutas para explorar contenido */}
           <Route path="/explorar" element={<ExplorePage />} />
           <Route path="/contenido/:slug" element={<ContentDetailPage />} />
+
+          <Route path="/" element={<Home />} />
+          {/* Esta es la ruta mágica para que funcione el enlace */}
+          <Route path="/proyectos/:id" element={<ContentDetailProject />} />
         </Routes>
       </main>
 
