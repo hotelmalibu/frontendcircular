@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Search, ChevronDown, FilterX } from "lucide-react";
 // Asegúrate que la ruta a mockContent sea correcta según tu estructura
 import { allContentData, contentTypeConfig } from "../../data/mockContent"; 
+import DOMPurify from 'dompurify';
 import { getAllNews } from "../../api/newsApi";
 
 
@@ -24,7 +25,7 @@ export default function ExplorePage() {
       type: "Noticias",
       topic: n.category || n.topic || "General",
       title: n.title || n.name || "Sin título",
-      excerpt: n.description || n.excerpt || "",
+      excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
       image: n.image || n.thumbnail || n.cover || "",
       date: n.published_at ? new Date(n.published_at).toLocaleDateString() : (n.publishedAt ? new Date(n.publishedAt).toLocaleDateString() : ""),
       slug: n.slug || (`noticia-${n.id || n._id || ''}`),

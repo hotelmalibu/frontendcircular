@@ -1,4 +1,5 @@
 import React from "react";
+import DOMPurify from 'dompurify';
 import {
   X,
   Edit,
@@ -214,7 +215,7 @@ export default function NewsDetailModal({ newsData, onClose, onEdit }) {
             {newsData.description ? (
               <div className="prose max-w-none">
                 <div className="text-gray-700 whitespace-pre-wrap bg-white p-4 rounded-lg border border-gray-200">
-                  {newsData.description}
+                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(newsData.description)) }} />
                 </div>
               </div>
             ) : (
