@@ -1,84 +1,108 @@
 import React from "react";
-import fondos_submenus from "../../../../assets/fondos_submenus.jpg";
 
 // --- IMPORTAR ACTIVOS ---
-import imgHeader from "../../../../assets/lineasestrategicas/1.png";
 import imgLogo from "../../../../assets/lineasestrategicas/innovacion/innovacion.png";
 
-// Colores del manual de marca
+// Colores del manual y acento específico para esta línea
 const COLOR_AZUL_PRINCIPAL = "#1E305D";
-const COLOR_AZUL_SECUNDARIO = "#00AB6D";
-// const COLOR_GRIS_TEXTO = "#333333";
+const COLOR_ACENTO_INNOVACION = "#9E1981";
+// const COLOR_FONDO_CLARO = "#d4f16aff"; 
 
 export default function Innovacion() {
   return (
     <div
-      className="mt-24 font-sans min-h-screen"
+      className="mt-24 font-sans min-h-[calc(100vh-6rem)] flex items-center justify-center p-4 md:p-8"
       style={{
-        backgroundImage: `url(${fondos_submenus})`,
+        backgroundColor: '#e6e6e6ff',
         backgroundSize: "cover",
         backgroundPosition: "center",
+        backgroundAttachment: "fixed", // Efecto Parallax
       }}
     >
-      {/* 1. IMAGEN DE CABECERA */}
-      <div className="w-full h-auto mb-10 overflow-hidden">
-        <img
-          src={imgHeader}
-          alt="Líneas Estratégicas - Cabecera"
-          className="w-full max-w-7xl mx-auto object-cover"
-        />
-      </div>
+      
+      {/* --- CONTENEDOR PRINCIPAL (TARJETA FLOTANTE) --- */}
+      <div className="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row">
+        
+        {/* --- COLUMNA IZQUIERDA: IDENTIDAD VISUAL (40%) --- */}
+        {/* Fondo con degradado suave hacia cian */}
+        <div className="w-full lg:w-2/5 bg-gradient-to-br from-white to-cyan-50 p-8 lg:p-12 flex flex-col justify-center items-center relative border-b lg:border-b-0 lg:border-r border-gray-100">
+          
+          {/* Decoración de fondo (Brillo tecnológico) */}
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-100 rounded-full blur-3xl opacity-60 -translate-x-1/4 translate-y-1/4"></div>
+          
+          <h2 className="text-sm font-bold tracking-widest uppercase text-gray-400 mb-6 self-start">
+            Línea Estratégica
+          </h2>
 
-      <div className="px-6 md:px-24 pb-14 max-w-7xl mx-auto">
-        {/* Título */}
-        <h1
-          className="text-4xl font-display font-bold text-center mb-10 uppercase"
-          style={{ color: COLOR_AZUL_PRINCIPAL }}
-        >
-          Líneas Estratégicas: Innovación
-        </h1>
-        <div
-          className="w-[45%] h-1 mx-auto mb-8"
-          style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}
-        ></div>
+          <img
+            src={imgLogo}
+            alt="Logo Innovación"
+            className="w-full h-auto object-contain drop-shadow-lg transform transition-transform duration-500 hover:scale-105"
+          />
 
-        {/* 2. TARJETA PRINCIPAL */}
-        <div className="flex flex-col lg:flex-row items-start gap-8 bg-transparent p-6 md:p-10 rounded-xl">
-          {/* Lado Izquierdo */}
-          <div className="w-full lg:w-1/3 flex flex-col items-center justify-center p-4">
-            <img
-              src={imgLogo}
-              alt="Innovación Logo"
-              className="w-full max-w-xs h-auto object-contain mb-4"
-            />
-          </div>
-
-          {/* Lado Derecho */}
-          <div className="w-full lg:w-2/3 text-lg font-sans text-left self-center">
-            <p className="text-gray-800 leading-relaxed text-2xl mb-4">
-              Dinamizar el <strong>ecosistema de innovación</strong> para el cierre de ciclo de
-              envases y empaques, promoviendo la tecnificación en toda la cadena de
-              valor y fortaleciendo <strong>la capacidad para la atracción de recursos</strong>.
-            </p>
+          {/* Adorno visual inferior */}
+          <div className="mt-8 flex gap-2">
+            <div className="h-2 w-16 rounded-full" style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}></div>
+            <div className="h-2 w-4 rounded-full" style={{ backgroundColor: COLOR_ACENTO_INNOVACION }}></div>
           </div>
         </div>
 
-        {/* 3. SECCIÓN INFERIOR – FONDO TRANSPARENTE */}
-        <section className="mt-6 text-center max-w-4xl mx-auto p-8 bg-transparent">
-          <h2
-            className="text-3xl font-sans font-bold mb-4"
-            style={{ color: COLOR_AZUL_SECUNDARIO }}
-          >
-            Enfoque y Alcance de la Línea
-          </h2>
+        {/* --- COLUMNA DERECHA: CONTENIDO (60%) --- */}
+        <div className="w-full lg:w-3/5 p-8 lg:p-12 flex flex-col justify-between relative">
+          
+          {/* SECCIÓN SUPERIOR: Objetivo Principal */}
+          <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-display font-bold mb-6 text-gray-800">
+              Línea de <span style={{ color: COLOR_ACENTO_INNOVACION }}>Innovación</span>
+            </h1>
+            
+            <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+              Dinamizamos el <span className="font-semibold text-gray-900">ecosistema de innovación</span> para el cierre de ciclo, promoviendo la tecnificación en toda la cadena.
+            </p>
 
-          <p className="text-xl text-gray-700 leading-relaxed mb-6">
-            Esta línea de acción impulsa la <strong>búsqueda, adopción y transferencia</strong> de
-            nuevas tecnologías y metodologías que permitan optimizar procesos,
-            incrementar <strong>bla eficiencia y fortalecer</strong> la circularidad en toda la cadena
-            de valor.
-          </p>
-        </section>
+            {/* Badges / Etiquetas Visuales */}
+            <div className="flex flex-wrap gap-3 mt-6">
+              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-cyan-50 text-cyan-900 border border-cyan-100 shadow-sm">
+                Tecnificación
+              </span>
+              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-blue-50 text-blue-900 border border-blue-100 shadow-sm">
+                Atracción de Recursos
+              </span>
+              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-gray-100 text-gray-700 border border-gray-200 shadow-sm">
+                Nuevas Metodologías
+              </span>
+            </div>
+          </div>
+
+          {/* SECCIÓN INFERIOR: La "Caja de Contraste" */}
+          <div 
+            className="rounded-2xl p-6 md:p-8 text-white shadow-lg transform translate-y-2 relative overflow-hidden"
+            style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}
+          >
+             {/* Decoración abstracta (Circuitos / Conexiones) */}
+             <div className="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none">
+                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                   <circle cx="90%" cy="20%" r="40" stroke="white" strokeWidth="2" fill="none" />
+                   <path d="M 80% 20% L 60% 50%" stroke="white" strokeWidth="2" />
+                </svg>
+             </div>
+
+            <div className="relative z-10">
+              {/* Icono de Bombilla/Idea + Título */}
+              <h3 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: COLOR_ACENTO_INNOVACION }}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                Enfoque y Alcance
+              </h3>
+              
+              <p className="text-base md:text-lg opacity-90 leading-relaxed font-light">
+                Impulsamos la <strong>búsqueda y transferencia</strong> de nuevas tecnologías para optimizar procesos, incrementar la eficiencia y fortalecer la circularidad.
+              </p>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );

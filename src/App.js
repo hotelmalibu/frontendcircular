@@ -34,6 +34,7 @@ import CadenaValor from "./modules/home/nuestrosTrabajos/lineasEstrategicas/cade
 import ConsumoResponsable from "./modules/home/nuestrosTrabajos/lineasEstrategicas/consumoResponsable";
 import InclusionSocialProductiva from "./modules/home/nuestrosTrabajos/lineasEstrategicas/inclusionSocialProductiva";
 import Innovacion from "./modules/home/nuestrosTrabajos/lineasEstrategicas/innovacion";
+import Pedagogia from "./modules/home/nuestrosTrabajos/lineasEstrategicas/pedagogia";
 import ProyectoEstrategico from "./modules/home/nuestrosTrabajos/lineasEstrategicas/proyectoEstrategico";
 import Certificaciones from "./modules/home/nuestrosTrabajos/E-Learning/certificaciones"; 
 import Cursos from "./modules/home/nuestrosTrabajos/E-Learning/cursos";
@@ -78,6 +79,7 @@ export default function App() {
 
           <Route path="/inclusin-social-y-productiva" element={<InclusionSocialProductiva />} />
           <Route path="/innovacin" element={<Innovacion />} />
+          <Route path="/pedagogia" element={<Pedagogia />} />
           <Route path="/proyectos-estratgico" element={<ProyectoEstrategico />} />
           <Route path="/certificaciones" element={<Certificaciones />} />
           <Route path="/cursos" element={<Cursos />} />

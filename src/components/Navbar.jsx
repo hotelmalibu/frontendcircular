@@ -4,20 +4,22 @@ import { AuthContext } from "../context/AuthContext";
 import LogoBlanco from "../assets/Logo_blanco.png";
 import Logo from "../assets/Logo.png";
 import DefaultAvatar from "../assets/default-avatar.png";
+// Nota: Puedes eliminar Building y Gavel de las importaciones si ya no las usarás en ningún otro lado, 
+// pero las dejo aquí para evitar errores si las mueves a otro sitio.
 import { User, LogOut, Home, Shield, Handshake, Building, Gavel, Menu, ChevronDown, Bell, MessageSquare } from "lucide-react";
 
 // --- COMPONENTES AUXILIARES (Badge, Menús) ---
-// (Se mantienen igual que antes, los comprimo para enfocarme en la lógica principal)
 
 function UserRoleBadge({ role }) {
+  // CONFIGURACIÓN DE ROLES ACTUALIZADA: Solo Administrador y Aliados
   const roleStyles = {
     Administrador: { icon: <Shield size={14} />, bg: "#1E305D", text: "#FFFFFF" },
-    Empresa: { icon: <Building size={14} />, bg: "#00AB6D", text: "#FFFFFF" },
-    Autoridades: { icon: <Gavel size={14} />, bg: "#E8AD00", text: "#1E305D" },
     Aliados: { icon: <Handshake size={14} />, bg: "#2C67B0", text: "#FFFFFF" },
-    Ciudadanía: { icon: <User size={14} />, bg: "#B1D357", text: "#1E305D" },
   };
+
+  // Si el rol no es Administrador ni Aliados, usará el estilo gris por defecto (Default)
   const selected = roleStyles[role] || { icon: <User size={14} />, bg: "#E5E7EB", text: "#374151" };
+
   return (
     <p className="flex items-center gap-2 text-xs font-semibold rounded-full px-3 py-1 inline-flex shadow-sm transition-transform duration-200 hover:scale-105" style={{ backgroundColor: selected.bg, color: selected.text }}>
       {selected.icon} <span>{role}</span>
@@ -341,10 +343,11 @@ export default function Navbar({ onMenuClick }) {
               path: "#",
               subItems: [
                 { label: "Cadenas de valor", path: "/cadenas-de-valor" },
-                { label: "Innovación", path: "/innovacion" },
-                { label: "Inclusión Social y Productiva", path: "/inclusion-social-y-productiva" },
-                { label: "Proyectos estratégico", path: "/proyectos-estrategico" },
-                { label: "Consumo Responsable", path: "/consumo-responsable" }
+                { label: "Innovación", path: "/innovacin" },
+                { label: "Inclusión Social y Productiva", path: "/inclusin-social-y-productiva" },
+                { label: "Proyectos estratégico", path: "/proyectos-estratgico  " },
+                { label: "Consumo Responsable", path: "/consumo-responsable" },
+                { label: "Pedagogía", path: "/pedagogia" }
               ]
             },
             { label: "Junta Directiva - Equipo", path: "/juntaDirecteEquipo" },
@@ -356,7 +359,7 @@ export default function Navbar({ onMenuClick }) {
           items: [
             { label: "Resoluciones", path: "/resoluciones" },
             { label: "Planes", path: "/planes" },
-            { label: "Políticas", path: "/politicas" },
+            { label: "Políticas", path: "/polticas" },
           ]
         }
       ]

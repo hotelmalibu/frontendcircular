@@ -1,82 +1,98 @@
 import React from "react";
-import fondos_submenus from "../../../../assets/fondos_submenus.jpg";
-
-// --- IMPORTAR ACTIVOS ---
-import imgHeader from "../../../../assets/lineasestrategicas/1.png";
+// Ajusta tus rutas según corresponda
 import imgLogo from "../../../../assets/lineasestrategicas/cadenasdevalor/cadenasdevalor.png";
 
-
-// Colores del manual de marca
+// Colores definidos
 const COLOR_AZUL_PRINCIPAL = '#1E305D';
-// const COLOR_VERDE_PRINCIPAL = '#00AB6D';
-const COLOR_AZUL_SECUNDARIO = '#00AB6D'; // Usado para el borde de la nueva sección
-// const COLOR_GRIS_TEXTO = '#333333';
-// const COLOR_FONDO_CLARO = '#f9f9f9';
-
+const COLOR_VERDE_PRINCIPAL = '#8CB200';
+const COLOR_VERDE_CLARO = '#E6F6F0'; 
 export default function CadenaValor() {
   return (
-    // Contenedor principal con padding superior para el Navbar fijo y fondo claro
-    <div className="mt-24 font-sans min-h-screen" style={{ backgroundImage: `url(${fondos_submenus})`, backgroundSize: "cover", backgroundPosition: "center" }}>
+    <div 
+      className="mt-24 font-sans min-h-[calc(100vh-6rem)] flex items-center justify-center p-4 md:p-8" 
+      style={{
+        backgroundColor: "#e6e6e6ff", 
+        backgroundSize: "cover", 
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed" // Efecto parallax sutil
+      }}
+    >
       
-      {/* 1. IMAGEN DE CABECERA (CENTRADA Y LIMITADA) */}
-      <div className="w-full h-auto mb-10 overflow-hidden">
-        <img 
-          src={imgHeader} 
-          alt="Líneas Estratégicas - Cabecera"
-          // Centrada y con ancho máximo
-          className="w-full max-w-7xl mx-auto object-cover" 
-        />
-      </div>
-
-      <div className="px-6 md:px-24 pb-14 max-w-7xl mx-auto">
+      {/* --- CONTENEDOR PRINCIPAL (TARJETA FLOTANTE) --- */}
+      <div className="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row">
         
-        {/* Título de la página */}
-        <h1 
-          className="text-4xl font-display font-bold text-center mb-10 uppercase"
-          style={{ color: COLOR_AZUL_PRINCIPAL }}
-        >
-          Líneas Estratégicas: Cadenas de Valor
-        </h1>
-       <div
-          className="w-[60%] h-1 mx-auto mb-8"
-          style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}
-        ></div>
-
-
-        {/* 2. CONTENIDO PRINCIPAL: Tarjeta de Fortalecimiento (Diseño original) */}
-        <div className="flex flex-col lg:flex-row items-start gap-8 bg-transparent p-6 md:p-10 rounded-xl">
+        {/* --- COLUMNA IZQUIERDA: IDENTIDAD VISUAL (40%) --- */}
+        {/* Usamos un fondo con degradado muy sutil para que no sea blanco plano */}
+        <div className="w-full lg:w-2/5 bg-gradient-to-br from-white to-gray-50 p-8 lg:p-12 flex flex-col justify-center items-center relative border-b lg:border-b-0 lg:border-r border-gray-100">
           
-          {/* Lado Izquierdo: Logo circular y Título */}
-          <div className="w-full lg:w-1/3 flex flex-col items-center justify-center p-4">
-            <img 
-              src={imgLogo} 
-              alt="Fortalecimiento de Cadenas de Valor Logo"
-              className="w-full max-w-xs h-auto object-contain mb-4" 
-            />
-          </div>
+          {/* Elemento decorativo de fondo (círculo verde difuminado) */}
+          <div className="absolute top-0 left-0 w-32 h-32 bg-green-100 rounded-full blur-3xl opacity-50 -translate-x-1/2 -translate-y-1/2"></div>
+          
+          <h2 className="text-sm font-bold tracking-widest uppercase text-gray-400 mb-6 self-start">
+            Línea Estratégica
+          </h2>
 
-          {/* Lado Derecho: Descripción */}
-          <div className="w-full lg:w-2/3 text-lg font-sans text-left self-center">
-            <p className="text-gray-800 leading-relaxed text-2xl mb-4">
-              Implementar <strong>un modelo de articulación y fortalecimiento</strong> de gestores y transformadores que
-              permita el cumplimiento normativo de <strong>REP</strong> y <strong>PUSU</strong>, y que responda a estrategias corporativas y
-              legales.
-            </p>
+          <img 
+            src={imgLogo} 
+            alt="Fortalecimiento de Cadenas de Valor"
+            className="w-full h-auto object-contain drop-shadow-lg transform transition-transform duration-500 hover:scale-105" 
+          />
+
+          {/* Pequeño adorno visual debajo del logo */}
+          <div className="mt-8 flex gap-2">
+            <div className="h-2 w-16 rounded-full" style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}></div>
+            <div className="h-2 w-4 rounded-full" style={{ backgroundColor: COLOR_VERDE_PRINCIPAL }}></div>
           </div>
         </div>
 
-        {/* 3. --- SECCIÓN DE TEXTO ADICIONAL CENTRADA EN CAJÓN --- */}
-        <section className="mt-6 text-center max-w-4xl mx-auto p-8 bg-transparent">
-          <h2 className="text-3xl font-sans font-bold mb-4" style={{ color: COLOR_AZUL_SECUNDARIO }}>
-            Enfoque y Alcance de la Línea
-          </h2>
-          <p className="text-xl text-gray-700 leading-relaxed mb-6">
-            Esta línea estratégica busca cerrar <strong>el ciclo de vida de los envases y empaques</strong>,
-            promoviendo la colaboración entre todos <strong>los actores de la cadena de valor</strong>, desde el
-            productor hasta el transformador final.
-          </p>
-        </section>
+        {/* --- COLUMNA DERECHA: CONTENIDO (60%) --- */}
+        <div className="w-full lg:w-3/5 p-8 lg:p-12 flex flex-col justify-between relative">
+          
+          {/* SECCIÓN SUPERIOR: Objetivo Principal */}
+          <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-display font-bold mb-6 text-gray-800">
+              Fortalecimiento de <span style={{ color: COLOR_VERDE_PRINCIPAL }}>Cadenas de Valor</span>
+            </h1>
+            
+            <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+              Implementamos un modelo de <span className="font-semibold text-gray-900">articulación y fortalecimiento</span> de gestores y transformadores.
+            </p>
 
+            {/* Badges / Etiquetas para conceptos clave (rompen la monotonía del texto) */}
+            <div className="flex flex-wrap gap-3 mt-6">
+              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-blue-50 text-blue-900 border border-blue-100 shadow-sm">
+                Cumplimiento REP
+              </span>
+              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-blue-50 text-blue-900 border border-blue-100 shadow-sm">
+                Normativa PUSU
+              </span>
+              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-green-50 text-green-800 border border-green-100 shadow-sm">
+                Estrategias Corporativas
+              </span>
+            </div>
+          </div>
+
+          {/* SECCIÓN INFERIOR: La "Caja de Contraste" */}
+          {/* Esta caja coloreada llena el espacio visual inferior y destaca el enfoque */}
+          <div 
+            className="rounded-2xl p-6 md:p-8 text-white shadow-lg transform translate-y-2 relative overflow-hidden"
+            style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}
+          >
+            {/* Decoración de fondo en la tarjeta azul */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10"></div>
+            
+            <div className="relative z-10">
+              <h3 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: '#8CB200' }}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                Enfoque y Alcance
+              </h3>
+              <p className="text-base md:text-lg opacity-90 leading-relaxed font-light">
+                Buscamos cerrar el <strong>ciclo de vida de envases y empaques</strong>, promoviendo la colaboración total entre productores, gestores y transformadores.
+              </p>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );
