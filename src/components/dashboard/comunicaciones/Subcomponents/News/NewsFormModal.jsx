@@ -37,55 +37,66 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
   }, [newsData, isEditing]);
 
   // Initialize CKEditor manually into the container with id news-description-editor
-useEffect(() => {
-  const initEditor = async () => {
-    if (hasInitialized.current) return;  // ⛔ evita doble creación
-    hasInitialized.current = true;
+  useEffect(() => {
+    const initEditor = async () => {
+      if (hasInitialized.current) return; // avoid double creation
+      hasInitialized.current = true;
 
-    try {
-      const container = editorRef.current;
-      if (!container) return;
+      try {
+        const container = editorRef.current || document.getElementById('news-description-editor');
+        if (!container) return;
+        if (editorInstanceRef.current) {
+          await editorInstanceRef.current.destroy();
+          editorInstanceRef.current = null;
+        }
 
+        const instance = await ClassicEditor.create(container, {
+          toolbar: [
+            'heading', '|', 'bold', 'italic', 'underline', 'link',
+            'bulletedList', 'numberedList', '|', 'outdent', 'indent',
+            '|', 'blockQuote', 'undo', 'redo'
+          ]
+        });
+
+        editorInstanceRef.current = instance;
+        // set initial data
+        instance.setData(formData.description || "");
+        // keep model synchronized
+        instance.model.document.on('change:data', () => {
+          const data = instance.getData();
+          setFormData(prev => ({ ...prev, description: data }));
+          if (errors.description) {
+            setErrors(prev => ({ ...prev, description: null }));
+          }
+        });
+      } catch (e) {
+        console.error('Error initializing editor:', e);
+      }
+    };
+
+    initEditor();
+    return () => {
       if (editorInstanceRef.current) {
-        await editorInstanceRef.current.destroy();
+        editorInstanceRef.current.destroy().catch(() => {});
         editorInstanceRef.current = null;
       }
+    };
+  }, []);
 
-      const instance = await ClassicEditor.create(container, {
-        toolbar: [
-          'heading', '|', 'bold', 'italic', 'underline', 'link',
-          'bulletedList', 'numberedList', '|', 'outdent', 'indent',
-          '|', 'blockQuote', 'undo', 'redo'
-        ]
-      });
-
-      editorInstanceRef.current = instance;
-      instance.setData(formData.description || "");
-
-      instance.model.document.on("change:data", () => {
-        const data = instance.getData();
-        setFormData(prev => ({ ...prev, description: data }));
-        if (errors.description) {
-          setErrors(prev => ({ ...prev, description: null }));
-        }
-      });
-
-    } catch (e) {
-      console.error("Error initializing editor:", e);
+  // Keep editor content in sync with formData.description (e.g., when opening edit modal)
+  useEffect(() => {
+    const instance = editorInstanceRef.current;
+    if (!instance) return;
+    const currentData = instance.getData() || '';
+    const targetData = formData.description || '';
+    if (currentData !== targetData) {
+      try {
+        instance.setData(targetData);
+      } catch (e) {
+        // ignore setData errors
+      }
     }
-  };
-
-  initEditor();
-
-  return () => {
-    if (editorInstanceRef.current) {
-      editorInstanceRef.current.destroy().catch(() => {});
-      editorInstanceRef.current = null;
-    }
-  };
-}, []);  // solo corre una vez REAL
-
-
+  }, [formData.description]);
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
