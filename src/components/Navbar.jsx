@@ -397,8 +397,7 @@ export default function Navbar({ onMenuClick }) {
       name: "Circularmente",
       subsections: [
         { title: "Micrositio", path: "/circularmente", items: [] },
-        { title: "Directorio", path: "/circularmente/directorio", items: [] },
-        { title: "Herramientas digitales", path: "/circularmente/herramientas-digitales", items: [] }
+        { title: "Herramientas digitales", path: "#", items: [] }
       ]
     }
   ];

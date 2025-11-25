@@ -6,133 +6,141 @@ import {
   Building2, 
   Download, 
   ArrowRight, 
-  Lock 
+  Lock,
+  CheckCircle2
 } from "lucide-react";
 
 export default function TransparencyPortal() {
   const transparenciaItems = [
     {
       icon: FileText,
-      titulo: "Código de Ética y Conducta",
-      descripcion:
-        "Marco de referencia que guía el comportamiento de colaboradores. Principios no negociables de nuestra operación.",
+      titulo: "Código de Ética",
+      descripcion: "Marco de referencia que guía el comportamiento. Principios no negociables.",
       action: "Descargar PDF",
       link: "#"
     },
     {
       icon: ShieldAlert,
-      titulo: "Línea Ética y Transparencia",
-      descripcion:
-        "Canal confidencial y anónimo para reportar conductas contrarias a nuestros principios, fraudes o corrupción.",
-      action: "Realizar Reporte",
+      titulo: "Línea Ética",
+      descripcion: "Canal confidencial y anónimo para reportar conductas contrarias a principios.",
+      action: "Reportar",
       link: "#",
       highlight: true 
     },
     {
       icon: Building2,
       titulo: "Gobierno Corporativo",
-      descripcion:
-        "Estructura de toma de decisiones, composición de la junta directiva y estatutos para una administración responsable.",
+      descripcion: "Estructura de toma de decisiones y junta directiva para una administración responsable.",
       action: "Ver Estructura",
       link: "#"
     },
     {
       icon: Scale,
       titulo: "Rendición de Cuentas",
-      descripcion:
-        "Informes anuales de gestión y sostenibilidad. Transparencia total en nuestros resultados financieros y sociales.",
+      descripcion: "Informes anuales de gestión y sostenibilidad. Transparencia total en resultados.",
       action: "Ver Informes",
       link: "#"
     },
   ];
 
   return (
-    // AQUI SE APLICARON LAS CLASES SOLICITADAS: mt-24 px-6 py-14 text-center
-    // Se mantiene bg-slate-50 para que tenga el color de fondo gris suave
-    <section className="bg-slate-50 mt-24 px-6 py-14 text-center relative">
+    <section className="bg-slate-50 mt-24 px-6 py-20 relative overflow-hidden">
       
-      {/* Encabezado */}
-      <div className="max-w-4xl mx-auto mb-16">
-        <span className="bg-white border border-slate-200 text-green-700 py-1 px-4 rounded-full text-sm font-bold uppercase tracking-wider mb-4 inline-block shadow-sm">
+      {/* Decoración de fondo sutil (opcional) */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-200 to-transparent"></div>
+
+      {/* --- BLOQUE SUPERIOR: TÍTULO + ÉTICA (Párrafo 1) --- */}
+      <div className="max-w-5xl mx-auto mb-16 text-center">
+        <span className="bg-green-100 text-green-800 py-1 px-4 rounded-full text-xs font-bold uppercase tracking-widest mb-6 inline-block">
           Integridad Institucional
         </span>
-        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">
-          Portal de Ética y <span className="text-green-700">Transparencia</span>
+        
+        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
+          Portal de Ética y <span className="text-green-600 relative inline-block">
+            Transparencia
+            <svg className="absolute w-full h-2 bottom-0 left-0 text-green-200 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" /></svg>
+          </span>
         </h2>
-        <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-          Promovemos una cultura de legalidad. Aquí encontrarás las herramientas y documentos que respaldan nuestro compromiso público.
+
+        {/* Párrafo 1: Introducción centrada y limpia */}
+        <p className="text-slate-600 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto">
+          En <strong className="text-slate-800">Visión Circular ANDI</strong> actuamos bajo principios de ética, responsabilidad y coherencia institucional. Gestionamos cada proyecto promoviendo prácticas responsables, priorizando la <span className="text-green-700 font-medium">inclusión, el respeto y la integridad</span> para asegurar estándares técnicos, sociales y ambientales sólidos.
         </p>
       </div>
 
-      {/* Grid de Tarjetas */}
+      {/* --- BLOQUE CENTRAL: TARJETAS (Herramientas) --- */}
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
         {transparenciaItems.map((item, index) => (
           <div
             key={index}
-            // Agregué 'items-center' para que el icono se centre junto con el texto (ya que el padre tiene text-center)
-            className={`group flex flex-col items-center bg-white rounded-xl transition-all duration-300 hover:-translate-y-1
+            className={`group flex flex-col bg-white rounded-2xl transition-all duration-300 hover:-translate-y-1
               ${item.highlight 
-                ? "border-2 border-green-500 shadow-lg shadow-green-900/5" 
-                : "border border-slate-200 shadow-sm hover:shadow-xl hover:border-green-300"
+                ? "border-2 border-green-500 shadow-xl shadow-green-900/10" 
+                : "border border-slate-100 shadow-sm hover:shadow-lg hover:border-green-200"
               }`}
           >
-            {/* Cuerpo de la tarjeta */}
-            <div className="p-6 flex-grow flex flex-col items-center">
-              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-5 transition-colors duration-300
-                ${item.highlight ? "bg-green-600 text-white" : "bg-slate-100 text-slate-600 group-hover:bg-green-600 group-hover:text-white"}`}>
-                <item.icon className="w-6 h-6" />
+            <div className="p-6 flex flex-col h-full">
+              <div className="flex justify-between items-start mb-4">
+                <div className={`p-3 rounded-xl ${item.highlight ? "bg-green-100 text-green-700" : "bg-slate-50 text-slate-500 group-hover:bg-green-50 group-hover:text-green-600"}`}>
+                  <item.icon className="w-6 h-6" />
+                </div>
+                {item.highlight && <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>}
               </div>
               
-              <h3 className="text-lg font-bold text-slate-900 mb-2">
-                {item.titulo}
-              </h3>
-              <p className="text-slate-500 text-sm leading-relaxed">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">{item.titulo}</h3>
+              <p className="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
                 {item.descripcion}
               </p>
-            </div>
 
-            {/* Footer de la tarjeta */}
-            <div className="w-full p-6 pt-0 mt-auto border-t border-slate-50">
-              <a 
-                href={item.link} 
-                className={`inline-flex items-center justify-center font-semibold text-sm mt-4 transition-colors
-                  ${item.highlight 
-                    ? "text-green-700 hover:text-green-900" 
-                    : "text-slate-400 group-hover:text-green-600"
-                  }`}
-              >
-                {item.action}
-                {item.action.includes("Descargar") ? (
-                  <Download className="w-4 h-4 ml-2" />
-                ) : (
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                )}
+              <a href={item.link} className={`flex items-center text-sm font-bold ${item.highlight ? "text-green-700" : "text-slate-400 group-hover:text-green-600"}`}>
+                {item.action} <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
               </a>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Banner Inferior de Seguridad (Restaurado a su diseño original dentro del contenedor) */}
-      <div className="max-w-5xl mx-auto bg-slate-900 rounded-2xl p-8 md:p-12 shadow-2xl">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-5 text-center md:text-left">
-              <div className="p-3 bg-slate-800 rounded-full">
-                <Lock className="w-6 h-6 text-green-400" />
-              </div>
-              <div>
-                <h4 className="text-white text-xl font-bold mb-2">Garantía de Anonimato</h4>
-                <p className="text-slate-400 text-sm max-w-md leading-relaxed">
-                  La línea ética es gestionada por un tercero independiente. No rastreamos IPs ni grabamos llamadas para proteger tu identidad.
-                </p>
-              </div>
+      {/* --- BLOQUE INFERIOR: TRANSPARENCIA (Párrafo 2) --- */}
+      {/* Este bloque separa visualmente el segundo texto, dándole su propio espacio */}
+      <div className="max-w-6xl mx-auto mb-16">
+        <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 flex flex-col md:flex-row gap-10 items-center shadow-sm">
+          
+          {/* Lado Izquierdo: Título visual */}
+          <div className="md:w-1/3 flex flex-col items-start border-b md:border-b-0 md:border-r border-slate-100 pb-6 md:pb-0 md:pr-6">
+            <h3 className="text-2xl font-bold text-slate-800 mb-2">Compromiso de Claridad</h3>
+            <div className="flex items-center gap-2 text-green-600 font-medium">
+              <CheckCircle2 className="w-5 h-5" />
+              <span>Economía Circular Trazable</span>
             </div>
-            
-            <button className="bg-green-600 hover:bg-green-500 text-white font-medium py-3 px-8 rounded-lg transition-colors shadow-lg shadow-green-900/20 flex items-center whitespace-nowrap">
-              Reportar incidente
-              <ShieldAlert className="w-4 h-4 ml-2" />
-            </button>
           </div>
+
+          {/* Lado Derecho: El Texto de Transparencia */}
+          <div className="md:w-2/3">
+            <p className="text-slate-600 text-lg leading-relaxed">
+              La transparencia es un eje fundamental en nuestra gestión. Mantenemos una comunicación clara y oportuna sobre avances y metodologías, publicando informes que permiten hacer seguimiento al impacto. 
+            </p>
+            <p className="text-slate-600 text-lg leading-relaxed mt-4">
+              Garantizamos que las alianzas operen bajo criterios de <strong className="text-slate-800">apertura y rendición de cuentas</strong>, reafirmando nuestro compromiso con las mejores prácticas del país.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      {/* --- FOOTER: BANNER DE SEGURIDAD --- */}
+      <div className="max-w-4xl mx-auto bg-slate-900 rounded-2xl p-6 md:p-10 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-slate-800 rounded-full text-green-400">
+            <Lock className="w-6 h-6" />
+          </div>
+          <div>
+            <h4 className="text-white text-lg font-bold">Garantía de Anonimato</h4>
+            <p className="text-slate-400 text-sm">Gestionado por un tercero independiente.</p>
+          </div>
+        </div>
+        <button className="bg-green-600 hover:bg-green-500 text-white font-medium py-2 px-6 rounded-lg transition-colors flex items-center shadow-lg shadow-green-900/20">
+          Reportar incidente <ShieldAlert className="w-4 h-4 ml-2" />
+        </button>
       </div>
 
     </section>
