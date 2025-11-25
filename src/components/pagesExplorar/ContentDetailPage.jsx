@@ -48,10 +48,10 @@ export default function ContentDetailPage() {
 
         // If links were generated as `noticia-{id}` on the cards, extract id
         const idFromSlug = typeof slug === 'string' && slug.startsWith('noticia-') ? slug.replace('noticia-', '') : null;
-        const searchKeys = { slug, idFromSlug };
-        console.debug('ContentDetailPage: searching newsArray with keys', searchKeys);
-
+        
+        // Search logic
         let found = newsArray.find(n => n.slug === slug || String(n.id) === slug || String(n._id) === slug || (idFromSlug && (String(n.id) === idFromSlug || String(n._id) === idFromSlug)));
+        
         // If not found in the batch, try to fetch by id directly when we have idFromSlug
         if (!found && idFromSlug) {
           try {
@@ -62,19 +62,29 @@ export default function ContentDetailPage() {
             console.warn('ContentDetailPage: getNewsById failed', err);
           }
         }
+
         if (found && mounted) {
-          // If the found content is not published, only allow displaying it for authenticated users (dashboard/editor).
+          // Log para depuración: Ver qué campos trae la API realmente
+          console.log("Datos recibidos de la API:", found);
+
+          // If the found content is not published, only allow displaying it for authenticated users.
           if (String(found.status).toLowerCase() !== 'published' && !isAuthenticated) {
             setContent(null);
             setLoading(false);
             return;
           }
+
           // Normalize API object into the shape expected by the detail page
           const mapped = {
             id: found.id || found._id || found.uid,
             title: found.title || found.name || "Sin título",
-            excerpt: found.excerpt || (found.description ? (String(found.description).slice(0, 250) + (String(found.description).length > 250 ? '...' : '')) : ""),
-            body: found.description || found.content || found.body || "",
+            // Excerpt usa description preferiblemente
+            excerpt: found.excerpt || found.description || (found.content ? (String(found.content).slice(0, 250) + '...') : ""),
+            
+            // --- CORRECCIÓN CLAVE ---
+            // Priorizamos 'content', 'body', 'html' o 'text' antes que 'description' para asegurar que se muestre el artículo completo
+            body: found.content || found.body || found.html || found.text || found.description || "",
+            
             image: found.image || found.thumbnail || found.cover || "",
             date: found.published_at || found.publishedAt || found.created_at || found.createdAt || "",
             type: found.type ? (found.type === 'news' ? 'Noticias' : found.type) : 'Noticias',
@@ -84,16 +94,16 @@ export default function ContentDetailPage() {
             status: found.status || "",
           };
 
-          // Sanitize body HTML to avoid XSS (server-side whitelist is recommended too)
+          // Sanitize body HTML to avoid XSS
           if (mapped.body) {
             try {
               mapped.body = DOMPurify.sanitize(String(mapped.body));
             } catch (e) {
-              // If DOMPurify is not available or sanitization fails, leave body as-is
+              // If sanitization fails, logic continues
             }
           }
 
-          // Format date to match mock format (simple localized string)
+          // Format date
           if (mapped.date) {
             try {
               mapped.date = new Date(mapped.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -116,9 +126,9 @@ export default function ContentDetailPage() {
 
     findContent();
     return () => { mounted = false };
-  }, [slug]);
-  
-  // Si aún no cargó el contenido, mostrar loader o mensaje
+  }, [slug, isAuthenticated]);
+   
+  // Loading State
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -130,6 +140,7 @@ export default function ContentDetailPage() {
     );
   }
 
+  // Not Found State
   if (!content) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
@@ -144,32 +155,22 @@ export default function ContentDetailPage() {
   const config = contentTypeConfig[content.type] || {};
   const Icon = config.icon || (() => null);
 
-  // --- CÁLCULO DE URLS DE COMPARTIR (IMPLEMENTACIÓN NUEVA) ---
+  // --- SOCIAL SHARE URLS ---
   const currentUrl = window.location.href;
   const rawTitle = content?.title || '';
-  
-  // Codificamos los valores para que sean seguros en una URL
+   
   const encodedUrl = encodeURIComponent(currentUrl);
   const encodedTitle = encodeURIComponent(rawTitle);
-  const encodedTextAndUrl = encodeURIComponent(`${rawTitle} ${currentUrl}`); // Para LinkedIn y Mail
+  const encodedTextAndUrl = encodeURIComponent(`${rawTitle} ${currentUrl}`);
 
-  // Definimos las URLs finales
-  // 1. Facebook: Solo permite URL. No permite pre-rellenar texto.
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-  
-  // 2. X (Twitter): Permite URL y Texto.
   const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
-  
-  // 3. LinkedIn: Usamos el endpoint 'feed' con 'text' para simular el comportamiento de X.
   const linkedinShareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedTextAndUrl}`;
-  
-  // 4. Mail
   const mailShareUrl = `mailto:?subject=${encodedTitle}&body=${encodedTextAndUrl}`;
-
 
   return (
     <div className="min-h-screen bg-white fontfamily-montserrat">
-      
+       
       {/* --- HERO HEADER --- */}
       <div className={`relative w-full h-[70vh] md:h-[80vh] flex items-end overflow-hidden ${config.isSolid ? config.bgColor : 'bg-gray-900'}`}>
 
@@ -224,7 +225,7 @@ export default function ContentDetailPage() {
       {/* --- CONTENIDO PRINCIPAL --- */}
       <div className="container mx-auto px-4 md:px-8 relative z-20">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 py-16">
-          
+           
           {/* COLUMNA IZQUIERDA (Social Share Sticky) */}
           <div className="lg:w-24 flex-shrink-0">
              <div className="sticky top-32 flex lg:flex-col gap-4 items-center lg:items-start">
@@ -232,30 +233,10 @@ export default function ContentDetailPage() {
                   Compartir
                 </span>
 
-                <SocialButton
-                  icon={Facebook}
-                  color="#1877F2"
-                  url={facebookShareUrl}
-                />
-
-                <SocialButton
-                  icon={X}
-                  color="#000000"
-                  url={xShareUrl}
-                />
-
-                <SocialButton
-                  icon={Linkedin}
-                  color="#0A66C2"
-                  url={linkedinShareUrl}
-                />
-
-                <SocialButton
-                  icon={Mail}
-                  color="#444444"
-                  url={mailShareUrl}
-                />
-
+                <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
+                <SocialButton icon={X} color="#000000" url={xShareUrl} />
+                <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
+                <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
 
                 {/* Móvil: Etiqueta compartir */}
                 <div className="lg:hidden flex items-center gap-2 text-gray-400 text-sm font-bold ml-auto">
@@ -267,19 +248,20 @@ export default function ContentDetailPage() {
           {/* COLUMNA DERECHA (Texto del Artículo) */}
           <div className="flex-1 max-w-3xl">
 
-            {/* Cuerpo del texto: usar `content.body` o `content.description` */}
+            {/* Cuerpo del texto */}
             <div className="prose prose-lg prose-headings:text-[#1E305D] prose-a:text-[#00AB6D] text-gray-600">
               {content.body ? (
-                // Si el body contiene HTML, renderizar como HTML; si es texto plano, dividir en párrafos
+                // Si el body contiene HTML, renderizar como HTML
                 /<[a-z][\s\S]*>/i.test(content.body) ? (
                   <div dangerouslySetInnerHTML={{ __html: content.body }} />
                 ) : (
+                  // Si es texto plano, dividir en párrafos
                   content.body.split(/\n\s*\n/).map((paragraph, idx) => (
                     <p key={idx}>{paragraph}</p>
                   ))
                 )
               ) : (
-                <p>{content.excerpt || 'No hay contenido disponible.'}</p>
+                <p>{content.excerpt || 'No hay contenido detallado disponible.'}</p>
               )}
             </div>
 
@@ -311,7 +293,6 @@ function SocialButton({ icon: Icon, url, color }) {
         border border-white/30
         text-white
       "
-      // Aquí aplicamos el color fijo directamente al estilo
       style={{ color: color }}
     >
       <Icon size={26} strokeWidth={2} />
