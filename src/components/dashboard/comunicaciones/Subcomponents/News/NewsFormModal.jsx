@@ -52,9 +52,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
         const instance = await ClassicEditor.create(container, {
           toolbar: [
-            'heading', '|', 'bold', 'italic', 'underline', 'link',
-            'bulletedList', 'numberedList', '|', 'outdent', 'indent',
-            '|', 'blockQuote', 'undo', 'redo'
+            'bold', 'italic', '|', 'undo', 'redo'
           ]
         });
 
@@ -366,80 +364,55 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
             {/* Dates Section */}
             <div className="border-t pt-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-1">
-                <Calendar size={16} />
-                Fechas
-              </h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-1">
+                  <Calendar size={16} />
+                  Fechas
+                </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Start Date */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">
-                    Fecha de Inicio
-                  </label>
-                  <input
-                    type="date"
-                    name="start_date"
-                    value={formData.start_date}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
-                    disabled={loading}
-                  />
-                </div>
+                {/* Contenedor en fila */}
+                <div className="flex flex-row gap-4">
+                  
+                  {/* Start Date */}
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      Fecha de Inicio
+                    </label>
+                    <input
+                      type="date"
+                      name="start_date"
+                      value={formData.start_date}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                      disabled={loading}
+                    />
+                  </div>
 
-                {/* End Date */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">
-                    Fecha de Fin
-                  </label>
-                  <input
-                    type="date"
-                    name="end_date"
-                    value={formData.end_date}
-                    onChange={handleChange}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none ${
-                      errors.end_date ? "border-red-500" : "border-gray-300"
-                    }`}
-                    disabled={loading}
-                  />
-                  {errors.end_date && (
-                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                      <AlertCircle size={14} />
-                      {errors.end_date}
-                    </p>
-                  )}
-                </div>
+                  {/* End Date */}
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      Fecha de Fin
+                    </label>
+                    <input
+                      type="date"
+                      name="end_date"
+                      value={formData.end_date}
+                      onChange={handleChange}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none ${
+                        errors.end_date ? "border-red-500" : "border-gray-300"
+                      }`}
+                      disabled={loading}
+                    />
 
-                {/* Published At is automated; not requested from the form */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">
-                    Fecha de Publicación
-                  </label>
-                  <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600">
-                    Se asigna automáticamente al cambiar a "Publicado"
+                    {errors.end_date && (
+                      <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                        <AlertCircle size={14} />
+                        {errors.end_date}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Info Note */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex gap-2">
-              <FileText className="text-blue-600 flex-shrink-0" size={20} />
-              <div className="text-sm text-blue-800">
-                <p className="font-medium mb-1">Información sobre las fechas:</p>
-                <ul className="list-disc list-inside space-y-1 text-xs">
-                  <li>
-                    <strong>Fecha de Inicio:</strong> Fecha en que la noticia/evento comienza
-                  </li>
-                  <li>
-                    <strong>Fecha de Fin:</strong> Fecha en que la noticia/evento expira
-                  </li>
-                  <li>
-                    <strong>Fecha de Publicación:</strong> Fecha efectiva de publicación
-                  </li>
-                </ul>
-              </div>
-            </div>
           </div>
         </form>
 
