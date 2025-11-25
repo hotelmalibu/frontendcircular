@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { X, Save, Calendar, User, Tag, FileText, AlertCircle } from "lucide-react";
 import { createNews, updateNews } from "../../../../../api/newsApi";
 
 export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess }) {
+  const editorRef = useRef(null);
+  const editorInstanceRef = useRef(null);
+  const hasInitialized = useRef(false);
   const [formData, setFormData] = useState({
     type: "news",
     title: "",
@@ -32,6 +36,67 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     }
   }, [newsData, isEditing]);
 
+  // Initialize CKEditor manually into the container with id news-description-editor
+  useEffect(() => {
+    const initEditor = async () => {
+      if (hasInitialized.current) return; // avoid double creation
+      hasInitialized.current = true;
+
+      try {
+        const container = editorRef.current || document.getElementById('news-description-editor');
+        if (!container) return;
+        if (editorInstanceRef.current) {
+          await editorInstanceRef.current.destroy();
+          editorInstanceRef.current = null;
+        }
+
+        const instance = await ClassicEditor.create(container, {
+          toolbar: [
+            'heading', '|', 'bold', 'italic', 'underline', 'link',
+            'bulletedList', 'numberedList', '|', 'outdent', 'indent',
+            '|', 'blockQuote', 'undo', 'redo'
+          ]
+        });
+
+        editorInstanceRef.current = instance;
+        // set initial data
+        instance.setData(formData.description || "");
+        // keep model synchronized
+        instance.model.document.on('change:data', () => {
+          const data = instance.getData();
+          setFormData(prev => ({ ...prev, description: data }));
+          if (errors.description) {
+            setErrors(prev => ({ ...prev, description: null }));
+          }
+        });
+      } catch (e) {
+        console.error('Error initializing editor:', e);
+      }
+    };
+
+    initEditor();
+    return () => {
+      if (editorInstanceRef.current) {
+        editorInstanceRef.current.destroy().catch(() => {});
+        editorInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  // Keep editor content in sync with formData.description (e.g., when opening edit modal)
+  useEffect(() => {
+    const instance = editorInstanceRef.current;
+    if (!instance) return;
+    const currentData = instance.getData() || '';
+    const targetData = formData.description || '';
+    if (currentData !== targetData) {
+      try {
+        instance.setData(targetData);
+      } catch (e) {
+        // ignore setData errors
+      }
+    }
+  }, [formData.description]);
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -246,15 +311,10 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Descripción / Contenido
               </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Ingrese el contenido completo de la noticia"
-                rows={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none resize-none"
-                disabled={loading}
-              />
+                {/* Rich text editor for description (CKEditor 5) */}
+                <div className="w-full">
+                  <div ref={editorRef} className="ck-editor__editable"></div>
+                </div>
             </div>
 
             {/* Category and Author Row */}

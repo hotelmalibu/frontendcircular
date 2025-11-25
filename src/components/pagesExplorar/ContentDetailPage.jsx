@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import DOMPurify from 'dompurify';
 import { useParams, Link } from 'react-router-dom';
 import { Facebook, Twitter, Linkedin, Mail, Calendar, ArrowLeft, Share2 } from 'lucide-react';
 import { allContentData, contentTypeConfig } from '../../data/mockContent'; 
@@ -82,6 +83,15 @@ export default function ContentDetailPage() {
             slug: found.slug || null,
             status: found.status || "",
           };
+
+          // Sanitize body HTML to avoid XSS (server-side whitelist is recommended too)
+          if (mapped.body) {
+            try {
+              mapped.body = DOMPurify.sanitize(String(mapped.body));
+            } catch (e) {
+              // If DOMPurify is not available or sanitization fails, leave body as-is
+            }
+          }
 
           // Format date to match mock format (simple localized string)
           if (mapped.date) {
@@ -222,9 +232,7 @@ export default function ContentDetailPage() {
           <div className="flex-1 max-w-3xl">
             
             {/* Extracto destacado */}
-            <p className="text-xl md:text-2xl text-gray-600 font-medium leading-relaxed mb-10 border-l-4 border-[#00AB6D] pl-6">
-              {content.excerpt}
-            </p>
+            
 
             {/* Cuerpo del texto: usar `content.body` o `content.description` */}
             <div className="prose prose-lg prose-headings:text-[#1E305D] prose-a:text-[#00AB6D] text-gray-600">

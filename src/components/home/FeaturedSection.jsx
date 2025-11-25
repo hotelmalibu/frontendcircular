@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { contentTypeConfig } from "../../data/mockContent"; 
+import DOMPurify from 'dompurify';
 import { getAllNews } from "../../api/newsApi";
 
 export default function FeaturedSection() {
@@ -37,8 +38,10 @@ export default function FeaturedSection() {
             if (possibleArrays.length > 0) newsArray = possibleArrays[0];
         }
 
-        // --- 2. Mapeo y Normalización (LA SOLUCIÓN ESTÁ AQUÍ) ---
-        const mapped = newsArray.map(n => {
+        // --- 2. Filtro: solo publicaciones (evitar mostrar borradores) ---
+        const publishedArray = newsArray.filter(n => String(n.status).toLowerCase() === 'published');
+        // --- 3. Mapeo y Normalización ---
+        const mapped = publishedArray.map(n => {
             // Obtenemos el tipo crudo de la API
             const rawType = n.type || n.category || ""; 
             
@@ -61,7 +64,7 @@ export default function FeaturedSection() {
                 type: finalType, // Usamos el tipo normalizado
                 topic: n.category || n.topic || "General",
                 title: n.title || n.name || "Sin título",
-                excerpt: n.description || n.excerpt || "",
+                excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
                 image: n.image || n.thumbnail || n.cover || "",
                 date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
                 slug: n.slug || (`noticia-${n.id || n._id || ''}`),

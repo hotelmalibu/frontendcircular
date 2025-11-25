@@ -13,6 +13,7 @@ import {
   Clock,
 } from "lucide-react";
 import { getAllNews, deleteNews } from "../../../../../api/newsApi";
+import DOMPurify from 'dompurify';
 import NewsFormModal from "./NewsFormModal";
 import NewsDetailModal from "./NewsDetailModal";
 
@@ -74,7 +75,6 @@ export default function NewsList() {
     }
     
     let filtered = [...news];
-
     if (searchTerm) {
       filtered = filtered.filter(
         (item) =>
@@ -242,8 +242,12 @@ export default function NewsList() {
               </div>
 
               {/* Description */}
-              <p className="text-gray-500 text-sm mb-5 line-clamp-2 flex-grow">
-                {item.description || "Sin descripción disponible..."}
+              <p className="text-gray-500 text-sm mb-5 line-clamp-2 flex-grow leading-relaxed">
+                {item.description ? (
+                  DOMPurify.sanitize(String(item.description)).replace(/<[^>]+>/g, '').slice(0, 200)
+                ) : (
+                  "Sin descripción disponible..."
+                )}
               </p>
 
               {/* Tags Row */}
@@ -304,7 +308,6 @@ export default function NewsList() {
           ))}
         </div>
       )}
-
       <div className="mt-6 text-center text-sm text-gray-400">
         Mostrando {filteredNews.length} resultados
       </div>

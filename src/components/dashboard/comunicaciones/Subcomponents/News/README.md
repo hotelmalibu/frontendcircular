@@ -40,6 +40,16 @@ src/
 - ✅ Estados: draft, published
 - ✅ Información contextual sobre fechas
 
+- ### Editor de Texto Enriquecido
+- ✅ Soporte para edición WYSIWYG de la descripción (`description`) usando CKEditor 5 (Classic build).
+- ✅ Formatos disponibles: encabezados (H1/H2/H3), negritas, cursivas, subrayado, listas ordenadas y viñetas, sangrías y tamaño de fuente.
+- ✅ El HTML resultante se guarda en `description` y se renderiza limpiamente en la vista pública y en el detalle de la noticia (sanitizado con DOMPurify).
+
+Dependencias requeridas (instalación):
+```bash
+npm install @ckeditor/ckeditor5-build-classic dompurify
+```
+
 ### NewsDetailModal Component
 - ✅ Vista detallada de la noticia
 - ✅ Visualización de todos los campos
