@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Instagram, Facebook, Linkedin } from "lucide-react";
 import Logo from "../assets/Logo_blanco.png";
 import fondoFooter from "../assets/fondo_footer.jpg";
 
@@ -46,10 +46,10 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contacto */}
+          {/* Contacto + Redes */}
           <div className="flex flex-col items-center md:items-start">
             <h4 className="font-semibold mb-2">Contáctenos</h4>
-            <address className="not-italic text-sm text-white/90 space-y-1 leading-relaxed">
+            <address className="not-italic text-sm text-white/90 space-y-1 leading-relaxed mb-3">
               <div>Carrera 13 # 25-405. Bogotá D.C.</div>
               <div>+57 1 381-3000</div>
               <div>
@@ -58,10 +58,44 @@ export default function Footer() {
                 </a>
               </div>
             </address>
+
+            {/* Redes Sociales */}
+            <div className="flex gap-4 mt-3">
+              <a
+                href="https://www.instagram.com/visioncircularandi/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 flex items-center justify-center rounded-full 
+                          bg-white/20 hover:bg-[#00AB6D] transition-all duration-300"
+              >
+                <Instagram size={26} className="text-white" />
+              </a>
+
+              <a
+                href="https://www.facebook.com/VisionCircularANDI/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 flex items-center justify-center rounded-full 
+                          bg-white/20 hover:bg-[#00AB6D] transition-all duration-300"
+              >
+                <Facebook size={26} className="text-white" />
+              </a>
+
+              <a
+                href="https://www.linkedin.com/in/andivision3030/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 flex items-center justify-center rounded-full 
+                          bg-white/20 hover:bg-[#00AB6D] transition-all duration-300"
+              >
+                <Linkedin size={26} className="text-white" />
+              </a>
+            </div>
+
           </div>
         </div>
 
-        {/* Botón subir (más cerca de la línea) */}
+        {/* Botón subir */}
         <div className="flex justify-center md:justify-end mt-6">
           <button
             onClick={scrollToTop}
@@ -75,13 +109,13 @@ export default function Footer() {
           </button>
         </div>
 
-        {/* Línea divisoria (menos espacio arriba y abajo) */}
+        {/* Línea divisoria */}
         <div className="container mx-auto px-6">
           <div className="w-full border-t border-[#8CB200] my-1" />
         </div>
       </div>
 
-      {/* Barra inferior (pegada a la línea) */}
+      {/* Barra inferior */}
       <div className="relative z-10 bg-black/40">
         <div className="container mx-auto px-6 py-3 flex flex-col sm:flex-row justify-between items-center text-xs text-white/80 gap-2 sm:gap-0">
           <div>© {new Date().getFullYear()} Visión Circular Colombia. Todos los derechos reservados.</div>
