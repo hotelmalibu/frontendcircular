@@ -18,7 +18,7 @@ import QuienesSomos from "./modules/home/nosotros/conocenos/quienesSomos";
 import PortalTransparencia from "./modules/home/nosotros/conocenos/portalTransparencia";
 import Estatutos from "./modules/home/nosotros/conocenos/estatutos";
 import Valores from "./modules/home/nosotros/conocenos/valores";
-import Presidencia from "./modules/home/nosotros/conocenos/presidencia";
+import JuantaDirectiva from "./modules/home/nosotros/conocenos/juntaDirecteEquipo";
 import Aliados from "./modules/home/nosotros/conocenos/aliados";
 import InformesAnuales from "./modules/home/nosotros/conocenos/informesAnuales";
 import Planes from "./modules/home/nosotros/marcoNormativo/planes";
@@ -31,7 +31,7 @@ import InclusionSocial from "./modules/home/nuestrosTrabajos/proyectosAlianzas/i
 import CasosExitos from "./modules/home/nuestrosTrabajos/proyectosAlianzas/casosExitos";
 import Convocatorias from "./modules/home/nuestrosTrabajos/proyectosAlianzas/convocatorias";
 import CadenaValor from "./modules/home/nuestrosTrabajos/lineasEstrategicas/cadenaValor";
-import ConsumoResponsable from "./modules/home/nuestrosTrabajos/lineasEstrategicas/consumoResponsable"; // <-- IMPORTACIÓN AÑADIDA
+import ConsumoResponsable from "./modules/home/nuestrosTrabajos/lineasEstrategicas/consumoResponsable";
 import InclusionSocialProductiva from "./modules/home/nuestrosTrabajos/lineasEstrategicas/inclusionSocialProductiva";
 import Innovacion from "./modules/home/nuestrosTrabajos/lineasEstrategicas/innovacion";
 import ProyectoEstrategico from "./modules/home/nuestrosTrabajos/lineasEstrategicas/proyectoEstrategico";
@@ -59,7 +59,7 @@ export default function App() {
           <Route path="/portal-de-transparencia" element={<PortalTransparencia />} />
           <Route path="/estatutos" element={<Estatutos />} />
           <Route path="/valores" element={<Valores />} />
-          <Route path="/presidencia" element={<Presidencia />} />
+          <Route path="/juntaDirecteEquipo" element={<JuantaDirectiva />} />
           <Route path="/aliados" element={<Aliados />} />
           <Route path="/informes-anuales" element={<InformesAnuales />} />
           <Route path="/planes" element={<Planes />} />

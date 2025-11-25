@@ -347,7 +347,7 @@ export default function Navbar({ onMenuClick }) {
                 { label: "Consumo Responsable", path: "/consumo-responsable" }
               ]
             },
-            { label: "Junta Directiva - Equipo", path: "/presidencia" },
+            { label: "Junta Directiva - Equipo", path: "/juntaDirecteEquipo" },
             { label: "Informes", path: "/informes-anuales" },
           ]
         },
