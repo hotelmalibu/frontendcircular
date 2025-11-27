@@ -40,11 +40,7 @@ export default function InclusionSocialProductiva() {
             className="w-full h-auto object-contain drop-shadow-lg transform transition-transform duration-500 hover:scale-105"
           />
 
-          {/* Adorno visual inferior */}
-          <div className="mt-8 flex gap-2">
-            <div className="h-2 w-16 rounded-full" style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}></div>
-            <div className="h-2 w-4 rounded-full" style={{ backgroundColor: COLOR_ACENTO_INCLUSION }}></div>
-          </div>
+         
         </div>
 
         {/* --- COLUMNA DERECHA: CONTENIDO (60%) --- */}
@@ -60,18 +56,7 @@ export default function InclusionSocialProductiva() {
               Impulsamos <span className="font-semibold text-gray-900">estrategias para cerrar brechas</span> entre los actores de la cadena, mejorando el impacto de la economía circular.
             </p>
 
-            {/* Badges / Etiquetas Visuales */}
-            <div className="flex flex-wrap gap-3 mt-6">
-              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-pink-50 text-pink-900 border border-pink-100 shadow-sm">
-                Cierre de Brechas
-              </span>
-              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-blue-50 text-blue-900 border border-blue-100 shadow-sm">
-                Énfasis en REP
-              </span>
-              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-gray-100 text-gray-700 border border-gray-200 shadow-sm">
-                Desarrollo de Capacidades
-              </span>
-            </div>
+          
           </div>
 
           {/* SECCIÓN INFERIOR: La "Caja de Contraste" */}

@@ -14,7 +14,7 @@ export default function ProyectoEstrategico() {
     <div
       className="mt-24 font-sans min-h-[calc(100vh-6rem)] flex items-center justify-center p-4 md:p-8"
       style={{
-        backgroundImage: `url(${fondos_submenus})`, // Usamos la imagen para uniformidad
+        backgroundColor: '#e6e6e6ff', // Usamos la imagen para uniformidad
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed", // Efecto Parallax
@@ -41,11 +41,7 @@ export default function ProyectoEstrategico() {
             className="w-full h-auto object-contain drop-shadow-lg transform transition-transform duration-500 hover:scale-105"
           />
 
-          {/* Adorno visual inferior */}
-          <div className="mt-8 flex gap-2">
-            <div className="h-2 w-16 rounded-full" style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}></div>
-            <div className="h-2 w-4 rounded-full" style={{ backgroundColor: COLOR_ACENTO_PROYECTOS }}></div>
-          </div>
+          
         </div>
 
         {/* --- COLUMNA DERECHA: CONTENIDO (60%) --- */}
@@ -61,18 +57,7 @@ export default function ProyectoEstrategico() {
               Desarrollamos modelos para <span className="font-semibold text-gray-900">implementar y escalar estrategias</span> de fortalecimiento de la economía circular.
             </p>
 
-            {/* Badges / Etiquetas Visuales */}
-            <div className="flex flex-wrap gap-3 mt-6">
-              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-purple-50 text-purple-900 border border-purple-100 shadow-sm">
-                Escalamiento
-              </span>
-              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-blue-50 text-blue-900 border border-blue-100 shadow-sm">
-                Residuos Aprovechables
-              </span>
-              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-gray-100 text-gray-700 border border-gray-200 shadow-sm">
-                Modelos Piloto
-              </span>
-            </div>
+            
           </div>
 
           {/* SECCIÓN INFERIOR: La "Caja de Contraste" */}
@@ -92,7 +77,7 @@ export default function ProyectoEstrategico() {
 
             <div className="relative z-10">
               {/* Icono de Cohete/Lanzamiento + Título */}
-              <h3 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: COLOR_ACENTO_PROYECTOS }}>
+              <h3 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: '#3e98ffff' }}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /> 
                   {/* Nota: Usé el rayo/impulso, pero podrías usar un mapa o bandera */}

@@ -15,7 +15,7 @@ export default function PedagogiaSensibilizacion() {
     <div
       className="mt-24 font-sans min-h-[calc(100vh-6rem)] flex items-center justify-center p-4 md:p-8"
       style={{
-        backgroundImage: `url(${fondos_submenus})`,
+        backgroundColor: '#e6e6e6ff',
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed", // Efecto Parallax
@@ -27,7 +27,7 @@ export default function PedagogiaSensibilizacion() {
         
         {/* --- COLUMNA IZQUIERDA: IDENTIDAD VISUAL (40%) --- */}
         {/* Fondo con degradado suave hacia ámbar/amarillo */}
-        <div className="w-full lg:w-2/5 bg-gradient-to-br from-white to-amber-50 p-8 lg:p-12 flex flex-col justify-center items-center relative border-b lg:border-b-0 lg:border-r border-gray-100">
+        <div className="w-full lg:w-2/5 bg-gradient-to-br  p-8 lg:p-12 flex flex-col justify-center items-center relative border-b lg:border-b-0 lg:border-r border-gray-100">
           
           {/* Decoración de fondo (Círculo de luz/conocimiento) */}
           <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-100 rounded-full blur-3xl opacity-60"></div>
@@ -43,11 +43,6 @@ export default function PedagogiaSensibilizacion() {
             className="w-full h-auto object-contain drop-shadow-lg transform transition-transform duration-500 hover:scale-105 mix-blend-multiply"
           />
 
-          {/* Adorno visual inferior */}
-          <div className="mt-8 flex gap-2">
-            <div className="h-2 w-16 rounded-full" style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}></div>
-            <div className="h-2 w-4 rounded-full" style={{ backgroundColor: COLOR_ACENTO_PEDAGOGIA }}></div>
-          </div>
         </div>
 
         {/* --- COLUMNA DERECHA: CONTENIDO (60%) --- */}
@@ -63,18 +58,7 @@ export default function PedagogiaSensibilizacion() {
               Diseñamos e implementamos estrategias educativas para <span className="font-semibold text-gray-900">transformar la cultura</span> del consumo y promover la sostenibilidad.
             </p>
 
-            {/* Badges / Etiquetas Visuales */}
-            <div className="flex flex-row flex-nowrap items-center gap-2 mt-6 overflow-x-auto pb-1 w-full">
-              <span className="px-2 py-2 rounded-lg font-bold text-xs md:text-sm bg-yellow-50 text-yellow-800 border border-yellow-100 shadow-sm whitespace-nowrap flex-shrink-0">
-                Cultura Ciudadana
-              </span>
-              <span className="px-2 py-2 rounded-lg font-bold text-xs md:text-sm bg-blue-50 text-blue-900 border border-blue-100 shadow-sm whitespace-nowrap flex-shrink-0">
-                Educación Ambiental
-              </span>
-              <span className="px-2 py-2 rounded-lg font-bold text-xs md:text-sm bg-gray-100 text-gray-700 border border-gray-200 shadow-sm whitespace-nowrap flex-shrink-0">
-                Cambio de Comportamiento
-              </span>
-            </div>
+            
           </div>
 
           {/* SECCIÓN INFERIOR: La "Caja de Contraste" */}

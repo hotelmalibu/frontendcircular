@@ -5,7 +5,6 @@ import imgLogo from "../../../../assets/lineasestrategicas/cadenasdevalor/cadena
 // Colores definidos
 const COLOR_AZUL_PRINCIPAL = '#1E305D';
 const COLOR_VERDE_PRINCIPAL = '#8CB200';
-const COLOR_VERDE_CLARO = '#E6F6F0'; 
 export default function CadenaValor() {
   return (
     <div 
@@ -14,7 +13,7 @@ export default function CadenaValor() {
         backgroundColor: "#e6e6e6ff", 
         backgroundSize: "cover", 
         backgroundPosition: "center",
-        backgroundAttachment: "fixed" // Efecto parallax sutil
+        backgroundAttachment: "fixed" 
       }}
     >
       
@@ -38,11 +37,7 @@ export default function CadenaValor() {
             className="w-full h-auto object-contain drop-shadow-lg transform transition-transform duration-500 hover:scale-105" 
           />
 
-          {/* Pequeño adorno visual debajo del logo */}
-          <div className="mt-8 flex gap-2">
-            <div className="h-2 w-16 rounded-full" style={{ backgroundColor: COLOR_AZUL_PRINCIPAL }}></div>
-            <div className="h-2 w-4 rounded-full" style={{ backgroundColor: COLOR_VERDE_PRINCIPAL }}></div>
-          </div>
+          
         </div>
 
         {/* --- COLUMNA DERECHA: CONTENIDO (60%) --- */}
@@ -58,18 +53,6 @@ export default function CadenaValor() {
               Implementamos un modelo de <span className="font-semibold text-gray-900">articulación y fortalecimiento</span> de gestores y transformadores.
             </p>
 
-            {/* Badges / Etiquetas para conceptos clave (rompen la monotonía del texto) */}
-            <div className="flex flex-wrap gap-3 mt-6">
-              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-blue-50 text-blue-900 border border-blue-100 shadow-sm">
-                Cumplimiento REP
-              </span>
-              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-blue-50 text-blue-900 border border-blue-100 shadow-sm">
-                Normativa PUSU
-              </span>
-              <span className="px-4 py-2 rounded-lg font-bold text-sm bg-green-50 text-green-800 border border-green-100 shadow-sm">
-                Estrategias Corporativas
-              </span>
-            </div>
           </div>
 
           {/* SECCIÓN INFERIOR: La "Caja de Contraste" */}

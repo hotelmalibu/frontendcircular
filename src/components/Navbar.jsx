@@ -379,11 +379,6 @@ export default function Navbar({ onMenuClick }) {
           ]
         },
         {
-          title: "Sectores",
-          items: [],
-          path: "/sectores"
-        },
-        {
           title: "e-learning",
           items: [
             { label: "Cursos", path: "/cursos" },
