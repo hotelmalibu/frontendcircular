@@ -246,12 +246,35 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
       const dataToSend = new FormData();
       
-      // Add basic form fields
+      // CRITICAL: Only add file if there's a valid file
+      if (formData.upload_file && 
+          formData.upload_file instanceof File && 
+          formData.upload_file.name && 
+          formData.upload_file.size > 0) {
+        dataToSend.append('file', formData.upload_file); // Field name must be 'file' to match Postman
+        console.log("✅ File added to FormData as 'file':", formData.upload_file.name);
+      } else {
+        console.log("ℹ️ No file selected or invalid file - NOT adding file field");
+        // Explicitly ensure we don't add an empty file field
+      }
+      
+      // Add basic form fields (AFTER checking file to avoid conflicts)
       dataToSend.append('type', formData.type);
       dataToSend.append('title', formData.title);
-      dataToSend.append('description', formData.description);
-      dataToSend.append('category', formData.category);
-      dataToSend.append('author', formData.author);
+      
+      // Ensure description is properly captured from CKEditor
+      let descriptionContent = formData.description;
+      if (editorInstanceRef.current) {
+        const editorContent = editorInstanceRef.current.getData();
+        if (editorContent !== descriptionContent) {
+          descriptionContent = editorContent;
+          console.log("Using editor content instead of form data:", descriptionContent);
+        }
+      }
+      dataToSend.append('description', descriptionContent || "");
+      
+      dataToSend.append('category', formData.category || "");
+      dataToSend.append('author', formData.author || "");
       dataToSend.append('status', formData.status);
       
       // Add dates
@@ -259,12 +282,27 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       if (formData.end_date) dataToSend.append('end_date', toIsoDate(formData.end_date));
       if (publishedAt) dataToSend.append('published_at', publishedAt);
 
-      // Add file if present
-      if (formData.upload_file && typeof formData.upload_file === 'object' && formData.upload_file.name) {
-        dataToSend.append('upload_file', formData.upload_file);
+      console.log("NewsFormModal - FormData to send:");
+      for (let [key, value] of dataToSend.entries()) {
+        if (value instanceof File) {
+          console.log(`  ${key}: [File] ${value.name} (${value.size} bytes, ${value.type})`);
+        } else {
+          console.log(`  ${key}: ${value}`);
+        }
       }
 
-      console.log("NewsFormModal - FormData to send:", dataToSend);
+      console.log("NewsFormModal - Form state:", {
+        type: formData.type,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        author: formData.author,
+        status: formData.status,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        hasFile: !!(formData.upload_file && formData.upload_file.name),
+        publishedAt: publishedAt
+      });
 
       if (isEditing && newsData?.id) {
         await updateNews(newsData.id, dataToSend);
@@ -276,22 +314,51 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
       onSuccess();
     } catch (err) {
+      console.error("Error saving news - Full error:", err);
+      console.error("Error response:", err.response);
+      
+      // Get detailed error information
+      let errorMessage = "Error al crear la publicación";
+      
+      // Try to get specific error from server
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (typeof err.response?.data === 'string') {
+        errorMessage = err.response.data;
+      } else if (err.response?.data) {
+        errorMessage = JSON.stringify(err.response.data);
+      } else if (err.message) {
+        errorMessage = err.message;
+      } else if (err.toString() !== "[object Object]") {
+        errorMessage = err.toString();
+      }
+      
       // Map server validation errors to form fields if available
-      const serverMessage = err.response?.data?.message;
       const serverErrors = err.response?.data?.errors;
       if (serverErrors && typeof serverErrors === "object") {
         const mapped = {};
         Object.keys(serverErrors).forEach((key) => {
-          // serverErrors[key] may be an array of messages
           const val = serverErrors[key];
           mapped[key] = Array.isArray(val) ? val.join(" ") : String(val);
         });
         setErrors((prev) => ({ ...prev, ...mapped }));
       }
-
-      const errorMessage = serverMessage || err.response?.data?.message || "Error al guardar la noticia";
-      alert(errorMessage);
-      console.error("Error saving news:", err);
+      
+      // Always show detailed error for debugging
+      const errorDetails = {
+        message: errorMessage,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        error: err.message,
+        fullError: err
+      };
+      
+      alert(`🔍 DETALLES DEL ERROR:\n\n${JSON.stringify(errorDetails, null, 2)}`);
+      
+      console.log("Complete error details:", errorDetails);
     } finally {
       setLoading(false);
     }

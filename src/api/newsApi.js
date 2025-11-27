@@ -100,15 +100,47 @@ export const getPublishedNewsWithImages = async () => {
  * @returns {Promise} - Created news object
  */
 export const createNews = async (newsData) => {
-  // If FormData, let axios set the content-type automatically
+  // If FormData, let axios set the content-type automatically (multipart/form-data)
+  // If JSON data, explicitly set application/json
   const config = newsData instanceof FormData ? {} : {
     headers: {
       'Content-Type': 'application/json',
     },
   };
   
-  const response = await api.post(NEWS_ENDPOINT, newsData, config);
-  return response.data;
+  console.log("newsApi.js - createNews called with:", {
+    isFormData: newsData instanceof FormData,
+    config: config,
+    endpoint: NEWS_ENDPOINT
+  });
+  
+  // Log FormData contents if it's FormData
+  if (newsData instanceof FormData) {
+    console.log("FormData contents:");
+    for (let [key, value] of newsData.entries()) {
+      if (value instanceof File) {
+        console.log(`  ${key}: [File] ${value.name} (${value.size} bytes, ${value.type})`);
+      } else {
+        console.log(`  ${key}: ${value}`);
+      }
+    }
+  }
+  
+  try {
+    console.log("🚀 Sending request to:", NEWS_ENDPOINT);
+    console.log("📤 Request config:", config);
+    const response = await api.post(NEWS_ENDPOINT, newsData, config);
+    console.log("✅ API Response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("❌ API Error Details:");
+    console.error("  Error object:", error);
+    console.error("  Response:", error.response);
+    console.error("  Response data:", error.response?.data);
+    console.error("  Status:", error.response?.status);
+    console.error("  Status text:", error.response?.statusText);
+    throw error;
+  }
 };
 
 /**
@@ -118,7 +150,8 @@ export const createNews = async (newsData) => {
  * @returns {Promise} - Updated news object
  */
 export const updateNews = async (newsId, newsData) => {
-  // If FormData, let axios set the content-type automatically
+  // If FormData, let axios set the content-type automatically (multipart/form-data)
+  // If JSON data, explicitly set application/json
   const config = newsData instanceof FormData ? {} : {
     headers: {
       'Content-Type': 'application/json',

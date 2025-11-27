@@ -7,7 +7,7 @@ const api = axios.create({
   baseURL: API_BASE,
   headers: {
     Accept: "application/json",
-    "Content-Type": "application/json",
+    // Don't set default Content-Type - let axios handle it automatically for FormData
   },
   // withCredentials: true, // enable if you use cookie-based auth
 });
