@@ -223,26 +223,7 @@ export default function FeaturedSection() {
           </div>
         )}
 
-        {/* CORS Information */}
-        <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <div className="flex items-start gap-2 text-amber-800">
-            <AlertCircle size={20} className="mt-0.5 flex-shrink-0" />
-            <div>
-              <h4 className="font-medium">Nota sobre CORS e Imágenes</h4>
-              <p className="text-sm mt-1">
-                Las imágenes se están cargando directamente desde el servidor API. Si experimenta problemas de carga, 
-                puede deberse a restricciones CORS del navegador.
-              </p>
-              <p className="text-sm mt-2 text-amber-700">
-                <strong>Solución Backend:</strong> Configure los headers CORS en su servidor de imágenes 
-                (<code>api-ecocircular.creativostecnologicosit.com</code>) para permitir solicitudes desde este dominio.
-              </p>
-              <p className="text-xs mt-2 text-amber-600">
-                Headers recomendados: <code>Access-Control-Allow-Origin: https://your-domain.com</code>
-              </p>
-            </div>
-          </div>
-        </div>
+
         
         {/* Móvil */}
         <div className="mt-12 md:hidden text-center">

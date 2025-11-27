@@ -85,7 +85,8 @@ export default function ContentDetailPage() {
             // Priorizamos 'content', 'body', 'html' o 'text' antes que 'description' para asegurar que se muestre el artículo completo
             body: found.content || found.body || found.html || found.text || found.description || "",
             
-            image: found.image || found.thumbnail || found.cover || "",
+            // Image: prioritize upload_file.url from API, then fallback to other image fields
+            image: (found.upload_file && found.upload_file.url) || found.image || found.thumbnail || found.cover || "",
             date: found.published_at || found.publishedAt || found.created_at || found.createdAt || "",
             type: found.type ? (found.type === 'news' ? 'Noticias' : found.type) : 'Noticias',
             topic: found.category || found.topic || "General",
