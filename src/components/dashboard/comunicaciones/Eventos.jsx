@@ -1,9 +1,9 @@
 import React from "react";
-import Eventoscomu from "./Subcomponents/Eventos/Eventoscomu";
+import Eventos from "./Subcomponents/Eventos";
 export default function CalendarioDeEventos() {
   return (
     <div>
-      <Eventoscomu />
+      <Eventos />
     </div>
   );
 }
