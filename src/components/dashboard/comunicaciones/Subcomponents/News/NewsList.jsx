@@ -11,8 +11,9 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
+  Image,
 } from "lucide-react";
-import { getAllNews, deleteNews } from "../../../../../api/newsApi";
+import { getAllNews, getPublishedNewsWithImages, deleteNews } from "../../../../../api/newsApi";
 import DOMPurify from 'dompurify';
 import NewsFormModal from "./NewsFormModal";
 import NewsDetailModal from "./NewsDetailModal";
@@ -42,6 +43,9 @@ export default function NewsList() {
     try {
       setLoading(true);
       setError(null);
+      
+      // For dashboard, we want to show all news (published and drafts) with images
+      // So we need a different approach - get all news and then get details for each
       const response = await getAllNews();
       
       let newsArray = [];
@@ -59,7 +63,34 @@ export default function NewsList() {
           newsArray = possibleArrays[0];
         }
       }
-      setNews(newsArray);
+
+      // For dashboard, we need to get detailed info for each news item to show images
+      // We'll do this selectively to avoid too many API calls
+      const detailedNews = await Promise.all(
+        newsArray.map(async (newsItem) => {
+          try {
+            // Only fetch details if the item might have an image (recent items)
+            const daysSinceCreation = newsItem.created_at 
+              ? (new Date() - new Date(newsItem.created_at)) / (1000 * 60 * 60 * 24)
+              : 999;
+            
+            // If it's a recent item (less than 30 days old), fetch details for image
+            if (daysSinceCreation < 30) {
+              const { getNewsById } = await import("../../../../../api/newsApi");
+              const detailedResponse = await getNewsById(newsItem.id);
+              const detailedNews = detailedResponse.data?.news || detailedResponse.news || detailedResponse;
+              return detailedNews;
+            } else {
+              return newsItem;
+            }
+          } catch (error) {
+            console.warn(`Failed to get detailed news for ID ${newsItem.id}:`, error);
+            return newsItem;
+          }
+        })
+      );
+
+      setNews(detailedNews);
     } catch (err) {
       setError(err.response?.data?.message || "Error al cargar las noticias");
       setNews([]);
@@ -240,6 +271,31 @@ export default function NewsList() {
                   {getStatusBadge(item.status)}
                 </div>
               </div>
+
+              {/* Image Section */}
+              {item.upload_file && item.upload_file.url ? (
+                <div className="mb-4">
+                  <div className="w-full h-40 bg-gray-100 rounded-xl overflow-hidden">
+                    <img
+                      src={item.upload_file.url}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = '/assets/placeholder-news.jpg';
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-4">
+                  <div className="w-full h-40 bg-gray-100 rounded-xl flex items-center justify-center">
+                    <div className="text-center text-gray-500">
+                      <Image size={32} className="mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">Sin imagen</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Description */}
               <p className="text-gray-500 text-sm mb-5 line-clamp-2 flex-grow leading-relaxed">

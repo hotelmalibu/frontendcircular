@@ -122,6 +122,28 @@ export default function NewsDetailModal({ newsData, onClose, onEdit }) {
             {newsData.title}
           </h1>
 
+          {/* Image Section */}
+          {newsData.upload_file && newsData.upload_file.url && (
+            <div className="mb-6">
+              <div className="aspect-video rounded-xl overflow-hidden shadow-lg">
+                <img
+                  src={newsData.upload_file.url}
+                  alt={newsData.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.log("Error loading image:", newsData.upload_file.url);
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </div>
+              {newsData.upload_file.original_name && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Imagen: {newsData.upload_file.original_name}
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Metadata Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
             {/* Category */}

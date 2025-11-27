@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { X, Save, Calendar, User, Tag, FileText, AlertCircle } from "lucide-react";
+import { X, Save, Calendar, User, Tag, FileText, AlertCircle, Upload, Image, XCircle } from "lucide-react";
 import { createNews, updateNews } from "../../../../../api/newsApi";
 
 export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess }) {
@@ -16,6 +16,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     start_date: "",
     end_date: "",
     status: "draft",
+    upload_file: null,
   });
 
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         start_date: newsData.start_date ? formatDateForInput(newsData.start_date) : "",
         end_date: newsData.end_date ? formatDateForInput(newsData.end_date) : "",
         status: newsData.status || "draft",
+        upload_file: newsData.upload_file || null,
       });
     }
   }, [newsData, isEditing]);
@@ -117,6 +119,50 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Por favor, seleccione un archivo de imagen válido (JPEG, PNG, GIF, WebP)');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        alert('El archivo es demasiado grande. El tamaño máximo permitido es 5MB.');
+        return;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        upload_file: file,
+      }));
+
+      // Clear file error if any
+      if (errors.upload_file) {
+        setErrors((prev) => ({
+          ...prev,
+          upload_file: null,
+        }));
+      }
+    }
+  };
+
+  const removeFile = () => {
+    setFormData((prev) => ({
+      ...prev,
+      upload_file: null,
+    }));
+    // Reset file input
+    const fileInput = document.getElementById('news-file-input');
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -134,7 +180,18 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       }
     }
 
-    // published_at is automated; no client-side input required
+    // Validate file if provided
+    if (formData.upload_file && typeof formData.upload_file === 'object') {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(formData.upload_file.type)) {
+        newErrors.upload_file = "Tipo de archivo no válido. Use JPEG, PNG, GIF o WebP.";
+      }
+      
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (formData.upload_file.size > maxSize) {
+        newErrors.upload_file = "El archivo es demasiado grande. Tamaño máximo: 5MB.";
+      }
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -187,20 +244,27 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         publishedAt = null;
       }
 
-      const dataToSend = {
-        ...formData,
-        start_date: toIsoDate(formData.start_date),
-        end_date: toIsoDate(formData.end_date),
-        published_at: publishedAt,
-      };
+      const dataToSend = new FormData();
+      
+      // Add basic form fields
+      dataToSend.append('type', formData.type);
+      dataToSend.append('title', formData.title);
+      dataToSend.append('description', formData.description);
+      dataToSend.append('category', formData.category);
+      dataToSend.append('author', formData.author);
+      dataToSend.append('status', formData.status);
+      
+      // Add dates
+      if (formData.start_date) dataToSend.append('start_date', toIsoDate(formData.start_date));
+      if (formData.end_date) dataToSend.append('end_date', toIsoDate(formData.end_date));
+      if (publishedAt) dataToSend.append('published_at', publishedAt);
 
-      // If we explicitly cleared published_at (for draft), remove the key to avoid backend validation issues
-      if (publishedAt === null) {
-        delete dataToSend.published_at;
+      // Add file if present
+      if (formData.upload_file && typeof formData.upload_file === 'object' && formData.upload_file.name) {
+        dataToSend.append('upload_file', formData.upload_file);
       }
 
-      // Debug: log payload sent to backend
-      console.log("NewsFormModal - payload to send:", dataToSend);
+      console.log("NewsFormModal - FormData to send:", dataToSend);
 
       if (isEditing && newsData?.id) {
         await updateNews(newsData.id, dataToSend);
@@ -359,6 +423,111 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
                   disabled={loading}
                 />
+              </div>
+            </div>
+
+            {/* Image Upload Section */}
+            <div className="border-t pt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center gap-1">
+                <Image size={16} />
+                Imagen de la Noticia
+              </label>
+              
+              <div className="space-y-4">
+                {!formData.upload_file ? (
+                  /* Upload Area */
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-400 transition-colors">
+                    <input
+                      type="file"
+                      id="news-file-input"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      disabled={loading}
+                    />
+                    <label
+                      htmlFor="news-file-input"
+                      className="cursor-pointer flex flex-col items-center gap-2"
+                    >
+                      <div className="bg-gray-100 rounded-full p-3">
+                        <Upload size={24} className="text-gray-500" />
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium text-green-600 hover:text-green-500">
+                          Haz clic para subir una imagen
+                        </span>{' '}
+                        o arrastra y suelta
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        PNG, JPG, GIF o WebP (máx. 5MB)
+                      </div>
+                    </label>
+                  </div>
+                ) : (
+                  /* Preview and File Info */
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-start gap-4">
+                      {/* Image Preview */}
+                      <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        {typeof formData.upload_file === 'object' && formData.upload_file.name ? (
+                          <img
+                            src={URL.createObjectURL(formData.upload_file)}
+                            alt="Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : formData.upload_file.url ? (
+                          <img
+                            src={formData.upload_file.url}
+                            alt="Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Image size={24} className="text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* File Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <div className="truncate">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {typeof formData.upload_file === 'object' && formData.upload_file.name 
+                                ? formData.upload_file.name 
+                                : formData.upload_file.original_name || 'Archivo seleccionado'}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {typeof formData.upload_file === 'object' && formData.upload_file.name 
+                                ? `${(formData.upload_file.size / 1024 / 1024).toFixed(2)} MB`
+                                : formData.upload_file.size 
+                                  ? `${(formData.upload_file.size / 1024 / 1024).toFixed(2)} MB`
+                                  : 'Tamaño desconocido'}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {formData.upload_file.mime || formData.upload_file.extension || 'Imagen'}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={removeFile}
+                            className="text-red-500 hover:text-red-700 p-1"
+                            disabled={loading}
+                          >
+                            <XCircle size={20} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {errors.upload_file && (
+                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle size={14} />
+                    {errors.upload_file}
+                  </p>
+                )}
               </div>
             </div>
 

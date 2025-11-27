@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, AlertCircle } from "lucide-react";
 import { contentTypeConfig } from "../../data/mockContent"; 
 import DOMPurify from 'dompurify';
-import { getAllNews } from "../../api/newsApi";
+import { getPublishedNewsWithImages } from "../../api/newsApi";
 
 export default function FeaturedSection() {
   const [newsItems, setNewsItems] = useState([]);
@@ -20,28 +20,27 @@ export default function FeaturedSection() {
     let mounted = true;
     const load = async () => {
       try {
-        const response = await getAllNews();
+        // Use the new API that combines list and detail endpoints
+        const response = await getPublishedNewsWithImages();
         if (!mounted) return;
 
-        // --- 1. Obtener el Array crudo ---
+        // The response should already be an array of published news with upload_file data
         let newsArray = [];
         if (Array.isArray(response)) {
-            newsArray = response;
+          newsArray = response;
         } else if (response?.data?.news && Array.isArray(response.data.news)) {
-            newsArray = response.data.news;
+          newsArray = response.data.news;
         } else if (response?.data && Array.isArray(response.data)) {
-            newsArray = response.data;
+          newsArray = response.data;
         } else if (response?.news && Array.isArray(response.news)) {
-            newsArray = response.news;
+          newsArray = response.news;
         } else if (typeof response === 'object' && response !== null) {
-            const possibleArrays = Object.values(response).filter(val => Array.isArray(val));
-            if (possibleArrays.length > 0) newsArray = possibleArrays[0];
+          const possibleArrays = Object.values(response).filter(val => Array.isArray(val));
+          if (possibleArrays.length > 0) newsArray = possibleArrays[0];
         }
 
-        // --- 2. Filtro: solo publicaciones (evitar mostrar borradores) ---
-        const publishedArray = newsArray.filter(n => String(n.status).toLowerCase() === 'published');
         // --- 3. Mapeo y Normalización ---
-        const mapped = publishedArray.map(n => {
+        const mapped = newsArray.map(n => {
             // Obtenemos el tipo crudo de la API
             const rawType = n.type || n.category || ""; 
             
@@ -59,13 +58,27 @@ export default function FeaturedSection() {
             }
             // Si no, se queda como "Noticias"
 
+            // Handle image data - use direct URL from JSON
+            let imageUrl = "";
+            
+            if (n.upload_file && n.upload_file.url) {
+                imageUrl = n.upload_file.url;
+                console.log(`News ${n.id} has image:`, imageUrl);
+            } else if (n.image) {
+                imageUrl = n.image;
+            } else if (n.thumbnail) {
+                imageUrl = n.thumbnail;
+            } else if (n.cover) {
+                imageUrl = n.cover;
+            }
+
             return {
                 id: n.id || n._id || n.uid || Math.random(),
                 type: finalType, // Usamos el tipo normalizado
                 topic: n.category || n.topic || "General",
                 title: n.title || n.name || "Sin título",
                 excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
-                image: n.image || n.thumbnail || n.cover || "",
+                image: imageUrl,
                 date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
                 slug: n.slug || (`noticia-${n.id || n._id || ''}`),
                 status: n.status || ""
@@ -74,7 +87,7 @@ export default function FeaturedSection() {
 
         setNewsItems(mapped);
       } catch (err) {
-        console.error("Error cargando noticias:", err);
+        console.error("Error cargando noticias con imágenes:", err);
       }
     };
 
@@ -163,6 +176,10 @@ export default function FeaturedSection() {
                             src={item.image} 
                             alt={item.title} 
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            onError={(e) => {
+                              console.log("Error loading image:", item.image);
+                              e.target.style.display = 'none';
+                            }}
                           />
                           <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"></div>
                         </>
@@ -205,6 +222,27 @@ export default function FeaturedSection() {
             </button>
           </div>
         )}
+
+        {/* CORS Information */}
+        <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="flex items-start gap-2 text-amber-800">
+            <AlertCircle size={20} className="mt-0.5 flex-shrink-0" />
+            <div>
+              <h4 className="font-medium">Nota sobre CORS e Imágenes</h4>
+              <p className="text-sm mt-1">
+                Las imágenes se están cargando directamente desde el servidor API. Si experimenta problemas de carga, 
+                puede deberse a restricciones CORS del navegador.
+              </p>
+              <p className="text-sm mt-2 text-amber-700">
+                <strong>Solución Backend:</strong> Configure los headers CORS en su servidor de imágenes 
+                (<code>api-ecocircular.creativostecnologicosit.com</code>) para permitir solicitudes desde este dominio.
+              </p>
+              <p className="text-xs mt-2 text-amber-600">
+                Headers recomendados: <code>Access-Control-Allow-Origin: https://your-domain.com</code>
+              </p>
+            </div>
+          </div>
+        </div>
         
         {/* Móvil */}
         <div className="mt-12 md:hidden text-center">
