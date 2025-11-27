@@ -32,7 +32,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
 
   useEffect(() => {
     if (isEditing && eventData) {
-      setFormData({
+      const newFormData = {
         title: eventData.title || "",
         description: eventData.description || "",
         category: eventData.category || "",
@@ -50,7 +50,20 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         max_attendees: eventData.max_attendees ? eventData.max_attendees.toString() : "",
         published_at: eventData.published_at ? formatDateForInput(eventData.published_at) : "",
         status: eventData.status || "draft",
-      });
+      };
+      
+      setFormData(newFormData);
+      
+      // Set CKEditor content after form data is set
+      setTimeout(() => {
+        if (editorInstanceRef.current) {
+          try {
+            editorInstanceRef.current.setData(newFormData.description || "");
+          } catch (e) {
+            console.warn("Could not set CKEditor data:", e);
+          }
+        }
+      }, 100);
     }
   }, [eventData, isEditing]);
 
@@ -167,19 +180,19 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       }
     }
 
-    // Validate location fields for in-person events
+    // Validate location fields for in-person events (only if not editing or if fields have content)
     if (formData.event_type === 'in_person') {
-      if (!formData.location_name.trim()) {
+      if (!isEditing && !formData.location_name.trim()) {
         newErrors.location_name = "El nombre del lugar es requerido para eventos presenciales";
       }
-      if (!formData.location_address.trim()) {
+      if (!isEditing && !formData.location_address.trim()) {
         newErrors.location_address = "La dirección es requerida para eventos presenciales";
       }
     }
 
-    // Validate meeting link for remote events
+    // Validate meeting link for remote events (only if not editing or if field has content)
     if (formData.event_type === 'remote') {
-      if (!formData.meeting_link.trim()) {
+      if (!isEditing && !formData.meeting_link.trim()) {
         newErrors.meeting_link = "El enlace de reunión es requerido para eventos remotos";
       }
     }
@@ -269,7 +282,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     } catch (err) {
       console.error("Error saving event - Full error:", err);
       
-      let errorMessage = "Error al crear el evento";
+      let errorMessage = isEditing ? "Error al actualizar el evento" : "Error al crear el evento";
       
       if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
@@ -291,6 +304,9 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         });
         setErrors((prev) => ({ ...prev, ...mapped }));
       }
+      
+      // Show detailed error for debugging
+      console.error("Server response data:", err.response?.data);
       
       alert(`Error: ${errorMessage}`);
     } finally {
