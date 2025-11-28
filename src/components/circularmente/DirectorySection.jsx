@@ -1,65 +1,38 @@
 import React, { useState, useEffect } from "react";
-// Se mantienen los iconos y se añade Zap para un detalle visual
-import { Building2, MapPin, Leaf, Phone, Mail, ExternalLink, X, Tag, Globe, Zap } from "lucide-react"; 
-// Importa la función de la API para cargar datos
+import { 
+  Building2, MapPin, Phone, Mail, ExternalLink, X, 
+  Globe, Tag, CheckCircle2, ChevronRight 
+} from "lucide-react";
 import { getAllCompanies } from "../../api/companiesApi";
 
 export default function DirectorySection({ selectedRegion, user }) {
-  // --- Estados del Componente ---
-  const [companies, setCompanies] = useState([]); 
+  const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  // --- Datos de reserva (Legacy/Fallback) ---
+  // --- Helpers ---
+  const getInitials = (name) => {
+    return name ? name.substring(0, 2).toUpperCase() : "EM";
+  };
+
+  // --- Datos Legacy ---
   const legacyCompanies = [
     {
-      id: 1,
+      id: "legacy-1",
       name: "Apropet S.A.S.",
       address: "Bogotá, Cundinamarca",
-      region: "Andina", 
-      materiales: "Resina PET reciclada, Plástico Grado Alimenticio", 
+      region: "Andina",
+      description: "Empresa especializada en resina PET reciclada.",
       phone: "+57 310 2890349",
       email: "info@apropet.com",
-      website_url: "https://www.apropet.com", 
-      tipo: "Transformadora",
-      description: "Empresa especializada en resina PET reciclada y escamas de PET, contribuyendo a la economía circular con enfoque en envases.",
-      logo: { url: "https://via.placeholder.com/64x64/00AB6D/FFFFFF?text=AP" },
-      products: [{ id: 1, name: "Escamas de PET" }, { id: 2, name: "Gránulos de PET" }]
-    },
-    {
-      id: 2,
-      name: "ArtePop Reciclajes",
-      address: "Bogotá, D.C.",
-      region: "Andina",
-      materiales: "Materiales posindustriales, Plásticos mixtos (PE/PP)",
-      phone: "+57 301 2293490",
-      email: "contacto@artepop.com",
-      website_url: "https://www.artepop.co",
-      tipo: "Transformadora",
-      description: "Líder en la transformación de residuos plásticos posindustriales en nuevos productos de alta calidad para la construcción.",
-      logo: null,
-      products: [{ id: 3, name: "Láminas Plásticas" }, { id: 4, name: "Madera Plástica" }]
-    },
-    {
-      id: 3,
-      name: "EcoEmpresa S.A.S",
-      address: "Carrera 15 #93-07, Bogotá, Colombia",
-      region: "Andina",
-      materiales: "Gestión integral de residuos, Sostenibilidad ambiental",
-      phone: "+57 300 123 4567",
-      email: "contacto1@ecoempresa.com",
-      website_url: "https://www.ecoempresa.com",
-      tipo: "Consultoría",
-      description: "Empresa dedicada a la gestión integral de residuos y sostenibilidad ambiental, ofreciendo soluciones para grandes industrias.",
-      logo: { url: "https://api-ecocircular.creativostecnologicosit.com/storage/companies/logos/COMP692914ed0084a.jpeg" },
-      products: []
+      website_url: "https://www.apropet.com",
+      logo: { url: "https://via.placeholder.com/300x200?text=Apropet" }
     }
   ];
 
-  // --- Lógica de Carga de Datos (Mantenida) ---
-
+  // --- Carga de Datos ---
   useEffect(() => {
     loadCompanies();
   }, []);
@@ -68,32 +41,25 @@ export default function DirectorySection({ selectedRegion, user }) {
     try {
       setLoading(true);
       setError(null);
-        
-      const response = await getAllCompanies(1, 50); 
-        
+      const response = await getAllCompanies(1, 50);
+      
       let companiesArray = [];
       if (response?.data?.items && Array.isArray(response.data.items)) {
         companiesArray = response.data.items;
-      } else if (response?.data?.companies && Array.isArray(response.data.companies)) {
-        companiesArray = response.data.companies;
-      } else if (response?.data?.data && Array.isArray(response.data.data)) {
-        companiesArray = response.data.data;
       } else if (response?.data && Array.isArray(response.data)) {
         companiesArray = response.data;
-      } else if (Array.isArray(response)) {
-        companiesArray = response;
+      } else {
+        companiesArray = [];
       }
-
       setCompanies(companiesArray);
     } catch (err) {
       console.error("Error loading companies:", err);
-      setError("Error al cargar las empresas. Mostrando datos de reserva.");
+      setError("No pudimos conectar con el directorio. Mostrando datos locales.");
     } finally {
       setLoading(false);
     }
   };
 
-  // --- Lógica de Interacción y Filtro (Mantenida) ---
   const handleCompanyClick = (company) => {
     setSelectedCompany(company);
     setShowModal(true);
@@ -106,303 +72,239 @@ export default function DirectorySection({ selectedRegion, user }) {
 
   const displayCompanies = companies.length > 0 ? companies : legacyCompanies;
   let filteredCompanies = displayCompanies;
-  let sectionTitle = "Directorio de Empresas Circulares";
-    
+  
   if (selectedRegion && selectedRegion.nombre) {
-    filteredCompanies = displayCompanies.filter((e) => e.region === selectedRegion.nombre);
-    sectionTitle = `Empresas en la Región ${selectedRegion.nombre}`;
+    filteredCompanies = displayCompanies.filter((e) => 
+       !e.region || e.region === selectedRegion.nombre
+    );
   }
 
-  // --- Verificación de Autenticación (Solo usuarios logueados pueden ver las empresas) ---
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
-  // --- Estados de Carga y Error (Mantenido) ---
   if (loading) {
-     return (
-      <section className="py-16 px-6 md:px-12 lg:px-20 bg-gradient-to-br from-[#F5F7FA] to-[#E8F0F7]">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#00AB6D]"></div>
-            <p className="mt-4 text-[#1E305D] font-medium text-lg">Cargando directorio de empresas...</p>
-          </div>
+    return (
+      <section className="py-20 bg-gray-50 flex justify-center items-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-16 h-16 border-4 border-[#00AB6D] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[#1E305D] font-medium animate-pulse">Cargando directorio...</p>
         </div>
       </section>
     );
   }
 
-  // --- Renderizado Principal (Sección de Empresas) ---
-
   return (
     <>
-      <section className="py-16 px-6 md:px-12 lg:px-20 bg-gradient-to-br from-[#F5F7FA] to-[#E8F0F7]">
-        <div className="max-w-5xl mx-auto">
-          
+      <section className="py-16 px-4 md:px-8 lg:px-16 bg-[#F8FAFC]">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-4">
-              <Building2 className="w-7 h-7 text-[#00AB6D]" />
-              <h2 className="text-4xl font-extrabold text-[#1E305D]">
-                {sectionTitle}
-              </h2>
-            </div>
-            <p className="text-gray-600 text-lg">
-              {filteredCompanies.length} empresa{filteredCompanies.length !== 1 ? "s" : ""} {selectedRegion ? "disponible(s) en esta región" : "disponible(s)"}
-            </p>
-            {error && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 font-medium flex items-center gap-2">
-                ⚠️ **Error al cargar**: {error}
-              </div>
-            )}
+          <div className="mb-10">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1E305D] flex items-center gap-3">
+              <Building2 className="text-[#00AB6D]" size={36} />
+              Directorio Circular
+            </h2>
           </div>
 
-          {/* Grid de Empresas */}
+          {error && (
+            <div className="mb-8 p-4 bg-orange-50 border-l-4 border-orange-400 text-orange-700 rounded-r-lg">
+              <p>{error}</p>
+            </div>
+          )}
+
+          {/* Grid de Tarjetas */}
           {filteredCompanies.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"> 
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredCompanies.map((company) => (
-                // Diseño de Tarjeta Mejorado
                 <div
                   key={company.id}
-                  className="bg-white rounded-xl shadow-lg p-5 border border-gray-100 hover:shadow-2xl hover:border-[#00AB6D] transition-all duration-300 group cursor-pointer flex flex-col h-full"
                   onClick={() => handleCompanyClick(company)}
+                  className="group bg-white rounded-xl shadow-md hover:shadow-2xl border border-gray-200 transition-all duration-300 flex flex-col overflow-hidden cursor-pointer h-full"
                 >
-                  
-                  {/* Company Logo and Header */}
-                  <div className="flex items-start gap-4 mb-3 pb-3 border-b border-gray-100">
-                    {/* Logo/Fallback */}
-                    <div className="flex-shrink-0">
-                      {company.logo?.url ? (
-                        <img
-                          src={company.logo.url}
-                          alt={`Logo de ${company.name || company.nombre}`}
-                          className="w-12 h-12 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex'; 
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className={`w-12 h-12 bg-gray-100 rounded-lg border-2 border-gray-200 flex items-center justify-center shadow-sm ${company.logo?.url ? 'hidden' : ''}`}
-                        style={{ display: company.logo?.url ? 'none' : 'flex' }} 
-                      >
-                        <Building2 className="text-gray-400" size={20} />
-                      </div>
-                    </div>
+                  {/* --- 1. IMAGEN DE TARJETA --- */}
+                  {/* CAMBIO: h-32 (128px) es suficiente para un logo. p-4 para margen interno. */}
+                  <div className="w-full h-36 bg-white border-b border-gray-100 flex items-center justify-center p-4 relative">
                     
-                    {/* Nombre y Tipo */}
-                    <div className="flex-grow">
-                      <h3 className="font-extrabold text-[#1E305D] text-xl leading-snug line-clamp-2 mb-1">
-                        {company.name || company.nombre} 
-                      </h3>
-                      <span className="text-xs font-bold text-[#00AB6D] bg-[#00AB6D]/10 px-2.5 py-0.5 rounded-full inline-block">
-                        {company.tipo || "Empresa"} 
-                      </span>
+                    {company.logo?.url ? (
+                      <img 
+                        src={company.logo.url} 
+                        alt={company.name}
+                        // CAMBIO: max-h-full y max-w-full permiten que la imagen crezca hasta tocar el borde del contenedor
+                        // pero sin deformarse (object-contain)
+                        className="max-h-full max-w-full object-contain transform group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    
+                    {/* Fallback */}
+                    <div 
+                       className="w-16 h-16 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-bold text-xl"
+                       style={{ display: company.logo?.url ? 'none' : 'flex' }}
+                    >
+                      {getInitials(company.name)}
                     </div>
                   </div>
 
-                  {/* Cuerpo: Descripción/Enfoque */}
-                  <div className="flex-grow mb-4">
+                  {/* --- 2. CONTENIDO --- */}
+                  <div className="p-5 flex flex-col flex-grow">
+                    <h3 className="font-extrabold text-[#1E305D] text-lg mb-2 line-clamp-2 group-hover:text-[#00AB6D] transition-colors">
+                      {company.name}
+                    </h3>
+
+                    <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed flex-grow">
+                      {company.description || "Sin descripción disponible."}
+                    </p>
                     
-                    {/* Descripción o Materiales (Destacado) */}
-                    {(company.description || company.materiales) && (
-                      <div className="flex items-start gap-2 text-sm text-gray-700 p-2 rounded-md">
-                        <Tag className="w-4 h-4 text-[#00AB6D] mt-1 flex-shrink-0" />
-                        <p className="font-normal line-clamp-3">
-                          <span className="font-semibold text-[#1E305D]">Enfoque:</span> {company.description || company.materiales}
-                        </p>
+                    {company.address && (
+                      <div className="flex items-start gap-2 text-xs text-gray-500 mb-4 bg-gray-50 p-2 rounded-lg">
+                        <MapPin size={14} className="mt-0.5 text-[#00AB6D] flex-shrink-0" />
+                        <span className="line-clamp-1">{company.address}</span>
                       </div>
                     )}
-                    
-                    {/* Ubicación */}
-                    {(company.address || company.ciudad) && (
-                      <div className="flex items-start gap-2 text-sm text-gray-600 mt-3">
-                        <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                        <p className="line-clamp-1">Ubicación: {company.address || company.ciudad}</p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Acción - Pie de Tarjeta */}
-                  <div className="pt-3 border-t border-gray-100 text-center mt-auto">
-                    <span className="inline-flex items-center gap-2 text-[#00AB6D] font-bold text-sm group-hover:text-[#008A5C] transition">
-                      Ver Ficha Completa
-                      <ExternalLink size={14} className="group-hover:translate-x-0.5 transition-transform" />
-                    </span>
+
+                    <div className="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
+                       <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                         Empresa
+                       </span>
+                       <button className="text-[#00AB6D] text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+                         Ver ficha <ChevronRight size={16} />
+                       </button>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            /* Mensaje cuando no hay empresas filtradas */
-            <div className="text-center py-12 bg-white rounded-xl shadow-md border border-gray-100">
-              <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-600 text-lg">
-                No hay empresas disponibles en esta región aún
-              </p>
+            <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-dashed border-gray-300">
+              <Building2 className="mx-auto text-gray-300 mb-4" size={48} />
+              <p className="text-gray-500 text-lg">No se encontraron empresas.</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* --- Company Detail Modal (Diseño Premium) --- */}
+      {/* --- MODAL --- */}
       {showModal && selectedCompany && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-lg rounded-2xl shadow-3xl overflow-hidden animate-fadeIn max-h-[95vh] flex flex-col transform transition-all duration-300 scale-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E305D]/70 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             
-            {/* Modal Header con Branding */}
-            <div className="relative p-6 bg-gradient-to-br from-[#00AB6D] to-[#008A5C] text-white">
-                <button
-                    onClick={closeModal}
-                    className="absolute top-4 right-4 text-white/80 p-1 rounded-full hover:bg-white/20 transition z-10"
+            {/* --- 1. MODAL HEADER: IMAGEN --- */}
+            {/* CAMBIO: Reducido a h-48 para menos espacio blanco */}
+            <div className="w-full h-48 bg-white flex items-center justify-center p-6 relative border-b border-gray-100">
+                <button 
+                  onClick={closeModal}
+                  className="absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 p-2 rounded-full text-gray-600 transition-colors z-10"
                 >
-                    <X size={24} />
+                  <X size={20} />
                 </button>
-                
-                <div className="flex items-center gap-4">
-                    {/* Logo */}
-                    {selectedCompany.logo?.url ? (
-                        <img
-                            src={selectedCompany.logo.url}
-                            alt={`Logo de ${selectedCompany.name || selectedCompany.nombre}`}
-                            className="w-16 h-16 object-cover rounded-xl border-4 border-white shadow-lg flex-shrink-0"
-                        />
-                    ) : (
-                        <div className="w-16 h-16 bg-white/20 rounded-xl border-4 border-white flex items-center justify-center flex-shrink-0">
-                            <Building2 className="text-white" size={28} />
-                        </div>
-                    )}
 
-                    <div>
-                        <h1 className="text-2xl font-extrabold leading-tight">
-                            {selectedCompany.name || selectedCompany.nombre}
-                        </h1>
-                        <span className="text-sm font-semibold bg-white/20 px-3 py-0.5 rounded-full inline-block mt-1">
-                            {selectedCompany.tipo || "Empresa"}
-                        </span>
-                    </div>
-                </div>
-                
-                {/* Elemento decorativo */}
-                <Zap size={20} className="absolute bottom-1 right-6 text-white/50 animate-pulse" />
+                {selectedCompany.logo?.url ? (
+                  <img 
+                    src={selectedCompany.logo.url} 
+                    alt={selectedCompany.name} 
+                    // max-h-full hace que la imagen sea tan grande como el contenedor le permita
+                    className="max-h-full max-w-full object-contain"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-bold text-3xl">
+                    {getInitials(selectedCompany.name)}
+                  </div>
+                )}
             </div>
 
-            {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            {/* --- 2. MODAL TITLE BAR --- */}
+            <div className=" p-5 text-white flex flex-col sm:flex-row justify-between items-center gap-3">
+               <h2 className="text-2xl font-bold leading-tight text-center sm:text-left text-[#1E305D]">
+                  {selectedCompany.name}
+               </h2>
+            </div>
+
+            {/* --- 3. MODAL BODY --- */}
+            <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar bg-gray-50/50">
               
-              <div className="space-y-5">
+              <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm mb-6">
+                <h3 className="text-[#1E305D] font-bold text-lg mb-3 flex items-center gap-2">
+                  <Tag size={20} className="text-[#00AB6D]" />
+                  Descripción
+                </h3>
+                <p className="text-gray-700 leading-relaxed text-sm md:text-base">
+                  {selectedCompany.description || "Sin descripción detallada."}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
-                {/* 1. Descripción y Enfoque */}
-                {(selectedCompany.description || selectedCompany.materiales) && (
-                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-inner">
-                    <h3 className="font-bold text-[#1E305D] mb-2 text-lg flex items-center gap-2 border-b pb-2 border-gray-200">
-                        <Tag size={20} className="text-[#00AB6D]" /> Descripción y Enfoque
-                    </h3>
-                    <p className="text-gray-700 text-sm leading-relaxed mt-2">{selectedCompany.description || selectedCompany.materiales}</p>
-                  </div>
-                )}
-
-                {/* 2. Ubicación y Productos */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Ubicación */}
-                    {(selectedCompany.address || selectedCompany.ciudad) && (
-                      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                        <h3 className="font-bold text-[#1E305D] mb-2 flex items-center gap-2">
-                            <MapPin size={18} className="text-red-500" /> Dirección
-                        </h3>
-                        <p className="text-gray-700 text-sm">{selectedCompany.address || selectedCompany.ciudad}</p>
-                        {selectedCompany.region && (
-                          <p className="text-xs text-gray-500 mt-1">Región: **{selectedCompany.region}**</p>
-                        )}
+                {/* Contacto */}
+                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm space-y-4 h-full">
+                  <h4 className="text-gray-900 font-bold border-b pb-2 mb-2">Contacto</h4>
+                  
+                  {selectedCompany.phone && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                        <Phone size={16} />
                       </div>
-                    )}
+                      <a href={`tel:${selectedCompany.phone}`} className="text-gray-700 hover:text-blue-600 font-medium">
+                        {selectedCompany.phone}
+                      </a>
+                    </div>
+                  )}
 
-                    {/* Products */}
-                    {selectedCompany.products && selectedCompany.products.length > 0 && (
-                      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                        <h3 className="font-bold text-[#1E305D] mb-2 flex items-center gap-2">
-                            <Leaf size={18} className="text-[#00AB6D]" /> Productos
-                        </h3>
-                        <ul className="list-none text-gray-700 pl-0 space-y-1 text-sm">
-                          {selectedCompany.products.map((product, index) => (
-                            <li key={index} className="flex items-center gap-2">
-                                <span className="text-[#00AB6D] font-extrabold text-sm leading-none">&bull;</span> {product.name}
-                            </li>
-                          ))}
-                        </ul>
+                  {selectedCompany.email && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+                        <Mail size={16} />
                       </div>
-                    )}
+                      <a href={`mailto:${selectedCompany.email}`} className="text-gray-700 hover:text-indigo-600 font-medium break-all">
+                        {selectedCompany.email}
+                      </a>
+                    </div>
+                  )}
+                  
+                  {selectedCompany.website_url && (
+                    <div className="flex items-center gap-3">
+                       <div className="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center text-teal-600">
+                        <Globe size={16} />
+                      </div>
+                      <a 
+                        href={selectedCompany.website_url} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="text-teal-600 font-medium hover:underline flex items-center gap-1"
+                      >
+                        Visitar Sitio Web <ExternalLink size={12} />
+                      </a>
+                    </div>
+                  )}
                 </div>
 
-                {/* 3. Contacto Público (Website) */}
-                {(selectedCompany.website_url) && (
-                  <div className="p-4 rounded-xl border-4 border-[#00AB6D]/20 bg-[#F5F7FA] shadow-md">
-                    <h3 className="font-bold text-[#1E305D] mb-3 flex items-center gap-2 text-lg border-b pb-2 border-gray-200">
-                        <Globe size={20} className="text-[#00AB6D]" /> Información Pública
-                    </h3>
-                    <div className="flex items-center gap-3 text-sm pt-2">
-                        <ExternalLink className="w-5 h-5 text-[#00AB6D] flex-shrink-0" />
-                        <a
-                            href={selectedCompany.website_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#1E305D] font-bold hover:text-[#008A5C] transition truncate"
-                            title={selectedCompany.website_url}
-                        >
-                            {selectedCompany.website_url.replace(/https?:\/\/(www\.)?/i, "").split('/')[0]}
-                        </a>
-                    </div>
-                  </div>
-                )}
+                {/* Ubicación */}
+                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
+                   <h4 className="text-gray-900 font-bold border-b pb-2 mb-2">Ubicación</h4>
+                   
+                   {selectedCompany.address ? (
+                     <div className="flex items-start gap-3">
+                       <MapPin className="text-red-500 mt-1 flex-shrink-0" size={18} />
+                       <p className="text-gray-700 font-medium">{selectedCompany.address}</p>
+                     </div>
+                   ) : (
+                     <p className="text-gray-400 text-sm italic">Ubicación no especificada</p>
+                   )}
+                </div>
 
-                {/* 4. Contacto Privado (Solo si el usuario está logueado) */}
-                {user && (selectedCompany.phone || selectedCompany.email) && (
-                  <div className="p-4 rounded-xl border-4 border-[#1E305D]/20 bg-[#1E305D] text-white shadow-xl">
-                    <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2 text-lg border-b pb-2 border-[#1E305D]/50">
-                        <Phone size={20} className="text-yellow-400" /> Contacto Directo <span className="text-xs font-normal bg-yellow-400 text-[#1E305D] px-2 py-0.5 rounded-full">EXCLUSIVO</span>
-                    </h3>
-                    <div className="space-y-2 text-sm pt-2">
-                      {/* Teléfono */}
-                      {(selectedCompany.phone) && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="w-4 h-4 text-yellow-400" />
-                          <a
-                            href={`tel:${selectedCompany.phone}`}
-                            className="font-semibold text-white hover:text-yellow-400 transition"
-                          >
-                            {selectedCompany.phone}
-                          </a>
-                        </div>
-                      )}
-                      {/* Email */}
-                      {selectedCompany.email && (
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-yellow-400" />
-                          <a
-                            href={`mailto:${selectedCompany.email}`}
-                            className="font-semibold text-white hover:text-yellow-400 transition truncate"
-                            title={selectedCompany.email}
-                          >
-                            {selectedCompany.email}
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-100">
-              <button
+            <div className="p-4 bg-white border-t flex justify-end">
+              <button 
                 onClick={closeModal}
-                className="px-6 py-2 rounded-lg bg-[#00AB6D] text-white font-bold hover:bg-[#008A5C] transition duration-300 shadow-md"
+                className="px-6 py-2 bg-[#1E305D] text-white rounded-lg font-bold hover:bg-[#152347] transition shadow-md"
               >
-                Cerrar Ficha
+                Cerrar
               </button>
             </div>
+
           </div>
         </div>
       )}
