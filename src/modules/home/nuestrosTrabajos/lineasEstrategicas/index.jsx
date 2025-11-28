@@ -17,13 +17,13 @@ const DATA_LINEAS = [
     highlight: "Estratégicos",
     description: "Estrategias para impulsar modelos circulares mediante procesos de generación de capacidades territoriales y sectoriales que generen impactos económicos, sociales y ambientales.",
     colorAcento: "#2B65AC",
-    iconColor: "#3e98ffff",
+    iconColor: "#ffffff",
     img: imgProyectos,
     bgGradient: "from-white to-purple-50",
     boxTitle: "Enfoque y Alcance",
     boxText: "Impulsamos estrategias territoriales que permiten validar y escalar modelos de economía circular en diferentes sectores productivos y regiones.",
     iconSvg: (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{color: '#2B65AC'}}>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
       </svg>
     )
@@ -38,13 +38,13 @@ const DATA_LINEAS = [
       </>
     ),
     colorAcento: "#F59E0B",
-    iconColor: "#F59E0B",
+    iconColor: "#ffffff",
     img: imgPedagogia,
     bgGradient: "from-white to-yellow-50",
     boxTitle: "Enfoque y Alcance",
     boxText: "Buscamos generar consciencia en el consumidor final mediante campañas de comunicación y pedagogía que fomenten la separación adecuada en la fuente.",
     iconSvg: (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"style={{color: '#F59E0B'}}>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
       </svg>
     )
@@ -73,13 +73,13 @@ const DATA_LINEAS = [
     highlight: "Productiva",
     description: "Cierre de brechas de las organizaciones de recicladores y transformadores para fortalecer su competitividad y promover una transición justa hacia modelos de negocio circulares.",
     colorAcento: "#CD0000",
-    iconColor: "#ff0000ff",
+    iconColor: "#ffffff",
     img: imgInclusion,
     bgGradient: "from-white to-red-50",
     boxTitle: "Enfoque y Alcance",
     boxText: "Garantizamos que los beneficios de la economía circular lleguen a todos los actores, fomentando la formalización y la inclusión productiva real.",
     iconSvg: (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{color: '#ff0000ff'}}>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
       </svg>
     )
@@ -90,13 +90,13 @@ const DATA_LINEAS = [
     highlight: "Consumo Responsable",
     description: "Sensibilizar y contribuir al cambio de hábitos y comportamiento del consumidor fomentando la correcta separación en la fuente.",
     colorAcento: "#E8AD00",
-    iconColor: "#E8AD00",
+    iconColor: "#ffffff",
     img: imgConsumo,
     bgGradient: "from-white to-yellow-50",
     boxTitle: "Enfoque y Alcance",
     boxText: "Esta línea busca formar consumidores conscientes, promoviendo prácticas que aporten directamente al ciclo de la economía circular.",
     iconSvg: (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{color: '#E8AD00'}}>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     )
@@ -107,13 +107,13 @@ const DATA_LINEAS = [
     highlight: "Cadenas de Valor",
     description: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales de aprovechamiento mediante la generación de valor entre actores de la cadena para el cumplimiento normativo en REP, aportando a estrategias corporativas.",
     colorAcento: "#8CB200",
-    iconColor: "#8CB200",
+    iconColor: "#ffffff",
     img: imgCadenas,
     bgGradient: "from-white to-green-50",
     boxTitle: "Enfoque y Alcance",
     boxText: "Buscamos cerrar el ciclo de vida de envases y empaques, promoviendo la colaboración total entre productores, gestores y transformadores.",
     iconSvg: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" style={{color: '#8CB200'}} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
     )
   }
 ];
