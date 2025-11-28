@@ -19,8 +19,8 @@ export default function Home() {
       )}
       <IndexImagen />
       <FeaturedSection />
-      <EventsSection />
       <ProjectsSection />
+      <EventsSection />
     </div>
   );
 }
