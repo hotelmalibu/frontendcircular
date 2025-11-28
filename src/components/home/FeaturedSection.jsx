@@ -205,10 +205,6 @@ export default function FeaturedSection() {
                     <h3 className="text-lg font-bold text-[#1E305D] leading-snug mb-3 group-hover:text-[#00AB6D] transition-colors">
                       {item.title}
                     </h3>
-
-                    <p className="text-gray-500 text-sm line-clamp-3 leading-relaxed flex-1">
-                      {item.excerpt}
-                    </p>
                   </div>
                 </a>
               );
