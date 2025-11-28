@@ -6,6 +6,8 @@ import {
   AlertOctagon,
   Download,
   RefreshCw,
+  Plus,
+  Building,
 } from "lucide-react";
 import {
   LineChart,
@@ -89,13 +91,16 @@ export default function Undexsub() {
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
       {/* Botones de acción */}
-      <div className="flex flex-col sm:flex-row justify-end mb-6 gap-3">
-        <button className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">
-          <RefreshCw size={18} /> Actualizar
-        </button>
-        <button className="flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition w-full sm:w-auto">
-          <Download size={18} /> Exportar
-        </button>
+      <div className="flex flex-col sm:flex-row justify-center mb-6 gap-3">
+        
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <button className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">
+            <RefreshCw size={18} /> Actualizar
+          </button>
+          <button className="flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition w-full sm:w-auto">
+            <Download size={18} /> Exportar
+          </button>
+        </div>
       </div>
 
       {/* Estadísticas */}

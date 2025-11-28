@@ -10,7 +10,8 @@ import {
   Settings, 
   Workflow, 
   LogOut,
-  Hexagon 
+  Hexagon,
+  Building 
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -21,6 +22,7 @@ export default function Sidebar() {
   const links = [
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
     { name: "Documentos", path: "/documentos", icon: <FileText size={20} /> },
+    { name: "Empresas", path: "/companies", icon: <Building size={20} /> },
     { name: "Seguimiento", path: "/seguimiento", icon: <Activity size={20} /> },
     { name: "Formularios", path: "/formularios", icon: <ClipboardList size={20} /> },
     { name: "Comunicaciones", path: "/comunicaciones", icon: <MessageSquare size={20} /> },

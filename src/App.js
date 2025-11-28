@@ -5,6 +5,7 @@ import Login from "./modules/auths/Login";
 import Register from "./modules/auths/Register";
 import Dashboard from "./modules/dashboard/Dashboard";
 import Documentos from "./modules/dashboard/Documentos";
+import Empresas from "./modules/dashboard/Empresas";
 import Trazabilidad from "./modules/dashboard/Trazabilidad";
 import Formularios from "./modules/dashboard/Formularios";
 import Comunicaciones from "./modules/dashboard/Comunicaciones";
@@ -73,6 +74,7 @@ export default function App() {
           {/* Rutas privadas: cada página del dashboard tiene su propia ruta directa */}
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/documentos" element={<PrivateRoute><Documentos /></PrivateRoute>} />
+          <Route path="/companies" element={<PrivateRoute><Empresas /></PrivateRoute>} />
           <Route path="/trazabilidad" element={<PrivateRoute><Trazabilidad /></PrivateRoute>} />
           <Route path="/formularios" element={<PrivateRoute><Formularios /></PrivateRoute>} />
           <Route path="/comunicaciones" element={<PrivateRoute><Comunicaciones /></PrivateRoute>} />
