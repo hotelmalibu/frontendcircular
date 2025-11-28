@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   Building2, MapPin, Phone, Mail, ExternalLink, X, 
-  Globe, Tag, CheckCircle2, ChevronRight 
+  Globe, Tag, ChevronRight 
 } from "lucide-react";
 import { getAllCompanies } from "../../api/companiesApi";
 

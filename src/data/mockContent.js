@@ -9,18 +9,6 @@ export const contentTypeConfig = {
     bgColor: "bg-white", 
     isSolid: false // Tarjeta con foto
   },
-  "Documentos de interés": { 
-    icon: FileText, 
-    color: "text-white", 
-    bgColor: "bg-[#2C67B0]", // Fondo azul sólido para documentos (estilo referencia)
-    isSolid: true 
-  },
-  "Gestión documental": { 
-    icon: FolderOpen, 
-    color: "text-white", 
-    bgColor: "bg-[#00AB6D]", // Fondo verde sólido (estilo referencia)
-    isSolid: true 
-  },
   "Podcast": { 
     icon: Mic, 
     color: "text-[#8B5CF6]", 
@@ -48,16 +36,6 @@ export const allContentData = [
   },
   {
     id: 2,
-    type: "Documentos de interés",
-    topic: "Infraestructura",
-    title: "Desarrollando infraestructura de recolección y reciclaje",
-    excerpt: "Informe técnico sobre la logística necesaria para municipios medianos.",
-    image: "", // Sin imagen porque es tarjeta sólida
-    date: "15 Oct 2024",
-    slug: "infraestructura-recoleccion"
-  },
-  {
-    id: 3,
     type: "Noticias",
     topic: "Biodiversidad",
     title: "Escalando la acción por la naturaleza: El marco global",
@@ -67,17 +45,7 @@ export const allContentData = [
     slug: "accion-por-naturaleza"
   },
   {
-    id: 4,
-    type: "Gestión documental",
-    topic: "Plásticos",
-    title: "Política de Plásticos y Abogacía Colectiva 2025",
-    excerpt: "Documento oficial de postura ante el tratado global de plásticos.",
-    image: "",
-    date: "05 Sep 2024",
-    slug: "politica-plasticos-2025"
-  },
-  {
-    id: 5,
+    id: 3,
     type: "Podcast",
     topic: "Retail",
     title: "Ep 203: ¿Por qué los minoristas deben adoptar la circularidad?",
@@ -87,7 +55,7 @@ export const allContentData = [
     slug: "podcast-retail-circular"
   },
   {
-    id: 6,
+    id: 4,
     type: "Artículo",
     topic: "Innovación",
     title: "Colaboración comercial: Un motor poderoso",
