@@ -4,9 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import LogoBlanco from "../assets/Logo_blanco.png";
 import Logo from "../assets/Logo.png";
 import DefaultAvatar from "../assets/default-avatar.png";
-// Nota: Puedes eliminar Building y Gavel de las importaciones si ya no las usarás en ningún otro lado, 
-// pero las dejo aquí para evitar errores si las mueves a otro sitio.
-import { User, LogOut, Home, Shield, Handshake, Building, Gavel, Menu, ChevronDown, Bell, MessageSquare } from "lucide-react";
+import { User, LogOut, Home, Shield, Handshake, Menu, ChevronDown, Bell, MessageSquare } from "lucide-react";
 
 // --- COMPONENTES AUXILIARES (Badge, Menús) ---
 
