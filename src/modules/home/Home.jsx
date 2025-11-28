@@ -3,6 +3,7 @@ import { AuthContext } from "../../context/AuthContext";
 import IndexImagen from "../../components/home/IndexImagen";
 import ProjectsSection from "../../components/home/ProjectsSection";
 import FeaturedSection from "../../components/home/FeaturedSection";
+import EventsSection from "../../components/home/EventsSection";
 export default function Home() {
   const { user } = useContext(AuthContext);
 
@@ -18,6 +19,7 @@ export default function Home() {
       )}
       <IndexImagen />
       <FeaturedSection />
+      <EventsSection />
       <ProjectsSection />
     </div>
   );

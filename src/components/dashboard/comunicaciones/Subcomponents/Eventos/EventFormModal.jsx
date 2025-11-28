@@ -274,8 +274,13 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         await updateSchedule(eventData.id, dataToSend);
         alert("Evento actualizado exitosamente");
       } else {
-        await createSchedule(dataToSend);
+        const result = await createSchedule(dataToSend);
         alert("Evento creado exitosamente");
+        
+        // Emit event for other components (like home page) to refresh
+        window.dispatchEvent(new CustomEvent('eventCreated', { 
+          detail: { event: result.data || result } 
+        }));
       }
 
       onSuccess();
