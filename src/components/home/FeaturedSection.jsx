@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, AlertCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { contentTypeConfig } from "../../data/mockContent"; 
 import DOMPurify from 'dompurify';
 import { getPublishedNewsWithImages } from "../../api/newsApi";

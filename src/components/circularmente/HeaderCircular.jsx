@@ -45,7 +45,7 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
           Conecta con transformadores líderes en reciclaje y sostenibilidad.
           <br />
           <span className="font-semibold text-[#b9e31b]">
-            La plataforma profesional que impulsa la economía circular en
+            La plataforma que impulsa la economía circular en
             Colombia.
           </span>
         </motion.p>

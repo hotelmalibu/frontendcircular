@@ -444,37 +444,8 @@ export default function MapSection() {
         {/* SECCIÓN: Acceso Requerido (sin login) */}
         {!user && (
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-20">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <MapPin className="w-20 h-20 text-[#1E305D] mx-auto mb-6" />
-              <h1 className="text-4xl md:text-5xl font-bold text-[#1E305D] mb-3">Acceso Requerido</h1>
-              <p className="text-lg md:text-xl text-[#1E305D]">
-                Inicia sesión para ver el directorio de empresas aliadas.
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="flex flex-col gap-4 w-full max-w-sm"
-            >
-              <button
-                onClick={() => navigate('/login')}
-                className="w-full bg-gradient-to-r from-[#00AB6D] to-[#008A5C] hover:from-[#009B5F] hover:to-[#007A4E] text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl text-lg"
-              >
-                Iniciar Sesión →
-              </button>
-              <button
-                onClick={() => navigate('/register')}
-                className="w-full bg-gradient-to-r from-[#B1D357] to-[#9AC844] hover:from-[#A8C84E] hover:to-[#90B53D] text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl text-lg"
-              >
-                Registrarse →
-              </button>
-            </motion.div>
+            
+           
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

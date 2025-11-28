@@ -340,15 +340,8 @@ export default function Navbar({ onMenuClick }) {
             { label: "Ética y transparencia", path: "/valores" },
             { 
               label: "Líneas estratégicas", 
-              path: "#",
-              subItems: [
-                { label: "Cadenas de valor", path: "/cadenas-de-valor" },
-                { label: "Innovación", path: "/innovacin" },
-                { label: "Inclusión Social y Productiva", path: "/inclusin-social-y-productiva" },
-                { label: "Proyectos estratégico", path: "/proyectos-estratgico  " },
-                { label: "Consumo Responsable", path: "/consumo-responsable" },
-                { label: "Pedagogía", path: "/pedagogia" }
-              ]
+              path: "/lineas-estrategicas",
+              
             },
             { label: "Junta Directiva - Equipo", path: "/juntaDirecteEquipo" },
             { label: "Informes", path: "/informes-anuales" },
@@ -377,15 +370,8 @@ export default function Navbar({ onMenuClick }) {
             { label: "Casos de éxito", path: "/casos-de-exito" },
             { label: "Convocatorias", path: "/convocatorias" }
           ]
-        },
-        {
-          title: "e-learning",
-          items: [
-            { label: "Cursos", path: "/cursos" },
-            { label: "Certificaciones", path: "/certificaciones" },
-            { label: "Financiamiento del reciclaje", path: "/financiamiento-del-reciclaje" }
-          ]
         }
+        
       ]
     },
     {

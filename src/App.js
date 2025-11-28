@@ -30,15 +30,7 @@ import Territoriales from "./modules/home/nuestrosTrabajos/proyectosAlianzas/ter
 import InclusionSocial from "./modules/home/nuestrosTrabajos/proyectosAlianzas/inclusionSocial";
 import CasosExitos from "./modules/home/nuestrosTrabajos/proyectosAlianzas/casosExitos";
 import Convocatorias from "./modules/home/nuestrosTrabajos/proyectosAlianzas/convocatorias";
-import CadenaValor from "./modules/home/nuestrosTrabajos/lineasEstrategicas/cadenaValor";
-import ConsumoResponsable from "./modules/home/nuestrosTrabajos/lineasEstrategicas/consumoResponsable";
-import InclusionSocialProductiva from "./modules/home/nuestrosTrabajos/lineasEstrategicas/inclusionSocialProductiva";
-import Innovacion from "./modules/home/nuestrosTrabajos/lineasEstrategicas/innovacion";
-import Pedagogia from "./modules/home/nuestrosTrabajos/lineasEstrategicas/pedagogia";
-import ProyectoEstrategico from "./modules/home/nuestrosTrabajos/lineasEstrategicas/proyectoEstrategico";
-import Certificaciones from "./modules/home/nuestrosTrabajos/E-Learning/certificaciones"; 
-import Cursos from "./modules/home/nuestrosTrabajos/E-Learning/cursos";
-import FinanciamientoReciclaje from "./modules/home/nuestrosTrabajos/E-Learning/financiamentoReciclaje";
+import LineasEstrategicasPage from "./modules/home/nuestrosTrabajos/lineasEstrategicas/index";
 import Profile from "./modules/dashboard/Profile";
 
 import ExplorePage from "./components/pagesExplorar/ExplorePage";
@@ -72,18 +64,10 @@ export default function App() {
           <Route path="/inclusin-social" element={<InclusionSocial />} />
           <Route path="/casos-de-xito" element={<CasosExitos />} />
           <Route path="/convocatorias" element={<Convocatorias />} />
-          <Route path="/cadenas-de-valor" element={<CadenaValor />} />
-          
-          {/* RUTA AÑADIDA */}
-          <Route path="/consumo-responsable" element={<ConsumoResponsable />} /> 
+          <Route path="/lineas-estrategicas" element={<LineasEstrategicasPage />} />
 
-          <Route path="/inclusin-social-y-productiva" element={<InclusionSocialProductiva />} />
-          <Route path="/innovacin" element={<Innovacion />} />
-          <Route path="/pedagogia" element={<Pedagogia />} />
-          <Route path="/proyectos-estratgico" element={<ProyectoEstrategico />} />
-          <Route path="/certificaciones" element={<Certificaciones />} />
-          <Route path="/cursos" element={<Cursos />} />
-          <Route path="/financiamiento-del-reciclaje" element={<FinanciamientoReciclaje />} />
+          
+      
 
 
           {/* Rutas privadas: cada página del dashboard tiene su propia ruta directa */}

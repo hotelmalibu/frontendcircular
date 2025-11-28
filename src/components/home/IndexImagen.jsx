@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import fondo1 from '../../assets/home/Carrusel/Index_imagen_1.png';
-import fondo2 from '../../assets/home/Carrusel/Index_imagen_2.png';
+import fondo2 from '../../assets/home/Carrusel/Index_imagen_2.jpeg';
 import fondo3 from '../../assets/home/Carrusel/Index_imagen_3.png';
 import fondo4 from '../../assets/home/Carrusel/Index_imagen_4.png';
 

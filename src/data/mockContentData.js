@@ -44,9 +44,98 @@ export const projectsData = [
     solution: "Creamos una incubadora de negocios verdes que financia y asesora técnicamente a emprendedores que crean productos a partir de plástico post-consumo y biomasa.",
     impact: "Desarrollo de madera plástica certificada para construcción de vivienda de interés social."
   },
-  // ... (Puedes añadir el resto de los proyectos 3 al 6 con la misma estructura)
-  { id: 3, title: "Sensibilización al Consumidor", type: "PEDAGOGÍA", color: "#1E305D", image: proyecto3, shortDescription: "Campañas educativas para promover la separación en la fuente.", date: "Continuo", location: "Medellín", stats: [], challenge: "...", solution: "...", impact: "..." },
-  { id: 4, title: "Investigación en Materiales", type: "INVESTIGACIÓN", color: "#00AB6D", image: proyecto4, shortDescription: "Estudios sobre nuevos materiales.", date: "2024", location: "Cali", stats: [], challenge: "...", solution: "...", impact: "..." },
-  { id: 5, title: "Producción Sostenible Local", type: "PRODUCCIÓN", color: "#1E305D", image: proyecto5, shortDescription: "Iniciativas con productores locales.", date: "2023", location: "Caribe", stats: [], challenge: "...", solution: "...", impact: "..." },
-  { id: 6, title: "Economía Colaborativa Verde", type: "ECONOMÍA", color: "#00AB6D", image: proyecto6, shortDescription: "Plataformas digitales de intercambio.", date: "2024", location: "Virtual", stats: [], challenge: "...", solution: "...", impact: "..." },
+  { 
+    id: 3, 
+    title: "Sensibilización al Consumidor", 
+    type: "PEDAGOGÍA", 
+    color: "#1E305D", 
+    image: proyecto3, 
+    shortDescription: "Campañas educativas para promover la separación en la fuente.", 
+    date: "Continuo", 
+    location: "Medellín", 
+    stats: [], 
+    challenge: "...", 
+    solution: "...", 
+    impact: "..." 
+  },
+  { 
+    id: 4, 
+    title: "Investigación en Materiales", 
+    type: "INVESTIGACIÓN", 
+    color: "#00AB6D", 
+    image: proyecto4, 
+    shortDescription: "Estudios sobre nuevos materiales.", 
+    date: "2024", 
+    location: "Cali", 
+    stats: [], 
+    challenge: "...", 
+    solution: "...", 
+    impact: "..." 
+  },
+  { 
+    id: 5, 
+    title: "Producción Sostenible Local", 
+    type: "PRODUCCIÓN", 
+    color: "#1E305D", 
+    image: proyecto5, 
+    shortDescription: "Iniciativas con productores locales.", 
+    date: "2023", 
+    location: "Caribe", 
+    stats: [], 
+    challenge: "...", 
+    solution: "...", 
+    impact: "..." 
+  },
+  { 
+    id: 6, 
+    title: "Economía Colaborativa Verde", 
+    type: "ECONOMÍA", 
+    color: "#00AB6D", 
+    image: proyecto6, 
+    shortDescription: "Plataformas digitales de intercambio.", 
+    date: "2024", 
+    location: "Virtual", 
+    stats: [], 
+    challenge: "...", 
+    solution: "...", 
+    impact: "..." 
+  },
+  // NUEVA NOTICIA DE INVESTIGACIÓN
+  {
+    id: 7,
+    title: "Bio-materiales de Residuos Agroindustriales",
+    type: "INVESTIGACIÓN",
+    color: "#00AB6D", // Color verde para investigación/innovación
+    image: proyecto4, // Reutilizando imagen (Importar una nueva si es necesario)
+    shortDescription: "Análisis de viabilidad para crear empaques compostables a partir de fibra de plátano y yuca.",
+    date: "Febrero 2024 - En curso",
+    location: "Eje Cafetero",
+    stats: [
+      { label: "Universidades aliadas", value: "3" },
+      { label: "Prototipos de empaque", value: "8" },
+      { label: "Tasa de degradación", value: "90 días" }
+    ],
+    challenge: "La industria agrícola genera toneladas de biomasa que actualmente se desperdician o queman, generando CO2, mientras seguimos dependiendo de plásticos de un solo uso.",
+    solution: "Estamos caracterizando física y químicamente fibras residuales para desarrollar un biopolímero que reemplace las bandejas de icopor en supermercados.",
+    impact: "Se ha logrado un prototipo funcional que soporta humedad y es 100% compostable en condiciones domésticas."
+  },
+  // NUEVA NOTICIA DE PRODUCCIÓN
+  {
+    id: 8,
+    title: "Ecodiseño en Mobiliario Urbano",
+    type: "PRODUCCIÓN",
+    color: "#1E305D", // Color azul para producción
+    image: proyecto5, // Reutilizando imagen (Importar una nueva si es necesario)
+    shortDescription: "Línea de producción de parques infantiles utilizando 100% plástico reciclado post-consumo.",
+    date: "Enero 2024 - Diciembre 2024",
+    location: "Barranquilla",
+    stats: [
+      { label: "Parques instalados", value: "10" },
+      { label: "Plástico desviado", value: "45 Ton" },
+      { label: "Empleos verdes", value: "22" }
+    ],
+    challenge: "El déficit de espacio público de calidad en zonas vulnerables y la acumulación de plásticos rígidos en zonas costeras.",
+    solution: "Establecimos una planta de transformación semi-industrial que convierte tapas y envases de detergente en madera plástica de alta resistencia para mobiliario.",
+    impact: "Instalación de parques duraderos que no requieren mantenimiento con químicos y reducción de la contaminación marina local."
+  }
 ];
