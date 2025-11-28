@@ -113,6 +113,11 @@ export default function DirectorySection({ selectedRegion, user }) {
     sectionTitle = `Empresas en la Región ${selectedRegion.nombre}`;
   }
 
+  // --- Verificación de Autenticación (Solo usuarios logueados pueden ver las empresas) ---
+  if (!user) {
+    return null;
+  }
+
   // --- Estados de Carga y Error (Mantenido) ---
   if (loading) {
      return (
