@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { contentTypeConfig } from "../../data/mockContent"; 
+import { contentTypeConfig } from "../../data/mockContent";
 import DOMPurify from 'dompurify';
 import { getPublishedNewsWithImages } from "../../api/newsApi";
+import { getDocuments } from "../../api/documentsApi";
 
 export default function FeaturedSection() {
   const [newsItems, setNewsItems] = useState([]);
@@ -20,50 +21,50 @@ export default function FeaturedSection() {
     let mounted = true;
     const load = async () => {
       try {
-        // Use the new API that combines list and detail endpoints
-        const response = await getPublishedNewsWithImages();
+        // Fetch both news and documents
+        const [newsResponse, documentsResponse] = await Promise.all([
+          getPublishedNewsWithImages(),
+          getDocuments()
+        ]);
+
         if (!mounted) return;
 
-        // The response should already be an array of published news with upload_file data
+        // Process news
         let newsArray = [];
-        if (Array.isArray(response)) {
-          newsArray = response;
-        } else if (response?.data?.news && Array.isArray(response.data.news)) {
-          newsArray = response.data.news;
-        } else if (response?.data && Array.isArray(response.data)) {
-          newsArray = response.data;
-        } else if (response?.news && Array.isArray(response.news)) {
-          newsArray = response.news;
-        } else if (typeof response === 'object' && response !== null) {
-          const possibleArrays = Object.values(response).filter(val => Array.isArray(val));
+        if (Array.isArray(newsResponse)) {
+          newsArray = newsResponse;
+        } else if (newsResponse?.data?.news && Array.isArray(newsResponse.data.news)) {
+          newsArray = newsResponse.data.news;
+        } else if (newsResponse?.data && Array.isArray(newsResponse.data)) {
+          newsArray = newsResponse.data;
+        } else if (newsResponse?.news && Array.isArray(newsResponse.news)) {
+          newsArray = newsResponse.news;
+        } else if (typeof newsResponse === 'object' && newsResponse !== null) {
+          const possibleArrays = Object.values(newsResponse).filter(val => Array.isArray(val));
           if (possibleArrays.length > 0) newsArray = possibleArrays[0];
         }
 
-        // --- 3. Mapeo y Normalización ---
-        const mapped = newsArray.map(n => {
-            // Obtenemos el tipo crudo de la API
-            const rawType = n.type || n.category || ""; 
-            
-            // LÓGICA DE ASIGNACIÓN:
-            // Dependiendo de cómo vengan tus datos, asignamos la categoría exacta del Tab.
-            let finalType = "Noticias"; // Valor por defecto
+        // Process documents
+        let documentsArray = [];
+        if (documentsResponse?.data && Array.isArray(documentsResponse.data)) {
+          documentsArray = documentsResponse.data;
+        }
 
-            // Si la API dice "document", "file", "interes", lo mandamos a Documentos
+        // Map news items
+        const mappedNews = newsArray.map(n => {
+            const rawType = n.type || n.category || "";
+            let finalType = "Noticias";
+
             if (rawType.toLowerCase().includes("doc") || rawType.toLowerCase().includes("interés")) {
                 finalType = "Documentos de interés";
-            } 
-            // Si la API dice "gestion", "management", lo mandamos a Gestión
+            }
             else if (rawType.toLowerCase().includes("gesti") || rawType.toLowerCase().includes("gestion")) {
                 finalType = "Gestión documental";
             }
-            // Si no, se queda como "Noticias"
 
-            // Handle image data - use direct URL from JSON
             let imageUrl = "";
-            
             if (n.upload_file && n.upload_file.url) {
                 imageUrl = n.upload_file.url;
-                console.log(`News ${n.id} has image:`, imageUrl);
             } else if (n.image) {
                 imageUrl = n.image;
             } else if (n.thumbnail) {
@@ -74,20 +75,61 @@ export default function FeaturedSection() {
 
             return {
                 id: n.id || n._id || n.uid || Math.random(),
-                type: finalType, // Usamos el tipo normalizado
+                type: finalType,
                 topic: n.category || n.topic || "General",
                 title: n.title || n.name || "Sin título",
                 excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
                 image: imageUrl,
                 date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
                 slug: n.slug || (`noticia-${n.id || n._id || ''}`),
-                status: n.status || ""
+                status: n.status || "",
+                source: 'news'
             };
         });
 
-        setNewsItems(mapped);
+        // Map documents
+        const documentTypes = [
+          { id: "1", name: "Normas y Politicas" },
+          { id: "2", name: "Formatos" },
+          { id: "3", name: "Actas" },
+          { id: "4", name: "Pesajes" },
+          { id: "5", name: "Contratos" }
+        ];
+
+        const mappedDocuments = documentsArray.map(doc => {
+          const documentType = documentTypes.find(type => type.id === doc.document_type_id);
+          let category = "Documentos de interés"; // Default category
+
+          // Map document types to categories
+          if (doc.document_type_id === "1") {
+            category = "Gestión documental"; // Normas y Políticas
+          } else if (doc.document_type_id === "2" || doc.document_type_id === "3") {
+            category = "Documentos de interés"; // Formatos, Actas
+          } else {
+            category = "Gestión documental"; // Pesajes, Contratos
+          }
+
+          return {
+            id: `doc-${doc.id}`,
+            type: category,
+            topic: documentType?.name || `Tipo ${doc.document_type_id}`,
+            title: doc.name,
+            excerpt: doc.description,
+            image: "", // Documents don't have images
+            date: new Date(doc.created_at).toLocaleDateString(),
+            slug: `documento-${doc.id}`,
+            status: doc.status,
+            source: 'document',
+            documentData: doc // Keep original document data for actions
+          };
+        });
+
+        // Combine and set items
+        const allItems = [...mappedNews, ...mappedDocuments];
+        setNewsItems(allItems);
+
       } catch (err) {
-        console.error("Error cargando noticias con imágenes:", err);
+        console.error("Error cargando contenido:", err);
       }
     };
 
@@ -151,14 +193,22 @@ export default function FeaturedSection() {
               const config = contentTypeConfig[item.type] || contentTypeConfig["Noticias"] || {};
               const Icon = config.icon;
 
+              const handleItemClick = () => {
+                if (item.source === 'document' && item.documentData) {
+                  const fileUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${item.documentData.upload_file.path}`;
+                  window.open(fileUrl, '_blank');
+                }
+              };
+
               return (
-                <a 
-                    key={item.id}
-                    href={window.location.origin + `/contenido/${item.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block h-full flex flex-col"
-                  >
+                <div
+                  key={item.id}
+                  onClick={item.source === 'document' ? handleItemClick : undefined}
+                  className={`group block h-full flex flex-col ${item.source === 'document' ? 'cursor-pointer' : ''}`}
+                  {...(item.source !== 'document' && {
+                    onClick: () => window.open(window.location.origin + `/contenido/${item.slug}`, '_blank')
+                  })}
+                >
                   {/* Imagen / Icono */}
                   <div className={`rounded-xl overflow-hidden mb-5 aspect-[16/10] relative shadow-sm transition-transform duration-500 group-hover:-translate-y-2 ${config.isSolid ? config.bgColor : 'bg-gray-100'}`}>
                     
@@ -206,7 +256,7 @@ export default function FeaturedSection() {
                       {item.title}
                     </h3>
                   </div>
-                </a>
+                </div>
               );
             })}
           </div>
