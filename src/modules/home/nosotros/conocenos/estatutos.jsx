@@ -1,6 +1,6 @@
 import React from "react";
 import Index from "../../../../components/home/nosotros/conocenos/estatutos/index.jsx";
-import fondos_submenus from "../../../../assets/fondos_submenus.jpg";
+import fondos_submenus from "../../../../assets/fondosYlogos/fondos_submenus.jpg";
 
 export default function Estatutos() {
   return (

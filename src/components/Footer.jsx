@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowUp, Instagram, Facebook, Linkedin } from "lucide-react";
-import Logo from "../assets/Logo_blanco.png";
-import fondoFooter from "../assets/fondo_footer.jpg";
+import Logo from "../assets/fondosYlogos/Logo_blanco.png";
+import fondoFooter from "../assets/fondosYlogos/fondo_footer.jpg";
 
 export default function Footer() {
   const scrollToTop = () => {

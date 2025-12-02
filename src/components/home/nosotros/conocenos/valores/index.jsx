@@ -100,8 +100,7 @@ export default function TransparencyPortal() {
         ))}
       </div>
 
-      {/* --- BLOQUE INFERIOR: TRANSPARENCIA (Párrafo 2) --- */}
-      {/* Este bloque separa visualmente el segundo texto, dándole su propio espacio */}
+     
       <div className="max-w-6xl mx-auto mb-16">
         <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 flex flex-col md:flex-row gap-10 items-center shadow-sm">
           

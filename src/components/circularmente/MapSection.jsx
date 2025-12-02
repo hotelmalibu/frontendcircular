@@ -7,7 +7,7 @@ import {
   AlertCircle, CheckCircle2, Sparkles
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import fondoMapa from '../../assets/fondo_mapaC.jpg';
+import fondoMapa from '../../assets/fondosYlogos/fondo_mapaC.jpg';
 import PyrcomLogo from '../../assets/empresaLogos/Pyrcom.png';
 import AaroLogo from '../../assets/empresaLogos/Acebrí.png';
 import AropetLogo from '../../assets/empresaLogos/Apropet.png';

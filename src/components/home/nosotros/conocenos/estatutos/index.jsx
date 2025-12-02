@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, Building2, ScrollText, Users, Gavel } from "lucide-react";
-import fondos_submenus from "../../../../../assets/fondos_submenus.jpg";
+import fondos_submenus from "../../../../../assets/fondosYlogos/fondos_submenus.jpg";
 export default function Index() {
   const [openChapter, setOpenChapter] = useState(null);
 

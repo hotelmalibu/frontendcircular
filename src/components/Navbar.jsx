@@ -1,9 +1,9 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import LogoBlanco from "../assets/Logo_blanco.png";
-import Logo from "../assets/Logo.png";
-import DefaultAvatar from "../assets/default-avatar.png";
+import LogoBlanco from "../assets/fondosYlogos/Logo_blanco.png";
+import Logo from "../assets/fondosYlogos/Logo.png";
+import DefaultAvatar from "../assets/fondosYlogos/default-avatar.png";
 import { User, LogOut, Home, Shield, Handshake, Menu, ChevronDown, Bell, MessageSquare } from "lucide-react";
 
 // --- COMPONENTES AUXILIARES (Badge, Menús) ---

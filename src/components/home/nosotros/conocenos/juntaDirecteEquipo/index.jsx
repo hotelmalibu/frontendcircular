@@ -8,19 +8,19 @@ import {
   User
 } from "lucide-react";
 
-import iconLogo from '../../../../../assets/iconologo.png';
-import andiLogo from '../../../../../assets/andi.png'; 
-import monicaV  from '../../../../../assets/monicav.jpg'; 
-import felipeB from '../../../../../assets/felipe.jpg';
-import monicaT from '../../../../../assets/monicat.jpg';
-import sebastiant from '../../../../../assets/sebastian.jpg';
-import diana from '../../../../../assets/Dianag.jpg';
-import gabriel from '../../../../../assets/gabriel.jpg';
-import jhostin from '../../../../../assets/Jhostinf.jpg';
-import nubia from '../../../../../assets/nubia.jpg';
-import luisa from '../../../../../assets/luisa.jpg';
-import mariaf from '../../../../../assets/mariaf.jpg';
-import defauli from '../../../../../assets/defaulimg.png';
+import iconLogo from '../../../../../assets/imgEquipo/iconologo.png';
+import andiLogo from '../../../../../assets/imgEquipo/andi.png'; 
+import monicaV  from '../../../../../assets/imgEquipo/monicav.jpg'; 
+import felipeB from '../../../../../assets/imgEquipo/felipe.jpg';
+import monicaT from '../../../../../assets/imgEquipo/monicat.jpg';
+import sebastiant from '../../../../../assets/imgEquipo/sebastian.jpg';
+import diana from '../../../../../assets/imgEquipo/Dianag.jpg';
+import gabriel from '../../../../../assets/imgEquipo/gabriel.jpg';
+import jhostin from '../../../../../assets/imgEquipo/Jhostinf.jpg';
+import nubia from '../../../../../assets/imgEquipo/nubia.jpg';
+import luisa from '../../../../../assets/imgEquipo/luisa.jpg';
+import mariaf from '../../../../../assets/imgEquipo/mariaf.jpg';
+import defauli from '../../../../../assets/imgEquipo/defaulimg.png';
 
 
 const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&q=80";

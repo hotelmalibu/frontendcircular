@@ -1,5 +1,5 @@
 import React from "react";
-import fondos_submenus from "../../../../assets/fondos_submenus.jpg";
+import fondos_submenus from "../../../../assets/fondosYlogos/fondos_submenus.jpg";
 export default function Aliados() {
   return (
     <div className="mt-24 px-6 py-14 text-center" style={{ backgroundImage: `url(${fondos_submenus})`, backgroundSize: "cover", backgroundPosition: "center" }}>

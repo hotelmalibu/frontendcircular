@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Target, Globe, Handshake } from "lucide-react";
-import Logo from "../../../../../assets/Logo.png";
+import Logo from "../../../../../assets/fondosYlogos/Logo.png";
 
 export default function Index() {
   return (

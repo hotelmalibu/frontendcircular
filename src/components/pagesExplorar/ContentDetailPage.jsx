@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
 import DOMPurify from 'dompurify';
 import { useParams, Link } from 'react-router-dom';
-import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, Share2 } from 'lucide-react';
+import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, Share2, Instagram, MessageCircle } from 'lucide-react';
 import { allContentData, contentTypeConfig } from '../../data/mockContent'; 
 import { AuthContext } from '../../context/AuthContext';
 import { getAllNews, getNewsById } from '../../api/newsApi';
+
 
 export default function ContentDetailPage() {
   const { slug } = useParams();
@@ -167,6 +168,8 @@ export default function ContentDetailPage() {
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
   const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
   const linkedinShareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedTextAndUrl}`;
+  const instagramShareUrl = `https://www.instagram.com/share?url=${encodedUrl}&text=${encodedTextAndUrl}`;
+  const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
   const mailShareUrl = `mailto:?subject=${encodedTitle}&body=${encodedTextAndUrl}`;
 
   return (
@@ -237,6 +240,8 @@ export default function ContentDetailPage() {
                 <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
                 <SocialButton icon={X} color="#000000" url={xShareUrl} />
                 <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
+                <SocialButton icon={Instagram} color="#E4405F" url={instagramShareUrl} />
+                <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
                 <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
 
                 {/* Móvil: Etiqueta compartir */}
@@ -280,6 +285,7 @@ export default function ContentDetailPage() {
   );
 }
 
+
 // Sub-componente Botón Social (ESTÁTICO)
 function SocialButton({ icon: Icon, url, color }) {
   return (
@@ -293,8 +299,10 @@ function SocialButton({ icon: Icon, url, color }) {
         bg-white/20 backdrop-blur-md
         border border-white/30
         text-white
+        transition-all duration-200 hover:bg-white/30 hover:scale-110
       "
       style={{ color: color }}
+      title="Compartir en red social"
     >
       <Icon size={26} strokeWidth={2} />
     </a>
