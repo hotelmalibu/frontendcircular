@@ -8,6 +8,19 @@ import api from "./index";
 const DOCUMENTS_ENDPOINT = "/document";
 
 /**
+ * Get all documents
+ * @param {Object} params - Query parameters for pagination/filtering
+ * @returns {Promise} - List of documents with pagination
+ */
+export const getDocuments = async (params = {}) => {
+  const queryString = new URLSearchParams(params).toString();
+  const url = queryString ? `${DOCUMENTS_ENDPOINT}?${queryString}` : DOCUMENTS_ENDPOINT;
+
+  const response = await api.get(url);
+  return response.data;
+};
+
+/**
  * Create a new document
  * @param {FormData} documentData - FormData containing document fields and file
  * @param {string} documentData.document_type_id - Document type ID (1-5)
@@ -54,5 +67,6 @@ export const createDocument = async (documentData) => {
 };
 
 export default {
+  getDocuments,
   createDocument,
 };
