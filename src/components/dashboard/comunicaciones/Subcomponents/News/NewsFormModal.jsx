@@ -16,7 +16,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     author: "",
     start_date: "",
     end_date: "",
-    status: "draft",
+    status: "published",
     upload_file: null,
   });
 
@@ -35,7 +35,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         author: newsData.author || "",
         start_date: newsData.start_date ? formatDateForInput(newsData.start_date) : "",
         end_date: newsData.end_date ? formatDateForInput(newsData.end_date) : "",
-        status: newsData.status || "draft",
+        status: "published",
         upload_file: newsData.upload_file || null,
       });
     }
@@ -205,10 +205,6 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       newErrors.title = "El título es requerido";
     }
 
-    if (!formData.status) {
-      newErrors.status = "El estado es requerido";
-    }
-
     if (formData.end_date && formData.start_date) {
       if (new Date(formData.end_date) < new Date(formData.start_date)) {
         newErrors.end_date = "La fecha de fin debe ser posterior a la fecha de inicio";
@@ -221,7 +217,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       if (!allowedTypes.includes(formData.upload_file.type)) {
         newErrors.upload_file = "Tipo de archivo no válido. Use JPEG, PNG, GIF o WebP.";
       }
-      
+
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (formData.upload_file.size > maxSize) {
         newErrors.upload_file = "El archivo es demasiado grande. Tamaño máximo: 5MB.";
@@ -258,7 +254,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         }
       };
 
-      // If the user didn't provide a published_at, and status is 'published', set today's date
+      // Since status is always 'published', set published_at to today's date if not provided
       const todayDate = () => {
         const d = new Date();
         const yyyy = d.getFullYear();
@@ -269,14 +265,11 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
       let publishedAt = null;
       // If the form included a published_at (from a previously published news), convert it.
-      // If the status is 'published', ensure we set published_at to an ISO or today's date.
-      // If the status is not 'published', explicitly clear published_at to avoid server-side validation errors.
-      if (formData.published_at) publishedAt = toIsoDate(formData.published_at);
-      if (formData.status === "published") {
-        if (!publishedAt) publishedAt = todayDate();
+      // Otherwise, set today's date since status is always published
+      if (formData.published_at) {
+        publishedAt = toIsoDate(formData.published_at);
       } else {
-        // When switching to draft, remove any published_at value to avoid inconsistent state on server
-        publishedAt = null;
+        publishedAt = todayDate();
       }
 
       const dataToSend = new FormData();
@@ -419,32 +412,6 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
           <div className="space-y-4">
-            {/* Status Row (type is fixed to 'news' by default) */}
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Estado <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none ${
-                    errors.status ? "border-red-500" : "border-gray-300"
-                  }`}
-                  disabled={loading}
-                >
-                  <option value="draft">Borrador</option>
-                  <option value="published">Publicado</option>
-                </select>
-                {errors.status && (
-                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                    <AlertCircle size={14} />
-                    {errors.status}
-                  </p>
-                )}
-              </div>
-            </div>
 
             {/* Title */}
             <div>
