@@ -1,49 +1,156 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { 
-  ArrowLeft, 
-  Check, 
-  Calendar, 
-  MapPin, 
-  ArrowUpRight, 
-  TrendingUp 
-} from "lucide-react"; 
-import { projectsData } from "../../data/mockContentData";
+import {
+  ArrowLeft,
+  Check,
+  Calendar,
+  MapPin,
+  ArrowUpRight,
+  TrendingUp,
+  Facebook,
+  X,
+  Linkedin,
+  Mail,
+  Share2,
+  MessageCircle,
+  Instagram
+} from "lucide-react";
+import { getProjectById } from "../../api/projectsApi";
 
 const formatNumber = (val) => {
   if (typeof val === 'number') {
-    if (val >= 1000) return `${(val / 1000).toFixed(1)}k+`; 
-    return `${val}+`; 
+    if (val >= 1000) return `${(val / 1000).toFixed(1)}k+`;
+    return `${val}+`;
   }
   return val;
 };
 
 export default function ContentDetailProject() {
   const { id } = useParams();
-  const project = projectsData.find((p) => p.id === parseInt(id));
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
 
-  if (!project) {
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getProjectById(id);
+
+        // Handle different response structures
+        let projectData = response;
+        if (response?.data) {
+          projectData = response.data;
+        }
+
+        // Map API data to expected format
+        const mappedProject = {
+          id: projectData.id,
+          title: projectData.title,
+          type: projectData.category,
+          image: projectData.image || "/assets/home/Proyectos/proyecto1.png", // fallback image
+          date: projectData.created_at ? new Date(projectData.created_at).toLocaleDateString() : "Fecha no disponible",
+          location: projectData.location || "Ubicación no especificada",
+          challenge: projectData.challenge || projectData.description || "Información del desafío no disponible",
+          solution: projectData.solution || "Información de la solución no disponible",
+          impact: projectData.impact || "Información del impacto no disponible",
+          stats: projectData.stats || []
+        };
+
+        setProject(mappedProject);
+      } catch (err) {
+        console.error("Error fetching project:", err);
+        setError(err.response?.data?.message || "Error al cargar el proyecto");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchProject();
+    }
+  }, [id]);
+
+  if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center text-[#1E305D] text-xl font-bold bg-[#F6F6F6]">
-        Proyecto no encontrado
+      <div className="h-screen flex items-center justify-center bg-[#F6F6F6]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00AB6D] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando proyecto...</p>
+        </div>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center text-[#1E305D] text-xl font-bold bg-[#F6F6F6]">
+        <div className="text-center">
+          <p className="mb-4">Error: {error}</p>
+          <Link to="/" className="text-[#00AB6D] hover:underline">
+            Volver al inicio
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="h-screen flex items-center justify-center text-[#1E305D] text-xl font-bold bg-[#F6F6F6]">
+        <div className="text-center">
+          <p className="mb-4">Proyecto no encontrado</p>
+          <Link to="/" className="text-[#00AB6D] hover:underline">
+            Volver al inicio
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Social share URLs
+  const currentUrl = window.location.href;
+  const encodedUrl = encodeURIComponent(currentUrl);
+  const encodedTitle = encodeURIComponent(project?.title || '');
+  const encodedTextAndUrl = encodeURIComponent(`${project?.title || ''} ${currentUrl}`);
+
+  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+  const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+  const linkedinShareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedTextAndUrl}`;
+  const instagramShareUrl = `https://www.instagram.com/share?url=${encodedUrl}&text=${encodedTextAndUrl}`;
+  const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
+  const mailShareUrl = `mailto:?subject=${encodedTitle}&body=${encodedTextAndUrl}`;
+
   return (
-    <div className="bg-[#F6F6F6] min-h-screen font-sans selection:bg-[#00AB6D]/30">
+    <>
+      {/* Force navbar white background for project detail pages */}
+      <style>{`
+        .navbar-forced-white header {
+          background-color: white !important;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        }
+        .navbar-forced-white .menu-underline {
+          border-bottom-color: #00AB6D !important;
+        }
+        .navbar-forced-white .hamburger-line {
+          background-color: #374151 !important;
+        }
+      `}</style>
+      {/* Add class to parent to force navbar styling */}
+      <div className="navbar-forced-white">
+        <div className="bg-[#F6F6F6] min-h-screen font-sans selection:bg-[#00AB6D]/30">
       
      
       <div className="relative h-[85vh] w-full overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={project.image}
-            alt={project.title}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[#1E305D]/60 via-[#1E305D]/80 to-[#1E305D]" />
@@ -73,9 +180,6 @@ export default function ContentDetailProject() {
               <span className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#00AB6D]" /> {project.date}
               </span>
-              <span className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#00AB6D]" /> {project.location}
-              </span>
             </div>
           </motion.div>
         </div>
@@ -83,117 +187,82 @@ export default function ContentDetailProject() {
 
       {/* --- CONTENIDO PRINCIPAL --- */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 md:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
-          {/* Columna Izquierda: Historia */}
-          <div className="lg:col-span-8 space-y-12">
-            
-            {/* El Reto */}
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <h3 className="text-[#00AB6D] font-bold uppercase tracking-wider mb-2 text-sm">
-                El Desafío
-              </h3>
-              <h2 className="text-3xl font-bold text-[#1E305D] mb-6">
-                ¿Qué problema estamos resolviendo?
-              </h2>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                {project.challenge}
-              </p>
-            </motion.section>
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-24">
 
-            {/* La Solución */}
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-[#e2e8f0] p-8 rounded-3xl border-l-4 border-[#00AB6D]"
-            >
-              <h3 className="text-[#1E305D] font-bold uppercase tracking-wider mb-4 text-sm">
-                Nuestra Intervención
-              </h3>
-              <p className="text-[#1E305D] text-lg font-medium leading-relaxed">
-                {project.solution}
-              </p>
-            </motion.section>
+          {/* COLUMNA IZQUIERDA: Social Share Sticky */}
+          <div className="lg:w-24 flex-shrink-0">
+            <div className="sticky top-32 flex lg:flex-col gap-4 items-center lg:items-start">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest hidden lg:block mb-2">
+                Compartir
+              </span>
 
-            {/* El Impacto */}
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <h3 className="text-[#00AB6D] font-bold uppercase tracking-wider mb-2 text-sm">
-                Resultados
-              </h3>
-              <h2 className="text-3xl font-bold text-[#1E305D] mb-6">
-                Impacto Generado
-              </h2>
-              <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                {project.impact}
-              </p>
+              <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
+              <SocialButton icon={X} color="#000000" url={xShareUrl} />
+              <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
+              <SocialButton icon={Instagram} color="#E4405F" url={instagramShareUrl} />
+              <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
+              <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
 
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3 text-gray-700">
-                  <Check className="w-5 h-5 text-[#00AB6D] mt-1 flex-shrink-0" />
-                  <span>Mejora continua en procesos de recolección.</span>
-                </li>
-                <li className="flex items-start gap-3 text-gray-700">
-                  <Check className="w-5 h-5 text-[#00AB6D] mt-1 flex-shrink-0" />
-                  <span>Alianzas estratégicas con el sector público.</span>
-                </li>
-              </ul>
-            </motion.section>
+              {/* Móvil: Etiqueta compartir */}
+              <div className="lg:hidden flex items-center gap-2 text-gray-400 text-sm font-bold ml-auto">
+                <Share2 size={16} /> Compartir
+              </div>
+            </div>
           </div>
 
-          {/* Columna Derecha: Stats y Sidebar */}
-          <div className="lg:col-span-4">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="bg-[#1E305D] text-white rounded-3xl p-8 shadow-xl h-fit"
-            >
-              <h4 className="text-xl font-bold mb-6 border-b border-white/20 pb-4 flex items-center gap-2">
-                <TrendingUp className="w-6 h-6 text-[#00AB6D]" />
-                Cifras Clave
-              </h4>
-              
-              <div className="space-y-8">
-                {project.stats?.length > 0 ? (
-                  project.stats.map((stat, index) => (
-                    <div key={index} className="flex flex-col">
-                      <div className="text-5xl font-extrabold text-[#00AB6D] mb-1">
-                        {formatNumber(stat.value)}
-                      </div>
-                      <div className="text-xs font-bold text-gray-300 uppercase tracking-wider">
-                        {stat.label}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-400 text-sm">
-                    Información estadística en recolección.
-                  </p>
-                )}
+          {/* COLUMNA DERECHA: Contenido del Proyecto */}
+          <div className="flex-1 max-w-4xl">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+              {/* Columna Izquierda: Descripción del Proyecto */}
+              <div className="lg:col-span-8">
+                <motion.section
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <div className="prose prose-lg prose-headings:text-[#1E305D] prose-a:text-[#00AB6D] text-gray-600">
+                    {project.challenge ? (
+                      /<[a-z][\s\S]*>/i.test(project.challenge) ? (
+                        <div dangerouslySetInnerHTML={{ __html: project.challenge }} />
+                      ) : (
+                        <p className="text-lg leading-relaxed">{project.challenge}</p>
+                      )
+                    ) : (
+                      <p className="text-lg leading-relaxed text-gray-500">Descripción del proyecto no disponible.</p>
+                    )}
+                  </div>
+                </motion.section>
               </div>
 
-              <div className="mt-10 pt-6 border-t border-white/20">
-                <p className="text-sm text-gray-300 mb-4">
-                  ¿Te interesa apoyar este proyecto?
-                </p>
-                <button className="w-full py-3 bg-[#00AB6D] hover:bg-[#009b62] text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 group">
-                  Contáctanos
-                  <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                </button>
-              </div>
-            </motion.div>
+        </div>
           </div>
         </div>
       </div>
-    </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// Sub-component Botón Social
+function SocialButton({ icon: Icon, url, color }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="
+        w-12 h-12 flex items-center justify-center
+        rounded-xl
+        bg-white/20 backdrop-blur-md
+        border border-white/30
+        text-white
+        transition-all duration-200 hover:bg-white/30 hover:scale-110
+      "
+      style={{ color: color }}
+      title="Compartir en red social"
+    >
+      <Icon size={26} strokeWidth={2} />
+    </a>
   );
 }
