@@ -26,8 +26,6 @@ import Planes from "./modules/home/nosotros/marcoNormativo/planes";
 import Politicas from "./modules/home/nosotros/marcoNormativo/politicas";
 import Resoluciones from "./modules/home/nosotros/marcoNormativo/resoluciones";
 import ProyectosActivos from "./modules/home/nuestrosTrabajos/proyectosAlianzas/proyectosActivos";
-import Sectoriales from "./modules/home/nuestrosTrabajos/proyectosAlianzas/sectoriales";
-import Territoriales from "./modules/home/nuestrosTrabajos/proyectosAlianzas/territoriales";
 import InclusionSocial from "./modules/home/nuestrosTrabajos/proyectosAlianzas/inclusionSocial";
 import CasosExitos from "./modules/home/nuestrosTrabajos/proyectosAlianzas/casosExitos";
 import Convocatorias from "./modules/home/nuestrosTrabajos/proyectosAlianzas/convocatorias";
@@ -60,8 +58,6 @@ export default function App() {
           <Route path="/polticas" element={<Politicas />} />
           <Route path="/resoluciones" element={<Resoluciones />} />
           <Route path="/proyectos-activos" element={<ProyectosActivos />} />
-          <Route path="/sectoriales" element={<Sectoriales />} />
-          <Route path="/territoriales" element={<Territoriales />} />
           <Route path="/inclusin-social" element={<InclusionSocial />} />
           <Route path="/casos-de-xito" element={<CasosExitos />} />
           <Route path="/convocatorias" element={<Convocatorias />} />
