@@ -8,6 +8,10 @@ import {
   RefreshCw,
   Plus,
   Building,
+  Edit,
+  Trash2,
+  Eye,
+  Search,
 } from "lucide-react";
 import {
   LineChart,
@@ -20,6 +24,10 @@ import {
   Bar,
   ResponsiveContainer,
 } from "recharts";
+import React, { useState, useEffect } from "react";
+import { getAllProjects, deleteProject } from "../../../../api/projectsApi";
+import ProjectFormModal from "../../../dashboard/comunicaciones/Subcomponents/Projects/ProjectFormModal";
+import ProjectDetailModal from "../../../dashboard/comunicaciones/Subcomponents/Projects/ProjectDetailModal";
 
 export default function Undexsub() {
   // Datos de ejemplo
@@ -87,6 +95,113 @@ export default function Undexsub() {
       icono: <AlertOctagon className="text-red-600" size={20} />,
     },
   ];
+
+  // Projects state management
+  const [projects, setProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Load projects on component mount
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  // Filter projects when search term or projects change
+  useEffect(() => {
+    filterProjectsData();
+  }, [searchTerm, projects]);
+
+  const loadProjects = async () => {
+    try {
+      setLoading(true);
+      const response = await getAllProjects();
+
+      let projectsArray = [];
+      if (response?.data?.items && Array.isArray(response.data.items)) {
+        projectsArray = response.data.items;
+      } else if (Array.isArray(response)) {
+        projectsArray = response;
+      } else if (response?.data?.projects && Array.isArray(response.data.projects)) {
+        projectsArray = response.data.projects;
+      } else if (response?.data && Array.isArray(response.data)) {
+        projectsArray = response.data;
+      } else if (response?.projects && Array.isArray(response.projects)) {
+        projectsArray = response.projects;
+      } else if (typeof response === 'object' && response !== null) {
+        const possibleArrays = Object.values(response).filter(val => Array.isArray(val));
+        if (possibleArrays.length > 0) {
+          projectsArray = possibleArrays[0];
+        }
+      }
+
+      setProjects(projectsArray);
+    } catch (err) {
+      console.error("Error loading projects:", err);
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterProjectsData = () => {
+    if (!Array.isArray(projects)) {
+      setFilteredProjects([]);
+      return;
+    }
+
+    let filtered = [...projects];
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (item) =>
+          item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.category?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredProjects(filtered);
+  };
+
+  const handleCreate = () => {
+    setSelectedProject(null);
+    setIsEditing(false);
+    setShowFormModal(true);
+  };
+
+  const handleEdit = (projectItem) => {
+    setSelectedProject(projectItem);
+    setIsEditing(true);
+    setShowFormModal(true);
+  };
+
+  const handleView = (projectItem) => {
+    setSelectedProject(projectItem);
+    setShowDetailModal(true);
+  };
+
+  const handleDelete = async (projectId) => {
+    if (!window.confirm("¿Está seguro de eliminar este proyecto?")) {
+      return;
+    }
+
+    try {
+      await deleteProject(projectId);
+      await loadProjects();
+    } catch (err) {
+      alert(err.response?.data?.message || "Error al eliminar el proyecto");
+    }
+  };
+
+  const handleFormSuccess = () => {
+    setShowFormModal(false);
+    loadProjects();
+  };
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
@@ -156,6 +271,104 @@ export default function Undexsub() {
         </div>
       </div>
 
+      {/* Gestión de Proyectos */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-8 border">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <Building className="text-blue-500" /> Gestión de Proyectos
+          </h2>
+          <button
+            onClick={handleCreate}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            <Plus size={18} /> Nuevo Proyecto
+          </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-4">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Buscar proyectos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            />
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : filteredProjects.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            {searchTerm ? "No se encontraron proyectos que coincidan con la búsqueda" : "No hay proyectos registrados"}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredProjects.slice(0, 6).map((project) => (
+              <div
+                key={project.id}
+                className="bg-gray-50 rounded-xl p-4 border hover:shadow-md transition"
+              >
+                {/* Project Info */}
+                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">
+                  {project.title}
+                </h3>
+                <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+                  {project.description ? project.description.replace(/<[^>]+>/g, '').slice(0, 120) : "Sin descripción"}
+                </p>
+                <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                    {project.category || "Sin categoría"}
+                  </span>
+                  <span>{project.author || "Sin autor"}</span>
+                </div>
+
+                {/* Actions */}
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => handleView(project)}
+                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                    title="Ver detalles"
+                  >
+                    <Eye size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleEdit(project)}
+                    className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition"
+                    title="Editar"
+                  >
+                    <Edit size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(project.id)}
+                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition"
+                    title="Eliminar"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {filteredProjects.length > 6 && (
+          <div className="text-center mt-4">
+            <p className="text-sm text-gray-500">
+              Mostrando 6 de {filteredProjects.length} proyectos.{" "}
+              <a href="/comunicaciones" className="text-blue-600 hover:underline">
+                Ver todos en Comunicaciones
+              </a>
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* Impacto Ambiental */}
       <div className="bg-white rounded-2xl shadow-sm p-6 border">
         <h2 className="text-lg font-semibold text-gray-800 mb-5">
@@ -216,6 +429,27 @@ export default function Undexsub() {
           </div>
         </div>
       </div>
+
+      {/* Project Modals */}
+      {showFormModal && (
+        <ProjectFormModal
+          projectData={selectedProject}
+          isEditing={isEditing}
+          onClose={() => setShowFormModal(false)}
+          onSuccess={handleFormSuccess}
+        />
+      )}
+
+      {showDetailModal && selectedProject && (
+        <ProjectDetailModal
+          projectData={selectedProject}
+          onClose={() => setShowDetailModal(false)}
+          onEdit={() => {
+            setShowDetailModal(false);
+            handleEdit(selectedProject);
+          }}
+        />
+      )}
     </div>
   );
 }
