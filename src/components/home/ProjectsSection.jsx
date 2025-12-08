@@ -1,7 +1,33 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { projectsData } from "../../data/mockContentData";
+import { getAllProjects } from "../../api/projectsApi";
+import proyecto1 from "../../assets/home/Proyectos/proyecto1.png";
+import proyecto2 from "../../assets/home/Proyectos/proyecto2.png";
+import proyecto3 from "../../assets/home/Proyectos/proyecto3.png";
+import proyecto4 from "../../assets/home/Proyectos/proyecto4.png";
+import proyecto5 from "../../assets/home/Proyectos/proyecto5.png";
+import proyecto6 from "../../assets/home/Proyectos/proyecto6.png";
+
+// Category to image mapping
+const categoryImages = {
+  "Fortalecimiento": proyecto1,
+  "Innovacion": proyecto2,
+  "Sensibilizacion": proyecto3,
+  "Investigacion": proyecto4,
+  "Produccion": proyecto5,
+  "Economia": proyecto6,
+};
+
+// Category to color mapping
+const categoryColors = {
+  "Fortalecimiento": "#1E305D",
+  "Innovacion": "#00AB6D",
+  "Sensibilizacion": "#1E305D",
+  "Investigacion": "#00AB6D",
+  "Produccion": "#1E305D",
+  "Economia": "#00AB6D",
+};
 
 // Icono SVG simple
 const ArrowIcon = () => (
@@ -12,15 +38,92 @@ const ArrowIcon = () => (
 );
 
 export default function ProjectsSection() {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getAllProjects();
+
+        let projectsArray = [];
+        if (response?.data?.items && Array.isArray(response.data.items)) {
+          projectsArray = response.data.items;
+        } else if (Array.isArray(response)) {
+          projectsArray = response;
+        } else if (response?.data?.projects && Array.isArray(response.data.projects)) {
+          projectsArray = response.data.projects;
+        } else if (response?.data && Array.isArray(response.data)) {
+          projectsArray = response.data;
+        } else if (response?.projects && Array.isArray(response.projects)) {
+          projectsArray = response.projects;
+        } else if (typeof response === 'object' && response !== null) {
+          const possibleArrays = Object.values(response).filter(val => Array.isArray(val));
+          if (possibleArrays.length > 0) {
+            projectsArray = possibleArrays[0];
+          }
+        }
+
+        // Map API data to component expected format
+        const mappedProjects = projectsArray.map(project => ({
+          id: project.id,
+          title: project.title,
+          type: project.category,
+          color: categoryColors[project.category] || "#1E305D",
+          image: categoryImages[project.category] || "/assets/home/Proyectos/proyecto1.png",
+          shortDescription: project.description || "Sin descripción disponible",
+        }));
+
+        setProjects(mappedProjects);
+      } catch (err) {
+        setError(err.response?.data?.message || "Error al cargar los proyectos");
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProjects();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="relative py-20 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center">
+        <div className="absolute inset-0 bg-[#F4F7F6]/90 mix-blend-overlay z-0 pointer-events-none"></div>
+        <div className="relative z-10 max-w-[1400px] mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="relative py-20 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center">
+        <div className="absolute inset-0 bg-[#F4F7F6]/90 mix-blend-overlay z-0 pointer-events-none"></div>
+        <div className="relative z-10 max-w-[1400px] mx-auto">
+          <div className="text-center py-20">
+            <p className="text-red-600">Error al cargar proyectos: {error}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative py-20 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center">
       <div className="absolute inset-0 bg-[#F4F7F6]/90 mix-blend-overlay z-0 pointer-events-none"></div>
 
       <div className="relative z-10 max-w-[1400px] mx-auto">
-        
+
         {/* Encabezado */}
         <div className="text-center mb-12 space-y-4">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -28,7 +131,7 @@ export default function ProjectsSection() {
           >
             Nuestras Iniciativas
           </motion.div>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -37,7 +140,7 @@ export default function ProjectsSection() {
           >
             Proyectos que <span className="text-[#00AB6D]">Transforman</span>
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -49,8 +152,8 @@ export default function ProjectsSection() {
         </div>
 
         {/* Grid de Proyectos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"> 
-          {projectsData.map((project, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {projects.map((project, index) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 30 }}
