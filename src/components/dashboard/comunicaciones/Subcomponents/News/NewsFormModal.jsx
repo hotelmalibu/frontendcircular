@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { X, Save, Calendar, User, Tag, FileText, AlertCircle, Upload, Image, XCircle } from "lucide-react";
 import { createNews, updateNews } from "../../../../../api/newsApi";
+import { getAllCategories } from "../../../../../api/categoriesApi";
 
 export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess }) {
   const editorRef = useRef(null);
@@ -21,6 +22,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   useEffect(() => {
     if (isEditing && newsData) {
@@ -37,6 +40,38 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       });
     }
   }, [newsData, isEditing]);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      setCategoriesLoading(true);
+      const response = await getAllCategories();
+
+      let categoriesArray = [];
+      if (response?.data?.items && Array.isArray(response.data.items)) {
+        categoriesArray = response.data.items;
+      } else if (Array.isArray(response)) {
+        categoriesArray = response;
+      } else if (response?.data && Array.isArray(response.data)) {
+        categoriesArray = response.data;
+      } else if (response?.categories && Array.isArray(response.categories)) {
+        categoriesArray = response.categories;
+      } else {
+        // If it's a single object, wrap it in an array
+        categoriesArray = response ? [response] : [];
+      }
+
+      setCategories(categoriesArray);
+    } catch (err) {
+      console.error("Error loading categories:", err);
+      setCategories([]);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
 
   // Initialize CKEditor manually into the container with id news-description-editor
   useEffect(() => {
@@ -459,19 +494,16 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                   value={formData.category}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
-                  disabled={loading}
+                  disabled={loading || categoriesLoading}
                 >
-                  <option value="">-- Seleccione categoría --</option>
-                  <option value="Medio Ambiente">Medio Ambiente</option>
-                  <option value="Reciclaje">Reciclaje</option>
-                  <option value="Biodiversidad">Biodiversidad</option>
-                  <option value="Cambio Climático">Cambio Climático</option>
-                  <option value="Gestión de Residuos">Gestión de Residuos</option>
-                  <option value="Energías Renovables">Energías Renovables</option>
-                  <option value="Conservación">Conservación</option>
-                  <option value="Agua y Saneamiento">Agua y Saneamiento</option>
-                  <option value="Educación Ambiental">Educación Ambiental</option>
-                  <option value="Políticas Públicas">Políticas Públicas</option>
+                  <option value="">
+                    {categoriesLoading ? "Cargando categorías..." : "-- Seleccione categoría --"}
+                  </option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
