@@ -3,60 +3,61 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, ChevronDown, FilterX } from "lucide-react";
 // Asegúrate que la ruta a mockContent sea correcta según tu estructura
-import { allContentData, contentTypeConfig } from "../../data/mockContent"; 
+import { contentTypeConfig } from "../../data/mockContent";
 import DOMPurify from 'dompurify';
 import { getAllNews } from "../../api/newsApi";
+import { getAllCategories } from "../../api/categoriesApi";
 
 
 export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTopic, setSelectedTopic] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [newsItems, setNewsItems] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loadingNews, setLoadingNews] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
-  // Combine noticias desde API con el contenido estático
-  const combinedData = useMemo(() => {
-    // Map news items to the same shape as allContentData
-    const mappedNews = (newsItems || [])
+  // Only use news from API (remove mock data)
+  const newsData = useMemo(() => {
+    // Map news items to the expected shape
+    return (newsItems || [])
       .filter(n => String(n.status).toLowerCase() === 'published')
       .map(n => ({
       id: n.id || n._id || Math.random(),
       type: "Noticias",
-      topic: n.category || n.topic || "General",
+      category: n.category || "General",
       title: n.title || n.name || "Sin título",
       excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
-      image: n.image || n.thumbnail || n.cover || "",
-      date: n.published_at ? new Date(n.published_at).toLocaleDateString() : (n.publishedAt ? new Date(n.publishedAt).toLocaleDateString() : ""),
+      image: (n.upload_file && n.upload_file.url) || n.image || n.thumbnail || n.cover || "",
+      date: n.published_at ? new Date(n.published_at).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : "",
       slug: n.slug || (`noticia-${n.id || n._id || ''}`),
     }));
-
-    return [...mappedNews, ...allContentData];
   }, [newsItems]);
 
-  const allTopics = useMemo(() => [...new Set(combinedData.map(item => item.topic))], [combinedData]);
-  const allTypes = useMemo(() => Object.keys(contentTypeConfig), []);
+  const allCategories = useMemo(() => categories.map(cat => cat.name), [categories]);
 
   const filteredResults = useMemo(() => {
-    return combinedData.filter(item => {
+    return newsData.filter(item => {
       const q = searchQuery.toLowerCase();
       const matchesSearch = item.title?.toLowerCase().includes(q) || item.excerpt?.toLowerCase().includes(q);
-      const matchesTopic = selectedTopic ? item.topic === selectedTopic : true;
+      const matchesCategory = selectedCategory ? item.category === selectedCategory : true;
       const matchesType = selectedType ? item.type === selectedType : true;
-      return matchesSearch && matchesTopic && matchesType;
+      return matchesSearch && matchesCategory && matchesType;
     });
-  }, [combinedData, searchQuery, selectedTopic, selectedType]);
+  }, [newsData, searchQuery, selectedCategory, selectedType]);
 
   const clearFilters = () => {
     setSearchQuery("");
-    setSelectedTopic("");
+    setSelectedCategory("");
     setSelectedType("");
   };
 
-  // Load news from API on mount
+  // Load news and categories from API on mount
   useEffect(() => {
     let mounted = true;
-    const load = async () => {
+
+    const loadNews = async () => {
       try {
         setLoadingNews(true);
         const response = await getAllNews();
@@ -84,7 +85,34 @@ export default function ExplorePage() {
       }
     };
 
-    load();
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const response = await getAllCategories();
+
+        let categoriesArray = [];
+        if (response?.data?.items && Array.isArray(response.data.items)) {
+          categoriesArray = response.data.items;
+        } else if (Array.isArray(response)) {
+          categoriesArray = response;
+        } else if (response?.data && Array.isArray(response.data)) {
+          categoriesArray = response.data;
+        } else if (response?.categories && Array.isArray(response.categories)) {
+          categoriesArray = response.categories;
+        } else {
+          categoriesArray = response ? [response] : [];
+        }
+
+        if (mounted) setCategories(categoriesArray);
+      } catch (err) {
+        console.error('Error loading categories for ExplorePage:', err);
+      } finally {
+        if (mounted) setLoadingCategories(false);
+      }
+    };
+
+    loadNews();
+    loadCategories();
     return () => { mounted = false };
   }, []);
 
@@ -136,13 +164,12 @@ export default function ExplorePage() {
         {/* Barra de Filtros Minimalista */}
         <div className="flex flex-wrap items-center gap-6 mb-12 border-b border-gray-100 pb-8">
           <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Filtrar resultados:</span>
-          
-          <FilterDropdown label="Tema" options={allTopics} selected={selectedTopic} onChange={setSelectedTopic} />
-          <FilterDropdown label="Tipo" options={allTypes} selected={selectedType} onChange={setSelectedType} />
-          
-          {(selectedTopic || selectedType || searchQuery) && (
-            <button 
-              onClick={clearFilters} 
+
+          <FilterDropdown label="Categoría" options={allCategories} selected={selectedCategory} onChange={setSelectedCategory} />
+
+          {(selectedCategory || selectedType || searchQuery) && (
+            <button
+              onClick={clearFilters}
               className="text-red-500 text-sm font-semibold hover:bg-red-50 px-3 py-2 rounded-lg transition-colors ml-auto md:ml-0 flex items-center gap-2"
             >
               <FilterX size={16} /> Borrar filtros
@@ -229,7 +256,7 @@ function MinimalistCard({ item }) {
         <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest mb-3 text-gray-400">
             <span className={config.isSolid ? "text-gray-500" : config.color}>{item.type}</span>
             <span className="text-gray-300">/</span>
-            <span>{item.topic}</span>
+            <span>{item.category}</span>
         </div>
         <h3 className="text-lg font-bold text-[#1E305D] leading-snug mb-3 group-hover:text-[#00AB6D] transition-colors">
           {item.title}

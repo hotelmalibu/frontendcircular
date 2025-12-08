@@ -271,12 +271,12 @@ export default function ContentDetailPage() {
               )}
             </div>
 
-            {/* Footer del artículo: Tema */}
+            {/* Footer del artículo: Categoría */}
             <div className="mt-16 pt-8 border-t border-gray-100">
-               <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mr-4">Temática relacionada:</span>
-               <Link to="/explorar" className="inline-block px-4 py-2 bg-gray-100 rounded-lg text-sm font-bold text-gray-600 hover:bg-[#00AB6D] hover:text-white transition-colors">
-                  {content.topic}
-               </Link>
+               <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mr-4">Categoría:</span>
+                <Link to="/explorar" className="inline-block px-4 py-2 bg-gray-100 rounded-lg text-sm font-bold text-gray-600 hover:bg-[#00AB6D] hover:text-white transition-colors">
+                   {content.topic}
+                </Link>
             </div>
           </div>
         </div>
