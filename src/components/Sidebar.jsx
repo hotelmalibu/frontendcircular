@@ -39,18 +39,9 @@ export default function Sidebar() {
  
 
   return (
-    <aside className="hidden md:flex md:flex-col w-72 bg-white border-r border-gray-200 h-screen sticky top-0 shadow-sm z-30">
+    <aside className="hidden md:flex mt-20 md:flex-col w-72 bg-white border-r border-gray-200 h-screen sticky top-0 shadow-sm z-30">
       
-      {/* 1. Header con Logo y Branding */}
-      <div className="flex items-center gap-3 px-6 py-8">
-        <div className="bg-blue-600 p-2 rounded-lg text-white">
-            <Hexagon size={24} strokeWidth={2.5} />
-        </div>
-        <div>
-            <h2 className="text-xl font-bold text-gray-800 tracking-tight">EcoCircular</h2>
-            <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">Panel Admin</span>
-        </div>
-      </div>
+      
 
       {/* 2. Navegación Principal */}
       <nav className="flex-1 overflow-y-auto px-4 space-y-1 mt-4">

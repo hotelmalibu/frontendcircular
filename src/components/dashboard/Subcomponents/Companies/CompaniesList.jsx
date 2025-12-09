@@ -196,14 +196,20 @@ export default function CompaniesList() {
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
       
       {/* ESPACIADOR SUPERIOR */}
-      <div className="w-full h-20 md:h-28"></div>
+      <div className="w-full "></div>
 
       {/* Encabezado */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
-        <div>
-          <h1 className="text-3xl font-bold" style={{ color: BRAND.darkBlue }}>Gestión de Empresas</h1>
-          <p className="text-gray-500 mt-1 text-lg">Administra los aliados y clientes registrados</p>
-        </div>
+        {/* Encabezado de Sección */}
+                  <div className="mb-8">
+                    <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
+                      <Building className="text-blue-400" size={32} />
+                      Directorio de Empresas
+                    </h1>
+                    <p className="text-gray-500 mt-2 text-lg ml-11">
+                      Gestión de aliados estratégicos y organizaciones registradas
+                    </p>
+                  </div>
         <button
           onClick={handleCreate}
           className="w-full lg:w-auto flex items-center justify-center gap-2 px-6 py-3 text-white rounded-xl shadow-md hover:shadow-lg transition-all font-bold text-sm transform active:scale-95"

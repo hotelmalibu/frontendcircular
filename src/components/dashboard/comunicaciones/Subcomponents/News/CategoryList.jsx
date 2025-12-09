@@ -5,11 +5,23 @@ import {
   Trash2,
   Search,
   AlertCircle,
-  CheckCircle,
   Tag,
+  FolderOpen
 } from "lucide-react";
 import { getAllCategories, deleteCategory } from "../../../../../api/categoriesApi";
 import CategoryFormModal from "./CategoryFormModal";
+
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  darkBlue: "#005380",   // Azul Logo/Profundo
+  lightBlue: "#7FB8D9",  // Azul Claro
+  green: "#B1D357",      // Verde Principal (Claro)
+  darkGreen: "#8CB200",  // Verde Secundario
+  orange: "#E15200",     // Naranja (Alertas)
+  yellow: "#E8AD00",     // Amarillo
+  gray: "#6B7280",
+};
 
 export default function CategoryList() {
   const [categories, setCategories] = useState([]);
@@ -46,7 +58,6 @@ export default function CategoryList() {
       } else if (response?.categories && Array.isArray(response.categories)) {
         categoriesArray = response.categories;
       } else {
-        // If it's a single object, wrap it in an array
         categoriesArray = response ? [response] : [];
       }
 
@@ -109,39 +120,46 @@ export default function CategoryList() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-4 mb-4" style={{ borderColor: BRAND.blue }}></div>
+        <p className="text-gray-500 font-medium">Cargando categorías...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen font-sans">
+    <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
+      
+      {/* ESPACIADOR SUPERIOR */}
+      <div className="w-full"></div>
+
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Categorías</h1>
-          <p className="text-gray-500 mt-1">Administra las categorías de las noticias</p>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: BRAND.darkBlue }}>Gestión de Categorías</h1>
+          <p className="text-gray-500 mt-1">Administra las etiquetas y clasificaciones de contenido</p>
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all shadow-sm font-medium"
+          className="flex items-center gap-2 px-6 py-3 text-white rounded-xl shadow-md hover:shadow-lg transition-all font-bold text-sm transform active:scale-95"
+          style={{ backgroundColor: BRAND.blue }}
         >
-          <Plus size={18} />
+          <Plus size={20} />
           Nueva Categoría
         </button>
       </div>
 
       {/* Search Bar */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm mb-8 border border-gray-100">
-        <div className="relative">
+      <div className="bg-white p-5 rounded-2xl shadow-sm mb-8 border border-gray-100 flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
             placeholder="Buscar por nombre o descripción..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white border focus:border-green-500 rounded-xl outline-none transition-all text-gray-700"
+            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-gray-700"
+            style={{ "--tw-ring-color": BRAND.lightBlue }}
           />
         </div>
       </div>
@@ -149,70 +167,78 @@ export default function CategoryList() {
       {/* Error Display */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-700">
-          <AlertCircle size={20} />
+          <AlertCircle size={20} style={{ color: BRAND.orange }} />
           <span>{error}</span>
         </div>
       )}
 
       {/* Categories Grid */}
       {filteredCategories.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
-          <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Search className="text-gray-400" size={24} />
+        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-gray-50">
+            <FolderOpen className="text-gray-400" size={32} />
           </div>
-          <h3 className="text-lg font-medium text-gray-900">No se encontraron categorías</h3>
-          <p className="text-gray-500">Intenta ajustar los filtros de búsqueda</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">No se encontraron categorías</h3>
+          <p className="text-gray-500 mb-8 max-w-md mx-auto">Intenta ajustar los filtros de búsqueda o crea una nueva categoría.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCategories.map((category) => (
             <div
               key={category.id}
-              className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-md border border-transparent hover:border-gray-200 transition-all duration-300 flex flex-col"
+              className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
             >
-              {/* Category Header */}
-              <div className="flex justify-between items-start gap-3 mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="bg-blue-50 p-2 rounded-lg">
-                    <Tag className="text-blue-600" size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 leading-tight">
-                      {category.name}
-                    </h3>
+              {/* Borde Superior de Acento */}
+              <div 
+                className="h-1.5 w-full absolute top-0 left-0" 
+                style={{ backgroundColor: BRAND.green }}
+              ></div>
+
+              <div className="p-6 flex-1 flex flex-col">
+                {/* Category Header */}
+                <div className="flex justify-between items-start gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-blue-50 rounded-xl text-blue-600">
+                      <Tag size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-800 leading-tight group-hover:text-blue-700 transition-colors">
+                        {category.name}
+                      </h3>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Description */}
-              <p className="text-gray-500 text-sm mb-6 flex-grow leading-relaxed">
-                {category.description || "Sin descripción disponible..."}
-              </p>
+                {/* Description */}
+                <p className="text-sm text-gray-500 mb-6 flex-grow leading-relaxed line-clamp-3">
+                  {category.description || "Sin descripción disponible..."}
+                </p>
 
-              {/* Actions Footer */}
-              <div className="pt-4 border-t border-gray-100 flex justify-end items-center gap-3 mt-auto">
-                <button
-                  onClick={() => handleEdit(category)}
-                  className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                  title="Editar"
-                >
-                  <Edit size={20} className="stroke-[1.5]" />
-                </button>
-                <button
-                  onClick={() => handleDelete(category.id)}
-                  className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Eliminar"
-                >
-                  <Trash2 size={20} className="stroke-[1.5]" />
-                </button>
+                {/* Actions Footer */}
+                <div className="pt-4 border-t border-gray-50 flex justify-end items-center gap-2 mt-auto">
+                  <button
+                    onClick={() => handleEdit(category)}
+                    className="p-2 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition"
+                    title="Editar"
+                  >
+                    <Edit size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(category.id)}
+                    className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
+                    title="Eliminar"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      <div className="mt-6 text-center text-sm text-gray-400">
-        Mostrando {filteredCategories.length} resultados
+      <div className="mt-8 text-center text-sm text-gray-400 border-t border-gray-200 pt-6">
+        Mostrando <span className="font-bold text-gray-600">{filteredCategories.length}</span> categorías
       </div>
 
       {/* Modal */}
