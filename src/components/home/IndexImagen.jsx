@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import fondo1 from '../../assets/home/Carrusel/Index_imagen_1.png';
 import fondo2 from '../../assets/home/Carrusel/Index_imagen_2.jpeg';
-import fondo3 from '../../assets/home/Carrusel/Index_imagen_3.jpg';
+// import fondo3 from '../../assets/home/Carrusel/Index_imagen_3.jpg';
 import fondo4 from '../../assets/home/Carrusel/Index_imagen_4.png';
 
 export default function IndexImagen() {
@@ -27,13 +27,6 @@ export default function IndexImagen() {
       button2: 'Sobre Nosotros'
     },
     {
-      image: fondo3,
-      title: 'Impulsando el país hacia',
-      subtitle: 'la economía circular',
-      description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-      button1: 'Conoce nuestros proyectos',
-      button2: 'Sobre Nosotros'},
-    {
       image: fondo4,
       title: 'Impulsando el país hacia',
       subtitle: 'la economía circular',
@@ -45,7 +38,7 @@ export default function IndexImagen() {
 
   // Duraciones personalizadas para cada slide
   const getDuration = (slideIndex) => {
-    if (slideIndex === 0) return 12; // Primera imagen: 12 segundos
+    if (slideIndex === 0) return 15; // Primera imagen: 15 segundos
     return 8; // Otras imágenes: 8 segundos
   };
 
@@ -131,11 +124,11 @@ export default function IndexImagen() {
 
 
         @keyframes pulseGlow {
-          0%, 100% { 
+          0%, 100% {
             box-shadow: 0 0 20px rgba(0, 171, 109, 0.3);
             transform: scale(1);
           }
-          50% { 
+          50% {
             box-shadow: 0 0 40px rgba(0, 171, 109, 0.6);
             transform: scale(1.05);
           }
@@ -355,19 +348,19 @@ export default function IndexImagen() {
       <div className={`absolute inset-0 z-[2] pointer-events-none overflow-hidden ${hasLoaded ? 'opacity-100' : 'opacity-0'}`} style={{ transition: 'opacity 0.8s ease-out' }}>
         <div className="floating-circle absolute top-20 right-20 w-40 h-40 rounded-full bg-gradient-to-br from-[#00AB6D]/20 to-[#2C67B0]/10 blur-2xl"></div>
         <div className="floating-circle absolute bottom-32 left-32 w-60 h-60 rounded-full bg-gradient-to-br from-[#2C67B0]/15 to-[#1E305D]/10 blur-3xl" style={{ animationDelay: '2s' }}></div>
-        <div className="floating-circle absolute top-1/2 right-1/4 w-32 h-32 rounded-full bg-gradient-to-br from-[#00AB6D]/25 to-transparent blur-xl" style={{ animationDelay: '4s' }}></div>
+        <div className="floating-circle absolute top-1/2 right-1/4 w-32 h-32 rounded-full bg-gradient-to-br from-[#00AB6D]/25 to-transparent blur-xl" style={{ animationDelay: '2s' }}></div>
       </div>
 
 
       {/* ========== INDICADORES LATERALES  ========== */}
-      <div className="absolute left-2 md:left-12 lg:left-6 top-1/2 -translate-y-1/2 -translate-y-[125px] z-20 flex flex-col items-center gap-10 translate-x-16">
+      <div className="absolute left-2 md:left-12  mt-6 lg:left-6 top-1/2 -translate-y-1/2 -translate-y-[125px] z-20 flex flex-col items-center gap-10 translate-x-16">
         {slides.map((_, index) => (
           <div key={index} className="nav-indicator-item">
             {index === currentSlide ? (
               // CONTADOR - Contenido dentro del círculo
               <div className="counter-container relative w-10 h-10 flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300">
                 <svg className="absolute w-full h-full -rotate-90" viewBox="0 0 120 120">
-                
+
                   {/* Círculo de progreso */}
                   <circle
                     cx="60"
@@ -479,8 +472,8 @@ export default function IndexImagen() {
 >
   {/* Contenedor animado flotante */}
   <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-[#00AB6D]/15 to-[#2C67B0]/20 border border-white/40 backdrop-blur-sm shadow-[0_0_25px_rgba(0,171,109,0.25)] animate-[float_3s_ease-in-out_infinite] transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_30px_#00AB6D66]">
-    
-    
+
+
     {/* Flecha */}
     <svg
       xmlns="http://www.w3.org/2000/svg"

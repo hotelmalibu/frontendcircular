@@ -16,11 +16,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import Footer from "./components/Footer";
 import Circularmente from "./modules/micrositio/Circularmente";
 import QuienesSomos from "./modules/home/nosotros/conocenos/quienesSomos";
-import PortalTransparencia from "./modules/home/nosotros/conocenos/portalTransparencia";
-import Estatutos from "./modules/home/nosotros/conocenos/estatutos";
 import Valores from "./modules/home/nosotros/conocenos/valores";
 import JuantaDirectiva from "./modules/home/nosotros/conocenos/juntaDirecteEquipo";
-import Aliados from "./modules/home/nosotros/conocenos/aliados";
 import InformesAnuales from "./modules/home/nosotros/conocenos/informesAnuales";
 import Planes from "./modules/home/nosotros/marcoNormativo/planes";
 import Politicas from "./modules/home/nosotros/marcoNormativo/politicas";
@@ -48,11 +45,8 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/circularmente" element={<Circularmente />} />
           <Route path="/quines-somos" element={<QuienesSomos />} />
-          <Route path="/portal-de-transparencia" element={<PortalTransparencia />} />
-          <Route path="/estatutos" element={<Estatutos />} />
           <Route path="/valores" element={<Valores />} />
           <Route path="/juntaDirecteEquipo" element={<JuantaDirectiva />} />
-          <Route path="/aliados" element={<Aliados />} />
           <Route path="/informes-anuales" element={<InformesAnuales />} />
           <Route path="/planes" element={<Planes />} />
           <Route path="/polticas" element={<Politicas />} />

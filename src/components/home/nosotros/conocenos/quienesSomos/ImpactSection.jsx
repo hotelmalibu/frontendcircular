@@ -3,375 +3,171 @@ import { MapPin, Activity, Leaf, Zap, Users, BarChart3, TrendingUp } from "lucid
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+// Asegúrate de importar tu imagen correctamente
 import fondoMapa from "../../../../../assets/home/ImpactSection/fondo_mapa.jpg";
 
-// Icono personalizado para los marcadores
-const createCustomIcon = (intensity, cityName) => {
-  const getColor = (intensity) => {
-    switch (intensity) {
-      case "high":
-        return "#00AB6D";
-      case "medium":
-        return "#B1D357";
-      case "low":
-        return "#D4E5A0";
-      default:
-        return "#E0E0E0";
+// --- DATOS ---
+const regions = [
+  { id: 1, name: "Bogotá", lat: 4.7110, lng: -74.0721, projects: 8, description: "Centro de operaciones y desarrollo." },
+  { id: 2, name: "Medellín", lat: 6.2442, lng: -75.5812, projects: 6, description: "Hub de producción sostenible." },
+  { id: 3, name: "Cali", lat: 3.4372, lng: -76.5225, projects: 5, description: "Iniciativas comunitarias." },
+  { id: 4, name: "Barranquilla", lat: 10.9639, lng: -74.7964, projects: 4, description: "Apoyo a recicladores locales." },
+  { id: 5, name: "Cartagena", lat: 10.3910, lng: -75.4794, projects: 2, description: "Programas educativos." },
+  { id: 6, name: "Santa Marta", lat: 11.2404, lng: -74.2197, projects: 2, description: "Economía colaborativa." },
+];
+
+const sectors = [
+  { id: 1, name: "Reciclaje", icon: Leaf, color: "#00AB6D", percentage: 95 },
+  { id: 2, name: "Innovación", icon: Zap, color: "#9E1981", percentage: 85 },
+  { id: 3, name: "Producción", icon: BarChart3, color: "#E8AD00", percentage: 78 },
+  { id: 4, name: "Investigación", icon: Activity, color: "#2B65AC", percentage: 65 },
+  { id: 5, name: "Sensibilización", icon: Users, color: "#E15200", percentage: 72 },
+  { id: 6, name: "Fortalecimiento", icon: TrendingUp, color: "#8CB200", percentage: 68 },
+];
+
+// --- COMPONENTES DEL MAPA ---
+const customIcon = new L.Icon({
+    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+});
+
+const MapController = ({ activeRegion }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (activeRegion) {
+      map.setView([activeRegion.lat, activeRegion.lng], 12, { animate: true });
+    } else {
+      map.setView([4.5709, -74.2973], 5, { animate: true });
     }
-  };
-
-  const getSize = (intensity) => {
-    switch (intensity) {
-      case "high":
-        return 32;
-      case "medium":
-        return 28;
-      case "low":
-        return 24;
-      default:
-        return 20;
-    }
-  };
-
-  const color = getColor(intensity);
-  const size = getSize(intensity);
-
-  const svgIcon = `
-    <svg width="${size}" height="${size}" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="16" cy="16" r="14" fill="${color}" opacity="0.3"/>
-      <circle cx="16" cy="16" r="8" fill="${color}" stroke="white" stroke-width="2"/>
-    </svg>
-  `;
-
-  return L.icon({
-    iconUrl: `data:image/svg+xml;base64,${btoa(svgIcon)}`,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
-    popupAnchor: [0, -size / 2],
-  });
+  }, [activeRegion, map]);
+  return null;
 };
 
-const ImpactSection = () => {
-  const [activeRegion, setActiveRegion] = useState(null);
-  const [mapKey, setMapKey] = useState(0);
-
-  // Coordenadas reales de ciudades colombianas
-  const regions = [
-    {
-      id: 1,
-      name: "Bogotá",
-      lat: 4.7110,
-      lng: -74.0721,
-      intensity: "high",
-      sectors: ["Reciclaje", "Innovación", "Investigación"],
-      projects: 8,
-      description: "Centro de operaciones y desarrollo tecnológico",
-    },
-    {
-      id: 2,
-      name: "Medellín",
-      lat: 6.2442,
-      lng: -75.5812,
-      intensity: "high",
-      sectors: ["Producción", "Reciclaje", "Fortalecimiento"],
-      projects: 6,
-      description: "Hub de producción sostenible",
-    },
-    {
-      id: 3,
-      name: "Cali",
-      lat: 3.4372,
-      lng: -76.5225,
-      intensity: "medium",
-      sectors: ["Sensibilización", "Colaboración", "Reciclaje"],
-      projects: 5,
-      description: "Iniciativas comunitarias y colaborativas",
-    },
-    {
-      id: 4,
-      name: "Barranquilla",
-      lat: 10.9639,
-      lng: -74.7964,
-      intensity: "medium",
-      sectors: ["Fortalecimiento", "Producción"],
-      projects: 4,
-      description: "Apoyo a recicladores locales",
-    },
-    {
-      id: 5,
-      name: "Cartagena",
-      lat: 10.3910,
-      lng: -75.4794,
-      intensity: "low",
-      sectors: ["Sensibilización", "Investigación"],
-      projects: 2,
-      description: "Programas educativos costeros",
-    },
-    {
-      id: 6,
-      name: "Santa Marta",
-      lat: 11.2404,
-      lng: -74.2197,
-      intensity: "low",
-      sectors: ["Sostenibilidad", "Colaboración"],
-      projects: 2,
-      description: "Economía colaborativa verde",
-    },
-  ];
-
-  // Sectores principales
-  const sectors = [
-    {
-      id: 1,
-      name: "Reciclaje",
-      icon: Leaf,
-      color: "#00AB6D",
-      activity: "high",
-      percentage: 95,
-    },
-    {
-      id: 2,
-      name: "Innovación",
-      icon: Zap,
-      color: "#9E1981",
-      activity: "high",
-      percentage: 85,
-    },
-    {
-      id: 3,
-      name: "Producción",
-      icon: BarChart3,
-      color: "#E8AD00",
-      activity: "high",
-      percentage: 78,
-    },
-    {
-      id: 4,
-      name: "Investigación",
-      icon: Activity,
-      color: "#2B65AC",
-      activity: "medium",
-      percentage: 65,
-    },
-    {
-      id: 5,
-      name: "Sensibilización",
-      icon: Users,
-      color: "#E15200",
-      activity: "medium",
-      percentage: 72,
-    },
-    {
-      id: 6,
-      name: "Fortalecimiento",
-      icon: TrendingUp,
-      color: "#8CB200",
-      activity: "medium",
-      percentage: 68,
-    },
-  ];
-
-  // Componente para controlar el mapa
-  const MapController = ({ regions }) => {
-    const map = useMap();
-
-    useEffect(() => {
-      if (regions && regions.length > 0) {
-        const group = L.featureGroup();
-        regions.forEach((region) => {
-          group.addLayer(L.marker([region.lat, region.lng]));
-        });
-        map.fitBounds(group.getBounds(), { padding: [50, 50] });
-      }
-    }, [map, regions]);
-
-    return null;
-  };
+// --- COMPONENTE PRINCIPAL ---
+const ImpactWithMap = () => {
+  const [activeRegion, setActiveRegion] = useState(regions[0]);
 
   return (
     <section
-  className="relative w-full py-12 px-6 md:px-12 lg:px-20 overflow-hidden bg-center bg-no-repeat"
-  style={{
-    backgroundImage: `url(${fondoMapa})`,
-    backgroundSize: "cover", // 🔹 llena todo el espacio, se recorta un poco
-  }}
->
-
+      className="relative w-full py-12 px-6 overflow-hidden bg-cover bg-center"
+      style={{ backgroundImage: `url(${fondoMapa})` }}
+    >
+      {/* Overlay oscuro para legibilidad */}
+      <div className="absolute inset-0 bg-black/25"></div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* HEADER COMPACTO */}
+        {/* HEADER */}
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">
             Lo que está Pasando
           </h2>
-          <p className="text-white/80 text-sm md:text-base max-w-2xl mx-auto">
+          <p className="text-white/90 text-sm md:text-base max-w-2xl mx-auto">
             Visualiza dónde estamos generando impacto y en qué sectores trabajamos
           </p>
         </div>
 
-        {/* CONTENEDOR PRINCIPAL - ULTRA COMPACTO */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* MAPA LEAFLET - COMPACTO */}
-          <div className="lg:col-span-2 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-2xl overflow-hidden">
-            <h3 className="text-lg font-bold text-[#1E305D] mb-3 flex items-center gap-2">
-              <MapPin className="text-[#00AB6D]" size={20} />
-              Cobertura
-            </h3>
-
-            {/* MAPA LEAFLET */}
-            <div
-              className="relative w-full rounded-lg overflow-hidden border-2"
-              style={{ borderColor: "#00AB6D", height: "300px" }}
-              key={mapKey}
-            >
-              <MapContainer
-                center={[6, -74.5]}
-                zoom={6}
-                style={{ height: "100%", width: "100%" }}
-                scrollWheelZoom={false}
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; OpenStreetMap contributors'
+        {/* CONTENEDOR PRINCIPAL: GLASSMORPHISM */}
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[500px]">
+          
+          {/* COLUMNA IZQUIERDA: MAPA (7 columnas) */}
+          <div className="lg:col-span-7 relative h-[300px] lg:h-auto border-r border-gray-200">
+            <MapContainer center={[4.71, -74.07]} zoom={5} style={{ height: "100%", width: "100%" }} zoomControl={false}>
+              <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
+              <MapController activeRegion={activeRegion} />
+              {regions.map((region) => (
+                <Marker 
+                  key={region.id} 
+                  position={[region.lat, region.lng]} 
+                  icon={customIcon}
+                  eventHandlers={{ click: () => setActiveRegion(region) }}
                 />
+              ))}
+            </MapContainer>
+            {/* Etiqueta flotante sobre el mapa */}
+            <div className="absolute top-4 left-4 bg-white/90 px-4 py-2 rounded-lg shadow-md z-[1000]">
+                <p className="text-xs text-gray-500 uppercase font-bold">Ubicación Actual</p>
+                <p className="text-lg font-bold text-[#1E305D]">{activeRegion.name}</p>
+            </div>
+          </div>
 
-                <MapController regions={regions} />
+          {/* COLUMNA DERECHA: DATOS (5 columnas) */}
+          <div className="lg:col-span-5 p-6 flex flex-col h-full">
+            
+            {/* 1. SELECCIÓN DE CIUDADES (Botones, sin scroll) */}
+            <div className="mb-6">
+               <h3 className="text-sm font-bold text-gray-500 mb-3 uppercase flex items-center gap-2">
+                 <MapPin size={16} /> Selecciona una región
+               </h3>
+               <div className="flex flex-wrap gap-2">
+                 {regions.map((region) => (
+                   <button
+                     key={region.id}
+                     onClick={() => setActiveRegion(region)}
+                     className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all border ${
+                       activeRegion.id === region.id
+                         ? "bg-[#1E305D] text-white border-[#1E305D]"
+                         : "bg-gray-50 text-gray-600 border-gray-200 hover:border-[#00AB6D]"
+                     }`}
+                   >
+                     {region.name}
+                   </button>
+                 ))}
+               </div>
+               
+               {/* Descripción dinámica */}
+               <div className="mt-4 p-4 bg-[#00AB6D]/10 rounded-xl border border-[#00AB6D]/20 animate-fade-in">
+                  <div className="flex justify-between items-start">
+                    <div>
+                        <h4 className="font-bold text-[#1E305D] text-lg">{activeRegion.name}</h4>
+                        <p className="text-sm text-gray-700 leading-snug">{activeRegion.description}</p>
+                    </div>
+                    <div className="text-center pl-4 border-l border-[#00AB6D]/30">
+                        <span className="block text-2xl font-bold text-[#00AB6D]">{activeRegion.projects}</span>
+                        <span className="text-[10px] uppercase font-bold text-gray-500">Proyectos</span>
+                    </div>
+                  </div>
+               </div>
+            </div>
 
-                {/* MARCADORES */}
-                {regions.map((region) => (
-                  <Marker
-                    key={region.id}
-                    position={[region.lat, region.lng]}
-                    icon={createCustomIcon(region.intensity, region.name)}
-                    eventHandlers={{
-                      click: () =>
-                        setActiveRegion(
-                          activeRegion?.id === region.id ? null : region
-                        ),
-                    }}
-                  >
-                    <Popup className="leaflet-popup-custom" minWidth={200}>
-                      <div className="text-sm">
-                        <h4 className="font-bold text-[#1E305D] mb-1">
-                          {region.name}
-                        </h4>
-                        <p className="text-xs text-gray-600 mb-2">
-                          {region.description}
-                        </p>
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {region.sectors.map((sector, idx) => (
-                            <span
-                              key={idx}
-                              className="px-1.5 py-0.5 bg-[#00AB6D]/10 text-[#00AB6D] font-semibold text-xs rounded-full"
-                            >
-                              {sector}
-                            </span>
-                          ))}
+            <div className="w-full h-px bg-gray-200 mb-6"></div>
+
+            {/* 2. SECTORES Y PORCENTAJES (Lista compacta) */}
+            <div className="flex-1">
+               <h3 className="text-sm font-bold text-gray-500 mb-3 uppercase flex items-center gap-2">
+                 <Activity size={16} /> Impacto por Sector
+               </h3>
+               <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                 {sectors.map((sector) => {
+                   const Icon = sector.icon;
+                   return (
+                     <div key={sector.id} className="group">
+                        <div className="flex justify-between items-center mb-1">
+                           <div className="flex items-center gap-1.5">
+                              <Icon size={14} style={{ color: sector.color }} />
+                              <span className="text-xs font-semibold text-gray-700">{sector.name}</span>
+                           </div>
+                           <span className="text-xs font-bold text-gray-500">{sector.percentage}%</span>
                         </div>
-                        <p className="text-xs font-bold text-[#00AB6D]">
-                          {region.projects} proyectos
-                        </p>
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
+                        <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                           <div 
+                             className="h-full rounded-full" 
+                             style={{ width: `${sector.percentage}%`, backgroundColor: sector.color }}
+                           ></div>
+                        </div>
+                     </div>
+                   );
+                 })}
+               </div>
             </div>
 
-            {/* PANEL DE DETALLES - SUPER COMPACTO */}
-            {activeRegion && (
-              <div className="mt-3 p-3 bg-gradient-to-r from-[#00AB6D]/10 to-[#00AB6D]/5 rounded-lg border border-[#00AB6D] animate-in fade-in slide-in-from-bottom-2">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-[#1E305D] text-sm">
-                      {activeRegion.name}
-                    </h4>
-                    <p className="text-xs text-gray-600 mb-1 line-clamp-2">
-                      {activeRegion.description}
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {activeRegion.sectors.slice(0, 2).map((sector, idx) => (
-                        <span
-                          key={idx}
-                          className="px-1.5 py-0.5 bg-white text-[#00AB6D] font-semibold text-xs rounded-full"
-                        >
-                          {sector}
-                        </span>
-                      ))}
-                      {activeRegion.sectors.length > 2 && (
-                        <span className="text-xs text-gray-600">
-                          +{activeRegion.sectors.length - 2}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-xl font-bold text-[#00AB6D]">
-                      {activeRegion.projects}
-                    </p>
-                    <p className="text-xs text-gray-600">proyectos</p>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
-
-          {/* SECTORES ACTIVOS - COMPACTO */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-[#1E305D] mb-4 flex items-center gap-2">
-              <Activity className="text-[#00AB6D]" size={20} />
-              Sectores
-            </h3>
-
-            <div className="space-y-2.5 max-h-80 overflow-y-auto pr-2">
-              {sectors.map((sector) => {
-                const IconComponent = sector.icon;
-                return (
-                  <div key={sector.id} className="group">
-                    {/* NOMBRE Y ICONO */}
-                    <div className="flex items-center gap-2 mb-1">
-                      <IconComponent
-                        size={14}
-                        style={{ color: sector.color }}
-                        className="flex-shrink-0"
-                      />
-                      <span className="font-semibold text-xs text-gray-800 truncate">
-                        {sector.name}
-                      </span>
-                    </div>
-
-                    {/* BARRA DE PROGRESO */}
-                    <div className="relative h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500 group-hover:shadow-md"
-                        style={{
-                          backgroundColor: sector.color,
-                          width: `${sector.percentage}%`,
-                        }}
-                      ></div>
-                    </div>
-
-                    {/* PORCENTAJE */}
-                    <p className="text-xs font-bold text-gray-600 mt-0.5">
-                      {sector.percentage}%
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* CTA FINAL - COMPACTO */}
-        <div className="text-center mt-6">
-          <button className="group relative inline-flex items-center justify-center gap-2 bg-[#B1D357] text-[#ffffff] font-medium px-5 py-2 rounded-lg text-sm shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 overflow-hidden">
-            <span className="relative">Conoce más</span>
-            <TrendingUp size={14} className="relative group-hover:translate-y-0.5 transition-transform" />
-          </button>
         </div>
       </div>
     </section>
   );
 };
 
-export default ImpactSection;
+export default ImpactWithMap;
