@@ -27,26 +27,6 @@ const BRAND = {
   gray: "#6B7280",
 };
 
-// --- COMPONENTES AUXILIARES ---
-
-function UserRoleBadge({ role }) {
-  const roleStyles = {
-    Administrador: { icon: <Shield size={12} />, bg: BRAND.darkBlue, text: "#FFFFFF", border: "transparent" },
-    Aliados: { icon: <Handshake size={12} />, bg: "#F0FDF4", text: BRAND.darkGreen, border: BRAND.green },
-  };
-
-  const selected = roleStyles[role] || { icon: <User size={12} />, bg: "#F3F4F6", text: "#374151", border: "#D1D5DB" };
-
-  return (
-    <span 
-      className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-bold rounded-full px-2.5 py-0.5 inline-flex shadow-sm border transition-transform duration-200 hover:scale-105" 
-      style={{ backgroundColor: selected.bg, color: selected.text, borderColor: selected.border }}
-    >
-      {selected.icon} <span>{role}</span>
-    </span>
-  );
-}
-
 function MobileMenuDropdown({ title, subsections, showWhiteBg, showHover, showWhiteText, onClose }) {
   const [open, setOpen] = useState(false);
   const [openSubmenus, setOpenSubmenus] = useState({});
@@ -253,7 +233,6 @@ function ProfileDropdown({ user, logout, showWhiteText }) {
       <button type="button" className="flex items-center gap-3 hover:opacity-90 transition-opacity group py-2">
         <div className="text-right hidden sm:block leading-tight">
           <p className={`text-sm font-bold ${showWhiteText ? 'text-white' : 'text-gray-800'}`}>{userFullName}</p>
-          <UserRoleBadge role={userRole} />
         </div>
         <div className="w-10 h-10 rounded-full border-2 border-white/50 group-hover:border-blue-400 transition-colors shadow-sm bg-gray-100 flex items-center justify-center overflow-hidden">
           <img src={userAvatar} alt={userFullName} className="w-full h-full object-cover" onError={(e) => (e.target.src = DefaultAvatar)} />
