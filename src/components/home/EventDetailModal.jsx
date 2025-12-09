@@ -13,358 +13,262 @@ import {
   CheckCircle,
   FileText,
   ArrowRight,
+  Info
 } from "lucide-react";
 
-export default function EventDetailModal({ eventData, onClose }) {
-  const formatDateTime = (dateString) => {
-    if (!dateString) return "No especificada";
-    const date = new Date(dateString);
-    return date.toLocaleString("es-CO", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  darkBlue: "#005380",   // Azul Logo/Profundo
+  lightBlue: "#7FB8D9",  // Azul Claro
+  green: "#B1D357",      // Verde Principal (Claro)
+  darkGreen: "#8CB200",  // Verde Secundario
+  orange: "#E15200",     // Naranja (Alertas)
+  yellow: "#E8AD00",     // Amarillo
+  gray: "#6B7280",
+};
 
+export default function EventDetailModal({ eventData, onClose }) {
+  
   const formatDate = (dateString) => {
     if (!dateString) return "No especificada";
     const date = new Date(dateString);
     return date.toLocaleDateString("es-CO", {
+      weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     });
   };
 
-  const formatDateTimeRange = (startDate, endDate, isAllDay) => {
-    if (isAllDay) {
-      return `Todo el día - ${formatDate(startDate)}`;
-    }
-    
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    
-    const startFormatted = start.toLocaleDateString("es-CO", {
-      day: "numeric",
-      month: "short",
+  const formatTime = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleTimeString("es-CO", {
       hour: "2-digit",
       minute: "2-digit",
     });
-    
-    const endFormatted = end.toLocaleDateString("es-CO", {
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    
-    return `${startFormatted} - ${endFormatted}`;
   };
 
-  const getEventTypeBadge = (type) => {
-    const typeConfig = {
-      in_person: {
-        color: "bg-purple-100 text-purple-800 border-purple-200",
-        icon: <MapPin size={18} />,
-        label: "Presencial",
-        gradient: "from-purple-600 to-purple-700"
-      },
-      remote: {
-        color: "bg-blue-100 text-blue-800 border-blue-200",
+  const getEventTypeConfig = (type) => {
+    if (type === 'remote') {
+      return {
+        label: "Virtual",
         icon: <Video size={18} />,
-        label: "Remoto",
-        gradient: "from-blue-600 to-blue-700"
-      },
+        bg: "bg-blue-50",
+        text: "text-blue-700",
+        border: "border-blue-100"
+      };
+    }
+    return {
+      label: "Presencial",
+      icon: <MapPin size={18} />,
+      bg: "bg-green-50",
+      text: "text-green-700",
+      border: "border-green-100"
     };
-
-    const config = typeConfig[type] || typeConfig.in_person;
-
-    return (
-      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border ${config.color} font-medium`}>
-        {config.icon}
-        <span>{config.label}</span>
-      </div>
-    );
   };
 
   const getEventStatus = () => {
     const now = new Date();
-    
     if (eventData.start_datetime && new Date(eventData.start_datetime) > now) {
-      return { 
-        text: "Próximo", 
-        color: "bg-emerald-100 text-emerald-800 border-emerald-200",
-        icon: <Calendar size={18} />
-      };
+      return { text: "Próximo", color: BRAND.blue, bg: "#EFF6FF", icon: <Calendar size={16} /> };
     }
-    
     if (eventData.end_datetime && new Date(eventData.end_datetime) < now) {
-      return { 
-        text: "Finalizado", 
-        color: "bg-gray-100 text-gray-800 border-gray-200",
-        icon: <Clock size={18} />
-      };
+      return { text: "Finalizado", color: BRAND.gray, bg: "#F3F4F6", icon: <Clock size={16} /> };
     }
-    
-    return { 
-      text: "En curso", 
-      color: "bg-green-100 text-green-800 border-green-200",
-      icon: <CheckCircle size={18} />
-    };
+    return { text: "En curso", color: BRAND.darkGreen, bg: "#F0FDF4", icon: <CheckCircle size={16} /> };
   };
 
+  const typeConfig = getEventTypeConfig(eventData.event_type);
   const status = getEventStatus();
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden max-h-[95vh] flex flex-col animate-fadeIn">
-        {/* Header */}
-        <div className={`relative px-8 py-8 bg-gradient-to-r ${eventData.event_type === 'remote' ? 'from-blue-600 to-blue-700' : 'from-green-600 to-green-700'} text-white`}>
+    <div className="fixed inset-0 z-50 bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col relative animate-fadeIn">
+        
+        {/* Header con Gradiente */}
+        <div 
+          className="relative px-8 py-10 text-white"
+          style={{ 
+            background: eventData.event_type === 'remote' 
+              ? `linear-gradient(135deg, ${BRAND.blue} 0%, ${BRAND.darkBlue} 100%)`
+              : `linear-gradient(135deg, ${BRAND.green} 0%, ${BRAND.darkGreen} 100%)`
+          }}
+        >
+          {/* Botón Cerrar */}
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
+            className="absolute top-6 right-6 p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all backdrop-blur-md"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
-          
-          {/* Badges */}
-          <div className="flex flex-wrap gap-3 mb-6">
-            {getEventTypeBadge(eventData.event_type)}
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border ${status.color}`}>
-              {status.icon}
-              <span className="font-medium">{status.text}</span>
-            </div>
+
+          {/* Badges Superiores */}
+          <div className="flex flex-wrap gap-3 mb-4">
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-white/20 text-white border border-white/30 backdrop-blur-md`}>
+              {typeConfig.icon} {typeConfig.label}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-white text-gray-800 shadow-sm">
+              <span style={{ color: status.color }}>{status.icon}</span> {status.text}
+            </span>
           </div>
 
-          {/* Title */}
-          <h1 className="text-3xl md:text-4xl font-bold leading-tight pr-12">
+          {/* Título */}
+          <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2">
             {eventData.title}
           </h1>
-
-          {/* Category */}
+          
+          {/* Categoría */}
           {eventData.category && (
-            <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full text-white/90">
+            <div className="flex items-center gap-2 text-white/80 text-sm font-medium">
               <Tag size={16} />
-              <span className="text-sm font-medium">{eventData.category}</span>
+              <span>{eventData.category}</span>
             </div>
           )}
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
-            {/* Event Summary Card */}
-            <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-6 mb-8 border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Calendar size={20} />
-                Información del Evento
-              </h3>
+        {/* Content Body */}
+        <div className="flex-1 overflow-y-auto bg-gray-50 p-6 md:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            {/* Columna Izquierda: Detalles Principales */}
+            <div className="lg:col-span-2 space-y-8">
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Date & Time */}
-                {eventData.start_datetime && (
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-white rounded-xl shadow-sm">
-                      <Calendar className="text-green-600" size={20} />
+              {/* Descripción */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <FileText className="text-blue-500" size={20} />
+                  Sobre el Evento
+                </h3>
+                {eventData.description ? (
+                  <div 
+                    className="prose prose-sm max-w-none text-gray-600 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(eventData.description) }} 
+                  />
+                ) : (
+                  <p className="text-gray-400 italic">No hay descripción disponible.</p>
+                )}
+              </div>
+
+              {/* Información Adicional (Si aplica) */}
+              {(eventData.requires_registration || eventData.max_attendees) && (
+                <div className="bg-orange-50 border border-orange-100 rounded-2xl p-5 flex items-start gap-4">
+                   <div className="p-2 bg-white rounded-full shadow-sm text-orange-500">
+                      <Info size={24} />
+                   </div>
+                   <div>
+                      <h4 className="font-bold text-orange-800 mb-1">Información de Registro</h4>
+                      <p className="text-sm text-orange-700">
+                        Este evento requiere registro previo. 
+                        {eventData.max_attendees && ` Cupo limitado a ${eventData.max_attendees} asistentes.`}
+                      </p>
+                   </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* Columna Derecha: Sidebar de Detalles */}
+            <div className="space-y-6">
+              
+              {/* Tarjeta de Fecha y Hora */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">Fecha y Hora</h3>
+                
+                <div className="space-y-4">
+                  <div className="flex gap-3">
+                    <div className="mt-1">
+                       <Calendar className="text-blue-600" size={20} />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">
-                        {eventData.is_all_day ? 'Fecha' : 'Fecha y Hora'}
+                      <p className="text-sm font-bold text-gray-800 capitalize">
+                        {formatDate(eventData.start_datetime)}
                       </p>
-                      <p className="text-gray-900 font-semibold">
-                        {eventData.is_all_day ? 
-                          formatDate(eventData.start_datetime) : 
-                          formatDateTime(eventData.start_datetime)
-                        }
-                      </p>
-                      {eventData.end_datetime && !eventData.is_all_day && (
-                        <p className="text-sm text-gray-600 mt-1">
-                          Hasta: {formatDateTime(eventData.end_datetime)}
-                        </p>
-                      )}
+                      <p className="text-xs text-gray-500">Fecha de inicio</p>
                     </div>
                   </div>
-                )}
 
-                {/* Location/Meeting */}
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-white rounded-xl shadow-sm">
-                    {eventData.event_type === 'remote' ? 
-                      <Video className="text-blue-600" size={20} /> :
-                      <MapPin className="text-purple-600" size={20} />
-                    }
+                  <div className="flex gap-3">
+                    <div className="mt-1">
+                       <Clock className="text-green-600" size={20} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-800">
+                        {eventData.is_all_day ? "Todo el día" : `${formatTime(eventData.start_datetime)} - ${formatTime(eventData.end_datetime)}`}
+                      </p>
+                      <p className="text-xs text-gray-500">Horario {eventData.timezone && `(${eventData.timezone})`}</p>
+                    </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Tarjeta de Ubicación */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">Ubicación</h3>
+                
+                {eventData.event_type === 'remote' ? (
                   <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">
-                      {eventData.event_type === 'remote' ? 'Reunión Virtual' : 'Ubicación'}
-                    </p>
-                    <p className="text-gray-900 font-semibold">
-                      {eventData.location_name || (eventData.event_type === 'remote' ? "Enlace de reunión" : "Por definir")}
-                    </p>
-                    {eventData.location_address && (
-                      <p className="text-sm text-gray-600 mt-1">{eventData.location_address}</p>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Video className="text-purple-600" size={20} />
+                      <span className="font-bold text-gray-800">Reunión Virtual</span>
+                    </div>
+                    
+                    {eventData.meeting_link ? (
+                      <a 
+                        href={eventData.meeting_link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-50 text-blue-700 rounded-xl font-bold text-sm hover:bg-blue-100 transition-colors"
+                      >
+                        <LinkIcon size={16} /> Unirse a la reunión
+                      </a>
+                    ) : (
+                      <p className="text-sm text-gray-500 italic bg-gray-50 p-3 rounded-lg text-center">
+                        Enlace pendiente
+                      </p>
                     )}
                   </div>
-                </div>
-
-                {/* Registration */}
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-white rounded-xl shadow-sm">
-                    <Users className="text-orange-600" size={20} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">Registro</p>
-                    <p className="text-gray-900 font-semibold">
-                      {eventData.requires_registration ? 
-                        `Requerido${eventData.max_attendees ? ` (máx. ${eventData.max_attendees})` : ''}` : 
-                        'No requerido'
-                      }
-                    </p>
-                  </div>
-                </div>
-
-                {/* Timezone */}
-                {eventData.timezone && (
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-white rounded-xl shadow-sm">
-                      <Globe className="text-indigo-600" size={20} />
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex gap-3">
+                       <MapPin className="text-red-500 mt-1" size={20} />
+                       <div>
+                          <p className="text-sm font-bold text-gray-800">
+                            {eventData.location_name || "Por definir"}
+                          </p>
+                          {eventData.location_address && (
+                            <p className="text-xs text-gray-500 mt-0.5">{eventData.location_address}</p>
+                          )}
+                       </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">Zona Horaria</p>
-                      <p className="text-gray-900 font-semibold">{eventData.timezone}</p>
-                    </div>
+                    {(eventData.latitude && eventData.longitude) && (
+                       <div className="h-32 bg-gray-100 rounded-xl flex items-center justify-center text-xs text-gray-400">
+                          {/* Aquí iría un componente de mapa real */}
+                          <span className="flex items-center gap-1"><MapPin size={12}/> Vista de Mapa</span>
+                       </div>
+                    )}
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Event Range Summary */}
-            {eventData.start_datetime && eventData.end_datetime && (
-              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8">
-                <h3 className="text-lg font-semibold text-blue-900 mb-2 flex items-center gap-2">
-                  <Clock size={20} />
-                  Horario del Evento
-                </h3>
-                <p className="text-blue-800 font-medium text-lg">
-                  {formatDateTimeRange(eventData.start_datetime, eventData.end_datetime, eventData.is_all_day)}
-                </p>
-                {eventData.timezone && (
-                  <p className="text-blue-600 text-sm mt-2">
-                    Zona horaria: {eventData.timezone}
-                  </p>
-                )}
-              </div>
-            )}
+              {/* Tarjeta de Organizador (Opcional) */}
+              {/* Si tuvieras datos del organizador, irían aquí */}
 
-            {/* Location/Meeting Link Details */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                {eventData.event_type === 'remote' ? <Video size={20} /> : <MapPin size={20} />}
-                {eventData.event_type === 'remote' ? 'Detalles de la Reunión' : 'Detalles de la Ubicación'}
-              </h3>
-              
-              {eventData.event_type === 'remote' ? (
-                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                  {eventData.meeting_link ? (
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 bg-blue-100 rounded-xl">
-                        <LinkIcon className="text-blue-600" size={24} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500 mb-1">Enlace de la reunión</p>
-                        <a 
-                          href={eventData.meeting_link} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 group"
-                        >
-                          Unirse a la reunión
-                          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                        </a>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="p-4 bg-gray-100 rounded-full w-fit mx-auto mb-4">
-                        <LinkIcon className="text-gray-400" size={32} />
-                      </div>
-                      <p className="text-gray-500">El enlace de la reunión se compartirá próximamente</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
-                  {eventData.location_name && (
-                    <div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">Lugar</p>
-                      <p className="text-gray-900 text-lg font-semibold">{eventData.location_name}</p>
-                    </div>
-                  )}
-                  
-                  {eventData.location_address && (
-                    <div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">Dirección</p>
-                      <p className="text-gray-700">{eventData.location_address}</p>
-                    </div>
-                  )}
-                  
-                  {(eventData.latitude && eventData.longitude) && (
-                    <div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">Coordenadas</p>
-                      <p className="text-gray-700 font-mono">
-                        Lat: {eventData.latitude}, Lng: {eventData.longitude}
-                      </p>
-                    </div>
-                  )}
-                  
-                  {!eventData.location_name && !eventData.location_address && (
-                    <div className="text-center py-6">
-                      <MapPin className="text-gray-400 mx-auto mb-2" size={32} />
-                      <p className="text-gray-500">Los detalles de ubicación se compartirán próximamente</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Description */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <FileText size={20} />
-                Descripción del Evento
-              </h3>
-              {eventData.description ? (
-                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                  <div 
-                    className="prose prose-gray max-w-none text-gray-700 leading-relaxed"
-                    dangerouslySetInnerHTML={{ 
-                      __html: DOMPurify.sanitize(String(eventData.description)) 
-                    }} 
-                  />
-                </div>
-              ) : (
-                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center">
-                  <FileText className="text-gray-400 mx-auto mb-3" size={32} />
-                  <p className="text-gray-500">No hay descripción disponible para este evento</p>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-8 py-6 bg-gray-50 border-t border-gray-200">
-          <div className="flex justify-end">
-            <button
-              onClick={onClose}
-              className="px-8 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors font-medium"
-            >
-              Cerrar
-            </button>
-          </div>
+        <div className="px-8 py-5 bg-white border-t border-gray-100 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-6 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+          >
+            Cerrar
+          </button>
         </div>
+
       </div>
     </div>
   );
