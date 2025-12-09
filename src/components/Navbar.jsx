@@ -280,7 +280,9 @@ export default function Navbar({ onMenuClick }) {
 
   const isLogin = location.pathname === "/login";
   const isRegister = location.pathname === "/register";
-  const isAuthPage = isLogin || isRegister;
+  const isJuntaDirecteEquipo = location.pathname === "/juntaDirecteEquipo";
+  
+  const isAuthPage = isLogin || isRegister || isJuntaDirecteEquipo;
   const showHover = isPublicPage || isTransparentNavPath;
 
   let showWhiteBg;
