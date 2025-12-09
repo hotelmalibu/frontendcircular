@@ -15,10 +15,25 @@ import {
   Clock,
   Globe,
   Link as LinkIcon,
+  Filter,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { getAllSchedules, deleteSchedule } from "../../../../../api/scheduleApi";
 import EventFormModal from "./EventFormModal";
 import EventDetailModal from "./EventDetailModal";
+
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  darkBlue: "#005380",   // Azul Logo/Profundo
+  lightBlue: "#7FB8D9",  // Azul Claro
+  green: "#B1D357",      // Verde Principal (Claro)
+  darkGreen: "#8CB200",  // Verde Secundario
+  orange: "#E15200",     // Naranja (Alertas)
+  yellow: "#E8AD00",     // Amarillo
+  gray: "#6B7280",
+};
 
 export default function EventList() {
   const [events, setEvents] = useState([]);
@@ -151,11 +166,14 @@ export default function EventList() {
   const getStatusBadge = (status) => {
     const isPublished = status === 'published';
     return (
-      <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${
-        isPublished 
-          ? "bg-green-50 text-green-600 border-green-100" 
-          : "bg-yellow-50 text-yellow-600 border-yellow-100"
-      }`}>
+      <div 
+        className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border"
+        style={{
+          backgroundColor: isPublished ? '#F0FDF4' : '#FFFBEB',
+          color: isPublished ? BRAND.darkGreen : BRAND.yellow,
+          borderColor: isPublished ? 'transparent' : 'transparent'
+        }}
+      >
         {isPublished ? <CheckCircle size={12} /> : <Clock size={12} />}
         <span>{isPublished ? "Publicado" : "Borrador"}</span>
       </div>
@@ -165,81 +183,75 @@ export default function EventList() {
   const getEventTypeBadge = (type) => {
     const isRemote = type === 'remote';
     return (
-      <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
-        isRemote 
-          ? "bg-blue-50 text-blue-600" 
-          : "bg-purple-50 text-purple-600"
-      }`}>
+      <div 
+        className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
+        style={{
+          backgroundColor: isRemote ? `${BRAND.blue}15` : `${BRAND.green}20`, // 15/20 hex alpha
+          color: isRemote ? BRAND.blue : BRAND.darkGreen
+        }}
+      >
         {isRemote ? <Video size={12} /> : <MapPin size={12} />}
-        <span>{isRemote ? "Remoto" : "Presencial"}</span>
+        <span>{isRemote ? "Virtual" : "Presencial"}</span>
       </div>
     );
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("es-CO", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const formatDateTime = (startDate, endDate, isAllDay) => {
     if (isAllDay) {
-      return `Todo el día - ${formatDate(startDate)}`;
+      return `Todo el día - ${new Date(startDate).toLocaleDateString("es-CO")}`;
     }
     
     const start = new Date(startDate);
     const end = new Date(endDate);
     
-    const startFormatted = start.toLocaleDateString("es-CO", {
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    
-    const endFormatted = end.toLocaleDateString("es-CO", {
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    
-    return `${startFormatted} - ${endFormatted}`;
+    const dateOptions = { day: "numeric", month: "short" };
+    const timeOptions = { hour: "2-digit", minute: "2-digit" };
+
+    return (
+      <div className="flex flex-col">
+        <span className="font-semibold text-gray-700">
+            {start.toLocaleDateString("es-CO", dateOptions)}
+        </span>
+        <span className="text-xs text-gray-500">
+            {start.toLocaleTimeString("es-CO", timeOptions)} - {end.toLocaleTimeString("es-CO", timeOptions)}
+        </span>
+      </div>
+    );
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-4 mb-4" style={{ borderColor: BRAND.blue }}></div>
+        <p className="text-gray-500 font-medium">Cargando agenda...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen font-sans">
+    <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
+      
+      {/* ESPACIADOR SUPERIOR */}
+      <div className="w-full "></div>
+
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Eventos</h1>
-          <p className="text-gray-500 mt-1">Administra los eventos y conferencias de la plataforma</p>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: BRAND.darkBlue }}>Gestión de Eventos</h1>
+          <p className="text-gray-500 mt-1">Agenda corporativa, talleres y conferencias</p>
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all shadow-sm font-medium"
+          className="flex items-center gap-2 px-6 py-3 text-white rounded-xl shadow-md hover:shadow-lg transition-all font-bold text-sm transform active:scale-95"
+          style={{ backgroundColor: BRAND.blue }}
         >
-          <Plus size={18} />
-          Nuevo Evento
+          <Plus size={20} />
+          Crear Evento
         </button>
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm mb-8 border border-gray-100 flex flex-col md:flex-row gap-4">
+      <div className="bg-white p-5 rounded-2xl shadow-sm mb-8 border border-gray-100 flex flex-col lg:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <input
@@ -247,155 +259,178 @@ export default function EventList() {
             placeholder="Buscar por título, categoría o ubicación..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white border focus:border-green-500 rounded-xl outline-none transition-all text-gray-700"
+            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-gray-700"
+            style={{ "--tw-ring-color": BRAND.lightBlue }}
           />
         </div>
-        <div className="flex gap-3">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2.5 bg-gray-50 border-transparent hover:bg-gray-100 rounded-xl outline-none text-gray-700 cursor-pointer"
-          >
-            <option value="all">Todos los estados</option>
-            <option value="published">Publicados</option>
-            <option value="draft">Borradores</option>
-          </select>
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2.5 bg-gray-50 border-transparent hover:bg-gray-100 rounded-xl outline-none text-gray-700 cursor-pointer"
-          >
-            <option value="all">Todos los tipos</option>
-            <option value="in_person">Presencial</option>
-            <option value="remote">Remoto</option>
-          </select>
+        
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+          <div className="relative min-w-[180px]">
+             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+             <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full pl-9 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm cursor-pointer appearance-none"
+                style={{ "--tw-ring-color": BRAND.lightBlue }}
+             >
+                <option value="all">Estado: Todos</option>
+                <option value="published">Publicados</option>
+                <option value="draft">Borradores</option>
+             </select>
+          </div>
+
+          <div className="relative min-w-[180px]">
+             <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+             <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="w-full pl-9 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm cursor-pointer appearance-none"
+                style={{ "--tw-ring-color": BRAND.lightBlue }}
+             >
+                <option value="all">Modalidad: Todas</option>
+                <option value="in_person">Presencial</option>
+                <option value="remote">Virtual</option>
+             </select>
+          </div>
         </div>
       </div>
 
       {/* Error Display */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-700">
-          <AlertCircle size={20} />
+          <AlertCircle size={20} style={{ color: BRAND.orange }} />
           <span>{error}</span>
         </div>
       )}
 
       {/* Events Grid */}
       {filteredEvents.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
-          <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Calendar className="text-gray-400" size={24} />
+        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-gray-50">
+            <Calendar className="text-gray-400" size={32} />
           </div>
-          <h3 className="text-lg font-medium text-gray-900">No se encontraron eventos</h3>
-          <p className="text-gray-500">Intenta ajustar los filtros de búsqueda</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">No se encontraron eventos</h3>
+          <p className="text-gray-500 mb-8 max-w-md mx-auto">No hay resultados para los filtros aplicados.</p>
+          <button
+            onClick={() => {setSearchTerm(""); setFilterStatus("all"); setFilterType("all")}}
+            className="text-sm font-medium hover:underline"
+            style={{ color: BRAND.blue }}
+          >
+            Limpiar filtros
+          </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredEvents.map((item) => (
             <div
               key={item.id}
-              className="group bg-white rounded-2xl p-5 shadow-sm hover:shadow-md border border-transparent hover:border-gray-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
+              className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
             >
-              {/* Card Header */}
-              <div className="flex justify-between items-start gap-3 mb-3">
-                <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2 flex-1">
-                  {item.title}
-                </h3>
-                <div className="flex flex-col gap-1 flex-shrink-0">
-                  {getStatusBadge(item.status)}
-                </div>
-              </div>
+              {/* Borde Superior de Color */}
+              <div 
+                className="h-1.5 w-full absolute top-0 left-0" 
+                style={{ backgroundColor: item.event_type === 'remote' ? BRAND.blue : BRAND.darkGreen }}
+              ></div>
 
-              {/* Event Type Badge */}
-              <div className="mb-3">
-                {getEventTypeBadge(item.event_type)}
-              </div>
-
-              {/* Description */}
-              <p className="text-gray-500 text-sm mb-5 line-clamp-2 flex-grow leading-relaxed">
-                {item.description ? 
-                  item.description.replace(/<[^>]+>/g, '').slice(0, 150) + (item.description.length > 150 ? '...' : '')
-                  : "Sin descripción disponible..."
-                }
-              </p>
-
-              {/* Event Details */}
-              <div className="space-y-2 mb-5">
-                {/* Date & Time */}
-                <div className="flex items-center gap-2 text-gray-500">
-                  <Calendar size={16} className="text-gray-400 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 truncate">
-                    {formatDateTime(item.start_datetime, item.end_datetime, item.is_all_day)}
-                  </span>
-                </div>
-
-                {/* Location */}
-                <div className="flex items-center gap-2 text-gray-500">
-                  <MapPin size={16} className="text-gray-400 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 truncate">
-                    {item.location_name || "Ubicación no especificada"}
-                  </span>
-                </div>
-
-                {/* Meeting Link (for remote events) */}
-                {item.event_type === 'remote' && item.meeting_link && (
-                  <div className="flex items-center gap-2 text-gray-500">
-                    <LinkIcon size={16} className="text-gray-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-600 truncate">
-                      Enlace de reunión disponible
-                    </span>
+              <div className="p-5 flex-1 flex flex-col">
+                  {/* Header: Fecha y Badges */}
+                  <div className="flex justify-between items-start mb-4">
+                     <div className="bg-gray-50 rounded-lg p-2 border border-gray-100 text-center min-w-[50px]">
+                        <span className="block text-xs font-bold text-gray-400 uppercase">
+                            {new Date(item.start_datetime).toLocaleDateString("es-CO", { month: 'short' })}
+                        </span>
+                        <span className="block text-xl font-bold" style={{ color: BRAND.darkBlue }}>
+                            {new Date(item.start_datetime).getDate()}
+                        </span>
+                     </div>
+                     <div className="flex flex-col gap-1 items-end">
+                        {getStatusBadge(item.status)}
+                     </div>
                   </div>
-                )}
 
-                {/* Registration Info */}
-                {item.requires_registration && (
-                  <div className="flex items-center gap-2 text-gray-500">
-                    <Users size={16} className="text-gray-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-600">
-                      Requiere registro
-                      {item.max_attendees && ` (máx. ${item.max_attendees} asistentes)`}
-                    </span>
+                  {/* Título y Tipo */}
+                  <div className="mb-3">
+                     <h3 className="text-lg font-bold text-gray-800 leading-tight line-clamp-2 mb-2 group-hover:text-blue-700 transition-colors">
+                        {item.title}
+                     </h3>
+                     {getEventTypeBadge(item.event_type)}
                   </div>
-                )}
-              </div>
 
-              {/* Tags Row */}
-              <div className="flex items-center gap-3 mb-5">
-                <div className="flex items-center gap-1.5 text-gray-500">
-                  <Tag size={14} className="stroke-2" />
-                  <span className="text-sm font-medium">{item.category || "General"}</span>
-                </div>
-                {item.timezone && (
-                  <div className="flex items-center gap-1.5 text-gray-500">
-                    <Globe size={14} className="stroke-2" />
-                    <span className="text-sm font-medium">{item.timezone}</span>
+                  {/* Description */}
+                  <p className="text-xs text-gray-500 mb-5 line-clamp-3 leading-relaxed">
+                    {item.description ? 
+                      item.description.replace(/<[^>]+>/g, '').slice(0, 120) + (item.description.length > 120 ? '...' : '')
+                      : "Sin descripción disponible."
+                    }
+                  </p>
+
+                  {/* Detalles de Información */}
+                  <div className="space-y-3 mt-auto border-t border-gray-50 pt-3">
+                    
+                    {/* Horario Detallado */}
+                    <div className="flex items-start gap-3">
+                        <Clock size={16} className="text-gray-400 mt-1 flex-shrink-0" />
+                        <div className="text-sm">
+                            {formatDateTime(item.start_datetime, item.end_datetime, item.is_all_day)}
+                        </div>
+                    </div>
+
+                    {/* Ubicación / Enlace */}
+                    {item.event_type === 'remote' && item.meeting_link ? (
+                       <div className="flex items-center gap-3 text-sm text-gray-600 truncate">
+                          <LinkIcon size={16} className="text-blue-400 flex-shrink-0" />
+                          <span className="truncate text-blue-600 hover:underline cursor-pointer">Enlace de reunión</span>
+                       </div>
+                    ) : (
+                       <div className="flex items-center gap-3 text-sm text-gray-600 truncate">
+                          <MapPin size={16} className="text-gray-400 flex-shrink-0" />
+                          <span className="truncate">{item.location_name || "Por definir"}</span>
+                       </div>
+                    )}
+
+                    {/* Asistentes */}
+                    {item.requires_registration && (
+                       <div className="flex items-center gap-3 text-xs text-gray-500 bg-gray-50 p-2 rounded-lg">
+                          <Users size={14} className="text-gray-400" />
+                          <span>Requiere registro {item.max_attendees && `(Cupo: ${item.max_attendees})`}</span>
+                       </div>
+                    )}
                   </div>
-                )}
               </div>
 
               {/* Actions Footer */}
-              <div className="pt-4 border-t border-gray-100 flex justify-end items-center gap-3 mt-auto">
-                <button
-                  onClick={() => handleView(item)}
-                  className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
-                  title="Ver detalle"
-                >
-                  <Eye size={20} className="stroke-[1.5]" />
-                </button>
-                <button
-                  onClick={() => handleEdit(item)}
-                  className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                  title="Editar"
-                >
-                  <Edit size={20} className="stroke-[1.5]" />
-                </button>
-                <button
-                  onClick={() => handleDelete(item.id)}
-                  className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Eliminar"
-                >
-                  <Trash2 size={20} className="stroke-[1.5]" />
-                </button>
+              <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-between items-center">
+                 <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium">
+                     <Tag size={12} />
+                     <span className="truncate max-w-[100px]">{item.category || "General"}</span>
+                 </div>
+
+                 <div className="flex gap-1">
+                    <button
+                        onClick={() => handleView(item)}
+                        className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
+                        title="Ver detalle"
+                        style={{ color: BRAND.blue }}
+                    >
+                        <Eye size={18} />
+                    </button>
+                    <button
+                        onClick={() => handleEdit(item)}
+                        className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
+                        title="Editar"
+                        style={{ color: BRAND.darkGreen }}
+                    >
+                        <Edit size={18} />
+                    </button>
+                    <button
+                        onClick={() => handleDelete(item.id)}
+                        className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
+                        title="Eliminar"
+                        style={{ color: BRAND.orange }}
+                    >
+                        <Trash2 size={18} />
+                    </button>
+                 </div>
               </div>
             </div>
           ))}
@@ -404,44 +439,47 @@ export default function EventList() {
 
       {/* Pagination */}
       {pagination.last_page > 1 && (
-        <div className="mt-8 flex justify-center items-center gap-2">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-3 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Anterior
-          </button>
+        <div className="mt-10 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-gray-200 pt-6">
+          <p className="text-sm text-gray-500">
+            Mostrando <span className="font-bold">{filteredEvents.length}</span> de <span className="font-bold">{pagination.total}</span> eventos
+          </p>
           
-          <div className="flex gap-1">
-            {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`px-3 py-2 rounded-lg ${
-                  page === currentPage
-                    ? "bg-green-600 text-white"
-                    : "border border-gray-300 text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+                <ChevronLeft size={20} />
+            </button>
+            
+            <div className="flex gap-1 overflow-x-auto max-w-[200px] sm:max-w-none no-scrollbar">
+                {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map((page) => (
+                <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`min-w-[36px] h-9 rounded-lg text-sm font-medium transition-all ${
+                    page === currentPage
+                        ? "text-white shadow-md"
+                        : "text-gray-600 hover:bg-gray-100 border border-transparent"
+                    }`}
+                    style={page === currentPage ? { backgroundColor: BRAND.blue } : {}}
+                >
+                    {page}
+                </button>
+                ))}
+            </div>
+            
+            <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === pagination.last_page}
+                className="p-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+                <ChevronRight size={20} />
+            </button>
           </div>
-          
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === pagination.last_page}
-            className="px-3 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Siguiente
-          </button>
         </div>
       )}
-
-      <div className="mt-6 text-center text-sm text-gray-400">
-        Mostrando {filteredEvents.length} de {pagination.total} eventos
-      </div>
 
       {/* Modals */}
       {showFormModal && (

@@ -1,14 +1,14 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
-import Administrador from "../../components/dashboard/documentos/Administrador";
+// import Administrador from "../../components/dashboard/documentos/Administrador";
 import Biblioteca from "../../components/dashboard/documentos/Biblioteca";
 import Dashboard from "../../components/dashboard/documentos/Dashboard";
-import Editor from "../../components/dashboard/documentos/Editor";
-import Estado from "../../components/dashboard/documentos/Estado";
-import Explorador from "../../components/dashboard/documentos/Explorador";
+// import Editor from "../../components/dashboard/documentos/Editor";
+// import Estado from "../../components/dashboard/documentos/Estado";
+// import Explorador from "../../components/dashboard/documentos/Explorador";
 import Versiones from "../../components/dashboard/documentos/Versiones";
-import Buscador from "../../components/dashboard/documentos/Buscador";
+// import Buscador from "../../components/dashboard/documentos/Buscador";
 
 export default function Documentos() {
   const { user } = useContext(AuthContext);
@@ -16,13 +16,13 @@ export default function Documentos() {
 
   const tabs = [
     { name: "Dashboard", component: <Dashboard /> },
-    { name: "Explorador", component: <Explorador /> },
-    { name: "Buscador", component: <Buscador /> },
-    { name: "Editor", component: <Editor /> },
-    { name: "Estado", component: <Estado /> },
+    // { name: "Explorador", component: <Explorador /> },
+    // { name: "Buscador", component: <Buscador /> },
+    // { name: "Editor", component: <Editor /> },
+    // { name: "Estado", component: <Estado /> },
     { name: "Versiones", component: <Versiones /> },
     { name: "Biblioteca", component: <Biblioteca /> },
-    { name: "Administrador", component: <Administrador /> },
+    // { name: "Administrador", component: <Administrador /> },
   ];
 
   return (

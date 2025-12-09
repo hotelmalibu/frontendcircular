@@ -2,7 +2,19 @@ import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login as loginRequest } from "../../api/auth";
 import { AuthContext } from "../../context/AuthContext";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+import Logo from "../../assets/fondosYlogos/Logo.png"; 
+import LogoBlanco from "../../assets/fondosYlogos/Logo_blanco.png";
+
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  darkBlue: "#005380",   // Azul Logo/Profundo (Fondo lateral)
+  lightBlue: "#7FB8D9",  // Azul Claro
+  green: "#B1D357",      // Verde Principal (Botón de acción)
+  darkGreen: "#8CB200",  // Verde Hover
+  gray: "#6B7280",
+};
 
 export default function Login() {
   const { login } = useContext(AuthContext);
@@ -11,10 +23,12 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
     try {
       const res = await loginRequest(email.trim(), password);
       login(res.data.data.user, res.data.data.token);
@@ -24,184 +38,165 @@ export default function Login() {
       const message =
         err.response?.data?.message ||
         err.message ||
-        "Credenciales incorrectas";
+        "Credenciales incorrectas. Inténtalo nuevamente.";
       setError(message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden flex flex-col pt-20">
+    <div className="min-h-screen w-full flex bg-white font-sans">
       
-      {/* LÍNEAS SVG DECORATIVAS */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none opacity-20"
-        preserveAspectRatio="none"
-        viewBox="0 0 1200 800"
-      >
-        {/* Líneas diagonales */}
-        <line x1="0" y1="0" x2="1200" y2="800" stroke="#00AB6D" strokeWidth="2" />
-        <line x1="0" y1="200" x2="1200" y2="600" stroke="#2C67B0" strokeWidth="1.5" />
-        <line x1="200" y1="0" x2="1000" y2="800" stroke="#B1D357" strokeWidth="1" opacity="0.6" />
-        <line x1="0" y1="600" x2="1200" y2="200" stroke="#00AB6D" strokeWidth="1.5" opacity="0.5" />
-      </svg>
+      {/* SECCIÓN IZQUIERDA - BRANDING (Solo visible en desktop) */}
+      <div className="hidden lg:flex w-1/2 relative overflow-hidden flex-col justify-between p-12 text-white"
+           style={{ backgroundColor: BRAND.darkBlue }}>
+        
+        {/* Elementos Decorativos de Fondo (Círculos difuminados) */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#2C67B0] rounded-full mix-blend-multiply filter blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2 animate-blob"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#B1D357] rounded-full mix-blend-multiply filter blur-3xl opacity-10 translate-y-1/2 -translate-x-1/2 animate-blob animation-delay-2000"></div>
+        
+        {/* Contenido Izquierda */}
+        <div className="relative z-10">
+          <img src={LogoBlanco} alt="Visión Circular" className="h-16 w-auto mb-8" />
+        </div>
 
-      
+        <div className="relative z-10 mb-24">
+          <h1 className="text-5xl font-bold leading-tight mb-6">
+            Impulsando el país hacia la <span style={{ color: BRAND.green }}>economía circular</span>.
+          </h1>
+          <p className="text-blue-100 text-lg max-w-md leading-relaxed">
+            Gestiona proyectos, monitorea indicadores y conecta con aliados estratégicos en una sola plataforma integral.
+          </p>
+        </div>
 
-      {/* CONTENIDO PRINCIPAL */}
-<div className="relative z-10 flex-1 flex items-center justify-center w-full px-4 sm:px-6 lg:px-12 py-8 pt-24">
-<div className="w-full max-w-md">
-          {/* Contenedor del formulario - Glassmorphism */}
-          <div className="w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20 animate-slide-up">
-            {/* Título */}
-            <h2 className="text-3xl font-bold text-[#005280] mb-2 text-center">
-              Iniciar Sesión
-            </h2>
-            <p className="text-gray-600 text-sm text-center mb-8">
-              Accede a tu plataforma de economía circular
-            </p>
+        
+      </div>
 
-            {/* Formulario */}
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Campo de correo */}
-              <div className="group">
-                <label className="block text-gray-700 text-sm font-semibold mb-2">
-                  Correo Electrónico
-                </label>
+      {/* SECCIÓN DERECHA - FORMULARIO */}
+      <div className="w-full lg:w-1/2 flex mt-24 items-center justify-center p-8 bg-gray-50/50">
+        <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl shadow-xl border border-gray-100">
+          
+          {/* Header Móvil (Logo visible solo en móvil) */}
+          <div className="lg:hidden flex justify-center mb-8">
+             <img src={Logo} alt="Visión Circular" className="h-12 w-auto" />
+          </div>
+
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">¡Hola de nuevo!</h2>
+            <p className="text-gray-500">Ingresa tus credenciales para continuar.</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            
+            {/* Input Email */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 ml-1">Correo Electrónico</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#2C67B0] transition-colors">
+                  <Mail size={20} />
+                </div>
                 <input
                   type="email"
-                  placeholder="ejemplo@correo.com"
+                  placeholder="usuario@empresa.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#00AB6D] focus:border-transparent bg-gray-50 transition-all duration-200 group-hover:border-[#00AB6D]/50"
+                  className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#2C67B0]/20 focus:border-[#2C67B0] transition-all duration-200"
                 />
               </div>
+            </div>
 
-              {/* Campo de contraseña */}
-              <div className="group">
-                <label className="block text-gray-700 text-sm font-semibold mb-2">
-                  Contraseña
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-[#00AB6D] focus:border-transparent bg-gray-50 transition-all duration-200 group-hover:border-[#00AB6D]/50"
-                  />
-                  {/* Botón ver/ocultar contraseña */}
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#00AB6D] transition-colors"
-                    aria-label="Mostrar/ocultar contraseña"
-                  >
-                    {showPassword ? (
-                      <EyeOff size={20} />
-                    ) : (
-                      <Eye size={20} />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Link de olvidaste contraseña */}
-              <div className="text-right">
+            {/* Input Password */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center ml-1">
+                <label className="text-sm font-semibold text-gray-700">Contraseña</label>
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-[#00AB6D] font-semibold hover:text-[#008A5C] transition-colors duration-200"
+                  className="text-xs font-semibold text-[#2C67B0] hover:text-[#005380] transition-colors"
                 >
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
-
-              {/* Mensaje de error */}
-              {error && (
-                <div className="bg-red-50 border-2 border-red-300 text-red-700 px-4 py-3 rounded-lg text-sm text-center transition-all duration-300 animate-shake">
-                  {error}
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#2C67B0] transition-colors">
+                  <Lock size={20} />
                 </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="block w-full pl-11 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#2C67B0]/20 focus:border-[#2C67B0] transition-all duration-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="p-4 rounded-xl bg-red-50 border border-red-100 flex gap-3 items-start animate-shake">
+                <div className="text-red-500 mt-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" /></svg>
+                </div>
+                <p className="text-sm text-red-700 font-medium">{error}</p>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-[#B1D357] hover:bg-[#9CB84D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B1D357] disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-300 transform active:scale-[0.99] text-[#005380]" // Texto azul oscuro para contraste en fondo verde
+            >
+              {isLoading ? (
+                <Loader2 className="animate-spin h-5 w-5" />
+              ) : (
+                <>
+                  INGRESAR AL SISTEMA <ArrowRight size={18} />
+                </>
               )}
+            </button>
+          </form>
 
-              {/* Botón de iniciar sesión */}
-              <button
-                type="submit"
-                className=" w-full text-white font-bold py-3 rounded-lg bg-gradient-to-r from-[#00AB6D] to-[#008A5C] hover:from-[#008A5C] hover:to-[#006F4C] transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#00AB6D] focus:ring-offset-2 focus:ring-offset-white mt-2"
-              >
-                Iniciar Sesión
-              </button>
-            </form>
-
-            {/* Línea decorativa inferior */}
-            <div className="h-1 w-24 bg-gradient-to-r from-[#2C67B0] to-[#00AB6D] rounded-full mx-auto my-2"></div>
-
-            {/* Link de registro */}
-            <p className="text-sm text-gray-600 text-center">
-              ¿No tienes una cuenta?{" "}
-              <Link
-                to="/register"
-                className="text-[#00AB6D] font-bold hover:text-[#008A5C] transition-colors duration-200"
-              >
-                Regístrate aquí
+          {/* Footer Register */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500">
+              ¿Aún no tienes una cuenta?{" "}
+              <Link to="/register" className="font-bold text-[#2C67B0] hover:text-[#005380] transition-colors">
+                Solicitar acceso
               </Link>
             </p>
           </div>
-
-          {/* Eslogán */}
-          <p className="text-white text-center text-xs font-semibold mt-8 opacity-80 tracking-wide">
-            Impulsando el país hacia la economía circular
-          </p>
         </div>
       </div>
 
-      {/* Footer placeholder - agregar Footer aquí */}
-
-      {/* ESTILOS ANIMACIONES */}
       <style>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
         }
-
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .animate-blob {
+          animation: blob 7s infinite;
         }
-
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
         @keyframes shake {
-          0%, 100% {
-            transform: translateX(0);
-          }
-          25% {
-            transform: translateX(-5px);
-          }
-          75% {
-            transform: translateX(5px);
-          }
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-4px); }
+          75% { transform: translateX(4px); }
         }
-
-        .animate-fade-in {
-          animation: fade-in 0.6s ease-out;
-        }
-
-        .animate-slide-up {
-          animation: slide-up 0.7s ease-out;
-        }
-
-        .animate-shake {
-          animation: shake 0.4s ease-in-out;
-        }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
       `}</style>
     </div>
   );

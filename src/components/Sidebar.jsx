@@ -23,11 +23,11 @@ export default function Sidebar() {
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
     { name: "Documentos", path: "/documentos", icon: <FileText size={20} /> },
     { name: "Empresas", path: "/companies", icon: <Building size={20} /> },
-    { name: "Seguimiento", path: "/seguimiento", icon: <Activity size={20} /> },
-    { name: "Formularios", path: "/formularios", icon: <ClipboardList size={20} /> },
+    // { name: "Seguimiento", path: "/seguimiento", icon: <Activity size={20} /> },
+    // { name: "Formularios", path: "/formularios", icon: <ClipboardList size={20} /> },
     { name: "Comunicaciones", path: "/comunicaciones", icon: <MessageSquare size={20} /> },
     { name: "Administración", path: "/administracion", icon: <Settings size={20} /> },
-    { name: "Integración", path: "/integracion", icon: <Workflow size={20} /> },
+    // { name: "Integración", path: "/integracion", icon: <Workflow size={20} /> },
   ];
 
   // 3. Función que maneja el click

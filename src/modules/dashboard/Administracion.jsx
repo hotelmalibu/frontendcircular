@@ -2,10 +2,10 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
 import Aprobaciones from "../../components/dashboard/administracion/Aprobaciones";
-import LogAuditoria from "../../components/dashboard/administracion/LogsAuditoria";
+// import LogAuditoria from "../../components/dashboard/administracion/LogsAuditoria";
 import Usuarios from "../../components/dashboard/administracion/Usuarios";
 import RolesPermisos from "../../components/dashboard/administracion/RolesPermisos";
-import Seguridad from "../../components/dashboard/administracion/Seguridad";
+// import Seguridad from "../../components/dashboard/administracion/Seguridad";
 import Recursos from "../../components/dashboard/administracion/Recursos";
 
 export default function Administracion() {
@@ -16,9 +16,9 @@ export default function Administracion() {
     { name: "Aprobaciones", component: <Aprobaciones /> },
     { name: "Usuarios", component: <Usuarios /> },
     { name: "Roles y Permisos", component: <RolesPermisos /> },
-    { name: "Seguridad", component: <Seguridad /> },
+    // { name: "Seguridad", component: <Seguridad /> },
     { name: "Recursos", component: <Recursos /> },
-    { name: "Logs Auditoría", component: <LogAuditoria /> },
+    // { name: "Logs Auditoría", component: <LogAuditoria /> },
   ];
 
   return (

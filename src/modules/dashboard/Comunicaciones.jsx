@@ -1,15 +1,15 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
-import Biblioteca from "../../components/dashboard/comunicaciones/Biblioteca";
+// import Biblioteca from "../../components/dashboard/comunicaciones/Biblioteca";
 import Contenido from "../../components/dashboard/comunicaciones/Contenido";
 import Dashboard from "../../components/dashboard/comunicaciones/Dashboard";
 import Eventos from "../../components/dashboard/comunicaciones/Eventos";
-import Newsletter from "../../components/dashboard/comunicaciones/Newsletter";
+// import Newsletter from "../../components/dashboard/comunicaciones/Newsletter";
 import News from "../../components/dashboard/comunicaciones/News";
 import Projects from "../../components/dashboard/comunicaciones/Projects";
-import RedesSociales from "../../components/dashboard/comunicaciones/RedesSociales";
-import Seo from "../../components/dashboard/comunicaciones/Seo";
+// import RedesSociales from "../../components/dashboard/comunicaciones/RedesSociales";
+// import Seo from "../../components/dashboard/comunicaciones/Seo";
 
 export default function Comunicaciones() {
   const { user } = useContext(AuthContext);
@@ -21,10 +21,10 @@ export default function Comunicaciones() {
     { name: "Eventos", component: <Eventos /> },
     { name: "Proyectos", component: <Projects /> },
     { name: "Contenido", component: <Contenido /> },
-    { name: "Biblioteca", component: <Biblioteca /> },
-    { name: "Newsletter", component: <Newsletter /> },
-    { name: "Redes Sociales", component: <RedesSociales /> },
-    { name: "SEO", component: <Seo /> },
+    // { name: "Biblioteca", component: <Biblioteca /> },
+    // { name: "Newsletter", component: <Newsletter /> },
+    // { name: "Redes Sociales", component: <RedesSociales /> },
+    // { name: "SEO", component: <Seo /> },
   ];
 
   return (

@@ -1,33 +1,169 @@
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
-import {  User } from "lucide-react";
+import { 
+  User, 
+  Mail, 
+  Shield, 
+  Edit3, 
+  Camera, 
+  Calendar, 
+  MapPin 
+} from "lucide-react";
+
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  darkBlue: "#005380",   // Azul Logo/Profundo
+  lightBlue: "#7FB8D9",  // Azul Claro
+  green: "#B1D357",      // Verde Principal (Claro)
+  darkGreen: "#8CB200",  // Verde Secundario
+  gray: "#6B7280",
+};
 
 export default function Profile() {
   const { user } = useContext(AuthContext);
 
+  // Fallback seguro por si el contexto aún no carga
+  const userData = user || { 
+    name: "Usuario Cargando...", 
+    email: "cargando@ejemplo.com", 
+    role: "Invitado" 
+  };
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-50 font-sans text-gray-700">
       <Sidebar />
-      <main className="flex-1 p-20 pt-32">
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-8 border">
-          <h2 className="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
-            <User className="text-blue-500" /> Información del Usuario
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-blue-50 p-4 rounded-xl">
-              <p className="text-gray-600 text-sm">Nombre</p>
-              <p className="text-lg font-semibold text-blue-700">{user.name}</p>
+      
+      <main className="flex-1 p-4 sm:p-8 pt-24 md:pt-32">
+        <div className="max-w-4xl mx-auto">
+          
+          {/* Encabezado de Página */}
+          <div className="mb-8 py-4" >
+            <h1 className="text-3xl font-bold" style={{ color: BRAND.darkBlue }}>
+              Mi Perfil
+            </h1>
+            <p className="text-gray-500 mt-1">Gestiona tu información personal y preferencias de cuenta</p>
+          </div>
+
+          {/* Tarjeta Principal de Perfil */}
+          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+            
+            {/* Banner Decorativo */}
+            <div 
+              className="h-40 w-full relative"
+              style={{ background: `linear-gradient(135deg, ${BRAND.darkBlue} 0%, ${BRAND.blue} 100%)` }}
+            >
+              {/* Patrón decorativo opcional o imagen de fondo */}
+              <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
             </div>
-            <div className="bg-blue-50 p-4 rounded-xl">
-              <p className="text-gray-600 text-sm">Email</p>
-              <p className="text-lg font-semibold text-blue-700">{user.email}</p>
-            </div>
-            <div className="bg-blue-50 p-4 rounded-xl">
-              <p className="text-gray-600 text-sm">Rol</p>
-              <p className="text-lg font-semibold text-blue-700">
-                {user.role || "Sin rol asignado"}
-              </p>
+
+            {/* Contenido del Perfil */}
+            <div className="px-8 pb-8 relative">
+              
+              {/* Sección Avatar y Nombre (Flotante sobre el banner) */}
+              <div className="flex flex-col md:flex-row items-start md:items-end justify-between -mt-16 mb-8 gap-4">
+                
+                <div className="flex items-end gap-6">
+                  {/* Avatar */}
+                  <div className="relative group">
+                    <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-200 flex items-center justify-center text-4xl font-bold text-gray-400 shadow-md overflow-hidden">
+                      {/* Si hubiera imagen: <img src={user.avatar} ... /> */}
+                      {userData.name.charAt(0).toUpperCase()}
+                    </div>
+                    <button className="absolute bottom-1 right-1 p-2 rounded-full bg-white text-gray-600 shadow-md border border-gray-100 hover:text-blue-600 transition group-hover:scale-110">
+                      <Camera size={18} />
+                    </button>
+                  </div>
+
+                  {/* Nombre y Rol */}
+                  <div className="mb-0">
+                    <h2 className="text-2xl font-bold text-gray-800">{userData.name}</h2>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="flex items-center gap-1 text-sm font-medium px-3 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+                        <Shield size={12} />
+                        {userData.role || "Sin rol asignado"}
+                      </span>
+                      <span className="text-xs text-gray-400 flex items-center gap-1">
+                        <MapPin size={12} /> Colombia
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Botón Editar */}
+                <button 
+                  className="mb-2 flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-medium shadow-md hover:shadow-lg transition-all transform active:scale-95"
+                  style={{ backgroundColor: BRAND.darkGreen }}
+                >
+                  <Edit3 size={18} /> Editar Información
+                </button>
+              </div>
+
+              {/* Grid de Información Detallada */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* Tarjeta de Información Básica */}
+                <div className="p-6 rounded-2xl border border-gray-100 bg-gray-50/50">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4 border-b border-gray-200 pb-2">
+                    Detalles de Contacto
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2.5 bg-white rounded-lg text-blue-600 shadow-sm border border-gray-100">
+                        <User size={20} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium">Nombre Completo</p>
+                        <p className="text-gray-800 font-medium text-base">{userData.name}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-4">
+                      <div className="p-2.5 bg-white rounded-lg text-blue-600 shadow-sm border border-gray-100">
+                        <Mail size={20} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium">Correo Electrónico</p>
+                        <p className="text-gray-800 font-medium text-base">{userData.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tarjeta de Información de Cuenta */}
+                <div className="p-6 rounded-2xl border border-gray-100 bg-gray-50/50">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4 border-b border-gray-200 pb-2">
+                    Información de Cuenta
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2.5 bg-white rounded-lg text-green-600 shadow-sm border border-gray-100">
+                        <Shield size={20} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium">Rol del Sistema</p>
+                        <p className="text-gray-800 font-medium text-base capitalize">
+                          {userData.role || "Usuario Estandar"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-4">
+                      <div className="p-2.5 bg-white rounded-lg text-orange-500 shadow-sm border border-gray-100">
+                        <Calendar size={20} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium">Miembro Desde</p>
+                        <p className="text-gray-800 font-medium text-base">Septiembre 2025</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </div>
         </div>
