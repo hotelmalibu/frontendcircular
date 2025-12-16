@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { MapPin, Activity, Leaf, Zap, Users, BarChart3, TrendingUp } from "lucide-react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-// Asegúrate de importar tu imagen correctamente
-import fondoMapa from "../../../../../assets/home/ImpactSection/fondo_mapa.jpg";
 
 // --- DATOS ---
 const regions = [
@@ -52,19 +50,17 @@ const ImpactWithMap = () => {
 
   return (
     <section
-      className="relative w-full py-12 px-6 overflow-hidden bg-cover bg-center"
-      style={{ backgroundImage: `url(${fondoMapa})` }}
+      className="relative w-full bg-center"
     >
-      {/* Overlay oscuro para legibilidad */}
-      <div className="absolute inset-0 bg-black/25"></div>
+      
 
       <div className="relative z-10 max-w-7xl mx-auto">
         {/* HEADER */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#1E305D] mb-2 leading-tight">
             Lo que está Pasando
           </h2>
-          <p className="text-white/90 text-sm md:text-base max-w-2xl mx-auto">
+          <p className="text-grey/90 text-sm md:text-base max-w-2xl mx-auto">
             Visualiza dónde estamos generando impacto y en qué sectores trabajamos
           </p>
         </div>

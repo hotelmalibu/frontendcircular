@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 
-// --- IMPORTACIÓN DE IMÁGENES ---
-// Asegúrate de que las rutas sean correctas
 import imgProyectos from "../../../../assets/lineasestrategicas/proyectos.png";
-import imgPedagogia from "../../../../assets/lineasestrategicas/Pedagogia.png";
 import imgInnovacion from "../../../../assets/lineasestrategicas/innovacion.png";
 import imgInclusion from "../../../../assets/lineasestrategicas/inclusion.png";
 import imgConsumo from "../../../../assets/lineasestrategicas/consumoresponsable.png";
 import imgCadenas from "../../../../assets/lineasestrategicas/cadenasdevalor.png";
+import ImpactSection from "../../../../components/home/nosotros/conocenos/quienesSomos/ImpactSection.jsx"; 
 
 // --- DATOS UNIFICADOS ---
 const DATA_LINEAS = [
@@ -16,7 +14,6 @@ const DATA_LINEAS = [
     title: "Proyectos",
     highlight: "Estratégicos",
     description: "Estrategias para impulsar modelos circulares mediante procesos de generación de capacidades territoriales y sectoriales que generen impactos económicos, sociales y ambientales.",
-    colorAcento: "#2B65AC",
     iconColor: "#ffffff",
     img: imgProyectos,
     bgGradient: "from-white to-purple-50",
@@ -28,33 +25,12 @@ const DATA_LINEAS = [
       </svg>
     )
   },
-  {
-    id: "pedagogia",
-    title: "Pedagogía y",
-    highlight: "Sensibilización",
-    description: (
-      <>
-        Diseñamos e implementamos estrategias educativas para <span className="font-semibold text-gray-900">transformar la cultura</span> del consumo y promover la sostenibilidad.
-      </>
-    ),
-    colorAcento: "#F59E0B",
-    iconColor: "#ffffff",
-    img: imgPedagogia,
-    bgGradient: "from-white to-yellow-50",
-    boxTitle: "Enfoque y Alcance",
-    boxText: "Buscamos generar consciencia en el consumidor final mediante campañas de comunicación y pedagogía que fomenten la separación adecuada en la fuente.",
-    iconSvg: (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-      </svg>
-    )
-  },
+  
   {
     id: "innovacion",
     title: "Línea de",
     highlight: "Innovación",
     description: "Investigación aplicada y desarrollo experimental enfocados en dinamizar el ecosistema de Ciencia, Tecnología e Innovación (CTeI), para el cierre de ciclo de envases, empaques y PUSU, basados en modelos de negocio circulares.",
-    colorAcento: "#9E1981",
     iconColor: "#ffffffff",
     img: imgInnovacion,
     bgGradient: "from-white to-pink-50",
@@ -72,7 +48,6 @@ const DATA_LINEAS = [
     title: "Inclusión Social y",
     highlight: "Productiva",
     description: "Cierre de brechas de las organizaciones de recicladores y transformadores para fortalecer su competitividad y promover una transición justa hacia modelos de negocio circulares.",
-    colorAcento: "#CD0000",
     iconColor: "#ffffff",
     img: imgInclusion,
     bgGradient: "from-white to-red-50",
@@ -89,7 +64,6 @@ const DATA_LINEAS = [
     title: "Fomento del",
     highlight: "Consumo Responsable",
     description: "Sensibilizar y contribuir al cambio de hábitos y comportamiento del consumidor fomentando la correcta separación en la fuente.",
-    colorAcento: "#E8AD00",
     iconColor: "#ffffff",
     img: imgConsumo,
     bgGradient: "from-white to-yellow-50",
@@ -106,7 +80,6 @@ const DATA_LINEAS = [
     title: "Fortalecimiento de",
     highlight: "Cadenas de Valor",
     description: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales de aprovechamiento mediante la generación de valor entre actores de la cadena para el cumplimiento normativo en REP, aportando a estrategias corporativas.",
-    colorAcento: "#8CB200",
     iconColor: "#ffffff",
     img: imgCadenas,
     bgGradient: "from-white to-green-50",
@@ -125,8 +98,8 @@ export default function LineasEstrategicasPage() {
   const activeData = DATA_LINEAS.find((item) => item.id === selectedId);
 
   return (
-    // AJUSTE: Se agregó 'bg-gray-100' para el fondo gris claro
-    <div className="mt-28 font-sans min-h-[60vh] flex flex-col items-center justify-center p-4 pb-10 bg-gray-100">
+    
+    <div className="mt-28 font-sans min-h-[60vh] flex flex-col items-center justify-center p-4 pb-10 bg-gradient-to-b from-gray-100 to-[#7FB8D9]/10 relative">
       
       {/* --- TÍTULO --- */}
       <h1 className="text-3xl md:text-4xl font-bold text-[#1E305D] mb-8 text-center tracking-wider">
@@ -177,20 +150,16 @@ export default function LineasEstrategicasPage() {
         {/* --- COLUMNA DERECHA: CONTENIDO --- */}
         <div className="w-full md:w-7/12 relative flex flex-col">
           
-          {/* ESTADO VACÍO: TEXTO E ICONO MÁS GRANDES Y OSCUROS */}
+         
           {!selectedId && (
-            // AJUSTE: Se eliminó 'opacity-40' para que los colores sean más oscuros y nítidos
+           
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-              {/* AJUSTE: Icono más grande (w-20 h-20), fondo sutil (bg-gray-100) y margen inferior (mb-4) */}
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                {/* AJUSTE: SVG más grande (h-10 w-10) y color más oscuro (text-gray-500) */}
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
                 </svg>
               </div>
-              {/* AJUSTE: Título más grande (text-xl) y oscuro (text-gray-900) */}
               <h3 className="text-xl font-bold text-gray-900 mb-2">Explora nuestras Líneas Estratégicas</h3>
-              {/* AJUSTE: Subtítulo más grande (text-base) y oscuro (text-gray-600) */}
               <p className="text-base text-gray-600 max-w-md">
                 Haz clic en los logos de la izquierda para ver el detalle.
               </p>
@@ -203,7 +172,7 @@ export default function LineasEstrategicasPage() {
               
               <div 
                 className={`absolute top-0 right-0 w-[300px] h-[300px] rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/4 pointer-events-none`}
-               
+                style={{ backgroundColor: activeData.colorAcento }}
               ></div>
 
               <div className="relative z-10 max-w-lg mx-auto w-full">
@@ -244,6 +213,13 @@ export default function LineasEstrategicasPage() {
 
       </div>
 
+      {/* Ícono de flecha hacia abajo */}
+      <div className="absolute top-1/3 right-14 -translate-y-1/2 animate-bounce">
+        <svg className="w-10 h-10 text-[#1E305D]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      </div>
+
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
@@ -263,6 +239,10 @@ export default function LineasEstrategicasPage() {
           border-radius: 10px;
         }
       `}</style>
+      <div className="mt-14 text-center">
+          <ImpactSection />  
+      </div>
+      
     </div>
   );
 }

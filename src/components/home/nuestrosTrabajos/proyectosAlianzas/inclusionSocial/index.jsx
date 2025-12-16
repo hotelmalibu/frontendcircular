@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, FileText } from "lucide-react";
 import PDFModal from "../../../../../components/PDFModal";
 
-// ✅ IMAGEN TEMPORAL (reemplázala por la tuya)
+
 import inclusion1 from "../../../../../assets/proyectosyalianzas/inclusionsocial/inclusion1.png";
 
 export default function InclusionSocial() {
