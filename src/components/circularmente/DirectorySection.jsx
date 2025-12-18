@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Building2, MapPin, Phone, Mail, ExternalLink, X, 
-  Globe, Tag, ChevronRight 
+import {
+  Building2, MapPin, Phone, Mail, ExternalLink, X,
+  Globe, Tag, ChevronRight, Package, Wrench, ShoppingCart, User
 } from "lucide-react";
 import { getAllCompanies } from "../../api/companiesApi";
+import { motion } from 'framer-motion';
 
 export default function DirectorySection({ selectedRegion, user }) {
   const [companies, setCompanies] = useState([]);
@@ -42,7 +43,7 @@ export default function DirectorySection({ selectedRegion, user }) {
       setLoading(true);
       setError(null);
       const response = await getAllCompanies(1, 50);
-      
+
       let companiesArray = [];
       if (response?.data?.items && Array.isArray(response.data.items)) {
         companiesArray = response.data.items;
@@ -72,12 +73,18 @@ export default function DirectorySection({ selectedRegion, user }) {
 
   const displayCompanies = companies.length > 0 ? companies : legacyCompanies;
   let filteredCompanies = displayCompanies;
-  
+
   if (selectedRegion && selectedRegion.nombre) {
-    filteredCompanies = displayCompanies.filter((e) => 
-       !e.region || e.region === selectedRegion.nombre
+    filteredCompanies = displayCompanies.filter((e) =>
+      !e.region || e.region === selectedRegion.nombre
     );
   }
+
+  // Helper para iconos de categoría (si existiera el dato)
+  const getCategoryIcon = (categoria) => {
+    // Lógica placeholder si no hay categoría real en los datos de API aún
+    return <Package size={16} className="inline mr-1" />;
+  };
 
   if (!user) return null;
 
@@ -97,12 +104,7 @@ export default function DirectorySection({ selectedRegion, user }) {
       <section className="py-16 px-4 md:px-8 lg:px-16 bg-[#F8FAFC]">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-10">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1E305D] flex items-center gap-3">
-              <Building2 className="text-[#00AB6D]" size={36} />
-              Directorio Circular
-            </h2>
-          </div>
+          
 
           {error && (
             <div className="mb-8 p-4 bg-orange-50 border-l-4 border-orange-400 text-orange-700 rounded-r-lg">
@@ -112,23 +114,22 @@ export default function DirectorySection({ selectedRegion, user }) {
 
           {/* Grid de Tarjetas */}
           {filteredCompanies.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredCompanies.map((company) => (
-                <div
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredCompanies.map((company, idx) => (
+                <motion.div
                   key={company.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
                   onClick={() => handleCompanyClick(company)}
-                  className="group bg-white rounded-xl shadow-md hover:shadow-2xl border border-gray-200 transition-all duration-300 flex flex-col overflow-hidden cursor-pointer h-full"
+                  className="rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group border-2 border-white/30 bg-white hover:border-[#00AB6D]/50 flex flex-col h-full"
                 >
-                  {/* --- 1. IMAGEN DE TARJETA --- */}
-                  {/* CAMBIO: h-32 (128px) es suficiente para un logo. p-4 para margen interno. */}
-                  <div className="w-full h-36 bg-white border-b border-gray-100 flex items-center justify-center p-4 relative">
-                    
+                  {/* Logo */}
+                  <div className="w-full h-32 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden p-4 border-b border-gray-200 group-hover:from-[#00AB6D]/10 group-hover:to-[#2C67B0]/10 transition-all relative">
                     {company.logo?.url ? (
-                      <img 
-                        src={company.logo.url} 
+                      <img
+                        src={company.logo.url}
                         alt={company.name}
-                        // CAMBIO: max-h-full y max-w-full permiten que la imagen crezca hasta tocar el borde del contenedor
-                        // pero sin deformarse (object-contain)
                         className="max-h-full max-w-full object-contain transform group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
                           e.target.style.display = 'none';
@@ -136,43 +137,39 @@ export default function DirectorySection({ selectedRegion, user }) {
                         }}
                       />
                     ) : null}
-                    
-                    {/* Fallback */}
-                    <div 
-                       className="w-16 h-16 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-bold text-xl"
-                       style={{ display: company.logo?.url ? 'none' : 'flex' }}
+
+                    {/* Fallback Logo */}
+                    <div
+                      className="w-16 h-16 rounded-full bg-white/80 text-gray-400 flex items-center justify-center font-bold text-xl shadow-sm"
+                      style={{ display: company.logo?.url ? 'none' : 'flex' }}
                     >
                       {getInitials(company.name)}
                     </div>
                   </div>
 
-                  {/* --- 2. CONTENIDO --- */}
-                  <div className="p-5 flex flex-col flex-grow">
-                    <h3 className="font-extrabold text-[#1E305D] text-lg mb-2 line-clamp-2 group-hover:text-[#00AB6D] transition-colors">
+                  {/* Contenido */}
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h4 className="font-bold text-[#1E305D] text-lg mb-2 line-clamp-2 group-hover:text-[#00AB6D] transition-colors">
                       {company.name}
-                    </h3>
+                    </h4>
 
-                    <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed flex-grow">
+                    {/* Ubicación */}
+                    <div className="text-xs text-gray-600 mb-3 bg-gray-50 p-2 rounded-lg">
+                      <p className="flex items-start gap-1.5">
+                        <MapPin size={14} className="text-[#00AB6D] flex-shrink-0 mt-0.5" />
+                        <span className="line-clamp-2">{company.address || company.region || "Ubicación no disponible"}</span>
+                      </p>
+                    </div>
+
+                    <p className="text-xs text-gray-600 line-clamp-3 mb-4 flex-grow leading-relaxed">
                       {company.description || "Sin descripción disponible."}
                     </p>
-                    
-                    {company.address && (
-                      <div className="flex items-start gap-2 text-xs text-gray-500 mb-4 bg-gray-50 p-2 rounded-lg">
-                        <MapPin size={14} className="mt-0.5 text-[#00AB6D] flex-shrink-0" />
-                        <span className="line-clamp-1">{company.address}</span>
-                      </div>
-                    )}
 
-                    <div className="pt-3 border-t border-gray-100 flex items-center justify-between mt-auto">
-                       <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                         Empresa
-                       </span>
-                       <button className="text-[#00AB6D] text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
-                         Ver ficha <ChevronRight size={16} />
-                       </button>
-                    </div>
+                    <button className="w-full bg-gradient-to-r from-[#00AB6D] to-[#008A5C] hover:from-[#009B5F] hover:to-[#007A4E] text-white font-bold py-2.5 rounded-lg text-xs transition-all duration-300 hover:shadow-lg mt-auto flex items-center justify-center gap-2">
+                      Ver Detalles <ChevronRight size={14} />
+                    </button>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           ) : (
@@ -184,67 +181,65 @@ export default function DirectorySection({ selectedRegion, user }) {
         </div>
       </section>
 
-      {/* --- MODAL --- */}
+      {/* --- MODAL (Mantenido igual funcionalmente, ligeros ajustes visuales si necesario) --- */}
       {showModal && selectedCompany && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E305D]/70 backdrop-blur-sm animate-fadeIn">
           <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            
-            {/* --- 1. MODAL HEADER: IMAGEN --- */}
-            {/* CAMBIO: Reducido a h-48 para menos espacio blanco */}
-            <div className="w-full h-48 bg-white flex items-center justify-center p-6 relative border-b border-gray-100">
-                <button 
-                  onClick={closeModal}
-                  className="absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 p-2 rounded-full text-gray-600 transition-colors z-10"
-                >
-                  <X size={20} />
-                </button>
 
-                {selectedCompany.logo?.url ? (
-                  <img 
-                    src={selectedCompany.logo.url} 
-                    alt={selectedCompany.name} 
-                    // max-h-full hace que la imagen sea tan grande como el contenedor le permita
-                    className="max-h-full max-w-full object-contain"
-                  />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-bold text-3xl">
-                    {getInitials(selectedCompany.name)}
-                  </div>
-                )}
+            {/* Header Modal */}
+            <div className="w-full h-40 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6 relative border-b border-gray-100">
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 bg-white/80 hover:bg-white p-2 rounded-full text-gray-600 transition-colors z-10 shadow-sm"
+              >
+                <X size={20} />
+              </button>
+
+              {selectedCompany.logo?.url ? (
+                <img
+                  src={selectedCompany.logo.url}
+                  alt={selectedCompany.name}
+                  className="max-h-full max-w-full object-contain"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-2xl shadow-md">
+                  {getInitials(selectedCompany.name)}
+                </div>
+              )}
             </div>
 
-            {/* --- 2. MODAL TITLE BAR --- */}
-            <div className=" p-5 text-white flex flex-col sm:flex-row justify-between items-center gap-3">
-               <h2 className="text-2xl font-bold leading-tight text-center sm:text-left text-[#1E305D]">
-                  {selectedCompany.name}
-               </h2>
+            {/* Title Bar */}
+            <div className="p-5 text-center border-b border-gray-50">
+              <h2 className="text-2xl font-bold text-[#1E305D]">
+                {selectedCompany.name}
+              </h2>
             </div>
 
-            {/* --- 3. MODAL BODY --- */}
-            <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar bg-gray-50/50">
-              
-              <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm mb-6">
-                <h3 className="text-[#1E305D] font-bold text-lg mb-3 flex items-center gap-2">
-                  <Tag size={20} className="text-[#00AB6D]" />
+            {/* Body */}
+            <div className="p-6 overflow-y-auto custom-scrollbar bg-white">
+
+              <div className="mb-6">
+                <h3 className="text-[#1E305D] font-bold text-sm uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <Tag size={16} className="text-[#00AB6D]" />
                   Descripción
                 </h3>
-                <p className="text-gray-700 leading-relaxed text-sm md:text-base">
+                <p className="text-gray-600 text-sm leading-relaxed p-4 bg-gray-50 rounded-xl border border-gray-100">
                   {selectedCompany.description || "Sin descripción detallada."}
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                 {/* Contacto */}
-                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm space-y-4 h-full">
-                  <h4 className="text-gray-900 font-bold border-b pb-2 mb-2">Contacto</h4>
-                  
+                <div className="space-y-3">
+                  <h4 className="text-gray-900 font-bold text-sm border-b pb-1 mb-2">Contacto</h4>
+
                   {selectedCompany.phone && (
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                        <Phone size={16} />
+                      <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
+                        <Phone size={14} />
                       </div>
-                      <a href={`tel:${selectedCompany.phone}`} className="text-gray-700 hover:text-blue-600 font-medium">
+                      <a href={`tel:${selectedCompany.phone}`} className="text-sm text-gray-700 hover:text-blue-600 font-medium">
                         {selectedCompany.phone}
                       </a>
                     </div>
@@ -252,25 +247,25 @@ export default function DirectorySection({ selectedRegion, user }) {
 
                   {selectedCompany.email && (
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
-                        <Mail size={16} />
+                      <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 flex-shrink-0">
+                        <Mail size={14} />
                       </div>
-                      <a href={`mailto:${selectedCompany.email}`} className="text-gray-700 hover:text-indigo-600 font-medium break-all">
+                      <a href={`mailto:${selectedCompany.email}`} className="text-sm text-gray-700 hover:text-indigo-600 font-medium break-all">
                         {selectedCompany.email}
                       </a>
                     </div>
                   )}
-                  
+
                   {selectedCompany.website_url && (
                     <div className="flex items-center gap-3">
-                       <div className="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center text-teal-600">
-                        <Globe size={16} />
+                      <div className="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center text-teal-600 flex-shrink-0">
+                        <Globe size={14} />
                       </div>
-                      <a 
-                        href={selectedCompany.website_url} 
-                        target="_blank" 
+                      <a
+                        href={selectedCompany.website_url}
+                        target="_blank"
                         rel="noreferrer"
-                        className="text-teal-600 font-medium hover:underline flex items-center gap-1"
+                        className="text-sm text-teal-600 font-medium hover:underline flex items-center gap-1"
                       >
                         Visitar Sitio Web <ExternalLink size={12} />
                       </a>
@@ -279,27 +274,27 @@ export default function DirectorySection({ selectedRegion, user }) {
                 </div>
 
                 {/* Ubicación */}
-                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
-                   <h4 className="text-gray-900 font-bold border-b pb-2 mb-2">Ubicación</h4>
-                   
-                   {selectedCompany.address ? (
-                     <div className="flex items-start gap-3">
-                       <MapPin className="text-red-500 mt-1 flex-shrink-0" size={18} />
-                       <p className="text-gray-700 font-medium">{selectedCompany.address}</p>
-                     </div>
-                   ) : (
-                     <p className="text-gray-400 text-sm italic">Ubicación no especificada</p>
-                   )}
+                <div>
+                  <h4 className="text-gray-900 font-bold text-sm border-b pb-1 mb-2">Ubicación</h4>
+
+                  {selectedCompany.address ? (
+                    <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                      <MapPin className="text-red-500 mt-1 flex-shrink-0" size={16} />
+                      <p className="text-sm text-gray-700 font-medium">{selectedCompany.address}</p>
+                    </div>
+                  ) : (
+                    <p className="text-gray-400 text-sm italic">Ubicación no especificada</p>
+                  )}
                 </div>
 
               </div>
             </div>
 
-            {/* Modal Footer */}
-            <div className="p-4 bg-white border-t flex justify-end">
-              <button 
+            {/* Footer */}
+            <div className="p-4 bg-gray-50 border-t flex justify-end">
+              <button
                 onClick={closeModal}
-                className="px-6 py-2 bg-[#1E305D] text-white rounded-lg font-bold hover:bg-[#152347] transition shadow-md"
+                className="px-6 py-2 bg-[#1E305D] text-white rounded-lg font-bold hover:bg-[#152347] transition shadow-md text-sm"
               >
                 Cerrar
               </button>
