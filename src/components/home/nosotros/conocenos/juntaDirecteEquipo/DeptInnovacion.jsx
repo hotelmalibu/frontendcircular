@@ -9,10 +9,9 @@ import felipeImg from "../../../../../assets/imgEquipo/felipe.jpg";
 export default function DeptInnovacion() {
   const styles = {
     title: "Innovación",
-    headerGradient: "bg-gradient-to-r from-[#E9B501] to-[#716404]",
-    headerText: "text-[#1E305D]",
-    bannerBg: "bg-[#DDEEBC]",
-    bannerNameBg: "bg-[#7F1D8D]",
+    headerGradient: "bg-gradient-to-r from-[#5A1E5F] to-[#9E1981]",
+    headerText: "text-white",
+    bannerNameBg: "bg-[#9E1981]",
     bannerAccent: "bg-gradient-to-r from-[#A3D95B] to-[#007D6A]",
   };
 
@@ -25,11 +24,6 @@ export default function DeptInnovacion() {
     
     <div className="w-full flex justify-center ">
       
-      {/* GRID:
-          - Se mantiene la misma estructura que los otros componentes.
-          - Al ser solo 2 miembros, ocuparán las primeras 2 columnas en desktop.
-          - gap-y-20 para proteger el título flotante.
-      */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-20 max-w-7xl">
         
         {members.map((member, idx) => (

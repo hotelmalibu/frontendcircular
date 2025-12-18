@@ -19,15 +19,15 @@ const DirectorBanner = ({ name, role, image }) => {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="relative w-[72%] max-w-3xl h-[300px] mx-auto"
-    >
+      className="relative w-[90%] md:w-[60%] xl:w-[50%] max-w-2xl min-h-[240px] md:h-[270px] mx-auto overflow-hidden rounded-lg shadow-xl">
+        
       {/* Fondo izquierdo */}
       <div
-        className="absolute top-0 left-0 h-full z-0 bg-[#DCE4F2]"
+        className="absolute top-0 left-0 z-0 bg-[#DCE4F2]"
         style={{
-          width: "72%",
-          borderTopLeftRadius: "60px",
-          clipPath: "polygon(18% 0, 100% 0, 84% 100%, 0% 100%)"
+          width: "60%",
+          height: "100%",
+          clipPath: "none"
         }}
       >
         <div className="absolute bottom-0 left-0 w-full h-2.5 bg-gradient-to-r from-[#A3D95B] to-[#007D6A]" />
@@ -35,28 +35,28 @@ const DirectorBanner = ({ name, role, image }) => {
 
       {/* Texto directora */}
       <div
-        className="absolute top-0 left-0 h-full z-20 flex flex-col justify-center items-center"
-        style={{ width: "72%" }}
+        className="absolute top-0 left-0 h-full z-2 flex flex-col justify-center items-center"
+        style={{ width: "70%" }}
       >
-        <div className="flex flex-col items-center justify-center pl-40 pr-10">
-          <div className="bg-gradient-to-r from-[#02897B] to-[#186B73] text-white text-right text-2xl md:text-3xl font-extrabold py-4 px-10 shadow-md mb-4 tracking-wide leading-none"
-            style={{ clipPath: "polygon(0% 0, 100% 0, 94% 100%, 0% 100%)" }}>
+        <div className="flex flex-col items-center justify-center ">
+          <div className="bg-gradient-to-r from-[#02897B] to-[#186B73] text-white text-right text-lg md:text-3xl font-extrabold py-2 px-6 md:px-8 shadow-md mb-4 tracking-wide leading-none whitespace-nowrap"
+            style={{ clipPath: "none" }}>
             {name}
           </div>
-          <div className="text-black text-lg md:text-xl font-bold leading-tight pl-10 text-right uppercase mb-8">
+          <div className="text-grey text-xs md:text-xl font-bold leading-tight pl-4 text-end md:pl-20 uppercase mb-6">
             DIRECTORA
             <br />
             VISIÓN CIRCULAR
           </div>
-          <div className="pr-44">
+          <div className="pr-2">
             {iconLogo ? (
               <img
                 src={iconLogo}
                 alt="Visión Circular Logo"
-                className="w-14 h-14 md:w-18 md:h-18 object-contain"
+                className="w-10 h-14 md:w-10 md:h-10 object-contain"
               />
             ) : (
-              <div className="w-14 h-14 md:w-18 md:h-18 rounded-full bg-gradient-to-r from-blue-500 to-green-500" />
+              <div className="w-14 h-14 md:w-14 md:h-14 rounded-full bg-gradient-to-r from-blue-500 to-green-500" />
             )}
           </div>
         </div>
@@ -66,8 +66,8 @@ const DirectorBanner = ({ name, role, image }) => {
       <div
         className="absolute top-0 right-0 h-full z-10"
         style={{
-          width: "45%",
-          clipPath: "polygon(28% 0, 100% 0, 74% 100%, 0% 100%)"
+          width: "40%",
+          clipPath: "none"
         }}
       >
         <img

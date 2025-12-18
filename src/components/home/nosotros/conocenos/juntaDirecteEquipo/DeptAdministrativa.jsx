@@ -10,17 +10,16 @@ import jhostinImg from "../../../../../assets/imgEquipo/Jhostinf.jpg";
 export default function DeptAdministrativa() {
   const styles = {
     title: "Administrativa y Financiera",
-    headerGradient: "bg-gradient-to-r from-[#FF0000] to-[#750000]",
+    headerGradient: "bg-gradient-to-r from-[#A53A00] to-[#E15200]",
     headerText: "text-white",
-    bannerBg: "bg-[#F5E6E6]",
-    bannerNameBg: "bg-gradient-to-r from-[#02897B] to-[#186B73]",
+    bannerNameBg: "bg-[#E15200]",
     bannerAccent: "bg-gradient-to-r from-[#A3D95B] to-[#007D6A]",
   };
 
   const members = [
     { role: "Jefe Administrativa", name: "Nubia Rivera", image: nubiaImg },
     { role: "Prof. Contable", name: "Sebastián Gómez", image: sebastianImg },
-    { role: "Analista Administrativo", name: "Jhostin Florez", image: jhostinImg }
+    { role: "Analista administrativo y financiero", name: "Jhostin Florez", image: jhostinImg }
   ];
 
   return (

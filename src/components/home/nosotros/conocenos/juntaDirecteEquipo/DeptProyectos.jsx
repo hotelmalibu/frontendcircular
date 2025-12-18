@@ -5,15 +5,14 @@ import DepartmentBanner from "./DepartmentBanner";
 // Imágenes específicas de Proyectos
 import estebanImg from "../../../../../assets/imgEquipo/defaulimg.png";
 import andersonImg from "../../../../../assets/imgEquipo/defaulimg.png";
-import andresImg from "../../../../../assets/imgEquipo/defaulimg.png";
+import andresImg from "../../../../../assets/imgEquipo/andres.jpg";
 
 export default function DeptProyectos() {
   const styles = {
     title: "Proyectos y Sostenibilidad",
-    headerGradient: "bg-gradient-to-r from-[#5A1E5F] to-[#9E1981]",
+    headerGradient: "bg-gradient-to-r from-[#173B68] to-[#2B65AC]",
     headerText: "text-white",
-    bannerBg: "bg-[#F0E6F5]",
-    bannerNameBg: "bg-gradient-to-r from-[#02897B] to-[#186B73]",
+    bannerNameBg: "bg-[#2B65AC]",
     bannerAccent: "bg-gradient-to-r from-[#A3D95B] to-[#007D6A]",
   };
 
