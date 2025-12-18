@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import HeaderCircular from "../../components/circularmente/HeaderCircular";
 import MapSection from "../../components/circularmente/MapSection";
-import DirectorySection from "../../components/circularmente/DirectorySection";
+
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Circularmente() {
@@ -51,9 +51,6 @@ export default function Circularmente() {
         )}
       </AnimatePresence>
 
-      {/* 🔹 Directorio de empresas */}
-      <DirectorySection selectedRegion={selectedRegion} user={user} />
-
       {/* 🔹 Panel de administración (solo visible si hay usuario logueado) */}
       {user && (
         <motion.div
@@ -61,7 +58,7 @@ export default function Circularmente() {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          
+
         </motion.div>
       )}
     </div>
