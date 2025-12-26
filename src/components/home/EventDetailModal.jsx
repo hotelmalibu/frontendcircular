@@ -126,9 +126,9 @@ export default function EventDetailModal({ eventData, onClose }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col animate-fadeIn">
-        
+
         {/* Header con Gradiente */}
-        <div 
+        <div
           className="relative px-8 py-12 text-white overflow-hidden"
           style={{ background: typeConfig.gradient }}
         >
@@ -151,18 +151,22 @@ export default function EventDetailModal({ eventData, onClose }) {
                 {status.icon}
                 {status.text}
               </span>
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-white/20 backdrop-blur-md border border-white/30">
+                <Tag size={18} />
+                {(() => {
+                  const cat = eventData.category_name || eventData.category || eventData.topic;
+                  if (!cat) return "General";
+                  if (typeof cat === 'object') return cat.name || "General";
+                  return cat;
+                })()}
+              </span>
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-black leading-tight mb-4 max-w-4xl">
+
+            <h1 className="text-3xl md:text-4xl font-black leading-tight max-w-4xl">
               {eventData.title}
             </h1>
 
-            {eventData.category && (
-              <div className="flex items-center gap-2 text-white/90 text-lg">
-                <Tag size={20} />
-                <span className="font-medium">{eventData.category}</span>
-              </div>
-            )}
           </div>
         </div>
 
@@ -181,9 +185,9 @@ export default function EventDetailModal({ eventData, onClose }) {
                     Sobre el Evento
                   </h3>
                   {eventData.description ? (
-                    <div 
+                    <div
                       className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(eventData.description) }} 
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(eventData.description) }}
                     />
                   ) : (
                     <p className="text-gray-500 italic">No hay descripción disponible para este evento.</p>
@@ -226,12 +230,27 @@ export default function EventDetailModal({ eventData, onClose }) {
                   </a>
                 )}
 
-                {/* Fecha y Hora */}
                 <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-5">Fecha y Hora</h3>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-5">Detalles</h3>
                   <div className="space-y-5">
                     <div className="flex gap-4">
+                      <Tag size={22} className="text-orange-600 mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="font-bold text-gray-900 capitalize">
+                          {(() => {
+                            const cat = eventData.category_name || eventData.category || eventData.topic;
+                            if (!cat) return "General";
+                            if (typeof cat === 'object') return cat.name || "General";
+                            return cat;
+                          })()}
+                        </p>
+                        <p className="text-sm text-gray-500">Categoría</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4">
                       <Calendar size={22} className="text-blue-600 mt-1 flex-shrink-0" />
+
                       <div>
                         <p className="font-bold text-gray-900 capitalize">{formatDate(eventData.start_datetime)}</p>
                         <p className="text-sm text-gray-500">Inicio del evento</p>
@@ -275,7 +294,7 @@ export default function EventDetailModal({ eventData, onClose }) {
                     <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-5">Organizado por</h3>
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                        {eventData.organizer_name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase()}
+                        {eventData.organizer_name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
                       </div>
                       <div>
                         <p className="font-bold text-gray-900">{eventData.organizer_name}</p>
@@ -295,10 +314,8 @@ export default function EventDetailModal({ eventData, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="px-8 py-6 bg-white border-t border-gray-200 flex justify-between items-center">
-          <p className="text-sm text-gray-500">
-            ID del evento: {eventData.id}
-          </p>
+        <div className="px-8 py-6 bg-white border-t border-gray-200 flex justify-end items-center">
+
           <button
             onClick={onClose}
             className="px-8 py-3 bg-gray-200 text-gray-800 font-bold rounded-xl hover:bg-gray-300 transition-colors"

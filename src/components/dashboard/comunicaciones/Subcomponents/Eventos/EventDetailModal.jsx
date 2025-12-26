@@ -43,24 +43,24 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
     if (isAllDay) {
       return `Todo el día - ${formatDate(startDate)}`;
     }
-    
+
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     const startFormatted = start.toLocaleDateString("es-CO", {
       day: "numeric",
       month: "short",
       hour: "2-digit",
       minute: "2-digit",
     });
-    
+
     const endFormatted = end.toLocaleDateString("es-CO", {
       day: "numeric",
       month: "short",
       hour: "2-digit",
       minute: "2-digit",
     });
-    
+
     return `${startFormatted} - ${endFormatted}`;
   };
 
@@ -208,19 +208,25 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
           {/* Event Details Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
             {/* Category */}
-            {eventData.category && (
-              <div className="flex items-start gap-3">
-                <Tag className="text-gray-500 mt-1 flex-shrink-0" size={20} />
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Categoría</p>
-                  <p className="text-gray-900">{eventData.category}</p>
-                </div>
+            <div className="flex items-start gap-3">
+              <Tag className="text-gray-500 mt-1 flex-shrink-0" size={20} />
+              <div>
+                <p className="text-sm font-medium text-gray-500">Categoría</p>
+                <p className="text-gray-900">
+                  {(() => {
+                    const cat = eventData.category_name || eventData.category || eventData.topic;
+                    if (!cat) return "General";
+                    if (typeof cat === 'object') return cat.name || "General";
+                    return cat;
+                  })()}
+                </p>
               </div>
-            )}
+            </div>
+
 
             {/* Event Type */}
             <div className="flex items-start gap-3">
-              {eventData.event_type === 'remote' ? 
+              {eventData.event_type === 'remote' ?
                 <Video className="text-gray-500 mt-1 flex-shrink-0" size={20} /> :
                 <MapPin className="text-gray-500 mt-1 flex-shrink-0" size={20} />
               }
@@ -241,8 +247,8 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
                     {eventData.is_all_day ? 'Fecha' : 'Fecha y Hora de Inicio'}
                   </p>
                   <p className="text-gray-900">
-                    {eventData.is_all_day ? 
-                      formatDate(eventData.start_datetime) : 
+                    {eventData.is_all_day ?
+                      formatDate(eventData.start_datetime) :
                       formatDateTime(eventData.start_datetime)
                     }
                   </p>
@@ -259,8 +265,8 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
                     {eventData.is_all_day ? '' : 'Fecha y Hora de Fin'}
                   </p>
                   <p className="text-gray-900">
-                    {eventData.is_all_day ? 
-                      formatDate(eventData.end_datetime) : 
+                    {eventData.is_all_day ?
+                      formatDate(eventData.end_datetime) :
                       formatDateTime(eventData.end_datetime)
                     }
                   </p>
@@ -296,8 +302,8 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
               <div>
                 <p className="text-sm font-medium text-gray-500">Registro</p>
                 <p className="text-gray-900">
-                  {eventData.requires_registration ? 
-                    `Requiere registro${eventData.max_attendees ? ` (máx. ${eventData.max_attendees} asistentes)` : ''}` : 
+                  {eventData.requires_registration ?
+                    `Requiere registro${eventData.max_attendees ? ` (máx. ${eventData.max_attendees} asistentes)` : ''}` :
                     'No requiere registro'
                   }
                 </p>
@@ -348,15 +354,15 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
               {eventData.event_type === 'remote' ? <Video size={20} /> : <MapPin size={20} />}
               {eventData.event_type === 'remote' ? 'Información de Reunión' : 'Ubicación'}
             </h3>
-            
+
             {eventData.event_type === 'remote' ? (
               <div className="bg-white p-4 rounded-lg border border-gray-200">
                 {eventData.meeting_link ? (
                   <div className="flex items-center gap-2 text-blue-600">
                     <LinkIcon size={20} />
-                    <a 
-                      href={eventData.meeting_link} 
-                      target="_blank" 
+                    <a
+                      href={eventData.meeting_link}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="hover:underline font-medium"
                     >
@@ -378,14 +384,14 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
                     <p className="text-gray-900">{eventData.location_name}</p>
                   </div>
                 )}
-                
+
                 {eventData.location_address && (
                   <div>
                     <p className="text-sm font-medium text-gray-500">Dirección</p>
                     <p className="text-gray-900">{eventData.location_address}</p>
                   </div>
                 )}
-                
+
                 {(eventData.latitude && eventData.longitude) && (
                   <div>
                     <p className="text-sm font-medium text-gray-500">Coordenadas</p>
@@ -394,7 +400,7 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
                     </p>
                   </div>
                 )}
-                
+
                 {!eventData.location_name && !eventData.location_address && (
                   <div className="flex items-center gap-2 text-gray-500">
                     <AlertCircle size={20} />
@@ -448,10 +454,6 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
               Información Adicional
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              <div className="flex justify-between p-2 bg-gray-50 rounded">
-                <span className="text-gray-600">ID:</span>
-                <span className="font-mono text-gray-900">{eventData.id}</span>
-              </div>
               {eventData.created_by && (
                 <div className="flex justify-between p-2 bg-gray-50 rounded">
                   <span className="text-gray-600">Creado por:</span>

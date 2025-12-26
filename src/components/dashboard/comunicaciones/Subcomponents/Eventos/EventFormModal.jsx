@@ -1,21 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { 
-  X, 
-  Save, 
-  Calendar, 
-  MapPin, 
-  Video, 
-  Users, 
-  Globe, 
-  Link as LinkIcon, 
-  AlertCircle, 
-  Clock, 
+import {
+  X,
+  Save,
+  Calendar,
+  MapPin,
+  Video,
+  Users,
+  Globe,
+  Link as LinkIcon,
+  AlertCircle,
+  Clock,
   CheckCircle,
   Type,
   AlignLeft
 } from "lucide-react";
 import { createSchedule, updateSchedule } from "../../../../../api/scheduleApi";
+import { getAllCategories } from "../../../../../api/categoriesApi";
+
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -33,11 +35,11 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
   const editorRef = useRef(null);
   const editorInstanceRef = useRef(null);
   const hasInitialized = useRef(false);
-  
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    category: "",
+    category_id: "",
     event_type: "in_person",
     start_datetime: "",
     end_datetime: "",
@@ -50,12 +52,15 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     meeting_link: "",
     requires_registration: false,
     max_attendees: "",
-    published_at: "",
-    status: "draft",
+    published_at: null,
+    status: "published",
   });
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
 
   // ... (Lógica de inicialización y carga de datos se mantiene igual)
   useEffect(() => {
@@ -63,7 +68,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       const newFormData = {
         title: eventData.title || "",
         description: eventData.description || "",
-        category: eventData.category || "",
+        category_id: eventData.category_id || "",
         event_type: eventData.event_type || "in_person",
         start_datetime: eventData.start_datetime ? formatDateTimeForInput(eventData.start_datetime) : "",
         end_datetime: eventData.end_datetime ? formatDateTimeForInput(eventData.end_datetime) : "",
@@ -76,12 +81,12 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         meeting_link: eventData.meeting_link || "",
         requires_registration: eventData.requires_registration || false,
         max_attendees: eventData.max_attendees ? eventData.max_attendees.toString() : "",
-        published_at: eventData.published_at ? formatDateForInput(eventData.published_at) : "",
+        published_at: eventData.published_at ? formatDateForInput(eventData.published_at) : null,
         status: eventData.status || "draft",
       };
-      
+
       setFormData(newFormData);
-      
+
       setTimeout(() => {
         if (editorInstanceRef.current) {
           try {
@@ -93,6 +98,36 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       }, 100);
     }
   }, [eventData, isEditing]);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      setCategoriesLoading(true);
+      const response = await getAllCategories();
+      let categoriesArray = [];
+      if (response?.data?.items && Array.isArray(response.data.items)) {
+        categoriesArray = response.data.items;
+      } else if (Array.isArray(response)) {
+        categoriesArray = response;
+      } else if (response?.data && Array.isArray(response.data)) {
+        categoriesArray = response.data;
+      } else if (response?.categories && Array.isArray(response.categories)) {
+        categoriesArray = response.categories;
+      } else {
+        categoriesArray = response ? [response] : [];
+      }
+      setCategories(categoriesArray);
+    } catch (err) {
+      console.error("Error loading categories:", err);
+      setCategories([]);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     const initEditor = async () => {
@@ -128,7 +163,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     initEditor();
     return () => {
       if (editorInstanceRef.current) {
-        editorInstanceRef.current.destroy().catch(() => {});
+        editorInstanceRef.current.destroy().catch(() => { });
         editorInstanceRef.current = null;
       }
     };
@@ -138,7 +173,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
   const formatDateTimeForInput = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toISOString().slice(0, 16); 
+    return date.toISOString().slice(0, 16);
   };
 
   const formatDateForInput = (dateString) => {
@@ -153,7 +188,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-    
+
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
@@ -200,17 +235,12 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         try { return new Date(value).toISOString(); } catch (e) { return value; }
       };
 
-      let publishedAt = null;
-      if (formData.published_at) {
-        publishedAt = toIsoDateTime(formData.published_at);
-      } else if (formData.status === "published") {
-        publishedAt = new Date().toISOString();
-      }
+      const publishedAt = formData.published_at ? toIsoDateTime(formData.published_at) : null;
 
       const dataToSend = {
         title: formData.title,
         description: formData.description || "",
-        category: formData.category || "",
+        category_id: formData.category_id || null,
         event_type: formData.event_type,
         start_datetime: toIsoDateTime(formData.start_datetime),
         end_datetime: toIsoDateTime(formData.end_datetime),
@@ -247,11 +277,11 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
   // --- Styles ---
   const inputClass = `w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm ${errors.title ? "border-orange-300" : "border-gray-200"}`;
   const labelClass = "block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1";
-  
+
   return (
     <div className="fixed inset-0 z-50 bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
-        
+
         {/* Header con Azul Profundo */}
         <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100" style={{ backgroundColor: BRAND.darkBlue }}>
           <div>
@@ -272,60 +302,59 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 bg-gray-50">
           <div className="space-y-8">
-            
+
             {/* SECCIÓN 1: Información General */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
               <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                 <Type size={16} style={{ color: BRAND.blue }} /> Información Básica
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
-                 {/* Estado */}
+                {/* Estado */}
                 <div>
-                   <label className={labelClass}>Estado *</label>
-                   <select
-                     name="status"
-                     value={formData.status}
-                     onChange={handleChange}
-                     className={inputClass}
-                     style={{ "--tw-ring-color": BRAND.lightBlue }}
-                   >
-                     <option value="draft">Borrador</option>
-                     <option value="published">Publicado</option>
-                   </select>
-                </div>
-
-                {/* Tipo de Evento */}
-                <div>
-                   <label className={labelClass}>Modalidad</label>
-                   <select
-                     name="event_type"
-                     value={formData.event_type}
-                     onChange={handleChange}
-                     className={inputClass}
-                     style={{ "--tw-ring-color": BRAND.lightBlue }}
-                   >
-                     <option value="in_person">Presencial</option>
-                     <option value="remote">Remoto / Virtual</option>
-                   </select>
-                </div>
-
-                 {/* Categoría */}
-                 <div>
-                  <label className={labelClass}>Categoría</label>
+                  <label className={labelClass}>Estado *</label>
                   <select
-                    name="category"
-                    value={formData.category}
+                    name="status"
+                    value={formData.status}
                     onChange={handleChange}
                     className={inputClass}
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
                   >
-                    <option value="">Seleccionar...</option>
-                    <option value="conference">Conferencia</option>
-                    <option value="workshop">Taller</option>
-                    <option value="webinar">Webinar</option>
-                    <option value="Reciclaje">Reciclaje</option>
-                    <option value="Políticas Públicas">Políticas Públicas</option>
+                    <option value="published">Publicado</option>
+                    <option value="draft">Borrador</option>
+                  </select>
+                </div>
+
+                {/* Tipo de Evento */}
+                <div>
+                  <label className={labelClass}>Modalidad</label>
+                  <select
+                    name="event_type"
+                    value={formData.event_type}
+                    onChange={handleChange}
+                    className={inputClass}
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                  >
+                    <option value="in_person">Presencial</option>
+                    <option value="remote">Remoto / Virtual</option>
+                  </select>
+                </div>
+
+                {/* Categoría */}
+                <div>
+                  <label className={labelClass}>Categoría</label>
+                  <select
+                    name="category_id"
+                    value={formData.category_id}
+                    onChange={handleChange}
+                    className={inputClass}
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    disabled={loading || categoriesLoading}
+                  >
+                    <option value="">{categoriesLoading ? "Cargando..." : "-- Seleccione --"}</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>{category.name}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -340,90 +369,90 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
                   onChange={handleChange}
                   placeholder="Ej: Congreso de Economía Circular 2025"
                   className={inputClass}
-                  style={{ 
+                  style={{
                     "--tw-ring-color": BRAND.lightBlue,
-                    borderColor: errors.title ? BRAND.orange : '' 
+                    borderColor: errors.title ? BRAND.orange : ''
                   }}
                 />
-                {errors.title && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12}/> {errors.title}</p>}
+                {errors.title && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.title}</p>}
               </div>
 
               {/* Descripción (CKEditor) */}
               <div>
-                <label className={labelClass}><AlignLeft size={12} className="inline mr-1"/> Descripción</label>
+                <label className={labelClass}><AlignLeft size={12} className="inline mr-1" /> Descripción</label>
                 <div className="prose max-w-none border rounded-xl overflow-hidden" style={{ borderColor: '#E5E7EB' }}>
-                   <div ref={editorRef}></div>
+                  <div ref={editorRef}></div>
                 </div>
               </div>
             </div>
 
             {/* SECCIÓN 2: Fecha y Hora */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-               <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                 <Calendar size={16} style={{ color: BRAND.darkGreen }} /> Fecha y Hora
               </h3>
 
               <div className="flex items-center gap-2 mb-4">
-                  <input
-                    type="checkbox"
-                    name="is_all_day"
-                    checked={formData.is_all_day}
-                    onChange={handleChange}
-                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
-                    style={{ color: BRAND.blue }}
-                  />
-                  <label className="text-sm text-gray-700 font-medium">Evento de día completo</label>
+                <input
+                  type="checkbox"
+                  name="is_all_day"
+                  checked={formData.is_all_day}
+                  onChange={handleChange}
+                  className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  style={{ color: BRAND.blue }}
+                />
+                <label className="text-sm text-gray-700 font-medium">Evento de día completo</label>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
-                 <div>
-                    <label className={labelClass}>Inicio *</label>
-                    <input
-                      type="datetime-local"
-                      name="start_datetime"
-                      value={formData.start_datetime}
-                      onChange={handleChange}
-                      className={inputClass}
-                      style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    />
-                    {errors.start_datetime && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.start_datetime}</p>}
-                 </div>
-                 <div>
-                    <label className={labelClass}>Fin *</label>
-                    <input
-                      type="datetime-local"
-                      name="end_datetime"
-                      value={formData.end_datetime}
-                      onChange={handleChange}
-                      className={inputClass}
-                      style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    />
-                     {errors.end_datetime && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.end_datetime}</p>}
-                 </div>
-              </div>
-
-              <div>
-                  <label className={labelClass}><Globe size={12} className="inline mr-1"/> Zona Horaria</label>
-                  <select
-                    name="timezone"
-                    value={formData.timezone}
+                <div>
+                  <label className={labelClass}>Inicio *</label>
+                  <input
+                    type="datetime-local"
+                    name="start_datetime"
+                    value={formData.start_datetime}
                     onChange={handleChange}
                     className={inputClass}
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  >
-                    <option value="America/Bogota">Bogotá (GMT-5)</option>
-                    <option value="America/Mexico_City">Ciudad de México (GMT-6)</option>
-                    <option value="America/Caracas">Caracas (GMT-4)</option>
-                    <option value="America/Lima">Lima (GMT-5)</option>
-                  </select>
+                  />
+                  {errors.start_datetime && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.start_datetime}</p>}
+                </div>
+                <div>
+                  <label className={labelClass}>Fin *</label>
+                  <input
+                    type="datetime-local"
+                    name="end_datetime"
+                    value={formData.end_datetime}
+                    onChange={handleChange}
+                    className={inputClass}
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                  />
+                  {errors.end_datetime && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.end_datetime}</p>}
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}><Globe size={12} className="inline mr-1" /> Zona Horaria</label>
+                <select
+                  name="timezone"
+                  value={formData.timezone}
+                  onChange={handleChange}
+                  className={inputClass}
+                  style={{ "--tw-ring-color": BRAND.lightBlue }}
+                >
+                  <option value="America/Bogota">Bogotá (GMT-5)</option>
+                  <option value="America/Mexico_City">Ciudad de México (GMT-6)</option>
+                  <option value="America/Caracas">Caracas (GMT-4)</option>
+                  <option value="America/Lima">Lima (GMT-5)</option>
+                </select>
               </div>
             </div>
 
             {/* SECCIÓN 3: Ubicación */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-               <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                {formData.event_type === 'remote' 
-                  ? <><Video size={16} style={{ color: BRAND.blue }} /> Conexión Remota</> 
+              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                {formData.event_type === 'remote'
+                  ? <><Video size={16} style={{ color: BRAND.blue }} /> Conexión Remota</>
                   : <><MapPin size={16} style={{ color: BRAND.orange }} /> Ubicación Física</>}
               </h3>
 
@@ -431,7 +460,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
                 <div>
                   <label className={labelClass}>Enlace de Reunión *</label>
                   <div className="relative">
-                    <LinkIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16}/>
+                    <LinkIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                     <input
                       type="url"
                       name="meeting_link"
@@ -459,7 +488,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
                     />
                     {errors.location_name && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.location_name}</p>}
                   </div>
-                  
+
                   <div>
                     <label className={labelClass}>Dirección *</label>
                     <input
@@ -471,7 +500,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
                       className={inputClass}
                       style={{ "--tw-ring-color": BRAND.lightBlue }}
                     />
-                     {errors.location_address && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.location_address}</p>}
+                    {errors.location_address && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.location_address}</p>}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -506,54 +535,41 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
 
             {/* SECCIÓN 4: Registro */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-               <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                 <Users size={16} style={{ color: BRAND.blue }} /> Asistentes
               </h3>
 
               <div className="flex items-center gap-2 mb-4">
-                  <input
-                    type="checkbox"
-                    name="requires_registration"
-                    checked={formData.requires_registration}
-                    onChange={handleChange}
-                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
-                    style={{ color: BRAND.blue }}
-                  />
-                  <label className="text-sm text-gray-700 font-medium">Requiere registro previo</label>
+                <input
+                  type="checkbox"
+                  name="requires_registration"
+                  checked={formData.requires_registration}
+                  onChange={handleChange}
+                  className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  style={{ color: BRAND.blue }}
+                />
+                <label className="text-sm text-gray-700 font-medium">Requiere registro previo</label>
               </div>
 
               {formData.requires_registration && (
                 <div>
-                   <label className={labelClass}>Cupo Máximo</label>
-                   <input
-                      type="number"
-                      name="max_attendees"
-                      value={formData.max_attendees}
-                      onChange={handleChange}
-                      placeholder="Ej: 100"
-                      className={inputClass}
-                      style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    />
-                    {errors.max_attendees && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.max_attendees}</p>}
+                  <label className={labelClass}>Cupo Máximo</label>
+                  <input
+                    type="number"
+                    name="max_attendees"
+                    value={formData.max_attendees}
+                    onChange={handleChange}
+                    placeholder="Ej: 100"
+                    className={inputClass}
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                  />
+                  {errors.max_attendees && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.max_attendees}</p>}
                 </div>
               )}
             </div>
 
-            {/* Fecha Publicación (Condicional) */}
-            {formData.status === "published" && (
-               <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                  <label className={labelClass} style={{color: BRAND.darkBlue}}>Fecha de Publicación Programada</label>
-                  <input
-                    type="date"
-                    name="published_at"
-                    value={formData.published_at}
-                    onChange={handleChange}
-                    className={inputClass}
-                    style={{ "--tw-ring-color": BRAND.lightBlue, borderColor: BRAND.lightBlue }}
-                  />
-               </div>
-            )}
-            
+
+
           </div>
         </form>
 
