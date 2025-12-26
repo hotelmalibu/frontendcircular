@@ -68,14 +68,17 @@ export default function ProjectsSection() {
         }
 
         // Map API data to component expected format
-        const mappedProjects = projectsArray.map(project => ({
-          id: project.id,
-          title: project.title,
-          type: project.category,
-          color: categoryColors[project.category] || "#1E305D",
-          image: categoryImages[project.category] || "/assets/home/Proyectos/proyecto1.png",
-          shortDescription: project.description || "Sin descripción disponible",
-        }));
+        const mappedProjects = projectsArray.map(project => {
+          const catName = project.category_name || project.category;
+          return {
+            id: project.id,
+            title: project.title,
+            type: catName || "General",
+            color: categoryColors[catName] || "#1E305D",
+            image: categoryImages[catName] || "/assets/home/Proyectos/proyecto1.png",
+            shortDescription: project.description || "Sin descripción disponible",
+          };
+        });
 
         setProjects(mappedProjects);
       } catch (err) {
@@ -160,7 +163,7 @@ export default function ProjectsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
-              
+
               // CAMBIO 1: Reduje la altura de h-[340px] a h-[280px] para que sea menos alta
               className="group relative w-full h-[280px] rounded-[1.5rem] overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
             >
@@ -193,7 +196,7 @@ export default function ProjectsSection() {
                   <h3 className="text-xl font-bold text-white mb-2 leading-tight">
                     {project.title}
                   </h3>
-                  
+
                   <div className="w-10 h-1 bg-[#00AB6D] mb-3 rounded-full transition-all duration-500 group-hover:w-full opacity-80"></div>
 
                   <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-500 ease-out">
@@ -201,9 +204,9 @@ export default function ProjectsSection() {
                       <p className="text-gray-200 text-xs leading-relaxed mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100 line-clamp-3">
                         {project.shortDescription}
                       </p>
-                      
-                      <Link 
-                        to={`/proyectos/${project.id}`} 
+
+                      <Link
+                        to={`/proyectos/${project.id}`}
                         className="flex items-center gap-2 text-white text-xs font-semibold group/btn w-fit hover:text-[#00AB6D] transition-colors"
                       >
                         Ver detalles

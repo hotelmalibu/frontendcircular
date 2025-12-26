@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { 
-  X, 
-  Save, 
-  User, 
-  Tag, 
-  AlertCircle, 
-  Type, 
+import {
+  X,
+  Save,
+  User,
+  Tag,
+  AlertCircle,
+  Type,
   AlignLeft,
-  FileText 
+  FileText
 } from "lucide-react";
 import { createProject, updateProject } from "../../../../../api/projectsApi";
+import { getAllCategories } from "../../../../../api/categoriesApi";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -28,33 +29,54 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
   const editorRef = useRef(null);
   const editorInstanceRef = useRef(null);
   const hasInitialized = useRef(false);
-  
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    category: "",
+    category_id: "",
     author: "",
   });
 
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [errors, setErrors] = useState({});
-  
-  // Project-specific categories (matching the image mapping)
-  const projectCategories = [
-    { id: "Fortalecimiento", name: "Fortalecimiento" },
-    { id: "Innovacion", name: "Innovación" },
-    { id: "Sensibilizacion", name: "Sensibilización" },
-    { id: "Investigacion", name: "Investigación" },
-    { id: "Produccion", name: "Producción" },
-    { id: "Economia", name: "Economía" },
-  ];
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const response = await getAllCategories();
+
+        let categoriesArray = [];
+        if (response?.data?.items && Array.isArray(response.data.items)) {
+          categoriesArray = response.data.items;
+        } else if (Array.isArray(response)) {
+          categoriesArray = response;
+        } else if (response?.data && Array.isArray(response.data)) {
+          categoriesArray = response.data;
+        } else if (response?.categories && Array.isArray(response.categories)) {
+          categoriesArray = response.categories;
+        }
+
+        setCategories(categoriesArray);
+      } catch (err) {
+        console.error("Error loading categories for projects:", err);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (isEditing && projectData) {
       setFormData({
         title: projectData.title || "",
         description: projectData.description || "",
-        category: projectData.category || "",
+        category_id: projectData.category_id || "",
         author: projectData.author || "",
       });
     }
@@ -95,7 +117,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
     initEditor();
     return () => {
       if (editorInstanceRef.current) {
-        editorInstanceRef.current.destroy().catch(() => {});
+        editorInstanceRef.current.destroy().catch(() => { });
         editorInstanceRef.current = null;
       }
     };
@@ -156,7 +178,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
       const dataToSend = {
         title: formData.title,
         description: descriptionContent || "",
-        category: formData.category || "",
+        category_id: formData.category_id || null,
         author: formData.author || "",
       };
 
@@ -172,7 +194,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
       console.error("Error saving project:", err);
       let errorMessage = "Error al guardar el proyecto";
       if (err.response?.data?.message) errorMessage = err.response.data.message;
-      
+
       if (err.response?.data?.errors) {
         const serverErrors = err.response.data.errors;
         const mapped = {};
@@ -195,7 +217,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
   return (
     <div className="fixed inset-0 z-50 bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
-        
+
         {/* Header con Azul Profundo */}
         <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100" style={{ backgroundColor: BRAND.darkBlue }}>
           <div>
@@ -219,7 +241,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
 
             {/* SECCIÓN 1: Detalles Principales */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-               <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                 <FileText size={16} style={{ color: BRAND.blue }} /> Detalles del Proyecto
               </h3>
 
@@ -227,36 +249,36 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
               <div className="mb-5">
                 <label className={labelClass}>Título del Proyecto *</label>
                 <div className="relative">
-                   <Type className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16}/>
-                   <input
+                  <Type className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                  <input
                     type="text"
                     name="title"
                     value={formData.title}
                     onChange={handleChange}
                     placeholder="Ej: Estrategia de Reciclaje 2025"
                     className={`${inputClass} pl-10`}
-                    style={{ 
+                    style={{
                       "--tw-ring-color": BRAND.lightBlue,
-                      borderColor: errors.title ? BRAND.orange : '' 
+                      borderColor: errors.title ? BRAND.orange : ''
                     }}
                     disabled={loading}
                   />
                 </div>
-                {errors.title && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12}/> {errors.title}</p>}
+                {errors.title && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.title}</p>}
               </div>
 
               {/* Description (CKEditor) */}
               <div>
-                <label className={labelClass}><AlignLeft size={12} className="inline mr-1"/> Descripción / Contenido</label>
+                <label className={labelClass}><AlignLeft size={12} className="inline mr-1" /> Descripción / Contenido</label>
                 <div className="prose max-w-none border rounded-xl overflow-hidden bg-white" style={{ borderColor: '#E5E7EB' }}>
-                   <div ref={editorRef}></div>
+                  <div ref={editorRef}></div>
                 </div>
               </div>
             </div>
 
             {/* SECCIÓN 2: Clasificación */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-               <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                 <Tag size={16} style={{ color: BRAND.darkGreen }} /> Clasificación
               </h3>
 
@@ -265,15 +287,15 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                 <div>
                   <label className={labelClass}>Categoría</label>
                   <select
-                    name="category"
-                    value={formData.category}
+                    name="category_id"
+                    value={formData.category_id}
                     onChange={handleChange}
                     className={inputClass}
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    disabled={loading}
+                    disabled={loading || categoriesLoading}
                   >
-                    <option value="">-- Seleccionar --</option>
-                    {projectCategories.map((category) => (
+                    <option value="">{categoriesLoading ? "Cargando..." : "-- Seleccionar --"}</option>
+                    {categories.map((category) => (
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>
@@ -285,8 +307,8 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                 <div>
                   <label className={labelClass}>Autor</label>
                   <div className="relative">
-                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16}/>
-                     <input
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                    <input
                       type="text"
                       name="author"
                       value={formData.author}

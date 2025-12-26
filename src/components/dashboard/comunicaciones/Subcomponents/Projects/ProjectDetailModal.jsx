@@ -66,18 +66,18 @@ export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
           </h1>
 
           {/* Category Image Section */}
-          {categoryImages[projectData.category] && (
+          {(categoryImages[projectData.category_name] || categoryImages[projectData.category]) && (
             <div className="mb-6">
               <div className="aspect-video rounded-xl overflow-hidden shadow-lg">
                 <CORSImage
-                  src={categoryImages[projectData.category]}
-                  alt={`Categoría: ${projectData.category}`}
+                  src={categoryImages[projectData.category_name] || categoryImages[projectData.category]}
+                  alt={`Categoría: ${projectData.category_name || projectData.category}`}
                   className="w-full h-full object-cover"
                   fallbackSrc="/assets/placeholder-news.jpg"
                 />
               </div>
               <p className="text-sm text-gray-500 mt-2">
-                Categoría: {projectData.category}
+                Categoría: {projectData.category_name || projectData.category || "General"}
               </p>
             </div>
           )}
@@ -85,15 +85,13 @@ export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
           {/* Metadata Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
             {/* Category */}
-            {projectData.category && (
-              <div className="flex items-start gap-3">
-                <Tag className="text-gray-500 mt-1 flex-shrink-0" size={20} />
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Categoría</p>
-                  <p className="text-gray-900">{projectData.category}</p>
-                </div>
+            <div className="flex items-start gap-3">
+              <Tag className="text-gray-500 mt-1 flex-shrink-0" size={20} />
+              <div>
+                <p className="text-sm font-medium text-gray-500">Categoría</p>
+                <p className="text-gray-900">{projectData.category_name || projectData.category || "General"}</p>
               </div>
-            )}
+            </div>
 
             {/* Author */}
             {projectData.author && (
@@ -157,10 +155,7 @@ export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
               Información Adicional
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              <div className="flex justify-between p-2 bg-gray-50 rounded">
-                <span className="text-gray-600">ID:</span>
-                <span className="font-mono text-gray-900">{projectData.id}</span>
-              </div>
+
               {projectData.created_by && (
                 <div className="flex justify-between p-2 bg-gray-50 rounded">
                   <span className="text-gray-600">Creado por:</span>

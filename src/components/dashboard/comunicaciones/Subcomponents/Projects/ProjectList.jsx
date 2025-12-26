@@ -105,6 +105,7 @@ export default function ProjectList() {
           item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.category_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.category?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -158,7 +159,7 @@ export default function ProjectList() {
 
   return (
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
-      
+
       {/* ESPACIADOR SUPERIOR */}
       <div className="w-full"></div>
 
@@ -218,8 +219,8 @@ export default function ProjectList() {
               className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
             >
               {/* Borde Superior de Acento */}
-              <div 
-                className="h-1.5 w-full absolute top-0 left-0" 
+              <div
+                className="h-1.5 w-full absolute top-0 left-0"
                 style={{ backgroundColor: BRAND.blue }}
               ></div>
 
@@ -227,8 +228,7 @@ export default function ProjectList() {
                 {/* Header: Categoría */}
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg uppercase tracking-wide bg-blue-50 text-blue-700">
-                     <Tag size={12} />
-                     <span>{item.category || "General"}</span>
+                    <span>{item.category_name || item.category || "General"}</span>
                   </div>
                 </div>
 
@@ -239,40 +239,40 @@ export default function ProjectList() {
 
                 {/* Imagen del Proyecto */}
                 <div className="mb-4 rounded-xl overflow-hidden border border-gray-100 h-40 bg-gray-50 flex items-center justify-center relative">
-                   {categoryImages[item.category] ? (
-                      <img 
-                        src={categoryImages[item.category]} 
-                        alt={item.title}
-                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                      />
-                   ) : item.image ? (
-                       <CORSImage 
-                         src={item.image} 
-                         alt={item.title} 
-                         className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                       />
-                   ) : (
-                       <div className="flex flex-col items-center justify-center text-gray-400">
-                          <ImageIcon size={32} className="mb-2 opacity-50" />
-                          <span className="text-xs">Sin imagen</span>
-                       </div>
-                   )}
-                   {/* Fallback div si la imagen falla */}
-                   <div className="hidden absolute inset-0 flex-col items-center justify-center text-gray-400 bg-gray-50">
+                  {categoryImages[item.category_name] || categoryImages[item.category] ? (
+                    <img
+                      src={categoryImages[item.category_name] || categoryImages[item.category]}
+                      alt={item.title}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : item.image ? (
+                    <CORSImage
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-gray-400">
                       <ImageIcon size={32} className="mb-2 opacity-50" />
-                      <span className="text-xs">Imagen no disponible</span>
-                   </div>
+                      <span className="text-xs">Sin imagen</span>
+                    </div>
+                  )}
+                  {/* Fallback div si la imagen falla */}
+                  <div className="hidden absolute inset-0 flex-col items-center justify-center text-gray-400 bg-gray-50">
+                    <ImageIcon size={32} className="mb-2 opacity-50" />
+                    <span className="text-xs">Imagen no disponible</span>
+                  </div>
                 </div>
 
                 {/* Descripción */}
                 <div className="text-xs text-gray-500 mb-5 line-clamp-3 leading-relaxed flex-grow">
                   {item.description ? (
-                    <div dangerouslySetInnerHTML={{ 
-                      __html: DOMPurify.sanitize(String(item.description)).slice(0, 150) + (item.description.length > 150 ? '...' : '') 
+                    <div dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(String(item.description)).slice(0, 150) + (item.description.length > 150 ? '...' : '')
                     }} />
                   ) : (
                     "Sin descripción disponible..."
