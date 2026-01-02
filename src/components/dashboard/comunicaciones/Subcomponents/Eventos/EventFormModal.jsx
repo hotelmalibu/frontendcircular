@@ -66,7 +66,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
   useEffect(() => {
     if (isEditing && eventData) {
       const description = eventData.description || "";
-      const catId = typeof eventData.category === 'object' ? (eventData.category?.id || "") : (eventData.category_id || "");
+      const catId = (eventData.category && typeof eventData.category === 'object') ? (eventData.category?.id || "") : (eventData.category_id || "");
 
       console.log("EventFormModal - Loading Data:", {
         isEditing,

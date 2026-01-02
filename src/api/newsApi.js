@@ -150,14 +150,22 @@ export const createNews = async (newsData) => {
  * @returns {Promise} - Updated news object
  */
 export const updateNews = async (newsId, newsData) => {
-  // If FormData, let axios set the content-type automatically (multipart/form-data)
-  // If JSON data, explicitly set application/json
-  const config = newsData instanceof FormData ? {} : {
+  // If FormData, use POST with _method spoofing for better backend compatibility
+  if (newsData instanceof FormData) {
+    // Only append if it doesn't already exist
+    if (!newsData.has('_method')) {
+      newsData.append('_method', 'PUT');
+    }
+    const response = await api.post(`${NEWS_ENDPOINT}/${newsId}`, newsData);
+    return response.data;
+  }
+
+  // If JSON data
+  const config = {
     headers: {
       'Content-Type': 'application/json',
     },
   };
-
   const response = await api.put(`${NEWS_ENDPOINT}/${newsId}`, newsData, config);
   return response.data;
 };

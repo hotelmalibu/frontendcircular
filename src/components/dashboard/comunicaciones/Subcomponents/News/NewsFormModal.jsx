@@ -56,7 +56,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
   useEffect(() => {
     if (isEditing && newsData) {
       const description = newsData.description || "";
-      const catId = typeof newsData.category === 'object' ? (newsData.category?.id || "") : (newsData.category_id || "");
+      const catId = (newsData.category && typeof newsData.category === 'object') ? (newsData.category?.id || "") : (newsData.category_id || "");
 
       console.log("NewsFormModal - Loading Data:", {
         isEditing,
@@ -270,6 +270,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       dataToSend.append('category_id', formData.category_id || "");
       dataToSend.append('author', formData.author || "");
       dataToSend.append('status', formData.status);
+
+      console.log("NewsFormModal - Submitting dataToSend (category_id):", formData.category_id);
 
       if (formData.start_date) dataToSend.append('start_date', toIsoDate(formData.start_date));
       if (formData.end_date) dataToSend.append('end_date', toIsoDate(formData.end_date));

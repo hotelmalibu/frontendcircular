@@ -76,7 +76,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
   useEffect(() => {
     if (isEditing && projectData) {
       const description = projectData.description || "";
-      const catId = typeof projectData.category === 'object' ? (projectData.category?.id || "") : (projectData.category_id || "");
+      const catId = (projectData.category && typeof projectData.category === 'object') ? (projectData.category?.id || "") : (projectData.category_id || "");
 
       console.log("ProjectFormModal - Loading Data:", {
         isEditing,
