@@ -32,12 +32,14 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
   const editorRef = useRef(null);
   const editorInstanceRef = useRef(null);
   const hasInitialized = useRef(false);
+  const hasSyncedDescription = useRef(false);
+  const [editorReady, setEditorReady] = useState(false);
 
   const [formData, setFormData] = useState({
     type: "news",
     title: "",
     description: "",
-    category: "",
+    category_id: "",
     author: "",
     start_date: "",
     end_date: "",
@@ -53,19 +55,40 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
   // ... (Efectos de carga de datos y categorías se mantienen igual)
   useEffect(() => {
     if (isEditing && newsData) {
-      setFormData({
+      const description = newsData.description || "";
+      const catId = typeof newsData.category === 'object' ? (newsData.category?.id || "") : (newsData.category_id || "");
+
+      console.log("NewsFormModal - Loading Data:", {
+        isEditing,
+        descriptionLength: description.length,
+        category_id: catId,
+        rawCategory: newsData.category
+      });
+
+      setFormData((prev) => ({
+        ...prev,
         type: newsData.type || "news",
         title: newsData.title || "",
-        description: newsData.description || "",
-        category: newsData.category || "",
+        description: description,
+        category_id: catId,
         author: newsData.author || "",
         start_date: newsData.start_date ? formatDateForInput(newsData.start_date) : "",
         end_date: newsData.end_date ? formatDateForInput(newsData.end_date) : "",
-        status: "published",
         upload_file: newsData.upload_file || null,
-      });
+      }));
     }
   }, [newsData, isEditing]);
+
+  // Sync editor data once when editor is ready and data is available
+  useEffect(() => {
+    if (editorReady && isEditing && formData.description && !hasSyncedDescription.current) {
+      if (editorInstanceRef.current) {
+        console.log("NewsFormModal - Syncing initial description to editor");
+        editorInstanceRef.current.setData(formData.description);
+        hasSyncedDescription.current = true;
+      }
+    }
+  }, [editorReady, isEditing, formData.description]);
 
   const loadCategories = React.useCallback(async () => {
     try {
@@ -115,7 +138,12 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         });
 
         editorInstanceRef.current = instance;
-        instance.setData(formData.description || "");
+        setEditorReady(true);
+
+        if (formData.description) {
+          instance.setData(formData.description);
+        }
+
         instance.model.document.on('change:data', () => {
           const data = instance.getData();
           setFormData(prev => ({ ...prev, description: data }));
@@ -133,6 +161,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       if (editorInstanceRef.current) {
         editorInstanceRef.current.destroy().catch(() => { });
         editorInstanceRef.current = null;
+        setEditorReady(false);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -147,6 +176,9 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'category' || name === 'category_id') {
+      console.log("NewsFormModal - Category Selected (Value):", value);
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
@@ -235,7 +267,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         if (editorContent !== descriptionContent) descriptionContent = editorContent;
       }
       dataToSend.append('description', descriptionContent || "");
-      dataToSend.append('category', formData.category || "");
+      dataToSend.append('category_id', formData.category_id || "");
       dataToSend.append('author', formData.author || "");
       dataToSend.append('status', formData.status);
 
@@ -332,8 +364,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                 <div>
                   <label className={labelClass}>Categoría</label>
                   <select
-                    name="category"
-                    value={formData.category}
+                    name="category_id"
+                    value={formData.category_id}
                     onChange={handleChange}
                     className={inputClass}
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
@@ -341,7 +373,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                   >
                     <option value="">{categoriesLoading ? "Cargando..." : "-- Seleccione --"}</option>
                     {categories.map((category) => (
-                      <option key={category.id} value={category.name}>{category.name}</option>
+                      <option key={category.id} value={category.id}>{category.name}</option>
                     ))}
                   </select>
                 </div>
@@ -395,19 +427,25 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
               ) : (
                 <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl bg-gray-50">
                   <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 border border-gray-300">
-                    {typeof formData.upload_file === 'object' ? (
+                    {formData.upload_file instanceof File || formData.upload_file instanceof Blob ? (
                       <img src={URL.createObjectURL(formData.upload_file)} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
-                      <img src={formData.upload_file.url} alt="Preview" className="w-full h-full object-cover" />
+                      <img
+                        src={typeof formData.upload_file === 'string' ? formData.upload_file : (formData.upload_file?.url || '')}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
-                      {formData.upload_file.name || "Imagen actual"}
+                      {formData.upload_file instanceof File ? formData.upload_file.name : (typeof formData.upload_file === 'string' ? 'Imagen actual' : (formData.upload_file?.name || "Imagen actual"))}
                     </p>
-                    <p className="text-xs text-gray-500">
-                      {(formData.upload_file.size / 1024 / 1024).toFixed(2)} MB
-                    </p>
+                    {formData.upload_file instanceof File && (
+                      <p className="text-xs text-gray-500">
+                        {(formData.upload_file.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    )}
                   </div>
                   <button onClick={removeFile} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition">
                     <XCircle size={20} />

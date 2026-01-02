@@ -33,6 +33,8 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
   const editorRef = useRef(null);
   const editorInstanceRef = useRef(null);
   const hasInitialized = useRef(false);
+  const hasSyncedDescription = useRef(false);
+  const [editorReady, setEditorReady] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -63,10 +65,20 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
   // ... (Lógica de inicialización y carga de datos se mantiene igual)
   useEffect(() => {
     if (isEditing && eventData) {
+      const description = eventData.description || "";
+      const catId = typeof eventData.category === 'object' ? (eventData.category?.id || "") : (eventData.category_id || "");
+
+      console.log("EventFormModal - Loading Data:", {
+        isEditing,
+        descriptionLength: description.length,
+        category_id: catId,
+        rawCategory: eventData.category
+      });
+
       const newFormData = {
         title: eventData.title || "",
-        description: eventData.description || "",
-        category_id: eventData.category_id || "",
+        description: description,
+        category_id: catId,
         event_type: eventData.event_type || "in_person",
         start_datetime: eventData.start_datetime ? formatDateTimeForInput(eventData.start_datetime) : "",
         end_datetime: eventData.end_datetime ? formatDateTimeForInput(eventData.end_datetime) : "",
@@ -84,18 +96,19 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       };
 
       setFormData(newFormData);
-
-      setTimeout(() => {
-        if (editorInstanceRef.current) {
-          try {
-            editorInstanceRef.current.setData(newFormData.description || "");
-          } catch (e) {
-            console.warn("Could not set CKEditor data:", e);
-          }
-        }
-      }, 100);
     }
   }, [eventData, isEditing]);
+
+  // Sync editor data once when editor is ready and data is available
+  useEffect(() => {
+    if (editorReady && isEditing && formData.description && !hasSyncedDescription.current) {
+      if (editorInstanceRef.current) {
+        console.log("EventFormModal - Syncing initial description to editor");
+        editorInstanceRef.current.setData(formData.description);
+        hasSyncedDescription.current = true;
+      }
+    }
+  }, [editorReady, isEditing, formData.description]);
 
   const loadCategories = React.useCallback(async () => {
     try {
@@ -145,7 +158,12 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         });
 
         editorInstanceRef.current = instance;
-        instance.setData(formData.description || "");
+        setEditorReady(true);
+
+        if (formData.description) {
+          instance.setData(formData.description);
+        }
+
         instance.model.document.on('change:data', () => {
           const data = instance.getData();
           setFormData(prev => ({ ...prev, description: data }));
@@ -163,6 +181,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       if (editorInstanceRef.current) {
         editorInstanceRef.current.destroy().catch(() => { });
         editorInstanceRef.current = null;
+        setEditorReady(false);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -183,6 +202,9 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    if (name === 'category_id') {
+      console.log("EventFormModal - Category ID Selected:", value);
+    }
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,

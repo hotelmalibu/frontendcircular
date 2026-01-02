@@ -29,6 +29,8 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
   const editorRef = useRef(null);
   const editorInstanceRef = useRef(null);
   const hasInitialized = useRef(false);
+  const hasSyncedDescription = useRef(false);
+  const [editorReady, setEditorReady] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -73,14 +75,35 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
 
   useEffect(() => {
     if (isEditing && projectData) {
+      const description = projectData.description || "";
+      const catId = typeof projectData.category === 'object' ? (projectData.category?.id || "") : (projectData.category_id || "");
+
+      console.log("ProjectFormModal - Loading Data:", {
+        isEditing,
+        descriptionLength: description.length,
+        category_id: catId,
+        rawCategory: projectData.category
+      });
+
       setFormData({
         title: projectData.title || "",
-        description: projectData.description || "",
-        category_id: projectData.category_id || "",
+        description: description,
+        category_id: catId,
         author: projectData.author || "",
       });
     }
   }, [projectData, isEditing]);
+
+  // Sync editor data once when editor is ready and data is available
+  useEffect(() => {
+    if (editorReady && isEditing && formData.description && !hasSyncedDescription.current) {
+      if (editorInstanceRef.current) {
+        console.log("ProjectFormModal - Syncing initial description to editor");
+        editorInstanceRef.current.setData(formData.description);
+        hasSyncedDescription.current = true;
+      }
+    }
+  }, [editorReady, isEditing, formData.description]);
 
   // Initialize CKEditor
   useEffect(() => {
@@ -101,7 +124,12 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
         });
 
         editorInstanceRef.current = instance;
-        instance.setData(formData.description || "");
+        setEditorReady(true);
+
+        if (formData.description) {
+          instance.setData(formData.description);
+        }
+
         instance.model.document.on('change:data', () => {
           const data = instance.getData();
           setFormData(prev => ({ ...prev, description: data }));
@@ -119,12 +147,17 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
       if (editorInstanceRef.current) {
         editorInstanceRef.current.destroy().catch(() => { });
         editorInstanceRef.current = null;
+        setEditorReady(false);
       }
     };
-  }, [formData.description, errors.description]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'category_id') {
+      console.log("ProjectFormModal - Category ID Selected:", value);
+    }
     setFormData((prev) => ({
       ...prev,
       [name]: value,

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import DOMPurify from 'dompurify';
 import { useParams, Link } from 'react-router-dom';
 import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, Share2, Instagram, MessageCircle } from 'lucide-react';
-import { allContentData, contentTypeConfig } from '../../data/mockContent'; 
+import { allContentData, contentTypeConfig } from '../../data/mockContent';
 import { AuthContext } from '../../context/AuthContext';
 import { getAllNews, getNewsById } from '../../api/newsApi';
 
@@ -49,10 +49,10 @@ export default function ContentDetailPage() {
 
         // If links were generated as `noticia-{id}` on the cards, extract id
         const idFromSlug = typeof slug === 'string' && slug.startsWith('noticia-') ? slug.replace('noticia-', '') : null;
-        
+
         // Search logic
         let found = newsArray.find(n => n.slug === slug || String(n.id) === slug || String(n._id) === slug || (idFromSlug && (String(n.id) === idFromSlug || String(n._id) === idFromSlug)));
-        
+
         // If not found in the batch, try to fetch by id directly when we have idFromSlug
         if (!found && idFromSlug) {
           try {
@@ -81,16 +81,18 @@ export default function ContentDetailPage() {
             title: found.title || found.name || "Sin título",
             // Excerpt usa description preferiblemente
             excerpt: found.excerpt || found.description || (found.content ? (String(found.content).slice(0, 250) + '...') : ""),
-            
+
             // --- CORRECCIÓN CLAVE ---
             // Priorizamos 'content', 'body', 'html' o 'text' antes que 'description' para asegurar que se muestre el artículo completo
             body: found.content || found.body || found.html || found.text || found.description || "",
-            
+
             // Image: prioritize upload_file.url from API, then fallback to other image fields
             image: (found.upload_file && found.upload_file.url) || found.image || found.thumbnail || found.cover || "",
             date: found.published_at || found.publishedAt || found.created_at || found.createdAt || "",
             type: found.type ? (found.type === 'news' ? 'Noticias' : found.type) : 'Noticias',
-            topic: found.category || found.topic || "General",
+            topic: found.category_name ||
+              (found.category && typeof found.category === 'object' ? found.category.name : found.category) ||
+              "Sin categoría asignada",
             author: found.author || found.by || "",
             slug: found.slug || null,
             status: found.status || "",
@@ -129,7 +131,7 @@ export default function ContentDetailPage() {
     findContent();
     return () => { mounted = false };
   }, [slug, isAuthenticated]);
-   
+
   // Loading State
   if (loading) {
     return (
@@ -160,7 +162,7 @@ export default function ContentDetailPage() {
   // --- SOCIAL SHARE URLS ---
   const currentUrl = window.location.href;
   const rawTitle = content?.title || '';
-   
+
   const encodedUrl = encodeURIComponent(currentUrl);
   const encodedTitle = encodeURIComponent(rawTitle);
   const encodedTextAndUrl = encodeURIComponent(`${rawTitle} ${currentUrl}`);
@@ -174,23 +176,23 @@ export default function ContentDetailPage() {
 
   return (
     <div className="min-h-screen bg-white fontfamily-montserrat">
-       
+
       {/* --- HERO HEADER --- */}
       <div className={`relative w-full h-[70vh] md:h-[80vh] flex items-end overflow-hidden ${config.isSolid ? config.bgColor : 'bg-gray-900'}`}>
 
         {/* FONDO: Imagen o Color Sólido */}
         {config.isSolid ? (
           <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-             <Icon size={400} strokeWidth={0.5} className="text-white opacity-10 absolute -right-20 -bottom-20 rotate-12" />
-             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            <Icon size={400} strokeWidth={0.5} className="text-white opacity-10 absolute -right-20 -bottom-20 rotate-12" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
           </div>
         ) : (
           <>
             {content.image ? (
               <>
-                <img 
-                  src={content.image} 
-                  alt={content.title} 
+                <img
+                  src={content.image}
+                  alt={content.title}
                   className="absolute inset-0 w-full h-full object-cover opacity-80"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1E305D]/90 via-[#1E305D]/40 to-transparent"></div>
@@ -229,26 +231,26 @@ export default function ContentDetailPage() {
       {/* --- CONTENIDO PRINCIPAL --- */}
       <div className="container mx-auto px-4 md:px-8 relative z-20">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 py-16">
-           
+
           {/* COLUMNA IZQUIERDA (Social Share Sticky) */}
           <div className="lg:w-24 flex-shrink-0">
-             <div className="sticky top-32 flex lg:flex-col gap-4 items-center lg:items-start">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest hidden lg:block mb-2">
-                  Compartir
-                </span>
+            <div className="sticky top-32 flex lg:flex-col gap-4 items-center lg:items-start">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest hidden lg:block mb-2">
+                Compartir
+              </span>
 
-                <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
-                <SocialButton icon={X} color="#000000" url={xShareUrl} />
-                <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
-                <SocialButton icon={Instagram} color="#E4405F" url={instagramShareUrl} />
-                <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
-                <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
+              <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
+              <SocialButton icon={X} color="#000000" url={xShareUrl} />
+              <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
+              <SocialButton icon={Instagram} color="#E4405F" url={instagramShareUrl} />
+              <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
+              <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
 
-                {/* Móvil: Etiqueta compartir */}
-                <div className="lg:hidden flex items-center gap-2 text-gray-400 text-sm font-bold ml-auto">
-                    <Share2 size={16} /> Compartir
-                </div>
-             </div>
+              {/* Móvil: Etiqueta compartir */}
+              <div className="lg:hidden flex items-center gap-2 text-gray-400 text-sm font-bold ml-auto">
+                <Share2 size={16} /> Compartir
+              </div>
+            </div>
           </div>
 
           {/* COLUMNA DERECHA (Texto del Artículo) */}
@@ -273,10 +275,10 @@ export default function ContentDetailPage() {
 
             {/* Footer del artículo: Categoría */}
             <div className="mt-16 pt-8 border-t border-gray-100">
-               <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mr-4">Categoría:</span>
-                <Link to="/explorar" className="inline-block px-4 py-2 bg-gray-100 rounded-lg text-sm font-bold text-gray-600 hover:bg-[#00AB6D] hover:text-white transition-colors">
-                   {content.topic}
-                </Link>
+              <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mr-4">Categoría:</span>
+              <Link to="/explorar" className="inline-block px-4 py-2 bg-gray-100 rounded-lg text-sm font-bold text-gray-600 hover:bg-[#00AB6D] hover:text-white transition-colors">
+                {content.topic}
+              </Link>
             </div>
           </div>
         </div>
@@ -289,7 +291,7 @@ export default function ContentDetailPage() {
 // Sub-componente Botón Social (ESTÁTICO)
 function SocialButton({ icon: Icon, url, color }) {
   return (
-    <a 
+    <a
       href={url}
       target="_blank"
       rel="noopener noreferrer"

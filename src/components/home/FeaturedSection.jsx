@@ -11,9 +11,9 @@ export default function FeaturedSection() {
   const [activeTab, setActiveTab] = useState("Todos");
 
   const categories = [
-    "Todos", 
-    "Noticias", 
-    "Documentos de interés", 
+    "Todos",
+    "Noticias",
+    "Documentos de interés",
     "Gestión documental"
   ];
 
@@ -52,39 +52,41 @@ export default function FeaturedSection() {
 
         // Map news items
         const mappedNews = newsArray.map(n => {
-            const rawType = n.type || n.category || "";
-            let finalType = "Noticias";
+          const rawType = n.type || n.category || "";
+          let finalType = "Noticias";
 
-            if (rawType.toLowerCase().includes("doc") || rawType.toLowerCase().includes("interés")) {
-                finalType = "Documentos de interés";
-            }
-            else if (rawType.toLowerCase().includes("gesti") || rawType.toLowerCase().includes("gestion")) {
-                finalType = "Gestión documental";
-            }
+          if (rawType.toLowerCase().includes("doc") || rawType.toLowerCase().includes("interés")) {
+            finalType = "Documentos de interés";
+          }
+          else if (rawType.toLowerCase().includes("gesti") || rawType.toLowerCase().includes("gestion")) {
+            finalType = "Gestión documental";
+          }
 
-            let imageUrl = "";
-            if (n.upload_file && n.upload_file.url) {
-                imageUrl = n.upload_file.url;
-            } else if (n.image) {
-                imageUrl = n.image;
-            } else if (n.thumbnail) {
-                imageUrl = n.thumbnail;
-            } else if (n.cover) {
-                imageUrl = n.cover;
-            }
+          let imageUrl = "";
+          if (n.upload_file && n.upload_file.url) {
+            imageUrl = n.upload_file.url;
+          } else if (n.image) {
+            imageUrl = n.image;
+          } else if (n.thumbnail) {
+            imageUrl = n.thumbnail;
+          } else if (n.cover) {
+            imageUrl = n.cover;
+          }
 
-            return {
-                id: n.id || n._id || n.uid || Math.random(),
-                type: finalType,
-                topic: n.category || n.topic || "General",
-                title: n.title || n.name || "Sin título",
-                excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
-                image: imageUrl,
-                date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
-                slug: n.slug || (`noticia-${n.id || n._id || ''}`),
-                status: n.status || "",
-                source: 'news'
-            };
+          return {
+            id: n.id || n._id || n.uid || Math.random(),
+            type: finalType,
+            topic: n.category_name ||
+              (n.category && typeof n.category === 'object' ? n.category.name : n.category) ||
+              "Sin categoría asignada",
+            title: n.title || n.name || "Sin título",
+            excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
+            image: imageUrl,
+            date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
+            slug: n.slug || (`noticia-${n.id || n._id || ''}`),
+            status: n.status || "",
+            source: 'news'
+          };
         });
 
         // Map documents
@@ -146,7 +148,7 @@ export default function FeaturedSection() {
   return (
     <section className="py-20 bg-white border-t border-gray-100">
       <div className="container mx-auto px-4 md:px-8">
-        
+
         {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 pb-2 border-b border-gray-200">
           <div className="w-full">
@@ -165,9 +167,9 @@ export default function FeaturedSection() {
                   onClick={() => setActiveTab(cat)}
                   className={`
                     pb-2 text-sm font-bold transition-all duration-300 border-b-2 
-                    ${activeTab === cat 
-                      ? "text-[#00AB6D] border-[#00AB6D]" 
-                      : "text-gray-400 border-transparent hover:text-[#1E305D]" 
+                    ${activeTab === cat
+                      ? "text-[#00AB6D] border-[#00AB6D]"
+                      : "text-gray-400 border-transparent hover:text-[#1E305D]"
                     }
                   `}
                 >
@@ -176,9 +178,9 @@ export default function FeaturedSection() {
               ))}
             </div>
           </div>
-          
-          <Link 
-            to="/explorar" 
+
+          <Link
+            to="/explorar"
             className="hidden md:flex items-center gap-2 text-sm font-bold text-[#1E305D] hover:text-[#00AB6D] transition-colors mb-3 shrink-0"
           >
             Ver más
@@ -211,7 +213,7 @@ export default function FeaturedSection() {
                 >
                   {/* Imagen / Icono */}
                   <div className={`rounded-xl overflow-hidden mb-5 aspect-[16/10] relative shadow-sm transition-transform duration-500 group-hover:-translate-y-2 ${config.isSolid ? config.bgColor : 'bg-gray-100'}`}>
-                    
+
                     {config.isSolid ? (
                       <div className="w-full h-full flex items-center justify-center relative p-6">
                         {Icon && <Icon strokeWidth={1} size={110} className="absolute -right-6 -bottom-6 text-white opacity-10 rotate-12 transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6" />}
@@ -222,9 +224,9 @@ export default function FeaturedSection() {
                     ) : (
                       item.image ? (
                         <>
-                          <img 
-                            src={item.image} 
-                            alt={item.title} 
+                          <img
+                            src={item.image}
+                            alt={item.title}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             onError={(e) => {
                               console.log("Error loading image:", item.image);
@@ -247,9 +249,9 @@ export default function FeaturedSection() {
                   {/* Textos */}
                   <div className="flex flex-col flex-1">
                     <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest mb-3 text-gray-400">
-                        <span className={config.isSolid ? "text-gray-500" : config.color}>{item.type}</span>
-                        <span className="text-gray-300">/</span>
-                        <span>{item.topic}</span>
+                      <span className={config.isSolid ? "text-gray-500" : config.color}>{item.type}</span>
+                      <span className="text-gray-300">/</span>
+                      <span>{item.topic}</span>
                     </div>
 
                     <h3 className="text-lg font-bold text-[#1E305D] leading-snug mb-3 group-hover:text-[#00AB6D] transition-colors">
@@ -264,18 +266,18 @@ export default function FeaturedSection() {
           <div className="py-12 text-center bg-gray-50 rounded-lg">
             <p className="text-gray-500 font-medium">No se encontró contenido en la categoría "{activeTab}".</p>
             <button onClick={() => setActiveTab("Todos")} className="mt-2 text-sm text-[#00AB6D] underline">
-                Ver todo el contenido
+              Ver todo el contenido
             </button>
           </div>
         )}
 
 
-        
+
         {/* Móvil */}
         <div className="mt-12 md:hidden text-center">
-            <Link to="/explorar" className="inline-flex items-center gap-2 text-sm font-bold text-[#00AB6D] px-6 py-3 border border-[#00AB6D] rounded-full hover:bg-[#00AB6D] hover:text-white transition-all">
-                Ver más <ArrowRight size={16} />
-            </Link>
+          <Link to="/explorar" className="inline-flex items-center gap-2 text-sm font-bold text-[#00AB6D] px-6 py-3 border border-[#00AB6D] rounded-full hover:bg-[#00AB6D] hover:text-white transition-all">
+            Ver más <ArrowRight size={16} />
+          </Link>
         </div>
 
       </div>
