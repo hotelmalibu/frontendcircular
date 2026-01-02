@@ -2,16 +2,16 @@ import React from "react";
 
 
 // --- IMPORTAR ACTIVOS (PDFs) ---
-import pdfENEC from "../../../../assets/marconormativo/planes/ENEC.pdf"; 
+import pdfENEC from "../../../../assets/marconormativo/planes/ENEC.pdf";
 import pdfPlasticos from "../../../../assets/marconormativo/planes/plan-nacional-para-la-gestion-sostenible-de-plasticos-un-solo-uso-minambiente_638235484889659598.pdf";
-import pdfPND from "../../../../assets/marconormativo/planes/PND.pdf"; 
+import pdfPND from "../../../../assets/marconormativo/planes/PND.pdf";
 
 // Colores del manual de marca
 const COLOR_AZUL_PRINCIPAL = '#1E305D';
 const COLOR_VERDE_PRINCIPAL = '#00AB6D';
 const COLOR_AZUL_SECUNDARIO = '#2C67B0';
-const COLOR_VERDE_CLARO = '#B1D357'; 
-const COLOR_FONDO_CLARO = '#f9f9f9';
+const COLOR_VERDE_CLARO = '#B1D357';
+
 
 
 // Datos de los planes (sin cambios)
@@ -20,7 +20,7 @@ const planes = [
     title: "ENEC - Estrategia nacional de economía circular",
     description: "MADS | 2019 - 2030",
     pdf: pdfENEC,
-    color: COLOR_VERDE_PRINCIPAL 
+    color: COLOR_VERDE_PRINCIPAL
   },
   {
     title: "Plan nacional para la gestión sostenible de los plásticos de un solo uso",
@@ -32,7 +32,7 @@ const planes = [
     title: "Plan Nacional de Desarrollo (PND)",
     description: "DNP | 2022 - 2026",
     pdf: pdfPND,
-    color: COLOR_VERDE_CLARO 
+    color: COLOR_VERDE_CLARO
   }
 ];
 
@@ -49,9 +49,9 @@ const PlanCard = ({ title, description, pdf, color }) => {
   };
 
   return (
-    <div 
-        className="w-full text-left bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg border-t-4"
-        
+    <div
+      className="w-full text-left bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg border-t-4"
+
     >
       <h3 className="text-lg font-sans font-semibold mb-1" style={{ color: COLOR_AZUL_PRINCIPAL }}>
         {title}
@@ -59,10 +59,10 @@ const PlanCard = ({ title, description, pdf, color }) => {
       <p className="text-sm font-sans text-gray-600 mb-2">
         {description}
       </p>
-      
-      <a 
-        href={pdf} 
-        target="_blank" 
+
+      <a
+        href={pdf}
+        target="_blank"
         rel="noopener noreferrer"
         className="text-sm font-sans font-medium transition-colors hover:underline"
         style={linkStyle}
@@ -81,7 +81,7 @@ export default function Index() {
     <div className="mt-24 font-sans min-h-screen" style={{ color: '#e6e6e6ff' }}>
 
       <div className="px-6 py-10 max-w-4xl mx-auto">
-        <h1 
+        <h1
           className="text-4xl font-sans font-extrabold text-center mb-12"
           style={{ color: COLOR_AZUL_PRINCIPAL }}
         >
@@ -90,16 +90,16 @@ export default function Index() {
 
         <div className="space-y-6">
           {planes.map((plan, index) => (
-            <PlanCard 
+            <PlanCard
               key={index}
               title={plan.title}
               description={plan.description}
               pdf={plan.pdf}
-              color={plan.color} 
+              color={plan.color}
             />
           ))}
         </div>
-        
+
         <div className="h-10"></div>
       </div>
     </div>

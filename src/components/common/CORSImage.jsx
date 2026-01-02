@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { getImageProxyFallbacks, extractOriginalUrl, needsCorsProxy } from '../../utils/imageUtils';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { getImageProxyFallbacks, needsCorsProxy } from '../../utils/imageUtils';
 import { AlertCircle } from 'lucide-react';
 
 /**
@@ -29,7 +29,7 @@ const CORSImage = ({
   const [imageKey, setImageKey] = useState(0); // Force re-render on fallback
   const imgRef = useRef(null);
 
-  const fallbackUrls = getImageProxyFallbacks(src);
+  const fallbackUrls = useMemo(() => getImageProxyFallbacks(src), [src]);
   const isCorsImage = needsCorsProxy(src);
 
   useEffect(() => {
@@ -38,11 +38,11 @@ const CORSImage = ({
       setError(null);
       setLoading(true);
     }
-  }, [src, imageKey]);
+  }, [src, imageKey, fallbackUrls]);
 
   const handleImageError = () => {
     const currentIndex = fallbackUrls.indexOf(currentSrc);
-    
+
     if (currentIndex < fallbackUrls.length - 1) {
       // Try next fallback
       const nextSrc = fallbackUrls[currentIndex + 1];
@@ -54,7 +54,7 @@ const CORSImage = ({
       console.error(errorMsg);
       setError(errorMsg);
       setLoading(false);
-      
+
       if (onError) {
         onError(new Error(errorMsg));
       }
@@ -88,7 +88,7 @@ const CORSImage = ({
       <div className={`bg-red-50 border border-red-200 rounded flex flex-col items-center justify-center p-4 ${className}`}>
         <AlertCircle size={24} className="text-red-400 mb-2" />
         <p className="text-red-600 text-xs text-center mb-2">Failed to load image</p>
-        <button 
+        <button
           onClick={handleRetry}
           className="text-red-500 hover:text-red-700 text-xs underline"
         >
@@ -105,7 +105,7 @@ const CORSImage = ({
           <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
         </div>
       )}
-      
+
       <img
         ref={imgRef}
         src={currentSrc}
@@ -115,7 +115,7 @@ const CORSImage = ({
         onError={handleImageError}
         {...imgProps}
       />
-      
+
       {isCorsImage && showCorsWarning && (
         <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
           Proxy

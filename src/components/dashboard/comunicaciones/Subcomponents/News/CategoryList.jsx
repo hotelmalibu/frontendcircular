@@ -33,15 +33,7 @@ export default function CategoryList() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  useEffect(() => {
-    filterCategoriesData();
-  }, [searchTerm, categories]);
-
-  const loadCategories = async () => {
+  const loadCategories = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -68,9 +60,9 @@ export default function CategoryList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const filterCategoriesData = () => {
+  const filterCategoriesData = React.useCallback(() => {
     if (!Array.isArray(categories)) {
       setFilteredCategories([]);
       return;
@@ -86,7 +78,15 @@ export default function CategoryList() {
     }
 
     setFilteredCategories(filtered);
-  };
+  }, [categories, searchTerm]);
+
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
+
+  useEffect(() => {
+    filterCategoriesData();
+  }, [searchTerm, categories, filterCategoriesData]);
 
   const handleCreate = () => {
     setSelectedCategory(null);
@@ -129,7 +129,7 @@ export default function CategoryList() {
 
   return (
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
-      
+
       {/* ESPACIADOR SUPERIOR */}
       <div className="w-full"></div>
 
@@ -189,8 +189,8 @@ export default function CategoryList() {
               className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
             >
               {/* Borde Superior de Acento */}
-              <div 
-                className="h-1.5 w-full absolute top-0 left-0" 
+              <div
+                className="h-1.5 w-full absolute top-0 left-0"
                 style={{ backgroundColor: BRAND.green }}
               ></div>
 

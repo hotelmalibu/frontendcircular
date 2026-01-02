@@ -6,12 +6,12 @@ import {
   Eye,
   Search,
   User,
-  Tag,
   AlertCircle,
-  Image as ImageIcon,
+  ImageIcon,
   FolderOpen
 } from "lucide-react";
 import { getAllProjects, deleteProject } from "../../../../../api/projectsApi";
+import { getAllCategories } from "../../../../../api/categoriesApi";
 import DOMPurify from 'dompurify';
 import ProjectFormModal from "./ProjectFormModal";
 import ProjectDetailModal from "./ProjectDetailModal";
@@ -49,16 +49,9 @@ export default function ProjectList() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
-  useEffect(() => {
-    loadProjects();
-  }, []);
-
-  useEffect(() => {
-    filterProjectsData();
-  }, [searchTerm, projects]);
-
-  const loadProjects = async () => {
+  const loadProjects = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -90,9 +83,21 @@ export default function ProjectList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const filterProjectsData = () => {
+  const fetchCategories = React.useCallback(async () => {
+    try {
+      setCategoriesLoading(true);
+      await getAllCategories();
+
+    } catch (err) {
+      console.error("Error loading categories for projects:", err);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  }, []);
+
+  const filterProjectsData = React.useCallback(() => {
     if (!Array.isArray(projects)) {
       setFilteredProjects([]);
       return;
@@ -111,7 +116,16 @@ export default function ProjectList() {
     }
 
     setFilteredProjects(filtered);
-  };
+  }, [projects, searchTerm]);
+
+  useEffect(() => {
+    loadProjects();
+    fetchCategories(); // Fetch categories on mount
+  }, [loadProjects, fetchCategories]);
+
+  useEffect(() => {
+    filterProjectsData();
+  }, [searchTerm, projects, filterProjectsData]);
 
   const handleCreate = () => {
     setSelectedProject(null);
@@ -148,7 +162,7 @@ export default function ProjectList() {
     loadProjects();
   };
 
-  if (loading) {
+  if (loading || categoriesLoading) { // Added categoriesLoading to loading state
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-4 mb-4" style={{ borderColor: BRAND.blue }}></div>

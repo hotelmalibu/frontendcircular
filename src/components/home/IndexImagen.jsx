@@ -1,46 +1,49 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import fondo1 from '../../assets/home/Carrusel/Index_imagen_1.png';
 import fondo2 from '../../assets/home/Carrusel/Index_imagen_2.jpeg';
 // import fondo3 from '../../assets/home/Carrusel/Index_imagen_3.jpg';
 import fondo4 from '../../assets/home/Carrusel/Index_imagen_4.png';
 
+const SLIDES = [
+  {
+    image: fondo1,
+    title: 'Impulsando el país hacia',
+    subtitle: 'la economía circular',
+    description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
+    button1: 'Conoce nuestros proyectos', button2: 'Sobre Nosotros'
+  },
+  {
+    image: fondo2,
+    title: 'Impulsando el país hacia',
+    subtitle: 'la economía circular',
+    description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
+    button1: 'Conoce nuestros proyectos',
+    button2: 'Sobre Nosotros'
+  },
+  {
+    image: fondo4,
+    title: 'Impulsando el país hacia',
+    subtitle: 'la economía circular',
+    description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
+    button1: 'Conoce nuestros proyectos',
+    button2: 'Sobre Nosotros'
+  }
+];
+
 export default function IndexImagen() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoplay, setIsAutoplay] = useState(true);
+  const [isAutoplay] = useState(true);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const slides = [
-    {
-      image: fondo1,
-      title: 'Impulsando el país hacia',
-      subtitle: 'la economía circular',
-      description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-      button1: 'Conoce nuestros proyectos',      button2: 'Sobre Nosotros'
-    },
-    {
-      image: fondo2,
-      title: 'Impulsando el país hacia',
-      subtitle: 'la economía circular',
-      description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-      button1: 'Conoce nuestros proyectos',
-      button2: 'Sobre Nosotros'
-    },
-    {
-      image: fondo4,
-      title: 'Impulsando el país hacia',
-      subtitle: 'la economía circular',
-      description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-      button1: 'Conoce nuestros proyectos',
-      button2: 'Sobre Nosotros'}
-  ];
+
 
 
   // Duraciones personalizadas para cada slide
-  const getDuration = (slideIndex) => {
+  const getDuration = useCallback((slideIndex) => {
     if (slideIndex === 0) return 15; // Primera imagen: 15 segundos
     return 8; // Otras imágenes: 8 segundos
-  };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -59,7 +62,7 @@ export default function IndexImagen() {
 
     const slideTimer = setInterval(() => {
       setProgress(0);
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
+      setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
     }, duration * 1000);
 
 
@@ -76,10 +79,10 @@ export default function IndexImagen() {
       clearInterval(slideTimer);
       clearInterval(progressTimer);
     };
-  }, [isAutoplay, slides.length, currentSlide]);
+  }, [isAutoplay, currentSlide, getDuration]);
 
 
-  const slide = slides[currentSlide];
+
 
 
   const handleScrollDown = () => {
@@ -331,12 +334,11 @@ export default function IndexImagen() {
 
       {/* Fondo con transición suave (crossfade) */}
       <div className="absolute inset-0">
-        {slides.map((s, index) => (
+        {SLIDES.map((s, index) => (
           <div
             key={index}
-            className={`carousel-bg carousel-bg-transition ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`carousel-bg carousel-bg-transition ${index === currentSlide ? 'opacity-100' : 'opacity-0'
+              }`}
             style={{ backgroundImage: `url(${s.image})` }}
           ></div>
         ))}
@@ -354,7 +356,7 @@ export default function IndexImagen() {
 
       {/* ========== INDICADORES LATERALES  ========== */}
       <div className="absolute left-2 md:left-12  mt-6 lg:left-6 top-1/2 -translate-y-1/2 -translate-y-[125px] z-20 flex flex-col items-center gap-10 translate-x-16">
-        {slides.map((_, index) => (
+        {SLIDES.map((_, index) => (
           <div key={index} className="nav-indicator-item">
             {index === currentSlide ? (
               // CONTADOR - Contenido dentro del círculo
@@ -386,7 +388,7 @@ export default function IndexImagen() {
 
 
                 {/* Número blanco puro */}
-                <div className="text-xs md:text-sm font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]">
+                <div className="text-xs md:text-sm font-bold text-white drop-shadow-[0_2px_6_rgba(0,0,0,0.3)]">
                   {index + 1}
                 </div>
               </div>
@@ -425,15 +427,15 @@ export default function IndexImagen() {
           {/* Títulos con animación SOLO AL CARGAR */}
           <div className="mb-6">
             <h1 className={`animate-on-load ${hasLoaded ? 'loaded' : ''} text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-2`}>
-              <span className="block whitespace-nowrap">{slide.title}</span>
-              <span className="block whitespace-nowrap">{slide.subtitle}</span>
+              <span className="block whitespace-nowrap">{SLIDES[currentSlide].title}</span>
+              <span className="block whitespace-nowrap">{SLIDES[currentSlide].subtitle}</span>
             </h1>
           </div>
 
 
           {/* Descripción */}
           <p className={`animate-on-load ${hasLoaded ? 'loaded' : ''} text-gray-100 text-base md:text-lg max-w-2xl leading-relaxed mb-8`}>
-            {slide.description}
+            {SLIDES[currentSlide].description}
           </p>
 
 
@@ -442,7 +444,7 @@ export default function IndexImagen() {
             {/* Botón primario - */}
             <button className="btn-primary group relative px-8 py-3 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
               <span className="relative z-10 flex items-center gap-2">
-                {slide.button1}
+                {SLIDES[currentSlide].button1}
                 <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -453,7 +455,7 @@ export default function IndexImagen() {
             {/* Botón secundario - Contorno limpio */}
             <button className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
               <span className="relative z-10 flex items-center gap-2">
-                {slide.button2}
+                {SLIDES[currentSlide].button2}
                 <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -464,33 +466,33 @@ export default function IndexImagen() {
       </div>
 
 
-     {/* 🔽 Botón Scroll Mejorado */}
-<button
-  onClick={handleScrollDown}
-  className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center group focus:outline-none"
-  aria-label="Desplazarse hacia abajo"
->
-  {/* Contenedor animado flotante */}
-  <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-[#00AB6D]/15 to-[#2C67B0]/20 border border-white/40 backdrop-blur-sm shadow-[0_0_25px_rgba(0,171,109,0.25)] animate-[float_3s_ease-in-out_infinite] transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_30px_#00AB6D66]">
+      {/* 🔽 Botón Scroll Mejorado */}
+      <button
+        onClick={handleScrollDown}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center group focus:outline-none"
+        aria-label="Desplazarse hacia abajo"
+      >
+        {/* Contenedor animado flotante */}
+        <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-[#00AB6D]/15 to-[#2C67B0]/20 border border-white/40 backdrop-blur-sm shadow-[0_0_25px_rgba(0,171,109,0.25)] animate-[float_3s_ease-in-out_infinite] transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_30px_#00AB6D66]">
 
 
-    {/* Flecha */}
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={2}
-      stroke="white"
-      className="relative w-6 h-6 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)] group-hover:translate-y-1 transition-transform duration-300"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-    </svg>
-  </div>
+          {/* Flecha */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="white"
+            className="relative w-6 h-6 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)] group-hover:translate-y-1 transition-transform duration-300"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
 
 
 
-  {/* Animaciones personalizadas */}
-  <style>{`
+        {/* Animaciones personalizadas */}
+        <style>{`
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
@@ -500,7 +502,7 @@ export default function IndexImagen() {
       50% { opacity: 0.8; transform: scale(1.1); }
     }
   `}</style>
-</button>
+      </button>
     </section>
   );
 }

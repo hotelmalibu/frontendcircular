@@ -66,7 +66,9 @@ export const createDocument = async (documentData) => {
   }
 };
 
-export default {
+const documentsApi = {
   getDocuments,
   createDocument,
 };
+
+export default documentsApi;

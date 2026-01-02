@@ -69,10 +69,12 @@ export const deleteProject = async (projectId) => {
   return response.data;
 };
 
-export default {
+const projectsApi = {
   getAllProjects,
   getProjectById,
   createProject,
   updateProject,
   deleteProject,
 };
+
+export default projectsApi;

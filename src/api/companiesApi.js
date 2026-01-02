@@ -19,7 +19,7 @@ export const getAllCompanies = async (page = 1, perPage = 15, sortBy = 'created_
       sort_by: sortBy,
       sort_order: sortOrder
     });
-    
+
     const response = await api.get(`${COMPANIES_ENDPOINT}?${params.toString()}`);
     return response.data;
   } catch (error) {
@@ -65,13 +65,13 @@ export const createCompany = async (companyData) => {
         'Content-Type': 'application/json',
       },
     };
-    
+
     console.log("companiesApi.js - createCompany called with:", {
       isFormData: companyData instanceof FormData,
       config: config,
       endpoint: COMPANIES_ENDPOINT
     });
-    
+
     // Log FormData contents if it's FormData
     if (companyData instanceof FormData) {
       console.log("FormData contents:");
@@ -83,7 +83,7 @@ export const createCompany = async (companyData) => {
         }
       }
     }
-    
+
     console.log("🚀 Sending request to:", COMPANIES_ENDPOINT);
     console.log("📤 Request config:", config);
     const response = await api.post(COMPANIES_ENDPOINT, companyData, config);
@@ -115,7 +115,7 @@ export const updateCompany = async (companyId, companyData) => {
         'Content-Type': 'application/json',
       },
     };
-    
+
     const response = await api.put(`${COMPANIES_ENDPOINT}/${companyId}`, companyData, config);
     return response.data;
   } catch (error) {
@@ -196,7 +196,7 @@ export const deleteCompanyProduct = async (companyId, productId) => {
   }
 };
 
-export default {
+const companiesApi = {
   getAllCompanies,
   getCompanyById,
   createCompany,
@@ -206,3 +206,5 @@ export default {
   updateCompanyProduct,
   deleteCompanyProduct,
 };
+
+export default companiesApi;

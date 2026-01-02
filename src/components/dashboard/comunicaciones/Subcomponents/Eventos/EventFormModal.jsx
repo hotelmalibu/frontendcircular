@@ -10,8 +10,6 @@ import {
   Globe,
   Link as LinkIcon,
   AlertCircle,
-  Clock,
-  CheckCircle,
   Type,
   AlignLeft
 } from "lucide-react";
@@ -99,11 +97,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     }
   }, [eventData, isEditing]);
 
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  const loadCategories = async () => {
+  const loadCategories = React.useCallback(async () => {
     try {
       setCategoriesLoading(true);
       const response = await getAllCategories();
@@ -126,7 +120,11 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     } finally {
       setCategoriesLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
 
 
   useEffect(() => {
@@ -167,6 +165,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         editorInstanceRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ... (Helpers de fecha y validación se mantienen igual)

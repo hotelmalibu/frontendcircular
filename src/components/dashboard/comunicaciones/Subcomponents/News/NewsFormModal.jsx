@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { 
-  X, 
-  Save, 
-  Calendar, 
-  User, 
-  Tag, 
-  FileText, 
-  AlertCircle, 
-  Upload, 
-  Image as ImageIcon, 
+import {
+  X,
+  Save,
+  Calendar,
+  User,
+  Tag,
+  FileText,
+  AlertCircle,
+  Upload,
+  Image as ImageIcon,
   XCircle,
   Type
 } from "lucide-react";
@@ -32,7 +32,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
   const editorRef = useRef(null);
   const editorInstanceRef = useRef(null);
   const hasInitialized = useRef(false);
-  
+
   const [formData, setFormData] = useState({
     type: "news",
     title: "",
@@ -67,11 +67,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     }
   }, [newsData, isEditing]);
 
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  const loadCategories = async () => {
+  const loadCategories = React.useCallback(async () => {
     try {
       setCategoriesLoading(true);
       const response = await getAllCategories();
@@ -94,7 +90,11 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     } finally {
       setCategoriesLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
 
   // ... (Inicialización del editor CKEditor se mantiene igual)
   useEffect(() => {
@@ -131,25 +131,13 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     initEditor();
     return () => {
       if (editorInstanceRef.current) {
-        editorInstanceRef.current.destroy().catch(() => {});
+        editorInstanceRef.current.destroy().catch(() => { });
         editorInstanceRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const instance = editorInstanceRef.current;
-    if (!instance) return;
-    const currentData = instance.getData() || '';
-    const targetData = formData.description || '';
-    if (currentData !== targetData) {
-      try {
-        instance.setData(targetData);
-      } catch (e) {
-        // ignore setData errors
-      }
-    }
-  }, [formData.description]);
 
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
@@ -200,7 +188,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       }
     }
     if (formData.upload_file && typeof formData.upload_file === 'object') {
-        // ... (Validaciones de archivo)
+      // ... (Validaciones de archivo)
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -237,10 +225,10 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       if (formData.upload_file && formData.upload_file instanceof File && formData.upload_file.name && formData.upload_file.size > 0) {
         dataToSend.append('file', formData.upload_file);
       }
-      
+
       dataToSend.append('type', formData.type);
       dataToSend.append('title', formData.title);
-      
+
       let descriptionContent = formData.description;
       if (editorInstanceRef.current) {
         const editorContent = editorInstanceRef.current.getData();
@@ -250,7 +238,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       dataToSend.append('category', formData.category || "");
       dataToSend.append('author', formData.author || "");
       dataToSend.append('status', formData.status);
-      
+
       if (formData.start_date) dataToSend.append('start_date', toIsoDate(formData.start_date));
       if (formData.end_date) dataToSend.append('end_date', toIsoDate(formData.end_date));
       if (publishedAt) dataToSend.append('published_at', publishedAt);
@@ -277,7 +265,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
   return (
     <div className="fixed inset-0 z-50 bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
-        
+
         {/* Header con Azul Profundo */}
         <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100" style={{ backgroundColor: BRAND.darkBlue }}>
           <div>
@@ -301,7 +289,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
             {/* SECCIÓN 1: Detalles Principales */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-               <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                 <FileText size={16} style={{ color: BRAND.blue }} /> Información General
               </h3>
 
@@ -309,8 +297,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
               <div className="mb-5">
                 <label className={labelClass}>Título <span className="text-red-500">*</span></label>
                 <div className="relative">
-                   <Type className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16}/>
-                   <input
+                  <Type className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                  <input
                     type="text"
                     name="title"
                     value={formData.title}
@@ -321,21 +309,21 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                     disabled={loading}
                   />
                 </div>
-                {errors.title && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12}/> {errors.title}</p>}
+                {errors.title && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.title}</p>}
               </div>
 
               {/* Description (CKEditor) */}
               <div>
                 <label className={labelClass}>Descripción / Contenido</label>
                 <div className="prose max-w-none border rounded-xl overflow-hidden bg-white" style={{ borderColor: '#E5E7EB' }}>
-                   <div ref={editorRef}></div>
+                  <div ref={editorRef}></div>
                 </div>
               </div>
             </div>
 
             {/* SECCIÓN 2: Clasificación y Autor */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-               <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                 <Tag size={16} style={{ color: BRAND.darkGreen }} /> Clasificación
               </h3>
 
@@ -362,8 +350,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                 <div>
                   <label className={labelClass}>Autor</label>
                   <div className="relative">
-                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16}/>
-                     <input
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                    <input
                       type="text"
                       name="author"
                       value={formData.author}
@@ -380,7 +368,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
             {/* SECCIÓN 3: Multimedia */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-               <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                 <ImageIcon size={16} style={{ color: BRAND.orange }} /> Imagen Destacada
               </h3>
 
@@ -406,59 +394,59 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                 </div>
               ) : (
                 <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl bg-gray-50">
-                   <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 border border-gray-300">
-                      {typeof formData.upload_file === 'object' ? (
-                        <img src={URL.createObjectURL(formData.upload_file)} alt="Preview" className="w-full h-full object-cover" />
-                      ) : (
-                        <img src={formData.upload_file.url} alt="Preview" className="w-full h-full object-cover" />
-                      )}
-                   </div>
-                   <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {formData.upload_file.name || "Imagen actual"}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {(formData.upload_file.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
-                   </div>
-                   <button onClick={removeFile} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition">
-                      <XCircle size={20} />
-                   </button>
+                  <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 border border-gray-300">
+                    {typeof formData.upload_file === 'object' ? (
+                      <img src={URL.createObjectURL(formData.upload_file)} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <img src={formData.upload_file.url} alt="Preview" className="w-full h-full object-cover" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {formData.upload_file.name || "Imagen actual"}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {(formData.upload_file.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                  <button onClick={removeFile} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition">
+                    <XCircle size={20} />
+                  </button>
                 </div>
               )}
-              {errors.upload_file && <p className="mt-2 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12}/> {errors.upload_file}</p>}
+              {errors.upload_file && <p className="mt-2 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.upload_file}</p>}
             </div>
 
             {/* SECCIÓN 4: Fechas */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-               <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                 <Calendar size={16} style={{ color: BRAND.blue }} /> Vigencia
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                 <div>
-                    <label className={labelClass}>Fecha Inicio</label>
-                    <input
-                      type="date"
-                      name="start_date"
-                      value={formData.start_date}
-                      onChange={handleChange}
-                      className={inputClass}
-                      style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    />
-                 </div>
-                 <div>
-                    <label className={labelClass}>Fecha Fin</label>
-                    <input
-                      type="date"
-                      name="end_date"
-                      value={formData.end_date}
-                      onChange={handleChange}
-                      className={inputClass}
-                      style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    />
-                    {errors.end_date && <p className="mt-1 text-xs font-medium text-orange-500">{errors.end_date}</p>}
-                 </div>
+                <div>
+                  <label className={labelClass}>Fecha Inicio</label>
+                  <input
+                    type="date"
+                    name="start_date"
+                    value={formData.start_date}
+                    onChange={handleChange}
+                    className={inputClass}
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Fecha Fin</label>
+                  <input
+                    type="date"
+                    name="end_date"
+                    value={formData.end_date}
+                    onChange={handleChange}
+                    className={inputClass}
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                  />
+                  {errors.end_date && <p className="mt-1 text-xs font-medium text-orange-500">{errors.end_date}</p>}
+                </div>
               </div>
             </div>
 

@@ -2,20 +2,20 @@ import { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register, getPublicRoles } from "../../api/auth";
 import { AuthContext } from "../../context/AuthContext";
-import { 
-  User, 
-  Mail, 
-  Lock, 
-  Shield, 
-  ArrowRight, 
-  CheckCircle2, 
+import {
+  User,
+  Mail,
+  Lock,
+  Shield,
+  ArrowRight,
+  CheckCircle2,
   Loader2,
   Eye,
   EyeOff,
   AlertCircle
 } from "lucide-react";
 
-import Logo from "../../assets/fondosYlogos/Logo.png"; 
+import Logo from "../../assets/fondosYlogos/Logo.png";
 import LogoBlanco from "../../assets/fondosYlogos/Logo_blanco.png";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -81,10 +81,7 @@ export default function Register() {
     if (error) setError("");
   };
 
-  const getRoleName = (roleId) => {
-    const role = roles.find(r => r.id == roleId);
-    return role ? role.name : "Sin rol";
-  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -129,7 +126,7 @@ export default function Register() {
 
       {/* SECCIÓN IZQUIERDA */}
       <div className="hidden lg:flex w-[50%] relative flex-col justify-between p-10 text-white"
-           style={{ background: `linear-gradient(135deg, ${BRAND.darkBlue} 0%, ${BRAND.blue} 100%)` }}>
+        style={{ background: `linear-gradient(135deg, ${BRAND.darkBlue} 0%, ${BRAND.blue} 100%)` }}>
 
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
 
@@ -265,7 +262,7 @@ export default function Register() {
                     className="w-full pl-9 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
                   />
 
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
@@ -291,7 +288,7 @@ export default function Register() {
                     className="w-full pl-9 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
                   />
 
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
                     className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"

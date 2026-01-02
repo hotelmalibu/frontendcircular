@@ -1,6 +1,5 @@
 // UBICACIÓN: src/pages/ExplorePage.jsx
 import React, { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Search, ChevronDown, FilterX } from "lucide-react";
 // Asegúrate que la ruta a mockContent sea correcta según tu estructura
 import { contentTypeConfig } from "../../data/mockContent";
@@ -16,7 +15,6 @@ export default function ExplorePage() {
   const [newsItems, setNewsItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loadingNews, setLoadingNews] = useState(true);
-  const [loadingCategories, setLoadingCategories] = useState(true);
 
   // Only use news from API (remove mock data)
   const newsData = useMemo(() => {
@@ -24,15 +22,15 @@ export default function ExplorePage() {
     return (newsItems || [])
       .filter(n => String(n.status).toLowerCase() === 'published')
       .map(n => ({
-      id: n.id || n._id || Math.random(),
-      type: "Noticias",
-      category: n.category || "General",
-      title: n.title || n.name || "Sin título",
-      excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
-      image: (n.upload_file && n.upload_file.url) || n.image || n.thumbnail || n.cover || "",
-      date: n.published_at ? new Date(n.published_at).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : "",
-      slug: n.slug || (`noticia-${n.id || n._id || ''}`),
-    }));
+        id: n.id || n._id || Math.random(),
+        type: "Noticias",
+        category: n.category || "General",
+        title: n.title || n.name || "Sin título",
+        excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
+        image: (n.upload_file && n.upload_file.url) || n.image || n.thumbnail || n.cover || "",
+        date: n.published_at ? new Date(n.published_at).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : "",
+        slug: n.slug || (`noticia-${n.id || n._id || ''}`),
+      }));
   }, [newsItems]);
 
   const allCategories = useMemo(() => categories.map(cat => cat.name), [categories]);
@@ -87,7 +85,6 @@ export default function ExplorePage() {
 
     const loadCategories = async () => {
       try {
-        setLoadingCategories(true);
         const response = await getAllCategories();
 
         let categoriesArray = [];
@@ -107,7 +104,7 @@ export default function ExplorePage() {
       } catch (err) {
         console.error('Error loading categories for ExplorePage:', err);
       } finally {
-        if (mounted) setLoadingCategories(false);
+        // loadingCategories setter removed
       }
     };
 
@@ -117,18 +114,18 @@ export default function ExplorePage() {
   }, []);
 
   return (
-    
+
     <div className="min-h-screen bg-white ">
-      
+
       {/* --- HERO SECTION (IMAGEN DE FONDO COMPLETA) --- */}
-      
+
       <div className="relative w-full h-[70vh] md:h-[82vh] flex items-center justify-center overflow-hidden bg-[#0D1B2A]">
-        
+
         {/* Imagen de fondo  */}
-        <div 
+        <div
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat scale-105"
-          style={{ 
-            backgroundImage: "url('https://images.unsplash.com/photo-1509881511796-3a0c5a059ec1?q=80&w=1633&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" 
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1509881511796-3a0c5a059ec1?q=80&w=1633&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"
           }}
         ></div>
 
@@ -141,7 +138,7 @@ export default function ExplorePage() {
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 fontfamily-montserrat tracking-tight drop-shadow-lg">
               Explora la economía circular
             </h1>
-            
+
             <div className="relative group max-w-2xl mx-auto">
               <input
                 type="text"
@@ -160,7 +157,7 @@ export default function ExplorePage() {
 
       {/* --- FILTROS Y RESULTADOS (Contenedor centrado) --- */}
       <div className="container mx-auto px-4 md:px-8 py-10">
-        
+
         {/* Barra de Filtros Minimalista */}
         <div className="flex flex-wrap items-center gap-6 mb-12 border-b border-gray-100 pb-8">
           <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Filtrar resultados:</span>
@@ -175,7 +172,7 @@ export default function ExplorePage() {
               <FilterX size={16} /> Borrar filtros
             </button>
           )}
-          
+
           <div className="ml-auto text-sm text-gray-500 font-medium hidden lg:block">
             {filteredResults.length} publicaciones encontradas
           </div>
@@ -238,8 +235,8 @@ function MinimalistCard({ item }) {
         ) : (
           item.image ? (
             <>
-               <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-               <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"></div>
+              <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10"></div>
             </>
           ) : (
             <div className="w-full h-full flex items-center justify-center relative p-6 bg-gray-50">
@@ -254,15 +251,15 @@ function MinimalistCard({ item }) {
 
       <div className="flex flex-col flex-1">
         <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest mb-3 text-gray-400">
-            <span className={config.isSolid ? "text-gray-500" : config.color}>{item.type}</span>
-            <span className="text-gray-300">/</span>
-            <span>{item.category}</span>
+          <span className={config.isSolid ? "text-gray-500" : config.color}>{item.type}</span>
+          <span className="text-gray-300">/</span>
+          <span>{item.category}</span>
         </div>
         <h3 className="text-lg font-bold text-[#1E305D] leading-snug mb-3 group-hover:text-[#00AB6D] transition-colors">
           {item.title}
         </h3>
         <p className="text-gray-500 text-sm line-clamp-3 leading-relaxed flex-1">
-            {item.excerpt}
+          {item.excerpt}
         </p>
       </div>
     </a>

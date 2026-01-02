@@ -9,23 +9,20 @@ import {
   Plus,
   Building,
   Edit,
-  Trash2,
-  Eye,
   Search,
-  LayoutDashboard,
-  FileText
+  FileText,
+  Eye,
+  Trash2
 } from "lucide-react";
 import {
   LineChart,
   Line,
   XAxis,
-  YAxis,
   CartesianGrid,
   Tooltip,
   BarChart,
   Bar,
   ResponsiveContainer,
-  Legend
 } from "recharts";
 import React, { useState, useEffect } from "react";
 import { getAllProjects, deleteProject } from "../../../../api/projectsApi";
@@ -123,21 +120,12 @@ export default function Undexsub() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    loadProjects();
-  }, []);
-
-  useEffect(() => {
-    filterProjectsData();
-  }, [searchTerm, projects]);
-
-  const loadProjects = async () => {
+  const loadProjects = React.useCallback(async () => {
     try {
       setLoading(true);
       const response = await getAllProjects();
-      // ... lógica de extracción de datos igual ...
       let projectsArray = [];
-       if (response?.data?.items && Array.isArray(response.data.items)) {
+      if (response?.data?.items && Array.isArray(response.data.items)) {
         projectsArray = response.data.items;
       } else if (Array.isArray(response)) {
         projectsArray = response;
@@ -150,28 +138,39 @@ export default function Undexsub() {
       }
       setProjects(projectsArray);
     } catch (err) {
-      console.error("Error loading projects:", err);
+      console.error("Error loading projects for main dashboard:", err);
       setProjects([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const filterProjectsData = () => {
+  const filterProjectsData = React.useCallback(() => {
     if (!Array.isArray(projects)) {
       setFilteredProjects([]);
       return;
     }
+
     let filtered = [...projects];
     if (searchTerm) {
       filtered = filtered.filter(
         (item) =>
           item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.description?.toLowerCase().includes(searchTerm.toLowerCase())
+          item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.author?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
+
     setFilteredProjects(filtered);
-  };
+  }, [projects, searchTerm]);
+
+  useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
+
+  useEffect(() => {
+    filterProjectsData();
+  }, [searchTerm, projects, filterProjectsData]);
 
   const handleCreate = () => {
     setSelectedProject(null);
@@ -209,7 +208,7 @@ export default function Undexsub() {
 
   return (
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
-      
+
       {/* Header Superior */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>
@@ -218,15 +217,15 @@ export default function Undexsub() {
           </h1>
           <p className="text-gray-500 mt-1">Resumen de actividad y gestión de proyectos</p>
         </div>
-        
+
         <div className="flex gap-3">
-          <button 
+          <button
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium shadow-sm hover:shadow-md transition-all"
             style={{ backgroundColor: BRAND.blue }}
           >
             <RefreshCw size={18} /> Actualizar
           </button>
-          <button 
+          <button
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium shadow-sm hover:shadow-md transition-all"
             style={{ backgroundColor: BRAND.darkGreen }}
           >
@@ -262,7 +261,7 @@ export default function Undexsub() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         {/* Sección Izquierda: Gestión de Proyectos (Ocupa 2/3) */}
         <div className="lg:col-span-2 flex flex-col gap-8">
-          
+
           {/* Gestión de Proyectos */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
@@ -308,26 +307,26 @@ export default function Undexsub() {
                     className="group bg-white rounded-xl p-5 border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200"
                   >
                     <div className="flex justify-between items-start mb-3">
-                      <span 
+                      <span
                         className="text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider"
                         style={{ backgroundColor: `${BRAND.lightBlue}20`, color: BRAND.darkBlue }}
                       >
                         {project.category || "General"}
                       </span>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => handleView(project)} className="p-1.5 hover:bg-gray-100 rounded text-gray-600"><Eye size={16}/></button>
-                        <button onClick={() => handleEdit(project)} className="p-1.5 hover:bg-gray-100 rounded text-gray-600"><Edit size={16}/></button>
-                        <button onClick={() => handleDelete(project.id)} className="p-1.5 hover:bg-red-50 rounded text-red-500"><Trash2 size={16}/></button>
+                        <button onClick={() => handleView(project)} className="p-1.5 hover:bg-gray-100 rounded text-gray-600"><Eye size={16} /></button>
+                        <button onClick={() => handleEdit(project)} className="p-1.5 hover:bg-gray-100 rounded text-gray-600"><Edit size={16} /></button>
+                        <button onClick={() => handleDelete(project.id)} className="p-1.5 hover:bg-red-50 rounded text-red-500"><Trash2 size={16} /></button>
                       </div>
                     </div>
-                    
+
                     <h3 className="font-bold text-gray-800 mb-2 truncate text-lg">
                       {project.title}
                     </h3>
                     <p className="text-sm text-gray-600 mb-4 line-clamp-2 h-10">
                       {project.description ? project.description.replace(/<[^>]+>/g, '') : "Sin descripción disponible."}
                     </p>
-                    
+
                     <div className="flex items-center gap-2 text-xs text-gray-400 pt-3 border-t border-gray-100">
                       <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
                         {project.author ? project.author.charAt(0) : "U"}
@@ -338,12 +337,12 @@ export default function Undexsub() {
                 ))}
               </div>
             )}
-            
+
             {filteredProjects.length > 6 && (
               <div className="text-center mt-6">
-                <a href="#" className="text-sm font-medium hover:underline" style={{ color: BRAND.blue }}>
+                <button className="text-sm font-medium hover:underline" style={{ color: BRAND.blue }}>
                   Ver todos los proyectos ({filteredProjects.length})
-                </a>
+                </button>
               </div>
             )}
           </div>
@@ -354,44 +353,44 @@ export default function Undexsub() {
               Métricas de Impacto Ambiental
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <div className="h-64">
-                 <h4 className="text-sm font-semibold text-gray-500 mb-4 text-center">Actividad Mensual</h4>
-                 <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={graficoImpacto}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB"/>
-                      <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{fill: '#6B7280'}} dy={10} />
-                      <Tooltip 
-                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="valor"
-                        stroke={BRAND.blue}
-                        strokeWidth={3}
-                        dot={{ r: 4, fill: BRAND.blue, strokeWidth: 2, stroke: '#fff' }}
-                        activeDot={{ r: 6, fill: BRAND.orange }}
-                      />
-                    </LineChart>
-                 </ResponsiveContainer>
-               </div>
-               <div className="h-64">
-                 <h4 className="text-sm font-semibold text-gray-500 mb-4 text-center">Distribución por Tipo</h4>
-                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={graficoRed}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB"/>
-                      <XAxis dataKey="tipo" axisLine={false} tickLine={false} tick={{fill: '#6B7280'}} dy={10} />
-                      <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ borderRadius: '8px' }} />
-                      <Bar dataKey="valor" radius={[6, 6, 0, 0]} barSize={40} />
-                    </BarChart>
-                 </ResponsiveContainer>
-               </div>
+              <div className="h-64">
+                <h4 className="text-sm font-semibold text-gray-500 mb-4 text-center">Actividad Mensual</h4>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={graficoImpacto}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                    <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} dy={10} />
+                    <Tooltip
+                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="valor"
+                      stroke={BRAND.blue}
+                      strokeWidth={3}
+                      dot={{ r: 4, fill: BRAND.blue, strokeWidth: 2, stroke: '#fff' }}
+                      activeDot={{ r: 6, fill: BRAND.orange }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="h-64">
+                <h4 className="text-sm font-semibold text-gray-500 mb-4 text-center">Distribución por Tipo</h4>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={graficoRed}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                    <XAxis dataKey="tipo" axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} dy={10} />
+                    <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px' }} />
+                    <Bar dataKey="valor" radius={[6, 6, 0, 0]} barSize={40} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Sección Derecha: Alertas y Resumen (Ocupa 1/3) */}
         <div className="lg:col-span-1 flex flex-col gap-8">
-          
+
           {/* Alertas */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
@@ -402,7 +401,7 @@ export default function Undexsub() {
                 <div
                   key={index}
                   className="p-4 rounded-xl border-l-4 transition-all hover:bg-gray-50"
-                  style={{ 
+                  style={{
                     borderColor: alerta.tipo === "crítica" ? BRAND.orange : alerta.tipo === "advertencia" ? BRAND.yellow : BRAND.blue,
                     backgroundColor: 'white',
                     borderWidth: '1px',
@@ -410,9 +409,9 @@ export default function Undexsub() {
                   }}
                 >
                   <div className="flex justify-between items-start mb-1">
-                    <span 
+                    <span
                       className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
-                      style={{ 
+                      style={{
                         color: alerta.tipo === "crítica" ? BRAND.orange : alerta.tipo === "advertencia" ? BRAND.yellow : BRAND.blue,
                         backgroundColor: alerta.tipo === "crítica" ? '#FFF5EB' : alerta.tipo === "advertencia" ? '#FFFBEB' : '#EFF6FF'
                       }}
@@ -433,27 +432,27 @@ export default function Undexsub() {
 
           {/* Resumen Ambiental Rápido */}
           <div className="bg-[#2C67B0] rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
-             {/* Elemento decorativo de fondo */}
-             <div className="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
-             <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-[#B1D357] opacity-20 rounded-full"></div>
-             
-             <h3 className="text-lg font-bold mb-4 relative z-10">Resumen Eco</h3>
-             <div className="space-y-4 relative z-10">
-                <div className="flex justify-between items-center border-b border-white/20 pb-3">
-                  <span className="text-blue-100 text-sm">Reducción CO₂</span>
-                  <span className="font-bold text-xl">152.8 kg</span>
+            {/* Elemento decorativo de fondo */}
+            <div className="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
+            <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-[#B1D357] opacity-20 rounded-full"></div>
+
+            <h3 className="text-lg font-bold mb-4 relative z-10">Resumen Eco</h3>
+            <div className="space-y-4 relative z-10">
+              <div className="flex justify-between items-center border-b border-white/20 pb-3">
+                <span className="text-blue-100 text-sm">Reducción CO₂</span>
+                <span className="font-bold text-xl">152.8 kg</span>
+              </div>
+              <div className="flex justify-between items-center border-b border-white/20 pb-3">
+                <span className="text-blue-100 text-sm">Ahorro Energía</span>
+                <span className="font-bold text-xl">45 MWh</span>
+              </div>
+              <div className="pt-2">
+                <div className="w-full bg-blue-900/30 rounded-full h-2 mb-2">
+                  <div className="bg-[#B1D357] h-2 rounded-full" style={{ width: '75%' }}></div>
                 </div>
-                <div className="flex justify-between items-center border-b border-white/20 pb-3">
-                  <span className="text-blue-100 text-sm">Ahorro Energía</span>
-                  <span className="font-bold text-xl">45 MWh</span>
-                </div>
-                <div className="pt-2">
-                  <div className="w-full bg-blue-900/30 rounded-full h-2 mb-2">
-                    <div className="bg-[#B1D357] h-2 rounded-full" style={{ width: '75%' }}></div>
-                  </div>
-                  <span className="text-xs text-blue-100">Meta mensual al 75%</span>
-                </div>
-             </div>
+                <span className="text-xs text-blue-100">Meta mensual al 75%</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

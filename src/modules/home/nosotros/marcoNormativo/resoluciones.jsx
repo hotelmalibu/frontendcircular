@@ -1,12 +1,12 @@
 import React from "react";
 // --- IMPORTACIONES DE LIBRERÍAS ---
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { 
-  Box, GlassWater, Trash2, Recycle, Target, MapPin, Lightbulb, GraduationCap, 
-  Package, ShoppingCart, Factory, Truck 
+import {
+  Box, GlassWater, Trash2, Recycle, Target, MapPin, Lightbulb, GraduationCap,
+  Package, ShoppingCart, Factory, Truck
 } from 'lucide-react';
 
 
@@ -20,10 +20,9 @@ import pdf0803 from "../../../../assets/marconormativo/resoluciones/RES.-0803-DE
 const COLOR_AZUL_PRINCIPAL = '#1E305D';
 const COLOR_AZUL_SECUNDARIO = '#2C67B0';
 const COLOR_VERDE_PRINCIPAL = '#00AB6D';
-const COLOR_FONDO_CLARO = '#f9f9f9';
 const COLOR_GRIS_TEXTO = '#333333';
 const COLOR_BARRA_START = '#00AB6D';
-const COLOR_BARRA_END = '#808E59'; 
+const COLOR_BARRA_END = '#808E59';
 
 
 // --- DATOS PARA GRÁFICOS DINÁMICOS ---
@@ -61,30 +60,28 @@ const customLeafletIcon = L.divIcon({
 
 
 export default function Index() {
-  const linkHoverStyle = {
-    transition: 'color 0.3s ease', color: COLOR_AZUL_SECUNDARIO, textDecoration: 'none',
-  };
+
   const handleLinkHover = (e, isHovering) => {
     e.target.style.color = isHovering ? COLOR_VERDE_PRINCIPAL : COLOR_AZUL_SECUNDARIO;
   };
 
   return (
     <div className="mt-24 font-sans min-h-screen" style={{ color: '#e6e6e6ff' }}>
-      
-     
+
+
       <div className="px-6 py-10 max-w-6xl mx-auto">
-        
+
         <h1 className="text-4xl font-sans font-extrabold text-center mb-12 uppercase" style={{ color: COLOR_AZUL_PRINCIPAL }}>
           Marco Normativo
         </h1>
 
         {/* --- SECCIÓN RESOLUCIONES 1407 Y 1342 --- */}
-        <section 
-          className="mb-16 p-8 rounded-xl shadow-lg" 
+        <section
+          className="mb-16 p-8 rounded-xl shadow-lg"
           style={{ backgroundColor: COLOR_AZUL_SECUNDARIO }} // Fondo azul
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 text-white">
-            
+
             <div className="flex flex-col items-center md:items-start flex-shrink-0">
               <h3 className="font-sans font-thin text-3xl text-gray-200 tracking-wider">RESOLUCIÓN</h3>
               <div className="flex items-baseline my-2">
@@ -97,7 +94,7 @@ export default function Index() {
               </div>
               <p className="text-sm text-gray-300 mt-4">Ministerio de Ambiente y Desarrollo Sostenible.</p>
             </div>
-            
+
             <div className="md:w-1/2 text-left md:border-l-2 border-gray-400 border-opacity-50 pl-8">
               <div className="flex flex-wrap justify-start gap-5 text-gray-200 mb-6">
                 <Package size={32} /> <ShoppingCart size={32} /> <GlassWater size={32} />
@@ -119,7 +116,7 @@ export default function Index() {
             Cadena de Valor Circular
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
+
             <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md">
               <Factory size={40} className="flex-shrink-0" style={{ color: COLOR_AZUL_SECUNDARIO }} />
               <div>
@@ -252,14 +249,14 @@ export default function Index() {
                 <li className="flex items-center"><span className="text-xl mr-3" style={{ color: COLOR_VERDE_PRINCIPAL }}>◆</span> Valorización energética</li>
               </ul>
             </div>
-            
+
             <div className="lg:w-2/3 w-full" style={{ height: '300px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={metasCumplimiento} margin={{ top: 20, right: 0, left: -20, bottom: 5 }}>
                   <defs>
                     <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={COLOR_BARRA_START} stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor={COLOR_BARRA_END} stopOpacity={0.8}/>
+                      <stop offset="5%" stopColor={COLOR_BARRA_START} stopOpacity={0.8} />
+                      <stop offset="95%" stopColor={COLOR_BARRA_END} stopOpacity={0.8} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -289,12 +286,12 @@ export default function Index() {
                 ))}
               </ul>
             </div>
-            
+
             <div className="lg:w-1/2 w-full h-80 rounded-lg overflow-hidden border-2" style={{ borderColor: COLOR_AZUL_SECUNDARIO }}>
-              <MapContainer 
+              <MapContainer
                 center={[4.5709, -74.2973]}
-                zoom={5} 
-                style={{ height: '100%', width: '100%' }} 
+                zoom={5}
+                style={{ height: '100%', width: '100%' }}
                 scrollWheelZoom={false}
               >
                 <TileLayer
@@ -322,8 +319,8 @@ export default function Index() {
               <Recycle size={150} style={{ color: COLOR_VERDE_PRINCIPAL }} strokeWidth={1} />
             </div>
             <div className="lg:w-2/3 text-left">
-              <div 
-                className="w-full p-6 rounded-lg" 
+              <div
+                className="w-full p-6 rounded-lg"
                 style={{ backgroundColor: COLOR_AZUL_SECUNDARIO }} // Fondo azul para la lista
               >
                 <h3 className="text-2xl font-bold text-white mb-4 border-b-2 border-white pb-2">CRITERIO</h3>
@@ -405,7 +402,7 @@ export default function Index() {
             ))}
           </div>
         </div>
-        
+
         <div className="h-10"></div>
       </div>
     </div>

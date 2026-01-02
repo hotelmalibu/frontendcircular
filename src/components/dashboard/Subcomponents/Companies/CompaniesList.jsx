@@ -13,7 +13,6 @@ import {
   Package,
   AlertCircle,
   Clock,
-  ExternalLink,
   ChevronLeft,
   ChevronRight,
   Filter
@@ -52,23 +51,15 @@ export default function CompaniesList() {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    loadCompanies();
-  }, [currentPage]);
-
-  useEffect(() => {
-    filterCompaniesData();
-  }, [searchTerm, companies]);
-
-  const loadCompanies = async () => {
+  const loadCompanies = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await getAllCompanies(currentPage, pagination.per_page, 'created_at', 'desc');
-      
+
       let companiesArray = [];
-      
+
       // Lógica de extracción de datos (Mantenida igual para robustez)
       if (response?.data?.items && Array.isArray(response.data.items)) {
         companiesArray = response.data.items;
@@ -92,7 +83,7 @@ export default function CompaniesList() {
           companiesArray = possibleArrays[0][1];
         }
         if (response.meta && typeof response.meta === 'object') {
-           if (response.meta.total !== undefined) {
+          if (response.meta.total !== undefined) {
             setPagination(prev => ({
               ...prev,
               total: response.meta.total,
@@ -105,31 +96,42 @@ export default function CompaniesList() {
 
       setCompanies(companiesArray);
     } catch (err) {
-      console.error("❌ Error loading companies:", err);
-      setError(err.response?.data?.message || "Error al cargar las empresas");
+      console.error("Error loading companies:", err);
+      setError("Error al conectar con el servidor");
       setCompanies([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, pagination.per_page]);
 
-  const filterCompaniesData = () => {
+  const filterCompaniesData = React.useCallback(() => {
     if (!Array.isArray(companies)) {
       setFilteredCompanies([]);
       return;
     }
-    let filtered = [...companies];
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (item) =>
-          item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.address?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+
+    if (!searchTerm.trim()) {
+      setFilteredCompanies(companies);
+      return;
     }
+
+    const term = searchTerm.toLowerCase();
+    const filtered = companies.filter(c =>
+      (c.name?.toLowerCase().includes(term)) ||
+      (c.description?.toLowerCase().includes(term)) ||
+      (c.email?.toLowerCase().includes(term)) ||
+      (c.address?.toLowerCase().includes(term))
+    );
     setFilteredCompanies(filtered);
-  };
+  }, [searchTerm, companies]);
+
+  useEffect(() => {
+    loadCompanies();
+  }, [currentPage, loadCompanies]);
+
+  useEffect(() => {
+    filterCompaniesData();
+  }, [searchTerm, companies, filterCompaniesData]);
 
   const handleCreate = () => {
     setSelectedCompany(null);
@@ -194,22 +196,22 @@ export default function CompaniesList() {
 
   return (
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
-      
+
       {/* ESPACIADOR SUPERIOR */}
       <div className="w-full "></div>
 
       {/* Encabezado */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
         {/* Encabezado de Sección */}
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
-                      <Building className="text-blue-400" size={32} />
-                      Directorio de Empresas
-                    </h1>
-                    <p className="text-gray-500 mt-2 text-lg ml-11">
-                      Gestión de aliados estratégicos y organizaciones registradas
-                    </p>
-                  </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
+            <Building className="text-blue-400" size={32} />
+            Directorio de Empresas
+          </h1>
+          <p className="text-gray-500 mt-2 text-lg ml-11">
+            Gestión de aliados estratégicos y organizaciones registradas
+          </p>
+        </div>
         <button
           onClick={handleCreate}
           className="w-full lg:w-auto flex items-center justify-center gap-2 px-6 py-3 text-white rounded-xl shadow-md hover:shadow-lg transition-all font-bold text-sm transform active:scale-95"
@@ -234,9 +236,9 @@ export default function CompaniesList() {
           />
         </div>
         <div className="flex gap-2 w-full md:w-auto">
-            <button className="flex items-center gap-2 px-4 py-3 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition w-full justify-center">
-                <Filter size={18} /> <span className="text-sm font-medium">Filtros</span>
-            </button>
+          <button className="flex items-center gap-2 px-4 py-3 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition w-full justify-center">
+            <Filter size={18} /> <span className="text-sm font-medium">Filtros</span>
+          </button>
         </div>
       </div>
 
@@ -276,107 +278,107 @@ export default function CompaniesList() {
               <div className="h-1.5 w-full absolute top-0 left-0" style={{ backgroundColor: BRAND.blue }}></div>
 
               <div className="p-5 flex-1 flex flex-col">
-                  {/* Cabecera de la Tarjeta */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="w-14 h-14 rounded-xl border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 bg-gray-50">
-                        {item.logo && item.logo.url ? (
-                        <img
-                            src={item.logo.url}
-                            alt={`Logo ${item.name}`}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                            }}
-                        />
-                        ) : null}
-                        <div className={`flex items-center justify-center w-full h-full ${item.logo && item.logo.url ? 'hidden' : ''}`}>
-                            <Building size={24} style={{ color: BRAND.lightBlue }} />
-                        </div>
-                    </div>
-                    
-                    {/* Badge de fecha */}
-                    <div className="flex items-center gap-1 text-[10px] bg-gray-100 px-2 py-1 rounded-full text-gray-500">
-                        <Clock size={10} />
-                        <span>{formatDate(item.created_at)}</span>
+                {/* Cabecera de la Tarjeta */}
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-14 h-14 rounded-xl border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 bg-gray-50">
+                    {item.logo && item.logo.url ? (
+                      <img
+                        src={item.logo.url}
+                        alt={`Logo ${item.name}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div className={`flex items-center justify-center w-full h-full ${item.logo && item.logo.url ? 'hidden' : ''}`}>
+                      <Building size={24} style={{ color: BRAND.lightBlue }} />
                     </div>
                   </div>
 
-                  {/* Información Principal */}
-                  <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-1 group-hover:text-blue-700 transition-colors">
-                    {item.name}
-                  </h3>
-                  
-                  <p className="text-xs text-gray-500 mb-4 line-clamp-3 leading-relaxed flex-grow">
-                    {item.description ? 
-                      item.description.replace(/<[^>]+>/g, '').slice(0, 100) + (item.description.length > 100 ? '...' : '')
-                      : "Sin descripción registrada."
-                    }
-                  </p>
-
-                  {/* Detalles de Contacto */}
-                  <div className="space-y-2 mb-4 border-t border-gray-100 pt-3">
-                    {item.email && (
-                      <div className="flex items-center gap-2 text-xs text-gray-500 truncate" title={item.email}>
-                        <Mail size={12} className="text-gray-400 flex-shrink-0" />
-                        <span className="truncate">{item.email}</span>
-                      </div>
-                    )}
-                    {item.phone && (
-                      <div className="flex items-center gap-2 text-xs text-gray-500 truncate">
-                        <Phone size={12} className="text-gray-400 flex-shrink-0" />
-                        <span>{item.phone}</span>
-                      </div>
-                    )}
-                    {item.address && (
-                      <div className="flex items-center gap-2 text-xs text-gray-500 truncate">
-                        <MapPin size={12} className="text-gray-400 flex-shrink-0" />
-                        <span className="truncate">{item.address}</span>
-                      </div>
-                    )}
-                     {item.website_url && (
-                      <div className="flex items-center gap-2 text-xs text-gray-500 truncate">
-                        <Globe size={12} className="text-gray-400 flex-shrink-0" />
-                        <a href={item.website_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate">
-                            Web Oficial
-                        </a>
-                      </div>
-                    )}
+                  {/* Badge de fecha */}
+                  <div className="flex items-center gap-1 text-[10px] bg-gray-100 px-2 py-1 rounded-full text-gray-500">
+                    <Clock size={10} />
+                    <span>{formatDate(item.created_at)}</span>
                   </div>
+                </div>
+
+                {/* Información Principal */}
+                <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-1 group-hover:text-blue-700 transition-colors">
+                  {item.name}
+                </h3>
+
+                <p className="text-xs text-gray-500 mb-4 line-clamp-3 leading-relaxed flex-grow">
+                  {item.description ?
+                    item.description.replace(/<[^>]+>/g, '').slice(0, 100) + (item.description.length > 100 ? '...' : '')
+                    : "Sin descripción registrada."
+                  }
+                </p>
+
+                {/* Detalles de Contacto */}
+                <div className="space-y-2 mb-4 border-t border-gray-100 pt-3">
+                  {item.email && (
+                    <div className="flex items-center gap-2 text-xs text-gray-500 truncate" title={item.email}>
+                      <Mail size={12} className="text-gray-400 flex-shrink-0" />
+                      <span className="truncate">{item.email}</span>
+                    </div>
+                  )}
+                  {item.phone && (
+                    <div className="flex items-center gap-2 text-xs text-gray-500 truncate">
+                      <Phone size={12} className="text-gray-400 flex-shrink-0" />
+                      <span>{item.phone}</span>
+                    </div>
+                  )}
+                  {item.address && (
+                    <div className="flex items-center gap-2 text-xs text-gray-500 truncate">
+                      <MapPin size={12} className="text-gray-400 flex-shrink-0" />
+                      <span className="truncate">{item.address}</span>
+                    </div>
+                  )}
+                  {item.website_url && (
+                    <div className="flex items-center gap-2 text-xs text-gray-500 truncate">
+                      <Globe size={12} className="text-gray-400 flex-shrink-0" />
+                      <a href={item.website_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate">
+                        Web Oficial
+                      </a>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Footer de Acciones */}
               <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-between items-center">
                 <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-                     <Package size={14} style={{ color: BRAND.darkGreen }} />
-                     <span>{item.products ? item.products.length : 0} Productos</span>
+                  <Package size={14} style={{ color: BRAND.darkGreen }} />
+                  <span>{item.products ? item.products.length : 0} Productos</span>
                 </div>
 
                 <div className="flex gap-1">
-                    <button
-                        onClick={() => handleView(item)}
-                        className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
-                        title="Ver detalle"
-                        style={{ color: BRAND.blue }}
-                    >
-                        <Eye size={18} />
-                    </button>
-                    <button
-                        onClick={() => handleEdit(item)}
-                        className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
-                        title="Editar"
-                        style={{ color: BRAND.darkGreen }}
-                    >
-                        <Edit size={18} />
-                    </button>
-                    <button
-                        onClick={() => handleDelete(item.id)}
-                        className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
-                        title="Eliminar"
-                        style={{ color: BRAND.orange }}
-                    >
-                        <Trash2 size={18} />
-                    </button>
+                  <button
+                    onClick={() => handleView(item)}
+                    className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    title="Ver detalle"
+                    style={{ color: BRAND.blue }}
+                  >
+                    <Eye size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleEdit(item)}
+                    className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    title="Editar"
+                    style={{ color: BRAND.darkGreen }}
+                  >
+                    <Edit size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    title="Eliminar"
+                    style={{ color: BRAND.orange }}
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
               </div>
             </div>
@@ -390,39 +392,38 @@ export default function CompaniesList() {
           <p className="text-sm text-gray-500">
             Mostrando <span className="font-bold">{filteredCompanies.length}</span> de <span className="font-bold">{pagination.total}</span> empresas
           </p>
-          
+
           <div className="flex items-center gap-2">
             <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="p-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-                <ChevronLeft size={20} />
+              <ChevronLeft size={20} />
             </button>
-            
+
             <div className="flex gap-1 overflow-x-auto max-w-[200px] sm:max-w-none no-scrollbar">
-                {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map((page) => (
+              {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map((page) => (
                 <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`min-w-[36px] h-9 rounded-lg text-sm font-medium transition-all ${
-                    page === currentPage
-                        ? "text-white shadow-md"
-                        : "text-gray-600 hover:bg-gray-100 border border-transparent"
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`min-w-[36px] h-9 rounded-lg text-sm font-medium transition-all ${page === currentPage
+                    ? "text-white shadow-md"
+                    : "text-gray-600 hover:bg-gray-100 border border-transparent"
                     }`}
-                    style={page === currentPage ? { backgroundColor: BRAND.blue } : {}}
+                  style={page === currentPage ? { backgroundColor: BRAND.blue } : {}}
                 >
-                    {page}
+                  {page}
                 </button>
-                ))}
+              ))}
             </div>
-            
+
             <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === pagination.last_page}
-                className="p-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === pagination.last_page}
+              className="p-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-                <ChevronRight size={20} />
+              <ChevronRight size={20} />
             </button>
           </div>
         </div>

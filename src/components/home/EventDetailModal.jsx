@@ -6,7 +6,6 @@ import {
   MapPin,
   Video,
   Users,
-  Link as LinkIcon,
   Tag,
   Clock,
   CheckCircle,

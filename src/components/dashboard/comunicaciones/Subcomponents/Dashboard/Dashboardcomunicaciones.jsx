@@ -3,7 +3,6 @@ import {
   Server,
   Zap,
   Database,
-  UploadCloud,
   Clock,
   PenTool,
   Calendar,
@@ -79,9 +78,9 @@ export default function DashboardContenido() {
   ];
 
   const actividad = [
-    { tipo: "Artículo", texto: "‘Innovaciones en Reciclaje’ publicado", time: "Hace 2h", icon: <PenTool size={14}/>, color: BRAND.blue },
-    { tipo: "Newsletter", texto: "‘EcoFriendly’ enviada a 12.800 suscriptores", time: "Hace 5h", icon: <Mail size={14}/>, color: BRAND.darkGreen },
-    { tipo: "Evento", texto: "‘Taller de Reaprovechamiento’ creado", time: "Ayer", icon: <Calendar size={14}/>, color: BRAND.orange },
+    { tipo: "Artículo", texto: "‘Innovaciones en Reciclaje’ publicado", time: "Hace 2h", icon: <PenTool size={14} />, color: BRAND.blue },
+    { tipo: "Newsletter", texto: "‘EcoFriendly’ enviada a 12.800 suscriptores", time: "Hace 5h", icon: <Mail size={14} />, color: BRAND.darkGreen },
+    { tipo: "Evento", texto: "‘Taller de Reaprovechamiento’ creado", time: "Ayer", icon: <Calendar size={14} />, color: BRAND.orange },
   ];
 
   return (
@@ -102,28 +101,28 @@ export default function DashboardContenido() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50 transition group">
             <div className="p-2 rounded-full bg-blue-100 text-blue-600 group-hover:bg-blue-200 transition">
-               <PenTool size={20} />
+              <PenTool size={20} />
             </div>
             <span className="text-sm font-semibold text-gray-700">Nuevo Artículo</span>
           </button>
-          
+
           <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-gray-300 hover:border-green-400 hover:bg-green-50 transition group">
             <div className="p-2 rounded-full bg-[#E9F5E9] text-[#65A30D] group-hover:bg-green-200 transition">
-               <Calendar size={20} />
+              <Calendar size={20} />
             </div>
             <span className="text-sm font-semibold text-gray-700">Nuevo Evento</span>
           </button>
 
           <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-gray-300 hover:border-orange-400 hover:bg-orange-50 transition group">
             <div className="p-2 rounded-full bg-[#FFF7ED] text-[#EA580C] group-hover:bg-orange-200 transition">
-               <Mail size={20} />
+              <Mail size={20} />
             </div>
             <span className="text-sm font-semibold text-gray-700">Newsletter</span>
           </button>
 
           <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-gray-300 hover:border-purple-400 hover:bg-purple-50 transition group">
             <div className="p-2 rounded-full bg-purple-100 text-purple-600 group-hover:bg-purple-200 transition">
-               <FileImage size={20} />
+              <FileImage size={20} />
             </div>
             <span className="text-sm font-semibold text-gray-700">Subir Media</span>
           </button>
@@ -139,17 +138,17 @@ export default function DashboardContenido() {
             <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
               <Server size={20} className="text-gray-400" /> Rendimiento General
             </h3>
-            <button className="text-gray-400 hover:text-gray-600"><MoreHorizontal size={20}/></button>
+            <button className="text-gray-400 hover:text-gray-600"><MoreHorizontal size={20} /></button>
           </div>
 
           <div className="grid grid-cols-2 gap-4 flex-grow">
             {metricas.map((m, idx) => (
               <div key={idx} className="flex flex-col justify-between bg-gray-50 rounded-xl p-5 hover:shadow-md transition-shadow">
                 <div className="flex justify-between items-start mb-2">
-                   <div className="p-2 rounded-lg bg-white shadow-sm" style={{ color: m.color }}>
-                     {m.icon}
-                   </div>
-                   {idx === 3 && <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-bold">+1.2%</span>}
+                  <div className="p-2 rounded-lg bg-white shadow-sm" style={{ color: m.color }}>
+                    {m.icon}
+                  </div>
+                  {idx === 3 && <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-bold">+1.2%</span>}
                 </div>
                 <div>
                   <p className="text-2xl font-bold" style={{ color: BRAND.darkBlue }}>{m.valor}</p>
@@ -221,17 +220,17 @@ export default function DashboardContenido() {
 
         {/* Actividad Reciente */}
         <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
-           <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
               <Clock size={20} className="text-gray-400" /> Bitácora de Actividad
             </h3>
-            <button className="p-1 hover:bg-gray-100 rounded text-gray-400"><ArrowUpRight size={18}/></button>
+            <button className="p-1 hover:bg-gray-100 rounded text-gray-400"><ArrowUpRight size={18} /></button>
           </div>
 
           <div className="relative pl-2">
             {/* Línea conectora */}
             <div className="absolute left-[11px] top-2 bottom-4 w-px bg-gray-200"></div>
-            
+
             <div className="space-y-6">
               {actividad.map((a, i) => (
                 <div key={i} className="relative flex items-start gap-4">

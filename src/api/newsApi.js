@@ -35,7 +35,7 @@ export const getPublishedNewsWithImages = async () => {
   try {
     // First, get the list of all news
     const listResponse = await getAllNews();
-    
+
     let newsArray = [];
     if (Array.isArray(listResponse)) {
       newsArray = listResponse;
@@ -54,7 +54,7 @@ export const getPublishedNewsWithImages = async () => {
 
     // Filter only published news
     const publishedNews = newsArray.filter(n => n.status === 'published');
-    
+
     // For each published news, try to get detailed info with image
     // We'll do this sequentially to avoid overwhelming the API
     const detailedNews = await Promise.all(
@@ -62,12 +62,12 @@ export const getPublishedNewsWithImages = async () => {
         try {
           const detailedResponse = await getNewsById(newsItem.id);
           const detailedNews = detailedResponse.data?.news || detailedResponse.news || detailedResponse;
-          
+
           // Keep original URL for images
           if (detailedNews.upload_file && detailedNews.upload_file.url) {
             console.log(`News ${detailedNews.id} image URL:`, detailedNews.upload_file.url);
           }
-          
+
           return detailedNews;
         } catch (error) {
           console.warn(`Failed to get detailed news for ID ${newsItem.id}:`, error);
@@ -107,13 +107,13 @@ export const createNews = async (newsData) => {
       'Content-Type': 'application/json',
     },
   };
-  
+
   console.log("newsApi.js - createNews called with:", {
     isFormData: newsData instanceof FormData,
     config: config,
     endpoint: NEWS_ENDPOINT
   });
-  
+
   // Log FormData contents if it's FormData
   if (newsData instanceof FormData) {
     console.log("FormData contents:");
@@ -125,7 +125,7 @@ export const createNews = async (newsData) => {
       }
     }
   }
-  
+
   try {
     console.log("🚀 Sending request to:", NEWS_ENDPOINT);
     console.log("📤 Request config:", config);
@@ -157,7 +157,7 @@ export const updateNews = async (newsId, newsData) => {
       'Content-Type': 'application/json',
     },
   };
-  
+
   const response = await api.put(`${NEWS_ENDPOINT}/${newsId}`, newsData, config);
   return response.data;
 };
@@ -172,7 +172,7 @@ export const deleteNews = async (newsId) => {
   return response.data;
 };
 
-export default {
+const newsApi = {
   getAllNews,
   getNewsById,
   getPublishedNewsWithImages,
@@ -180,3 +180,5 @@ export default {
   updateNews,
   deleteNews,
 };
+
+export default newsApi;

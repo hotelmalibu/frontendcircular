@@ -18,13 +18,13 @@ const CORS_PROXIES = [
  */
 export const getImageProxyUrl = (imageUrl, proxyIndex = 0) => {
   if (!imageUrl) return '';
-  
+
   // If the image is from our API domain, use a CORS proxy
   if (imageUrl.includes('api-ecocircular.creativostecnologicosit.com')) {
     const proxy = CORS_PROXIES[proxyIndex] || CORS_PROXIES[0];
     return `${proxy}${encodeURIComponent(imageUrl)}`;
   }
-  
+
   // Return original URL for other domains
   return imageUrl;
 };
@@ -38,7 +38,7 @@ export const getImageProxyFallbacks = (imageUrl) => {
   if (!imageUrl || !imageUrl.includes('api-ecocircular.creativostecnologicosit.com')) {
     return [imageUrl].filter(Boolean);
   }
-  
+
   return CORS_PROXIES.map(proxy => `${proxy}${encodeURIComponent(imageUrl)}`);
 };
 
@@ -58,7 +58,7 @@ export const needsCorsProxy = (imageUrl) => {
  */
 export const extractOriginalUrl = (proxyUrl) => {
   if (!proxyUrl) return '';
-  
+
   for (const proxy of CORS_PROXIES) {
     if (proxyUrl.startsWith(proxy)) {
       try {
@@ -70,7 +70,7 @@ export const extractOriginalUrl = (proxyUrl) => {
       }
     }
   }
-  
+
   return proxyUrl;
 };
 
@@ -86,36 +86,36 @@ export const extractOriginalUrl = (proxyUrl) => {
 export const createImageWithFallback = (src, options = {}) => {
   const { onLoad, onError, fallbacks = [] } = options;
   const img = new Image();
-  
+
   let currentSrcIndex = 0;
   const allSrcs = [src, ...fallbacks].filter(Boolean);
-  
+
   const tryNextSrc = () => {
     if (currentSrcIndex >= allSrcs.length) {
       if (onError) onError(new Error('All image sources failed'));
       return;
     }
-    
+
     img.src = allSrcs[currentSrcIndex];
     currentSrcIndex++;
   };
-  
+
   img.onload = () => {
     if (onLoad) onLoad(img.src);
   };
-  
+
   img.onerror = () => {
     console.log(`Failed to load image: ${allSrcs[currentSrcIndex - 1]}`);
     tryNextSrc();
   };
-  
+
   // Start loading
   tryNextSrc();
-  
+
   return img;
 };
 
-export default {
+const imageUtils = {
   getImageProxyUrl,
   getImageProxyFallbacks,
   needsCorsProxy,
@@ -123,3 +123,5 @@ export default {
   createImageWithFallback,
   CORS_PROXIES
 };
+
+export default imageUtils;

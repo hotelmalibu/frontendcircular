@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Calendar,
   MapPin,
@@ -13,14 +13,11 @@ import {
 import { getAllSchedules } from "../../api/scheduleApi";
 import EventDetailModal from "./EventDetailModal";
 
-const BRAND = {
-  blue: "#2C67B0",
-  darkBlue: "#005380",
-  lightBlue: "#7FB8D9",
-  green: "#B1D357",
-  darkGreen: "#8CB200",
-  gray: "#6B7280",
-};
+
+
+// Configuración fija
+const CARDS_PER_PAGE = 3;
+const CARD_WIDTH_WITH_GAP = 320 + 24; // 320px + 24px gap
 
 export default function EventsSection() {
   const [events, setEvents] = useState([]);
@@ -33,19 +30,9 @@ export default function EventsSection() {
 
   const scrollContainerRef = useRef(null);
 
-  // Configuración fija
-  const cardsPerPage = 3;
-  const cardWidthWithGap = 320 + 24; // 320px + 24px gap
-  const totalPages = Math.ceil(events.length / cardsPerPage);
+  const totalPages = Math.ceil(events.length / CARDS_PER_PAGE);
 
-  useEffect(() => {
-    loadEvents();
-    const handleEventCreated = () => loadEvents();
-    window.addEventListener("eventCreated", handleEventCreated);
-    return () => window.removeEventListener("eventCreated", handleEventCreated);
-  }, []);
-
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -76,7 +63,14 @@ export default function EventsSection() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadEvents();
+    const handleEventCreated = () => loadEvents();
+    window.addEventListener("eventCreated", handleEventCreated);
+    return () => window.removeEventListener("eventCreated", handleEventCreated);
+  }, [loadEvents]);
 
   const handleEventClick = (event) => {
     setSelectedEvent(event);
@@ -95,11 +89,10 @@ export default function EventsSection() {
     const isRemote = type === "remote";
     return (
       <span
-        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-          isRemote
-            ? "text-blue-700 bg-blue-50 border border-blue-100"
-            : "text-purple-700 bg-purple-50 border border-purple-100"
-        }`}
+        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isRemote
+          ? "text-blue-700 bg-blue-50 border border-blue-100"
+          : "text-purple-700 bg-purple-50 border border-purple-100"
+          }`}
       >
         {isRemote ? <Video size={10} /> : <MapPin size={10} />}
         {isRemote ? "Virtual" : "Presencial"}
@@ -135,7 +128,7 @@ export default function EventsSection() {
   // Función para ir a una página específica
   const goToPage = (page) => {
     if (!scrollContainerRef.current) return;
-    const targetScroll = page * cardWidthWithGap * cardsPerPage;
+    const targetScroll = page * CARD_WIDTH_WITH_GAP * CARDS_PER_PAGE;
     scrollContainerRef.current.scrollTo({
       left: targetScroll,
       behavior: "smooth",
@@ -150,11 +143,11 @@ export default function EventsSection() {
 
     const handleScroll = () => {
       const scrollLeft = container.scrollLeft;
-      const pageWidth = cardWidthWithGap * cardsPerPage;
+      const pageWidth = CARD_WIDTH_WITH_GAP * CARDS_PER_PAGE;
       let newPage = Math.round(scrollLeft / pageWidth);
 
       // Porque el contenedor es duplicado, ajustamos el índice real
-      if (newPage >= events.length / cardsPerPage) {
+      if (newPage >= events.length / CARDS_PER_PAGE) {
         newPage = 0;
         // Reiniciamos suavemente al inicio para mantener el loop infinito
         container.scrollTo({ left: 0, behavior: "instant" });
@@ -255,10 +248,9 @@ export default function EventsSection() {
                         className="min-w-[320px] max-w-[320px] flex-shrink-0 bg-white rounded-xl p-5 shadow-sm hover:shadow-md border border-gray-100 hover:border-green-300 transition-all duration-200 cursor-pointer relative overflow-hidden"
                       >
                         <div
-                          className={`absolute left-0 top-0 bottom-0 w-1 ${
-                            status.text === "En curso" ? "bg-green-500" :
+                          className={`absolute left-0 top-0 bottom-0 w-1 ${status.text === "En curso" ? "bg-green-500" :
                             status.text === "Próximo" ? "bg-blue-500" : "bg-gray-300"
-                          }`}
+                            }`}
                         ></div>
 
                         <div className="flex justify-between items-start gap-4 pl-2">
@@ -313,11 +305,10 @@ export default function EventsSection() {
                     <button
                       key={i}
                       onClick={() => goToPage(i)}
-                      className={`transition-all duration-300 rounded-full ${
-                        currentPage === i
-                          ? "bg-green-600 w-10 h-2"
-                          : "bg-gray-300 w-3 h-2 hover:bg-gray-400"
-                      }`}
+                      className={`transition-all duration-300 rounded-full ${currentPage === i
+                        ? "bg-green-600 w-10 h-2"
+                        : "bg-gray-300 w-3 h-2 hover:bg-gray-400"
+                        }`}
                       aria-label={`Ir a página ${i + 1}`}
                     />
                   ))}

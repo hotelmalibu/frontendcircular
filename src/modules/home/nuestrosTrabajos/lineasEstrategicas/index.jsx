@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import imgProyectos from "../../../../assets/lineasestrategicas/proyectos.png";
 import imgInnovacion from "../../../../assets/lineasestrategicas/innovacion.png";
 import imgInclusion from "../../../../assets/lineasestrategicas/inclusion.png";

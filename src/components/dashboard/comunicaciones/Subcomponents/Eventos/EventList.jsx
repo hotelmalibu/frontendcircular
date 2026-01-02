@@ -59,16 +59,7 @@ export default function EventList() {
     total: 0
   });
 
-  useEffect(() => {
-    loadEvents();
-    loadCategories();
-  }, [currentPage]);
-
-  useEffect(() => {
-    filterEventsData();
-  }, [searchTerm, filterCategory, filterStatus, filterType, events]);
-
-  const loadEvents = async () => {
+  const loadEvents = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -94,9 +85,9 @@ export default function EventList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, pagination.per_page]);
 
-  const loadCategories = async () => {
+  const loadCategories = React.useCallback(async () => {
     try {
       setCategoriesLoading(true);
       const response = await getAllCategories();
@@ -116,9 +107,9 @@ export default function EventList() {
     } finally {
       setCategoriesLoading(false);
     }
-  };
+  }, []);
 
-  const filterEventsData = () => {
+  const filterEventsData = React.useCallback(() => {
     if (!Array.isArray(events)) {
       setFilteredEvents([]);
       return;
@@ -146,7 +137,19 @@ export default function EventList() {
     }
 
     setFilteredEvents(filtered);
-  };
+  }, [events, searchTerm, filterCategory, filterStatus, filterType]);
+
+  useEffect(() => {
+    loadEvents();
+  }, [currentPage, loadEvents]);
+
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
+
+  useEffect(() => {
+    filterEventsData();
+  }, [searchTerm, filterCategory, filterStatus, filterType, events, filterEventsData]);
 
   const handleCreate = () => {
     setSelectedEvent(null);

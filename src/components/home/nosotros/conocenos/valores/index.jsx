@@ -1,11 +1,10 @@
 import React from "react";
-import { 
-  ShieldAlert, 
-  FileText, 
-  Scale, 
-  Building2, 
-  Download, 
-  ArrowRight, 
+import {
+  ShieldAlert,
+  FileText,
+  Scale,
+  Building2,
+  ArrowRight,
   Lock,
   CheckCircle2
 } from "lucide-react";
@@ -25,7 +24,7 @@ export default function TransparencyPortal() {
       descripcion: "Canal confidencial y anónimo para reportar conductas contrarias a principios.",
       action: "Reportar",
       link: "#",
-      highlight: true 
+      highlight: true
     },
     {
       icon: Building2,
@@ -45,7 +44,7 @@ export default function TransparencyPortal() {
 
   return (
     <section className="bg-slate-50 mt-24 px-6 py-20 relative overflow-hidden">
-      
+
       {/* Decoración de fondo sutil (opcional) */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-200 to-transparent"></div>
 
@@ -54,7 +53,7 @@ export default function TransparencyPortal() {
         <span className="bg-green-100 text-green-800 py-1 px-4 rounded-full text-xs font-bold uppercase tracking-widest mb-6 inline-block">
           Integridad Institucional
         </span>
-        
+
         <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
           Portal de Ética y <span className="text-green-600 relative inline-block">
             Transparencia
@@ -74,8 +73,8 @@ export default function TransparencyPortal() {
           <div
             key={index}
             className={`group flex flex-col bg-white rounded-2xl transition-all duration-300 hover:-translate-y-1
-              ${item.highlight 
-                ? "border-2 border-green-500 shadow-xl shadow-green-900/10" 
+              ${item.highlight
+                ? "border-2 border-green-500 shadow-xl shadow-green-900/10"
                 : "border border-slate-100 shadow-sm hover:shadow-lg hover:border-green-200"
               }`}
           >
@@ -86,7 +85,7 @@ export default function TransparencyPortal() {
                 </div>
                 {item.highlight && <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>}
               </div>
-              
+
               <h3 className="text-lg font-bold text-slate-900 mb-2">{item.titulo}</h3>
               <p className="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
                 {item.descripcion}
@@ -100,10 +99,10 @@ export default function TransparencyPortal() {
         ))}
       </div>
 
-     
+
       <div className="max-w-6xl mx-auto mb-16">
         <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 flex flex-col md:flex-row gap-10 items-center shadow-sm">
-          
+
           {/* Lado Izquierdo: Título visual */}
           <div className="md:w-1/3 flex flex-col items-start border-b md:border-b-0 md:border-r border-slate-100 pb-6 md:pb-0 md:pr-6">
             <h3 className="text-2xl font-bold text-slate-800 mb-2">Compromiso de Claridad</h3>
@@ -116,7 +115,7 @@ export default function TransparencyPortal() {
           {/* Lado Derecho: El Texto de Transparencia */}
           <div className="md:w-2/3">
             <p className="text-slate-600 text-lg leading-relaxed">
-              La transparencia es un eje fundamental en nuestra gestión. Mantenemos una comunicación clara y oportuna sobre avances y metodologías, publicando informes que permiten hacer seguimiento al impacto. 
+              La transparencia es un eje fundamental en nuestra gestión. Mantenemos una comunicación clara y oportuna sobre avances y metodologías, publicando informes que permiten hacer seguimiento al impacto.
             </p>
             <p className="text-slate-600 text-lg leading-relaxed mt-4">
               Garantizamos que las alianzas operen bajo criterios de <strong className="text-slate-800">apertura y rendición de cuentas</strong>, reafirmando nuestro compromiso con las mejores prácticas del país.

@@ -3,11 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
-  Check,
   Calendar,
-  MapPin,
-  ArrowUpRight,
-  TrendingUp,
   Facebook,
   X,
   Linkedin,
@@ -18,13 +14,7 @@ import {
 } from "lucide-react";
 import { getProjectById } from "../../api/projectsApi";
 
-const formatNumber = (val) => {
-  if (typeof val === 'number') {
-    if (val >= 1000) return `${(val / 1000).toFixed(1)}k+`;
-    return `${val}+`;
-  }
-  return val;
-};
+
 
 export default function ContentDetailProject() {
   const { id } = useParams();
@@ -151,6 +141,7 @@ export default function ContentDetailProject() {
             <div className="absolute inset-0">
               <img
                 src={project.image}
+                alt={project.title}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-b from-[#1E305D]/60 via-[#1E305D]/80 to-[#1E305D]" />

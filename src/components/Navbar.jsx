@@ -4,15 +4,13 @@ import { AuthContext } from "../context/AuthContext";
 import LogoBlanco from "../assets/fondosYlogos/Logo_blanco.png";
 import Logo from "../assets/fondosYlogos/Logo.png";
 import DefaultAvatar from "../assets/fondosYlogos/default-avatar.png";
-import { 
-  User, 
-  LogOut, 
-  Home, 
-  Shield, 
-  Handshake, 
-  Menu, 
-  ChevronDown, 
-  Bell, 
+import {
+  User,
+  LogOut,
+  Home,
+  Menu,
+  ChevronDown,
+  Bell,
   MessageSquare
 } from "lucide-react";
 
@@ -67,7 +65,7 @@ function MobileMenuDropdown({ title, subsections, showWhiteBg, showHover, showWh
                       <span>{subsection.title}</span>
                       <ChevronDown className={`w-4 h-4 transition-transform ${openSubmenus[idx] ? "rotate-180" : ""}`} />
                     </button>
-                    
+
                     {openSubmenus[idx] && (
                       <div className="bg-gray-100/50 border-l-2 ml-8 mb-2" style={{ borderColor: BRAND.lightBlue }}>
                         {subsection.items.map((item, itemIdx) => {
@@ -100,13 +98,13 @@ function MobileMenuDropdown({ title, subsections, showWhiteBg, showHover, showWh
                             );
                           }
                           return (
-                            <Link 
-                              key={itemIdx} 
-                              to={item.path} 
-                              onClick={onClose} 
+                            <Link
+                              key={itemIdx}
+                              to={item.path}
+                              onClick={onClose}
                               className="block py-2 px-4 text-sm text-gray-600 hover:text-blue-600 transition-colors"
                             >
-                              {item.label} 
+                              {item.label}
                             </Link>
                           );
                         })}
@@ -114,9 +112,9 @@ function MobileMenuDropdown({ title, subsections, showWhiteBg, showHover, showWh
                     )}
                   </>
                 ) : (
-                  <Link 
-                    to={sectionPath} 
-                    onClick={onClose} 
+                  <Link
+                    to={sectionPath}
+                    onClick={onClose}
                     className="block py-3 px-8 font-semibold text-xs uppercase tracking-wide text-gray-600 hover:text-blue-600"
                   >
                     {subsection.title}
@@ -134,28 +132,28 @@ function MobileMenuDropdown({ title, subsections, showWhiteBg, showHover, showWh
 function MegaMenuDropdown({ label, sections = [], showWhiteBg, showHover, showWhiteText, onOpenChange }) {
   const [open, setOpen] = useState(false);
   const timeoutRef = useRef(null);
-  
+
   const handleMouseEnter = () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setOpen(true); onOpenChange(true); };
   const handleMouseLeave = () => { timeoutRef.current = setTimeout(() => { setOpen(false); onOpenChange(false); }, 300); };
-  
+
   useEffect(() => { return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }; }, []);
 
   const textColorClass = showWhiteText ? "text-white" : "text-gray-700";
 
   return (
     <div className="relative group h-full flex items-center" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      <button 
-        type="button" 
+      <button
+        type="button"
         className={`text-base lg:text-base font-semibold fontfamily-montserrat transition-all menu-underline pb-1 ${open ? "active" : ""} ${textColorClass}`}
         style={{ '--hover-color': BRAND.blue }}
       >
         {label}
       </button>
-      
+
       <div className={`fixed left-0 right-0 top-full bg-white shadow-xl transform transition-all duration-300 border-t border-gray-100 ${open ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-2"}`}>
         {/* Barra de gradiente superior */}
         <div className="h-1.5 w-full bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${BRAND.green}, ${BRAND.blue}, ${BRAND.darkBlue})` }}></div>
-        
+
         <div className="container mx-auto px-8 py-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 items-start">
             {sections.map((section, idx) => {
@@ -171,11 +169,11 @@ function MegaMenuDropdown({ label, sections = [], showWhiteBg, showHover, showWh
                       {section.title}
                     </Link>
                   )}
-                  
+
                   {section.items && section.items.length > 0 && (
                     <ul className="space-y-2.5">
                       {section.items.map((item, itemIdx) => (
-                        <li key={itemIdx} className="group/item relative"> 
+                        <li key={itemIdx} className="group/item relative">
                           {item.subItems && item.subItems.length > 0 ? (
                             <div className="w-full">
                               <button className="w-full text-left flex items-center justify-between text-gray-600 hover:text-blue-600 text-sm transition-all duration-200 py-0.5 font-medium group-hover/item:translate-x-1">
@@ -217,10 +215,10 @@ function ProfileDropdown({ user, logout, showWhiteText }) {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const timeoutRef = useRef(null);
-  
+
   const handleMouseEnter = () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setOpen(true); };
   const handleMouseLeave = () => { timeoutRef.current = setTimeout(() => { setOpen(false); }, 300); };
-  
+
   const userFullName = user?.name ? `${user.name} ${user.lastName || ''}`.trim() : 'Usuario';
   const userRole = user?.role || 'Sin rol';
   const userAvatar = user?.avatar || DefaultAvatar;
@@ -239,11 +237,11 @@ function ProfileDropdown({ user, logout, showWhiteText }) {
         </div>
         <ChevronDown size={16} className={`${showWhiteText ? 'text-white' : 'text-gray-500'} transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
-      
+
       <div className={`absolute right-0 mt-0 w-56 bg-white rounded-xl shadow-xl border border-gray-100 transform transition-all duration-200 origin-top-right overflow-hidden ${open ? "opacity-100 visible scale-100" : "opacity-0 invisible scale-95"}`}>
         <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 sm:hidden">
-            <p className="text-sm font-bold text-gray-800">{userFullName}</p>
-            <p className="text-xs text-gray-500">{userRole}</p>
+          <p className="text-sm font-bold text-gray-800">{userFullName}</p>
+          <p className="text-xs text-gray-500">{userRole}</p>
         </div>
         <div className="py-1">
           <Link to="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
@@ -277,7 +275,7 @@ export default function Navbar({ onMenuClick }) {
 
   // --- LÓGICA DE VISIBILIDAD ---
   const isPublicPage = location.pathname === '/';
-  
+
   const internalPaths = ["/dashboard", "/documentos", "/seguimiento", "/formularios", "/comunicaciones", "/administracion", "/integracion", "/profile"];
   const isInternalPage = user && internalPaths.some(path => location.pathname.startsWith(path));
 
@@ -285,11 +283,11 @@ export default function Navbar({ onMenuClick }) {
   const isTransparentNavPath = transparentPaths.some(path => location.pathname.startsWith(path));
 
   const isInteracted = scrolled || isHovered || hasOpenDropdown || mobileMenuOpen;
-  
+
   const isDashboardView = (user && isPublicPage && !isInteracted);
   const isAuthPage = ["/login", "/register", "/juntaDirecteEquipo"].includes(location.pathname);
-  
-  const showHover = isPublicPage || isTransparentNavPath;
+
+
 
   let showWhiteBg;
   if (isAuthPage) {
@@ -300,7 +298,7 @@ export default function Navbar({ onMenuClick }) {
     showWhiteBg = false;
   } else {
     if (user) {
-      showWhiteBg = true; 
+      showWhiteBg = true;
     } else {
       showWhiteBg = isInteracted;
     }
@@ -384,9 +382,8 @@ export default function Navbar({ onMenuClick }) {
 
   return (
     <div
-      className={`fixed top-0 left-0 w-full z-50 font-sans ${user ? '' : 'transition-all duration-500 ease-in-out'} ${
-        user ? 'translate-y-0 opacity-100' : (visible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0")
-      }`}
+      className={`fixed top-0 left-0 w-full z-50 font-sans ${user ? '' : 'transition-all duration-500 ease-in-out'} ${user ? 'translate-y-0 opacity-100' : (visible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0")
+        }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -421,7 +418,7 @@ export default function Navbar({ onMenuClick }) {
 
       {/* NAVBAR HEADER */}
       <header className={`flex items-center justify-between px-4 md:px-24 py-4 transition-all duration-300 ${!showWhiteBg ? "bg-transparent" : "bg-white shadow-md border-b border-gray-100"}`}>
-        
+
         {/* HAMBURGER MENU (Mobile) */}
         {user && isPublicPage && (
           <button onClick={onMenuClick} className="md:hidden text-white hover:text-gray-200 transition-colors mr-4" aria-label="Abrir menú">
@@ -443,14 +440,14 @@ export default function Navbar({ onMenuClick }) {
         {(!user || (user && !isInternalPage)) && (
           <nav className="nav-desktop flex items-center gap-8 lg:gap-16 flex-1 justify-center mx-4">
             {menuSections.map((section) => (
-              <MegaMenuDropdown 
-                key={section.name} 
-                label={section.name} 
-                sections={section.subsections} 
-                showWhiteBg={showWhiteBg} 
-                showHover={isPublicPage || isTransparentNavPath} 
-                showWhiteText={showWhiteText} 
-                onOpenChange={setHasOpenDropdown} 
+              <MegaMenuDropdown
+                key={section.name}
+                label={section.name}
+                sections={section.subsections}
+                showWhiteBg={showWhiteBg}
+                showHover={isPublicPage || isTransparentNavPath}
+                showWhiteText={showWhiteText}
+                onOpenChange={setHasOpenDropdown}
               />
             ))}
           </nav>
@@ -458,7 +455,7 @@ export default function Navbar({ onMenuClick }) {
 
         {/* BOTONES Y USUARIO */}
         <div className="flex items-center gap-3 md:gap-5 ml-auto">
-          
+
           {/* Alertas (Solo si hay usuario) */}
           {user && (
             <div className="flex items-center gap-1">
@@ -481,9 +478,9 @@ export default function Navbar({ onMenuClick }) {
 
           {/* HAMBURGER (Mobile - Right) */}
           {!isInternalPage && (
-            <button 
-              className={`nav-mobile ml-2 hamburger ${mobileMenuOpen ? "active" : ""}`} 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+            <button
+              className={`nav-mobile ml-2 hamburger ${mobileMenuOpen ? "active" : ""}`}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Menú móvil"
             >
               <div className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-800"}`}></div>
@@ -497,26 +494,26 @@ export default function Navbar({ onMenuClick }) {
       {/* MENÚ MÓVIL */}
       {mobileMenuOpen && !user && !isInternalPage && (
         <div className="nav-mobile fixed inset-0 z-40 bg-gray-900/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
-           <div className="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-white shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
-              <div className="p-5 border-b border-gray-100 flex justify-end">
-                 <button onClick={() => setMobileMenuOpen(false)} className="p-2 bg-gray-100 rounded-full text-gray-500">
-                    <LogOut size={20} className="rotate-180"/> 
-                 </button>
-              </div>
-              <div className="flex-1 overflow-y-auto py-4">
-                {menuSections.map((section) => (
-                  <MobileMenuDropdown 
-                    key={section.name} 
-                    title={section.name} 
-                    subsections={section.subsections} 
-                    showWhiteBg={true} 
-                    showHover={false} 
-                    showWhiteText={false} 
-                    onClose={handleMobileMenuClick} 
-                  />
-                ))}
-              </div>
-           </div>
+          <div className="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-white shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="p-5 border-b border-gray-100 flex justify-end">
+              <button onClick={() => setMobileMenuOpen(false)} className="p-2 bg-gray-100 rounded-full text-gray-500">
+                <LogOut size={20} className="rotate-180" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto py-4">
+              {menuSections.map((section) => (
+                <MobileMenuDropdown
+                  key={section.name}
+                  title={section.name}
+                  subsections={section.subsections}
+                  showWhiteBg={true}
+                  showHover={false}
+                  showWhiteText={false}
+                  onClose={handleMobileMenuClick}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

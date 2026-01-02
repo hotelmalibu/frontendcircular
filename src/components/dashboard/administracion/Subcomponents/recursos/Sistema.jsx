@@ -1,12 +1,11 @@
 import React from "react";
-import { 
-  Settings, 
-  BarChart2, 
-  Users, 
-  Activity, 
-  Server, 
-  FileText, 
-  LayoutDashboard, 
+import {
+  Settings,
+  BarChart2,
+  Users,
+  Server,
+  FileText,
+  LayoutDashboard,
   ClipboardList,
   CheckCircle,
   AlertTriangle,
@@ -101,7 +100,7 @@ export default function Sistema() {
 
   return (
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
-      
+
       {/* ESPACIADOR SUPERIOR */}
       <div className="w-full"></div>
 
@@ -118,26 +117,26 @@ export default function Sistema() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {sistemas.map((sistema) => {
           const statusStyle = getStatusConfig(sistema.estado);
-          
+
           return (
             <div
               key={sistema.id}
               className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 flex flex-col relative overflow-hidden group"
             >
               {/* Borde superior de estado */}
-              <div 
-                className="h-1.5 w-full absolute top-0 left-0" 
+              <div
+                className="h-1.5 w-full absolute top-0 left-0"
                 style={{ backgroundColor: statusStyle.darkColor }}
               ></div>
 
               <div className="p-6 flex-1 flex flex-col">
-                
+
                 {/* Header Card */}
                 <div className="flex justify-between items-start mb-4">
                   <div className="p-3 rounded-xl bg-blue-50 text-blue-700">
                     {React.cloneElement(sistema.icono, { color: BRAND.darkBlue })}
                   </div>
-                  <span 
+                  <span
                     className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide"
                     style={{ backgroundColor: statusStyle.bg, color: statusStyle.darkColor }}
                   >
@@ -152,7 +151,7 @@ export default function Sistema() {
 
                 {/* Métricas */}
                 <div className="mt-auto space-y-4">
-                  
+
                   {/* Usuarios */}
                   <div className="flex justify-between items-end">
                     <div>
@@ -175,11 +174,11 @@ export default function Sistema() {
                       </span>
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                      <div 
+                      <div
                         className="h-full rounded-full transition-all duration-1000"
-                        style={{ 
-                          width: `${sistema.disponibilidad}%`, 
-                          backgroundColor: statusStyle.color 
+                        style={{
+                          width: `${sistema.disponibilidad}%`,
+                          backgroundColor: statusStyle.color
                         }}
                       ></div>
                     </div>
@@ -190,13 +189,13 @@ export default function Sistema() {
 
               {/* Footer Actions */}
               <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex gap-3">
-                <button 
+                <button
                   className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold text-white transition hover:opacity-90 shadow-sm"
                   style={{ backgroundColor: BRAND.blue }}
                 >
                   <Settings size={16} /> Configurar
                 </button>
-                <button 
+                <button
                   className="flex items-center justify-center p-2 rounded-lg border border-gray-200 bg-white text-gray-500 hover:text-blue-600 hover:border-blue-200 transition shadow-sm"
                   title="Ver Estadísticas"
                 >

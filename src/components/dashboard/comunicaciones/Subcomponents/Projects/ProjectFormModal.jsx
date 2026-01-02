@@ -42,34 +42,34 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [errors, setErrors] = useState({});
 
+  const fetchCategories = React.useCallback(async () => {
+    try {
+      setCategoriesLoading(true);
+      const response = await getAllCategories();
+
+      let categoriesArray = [];
+      if (response?.data?.items && Array.isArray(response.data.items)) {
+        categoriesArray = response.data.items;
+      } else if (Array.isArray(response)) {
+        categoriesArray = response;
+      } else if (response?.data && Array.isArray(response.data)) {
+        categoriesArray = response.data;
+      } else if (response?.categories && Array.isArray(response.categories)) {
+        categoriesArray = response.categories;
+      }
+
+      setCategories(categoriesArray);
+    } catch (err) {
+      console.error("Error loading categories for projects:", err);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  }, []);
+
   // Fetch categories on mount
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setCategoriesLoading(true);
-        const response = await getAllCategories();
-
-        let categoriesArray = [];
-        if (response?.data?.items && Array.isArray(response.data.items)) {
-          categoriesArray = response.data.items;
-        } else if (Array.isArray(response)) {
-          categoriesArray = response;
-        } else if (response?.data && Array.isArray(response.data)) {
-          categoriesArray = response.data;
-        } else if (response?.categories && Array.isArray(response.categories)) {
-          categoriesArray = response.categories;
-        }
-
-        setCategories(categoriesArray);
-      } catch (err) {
-        console.error("Error loading categories for projects:", err);
-      } finally {
-        setCategoriesLoading(false);
-      }
-    };
-
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   useEffect(() => {
     if (isEditing && projectData) {
@@ -121,22 +121,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
         editorInstanceRef.current = null;
       }
     };
-  }, []);
-
-  // Sync editor content
-  useEffect(() => {
-    const instance = editorInstanceRef.current;
-    if (!instance) return;
-    const currentData = instance.getData() || '';
-    const targetData = formData.description || '';
-    if (currentData !== targetData) {
-      try {
-        instance.setData(targetData);
-      } catch (e) {
-        // ignore setData errors
-      }
-    }
-  }, [formData.description]);
+  }, [formData.description, errors.description]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

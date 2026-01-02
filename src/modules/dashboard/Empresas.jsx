@@ -2,16 +2,9 @@ import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
 import Companies from "../../components/dashboard/Companies";
-import { Building, UserX } from "lucide-react";
+import { UserX } from "lucide-react";
 
-// --- PALETA DE COLORES VISIÓN CIRCULAR ---
-const BRAND = {
-  blue: "#2C67B0",       // Azul Principal
-  darkBlue: "#005380",   // Azul Logo/Profundo
-  lightBlue: "#7FB8D9",  // Azul Claro
-  green: "#B1D357",      // Verde Principal
-  gray: "#6B7280",
-};
+
 
 export default function Empresas() {
   const { user } = useContext(AuthContext);
@@ -22,8 +15,8 @@ export default function Empresas() {
 
       <main className="flex-1 p-4 sm:p-8 lg:pt-28 transition-all duration-300">
         <div className="max-w-7xl mx-auto">
-          
-          
+
+
 
           {user ? (
             <div className="animate-fade-in-up min-h-[500px]">

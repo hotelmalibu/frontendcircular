@@ -59,10 +59,12 @@ export const deleteCategory = async (categoryId) => {
   return response.data;
 };
 
-export default {
+const categoriesApi = {
   getAllCategories,
   getCategoryById,
   createCategory,
   updateCategory,
   deleteCategory,
 };
+
+export default categoriesApi;

@@ -7,12 +7,11 @@ import {
   Search,
   Calendar,
   User,
-  Tag,
   AlertCircle,
-  CheckCircle,
-  Clock,
   Image as ImageIcon,
   Filter,
+  CheckCircle,
+  Clock,
   Newspaper
 } from "lucide-react";
 import { getAllNews, deleteNews } from "../../../../../api/newsApi";
@@ -38,28 +37,19 @@ export default function NewsList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("all");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all"); // filterType was unused, removed. filterStatus is now stateful.
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedNews, setSelectedNews] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    loadNews();
-  }, []);
-
-  useEffect(() => {
-    filterNewsData();
-  }, [searchTerm, filterType, filterStatus, news]);
-
-  const loadNews = async () => {
+  const loadNews = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await getAllNews();
-      
+
       let newsArray = [];
       if (Array.isArray(response)) {
         newsArray = response;
@@ -80,10 +70,10 @@ export default function NewsList() {
       const detailedNews = await Promise.all(
         newsArray.map(async (newsItem) => {
           try {
-            const daysSinceCreation = newsItem.created_at 
+            const daysSinceCreation = newsItem.created_at
               ? (new Date() - new Date(newsItem.created_at)) / (1000 * 60 * 60 * 24)
               : 999;
-            
+
             if (daysSinceCreation < 30) {
               const { getNewsById } = await import("../../../../../api/newsApi");
               const detailedResponse = await getNewsById(newsItem.id);
@@ -106,14 +96,14 @@ export default function NewsList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const filterNewsData = () => {
+  const filterNewsData = React.useCallback(() => {
     if (!Array.isArray(news)) {
       setFilteredNews([]);
       return;
     }
-    
+
     let filtered = [...news];
     if (searchTerm) {
       filtered = filtered.filter(
@@ -125,15 +115,24 @@ export default function NewsList() {
       );
     }
 
-    if (filterType !== "all") {
-      filtered = filtered.filter((item) => item.type === filterType);
-    }
+    // filterType was unused, removed.
+    // if (filterType !== "all") {
+    //   filtered = filtered.filter((item) => item.type === filterType);
+    // }
     if (filterStatus !== "all") {
       filtered = filtered.filter((item) => item.status === filterStatus);
     }
 
     setFilteredNews(filtered);
-  };
+  }, [news, searchTerm, filterStatus]); // Removed filterType from dependencies
+
+  useEffect(() => {
+    loadNews();
+  }, [loadNews]);
+
+  useEffect(() => {
+    filterNewsData();
+  }, [searchTerm, filterStatus, news, filterNewsData]); // Removed filterType from dependencies
 
   const handleCreate = () => {
     setSelectedNews(null);
@@ -176,7 +175,7 @@ export default function NewsList() {
   const getStatusBadge = (status) => {
     const isPublished = status === 'published';
     return (
-      <div 
+      <div
         className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border"
         style={{
           backgroundColor: isPublished ? '#F0FDF4' : '#FFFBEB',
@@ -197,7 +196,7 @@ export default function NewsList() {
       day: "numeric",
       month: "short",
       year: "numeric",
-    }); 
+    });
   };
 
   if (loading) {
@@ -211,7 +210,7 @@ export default function NewsList() {
 
   return (
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
-      
+
       {/* ESPACIADOR SUPERIOR */}
       <div className="w-full"></div>
 
@@ -244,20 +243,20 @@ export default function NewsList() {
             style={{ "--tw-ring-color": BRAND.lightBlue }}
           />
         </div>
-        
+
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <div className="relative min-w-[180px]">
-             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-             <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full pl-9 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm cursor-pointer appearance-none"
-                style={{ "--tw-ring-color": BRAND.lightBlue }}
-             >
-                <option value="all">Estado: Todos</option>
-                <option value="published">Publicados</option>
-                <option value="draft">Borradores</option>
-             </select>
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="w-full pl-9 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm cursor-pointer appearance-none"
+              style={{ "--tw-ring-color": BRAND.lightBlue }}
+            >
+              <option value="all">Estado: Todos</option>
+              <option value="published">Publicados</option>
+              <option value="draft">Borradores</option>
+            </select>
           </div>
         </div>
       </div>
@@ -287,52 +286,52 @@ export default function NewsList() {
               className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
             >
               {/* Borde Superior de Acento */}
-              <div 
-                className="h-1.5 w-full absolute top-0 left-0" 
+              <div
+                className="h-1.5 w-full absolute top-0 left-0"
                 style={{ backgroundColor: item.type === 'news' ? BRAND.blue : BRAND.darkGreen }}
               ></div>
 
               <div className="p-5 flex-1 flex flex-col">
                 {/* Header: Fecha y Estado */}
                 <div className="flex justify-between items-start mb-3">
-                   <div className="flex flex-col">
-                      <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">
-                        {item.category || "General"}
-                      </span>
-                      <h3 className="text-lg font-bold text-gray-800 leading-tight line-clamp-2 group-hover:text-blue-700 transition-colors">
-                        {item.title}
-                      </h3>
-                   </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">
+                      {item.category || "General"}
+                    </span>
+                    <h3 className="text-lg font-bold text-gray-800 leading-tight line-clamp-2 group-hover:text-blue-700 transition-colors">
+                      {item.title}
+                    </h3>
+                  </div>
                 </div>
 
                 {/* Badge de Estado (Flotante o integrado) */}
                 <div className="mb-4">
-                   {getStatusBadge(item.status)}
+                  {getStatusBadge(item.status)}
                 </div>
 
                 {/* Imagen Destacada */}
                 <div className="mb-4 rounded-xl overflow-hidden border border-gray-100 h-40 bg-gray-50 flex items-center justify-center relative group-hover:shadow-inner transition-all">
-                   {item.upload_file && item.upload_file.url ? (
-                      <img 
-                        src={item.upload_file.url} 
-                        alt={item.title}
-                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                      />
-                   ) : (
-                       <div className="flex flex-col items-center justify-center text-gray-400">
-                          <ImageIcon size={32} className="mb-2 opacity-50" />
-                          <span className="text-xs">Sin imagen</span>
-                       </div>
-                   )}
-                   {/* Fallback div */}
-                   <div className="hidden absolute inset-0 flex-col items-center justify-center text-gray-400 bg-gray-50">
+                  {item.upload_file && item.upload_file.url ? (
+                    <img
+                      src={item.upload_file.url}
+                      alt={item.title}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-gray-400">
                       <ImageIcon size={32} className="mb-2 opacity-50" />
-                      <span className="text-xs">Imagen no disponible</span>
-                   </div>
+                      <span className="text-xs">Sin imagen</span>
+                    </div>
+                  )}
+                  {/* Fallback div */}
+                  <div className="hidden absolute inset-0 flex-col items-center justify-center text-gray-400 bg-gray-50">
+                    <ImageIcon size={32} className="mb-2 opacity-50" />
+                    <span className="text-xs">Imagen no disponible</span>
+                  </div>
                 </div>
 
                 {/* Descripción Corta */}
@@ -346,14 +345,14 @@ export default function NewsList() {
 
                 {/* Metadata Footer */}
                 <div className="flex items-center justify-between text-xs text-gray-400 border-t border-gray-50 pt-3 mt-auto">
-                   <div className="flex items-center gap-1.5">
-                      <User size={12} />
-                      <span className="truncate max-w-[80px]">{item.author || "Admin"}</span>
-                   </div>
-                   <div className="flex items-center gap-1.5">
-                      <Calendar size={12} />
-                      <span>{formatDate(item.published_at)}</span>
-                   </div>
+                  <div className="flex items-center gap-1.5">
+                    <User size={12} />
+                    <span className="truncate max-w-[80px]">{item.author || "Admin"}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Calendar size={12} />
+                    <span>{formatDate(item.published_at)}</span>
+                  </div>
                 </div>
               </div>
 

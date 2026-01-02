@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, FileText, Download, Filter, X, BookOpen, MapPin, TrendingUp, ChevronRight } from "lucide-react";
+import { ArrowRight, FileText, Download, X, BookOpen, MapPin, ChevronRight } from "lucide-react";
 
 // Skeleton loader components
 const SkeletonCard = ({ isWide }) => (
@@ -8,9 +8,8 @@ const SkeletonCard = ({ isWide }) => (
     initial={{ opacity: 0.5 }}
     animate={{ opacity: 1 }}
     transition={{ duration: 1.5, repeat: Infinity }}
-    className={`bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 backdrop-blur-xl rounded-xl shadow-sm border border-gray-300 overflow-hidden ${
-      isWide ? "h-48 sm:h-56" : "h-full flex flex-col"
-    }`}
+    className={`bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 backdrop-blur-xl rounded-xl shadow-sm border border-gray-300 overflow-hidden ${isWide ? "h-48 sm:h-56" : "h-full flex flex-col"
+      }`}
   >
     {!isWide && (
       <>
@@ -168,11 +167,10 @@ export default function ProyectosYAlianzas() {
                 width: activeSection === "sectoriales" ? "100%" : "100px"
               }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className={`relative rounded-2xl overflow-hidden ${
-                activeSection === "sectoriales"
-                  ? "bg-gradient-to-br from-white/95 to-white/85 shadow-lg"
-                  : "bg-[#00AB6D] cursor-pointer hover:bg-[#00C77A] shadow-lg hover:shadow-xl"
-              } transition-all duration-300`}
+              className={`relative rounded-2xl overflow-hidden ${activeSection === "sectoriales"
+                ? "bg-gradient-to-br from-white/95 to-white/85 shadow-lg"
+                : "bg-[#00AB6D] cursor-pointer hover:bg-[#00C77A] shadow-lg hover:shadow-xl"
+                } transition-all duration-300`}
               onClick={() => activeSection !== "sectoriales" && setActiveSection("sectoriales")}
             >
               {/* Tab cerrado */}
@@ -189,7 +187,7 @@ export default function ProyectosYAlianzas() {
                   >
                     <BookOpen className="w-10 h-10 text-white" />
                   </motion.div>
-                  
+
                   <div className="transform -rotate-90 whitespace-nowrap flex-shrink-0">
                     <h2 className="text-xl font-bold text-white">
                       Proyectos Sectoriales
@@ -198,7 +196,7 @@ export default function ProyectosYAlianzas() {
 
                   <motion.div
                     animate={{ x: [0, 5, 0] }}
-                    transition={{ 
+                    transition={{
                       duration: 2,
                       repeat: Infinity,
                       ease: "easeInOut"
@@ -325,11 +323,10 @@ export default function ProyectosYAlianzas() {
                 width: activeSection === "territoriales" ? "100%" : "100px"
               }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className={`relative rounded-2xl overflow-hidden ${
-                activeSection === "territoriales"
-                  ? "bg-gradient-to-br from-white/95 to-white/85 shadow-lg"
-                  : "bg-[#2B65AC] cursor-pointer hover:bg-[#3A7BC8] shadow-lg hover:shadow-xl"
-              } transition-all duration-300`}
+              className={`relative rounded-2xl overflow-hidden ${activeSection === "territoriales"
+                ? "bg-gradient-to-br from-white/95 to-white/85 shadow-lg"
+                : "bg-[#2B65AC] cursor-pointer hover:bg-[#3A7BC8] shadow-lg hover:shadow-xl"
+                } transition-all duration-300`}
               onClick={() => activeSection !== "territoriales" && setActiveSection("territoriales")}
             >
               {/* Tab cerrado */}
@@ -346,7 +343,7 @@ export default function ProyectosYAlianzas() {
                   >
                     <MapPin className="w-10 h-10 text-white" />
                   </motion.div>
-                  
+
                   <div className="transform -rotate-90 whitespace-nowrap flex-shrink-0">
                     <h2 className="text-xl font-bold text-white">
                       Incidencia Territorial
@@ -355,7 +352,7 @@ export default function ProyectosYAlianzas() {
 
                   <motion.div
                     animate={{ x: [0, 5, 0] }}
-                    transition={{ 
+                    transition={{
                       duration: 2,
                       repeat: Infinity,
                       ease: "easeInOut"
@@ -412,11 +409,10 @@ export default function ProyectosYAlianzas() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleFilterChange(category)}
-                        className={`px-3 py-1 rounded-full font-semibold text-xs transition-all duration-300 ${
-                          activeFilter === category
-                            ? "bg-gradient-to-r from-[#2B65AC] to-[#00AB6D] text-white shadow-md"
-                            : "bg-gray-100 border border-gray-200 text-gray-700 hover:border-[#00AB6D] hover:text-[#00AB6D]"
-                        }`}
+                        className={`px-3 py-1 rounded-full font-semibold text-xs transition-all duration-300 ${activeFilter === category
+                          ? "bg-gradient-to-r from-[#2B65AC] to-[#00AB6D] text-white shadow-md"
+                          : "bg-gray-100 border border-gray-200 text-gray-700 hover:border-[#00AB6D] hover:text-[#00AB6D]"
+                          }`}
                       >
                         {category === "all" ? "Todos" : category}
                       </motion.button>

@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import {
-  Search, MapPin, Mail, Phone, Globe, User, X,
-  Package, Wrench, ShoppingCart,
+  Search, MapPin, Mail, Phone, Globe, X,
   AlertCircle, CheckCircle2, Sparkles,
-  Building2, Tag, ExternalLink, ChevronRight
+  Tag, ExternalLink, ChevronRight
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import fondoMapa from '../../assets/fondosYlogos/fondo_mapaC.jpg';
@@ -30,12 +28,13 @@ const fuzzySearch = (searchTerm, text) => {
 
 export default function MapSection() {
   const { user } = useContext(AuthContext);
-  const navigate = useNavigate();
+
 
   const [searchTerm, setSearchTerm] = useState('');
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
 
   const [empresasFiltradas, setEmpresasFiltradas] = useState([]);
   const [selectedEmpresa, setSelectedEmpresa] = useState(null);
@@ -242,6 +241,16 @@ export default function MapSection() {
                 )}
               </motion.div>
             </motion.div>
+
+            {/* Errores */}
+            {error && (
+              <div className="max-w-7xl mx-auto px-4 mb-4">
+                <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5" />
+                  <p className="text-sm font-medium">{error}</p>
+                </div>
+              </div>
+            )}
 
             {/* Grid de Empresas */}
             <div className="flex-1">

@@ -1,19 +1,19 @@
 // src/data/mockContent.js
-import { Newspaper, FileText, FolderOpen, Video, Mic, Leaf, Globe } from "lucide-react";
+import { Newspaper, Mic, Leaf } from "lucide-react";
 
 // Configuración de estilo por tipo (Colores minimalistas basados en tus referencias)
 export const contentTypeConfig = {
-  "Noticias": { 
-    icon: Newspaper, 
-    color: "text-[#00AB6D]", 
-    bgColor: "bg-white", 
+  "Noticias": {
+    icon: Newspaper,
+    color: "text-[#00AB6D]",
+    bgColor: "bg-white",
     isSolid: false // Tarjeta con foto
   },
-  "Podcast": { 
-    icon: Mic, 
-    color: "text-[#8B5CF6]", 
-    bgColor: "bg-white", 
-    isSolid: false 
+  "Podcast": {
+    icon: Mic,
+    color: "text-[#8B5CF6]",
+    bgColor: "bg-white",
+    isSolid: false
   },
   "Artículo": {
     icon: Leaf,

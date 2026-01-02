@@ -77,9 +77,10 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
       onSuccess();
     } catch (err) {
       console.error("Error saving category:", err);
-      let errorMessage = "Error al guardar la categoría";
-      if (err.response?.data?.message) errorMessage = err.response.data.message;
-      
+      if (err.response?.data?.message) {
+        // console.error("Server error:", err.response.data.message);
+      }
+
       if (err.response?.data?.errors) {
         const serverErrors = err.response.data.errors;
         const mapped = {};
@@ -102,19 +103,19 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
   return (
     <div className="fixed inset-0 z-50 bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-fadeIn flex flex-col">
-        
+
         {/* Header con Azul Profundo */}
         <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100" style={{ backgroundColor: BRAND.darkBlue }}>
           <div className="flex items-center gap-3">
-             <div className="p-2 bg-white/10 rounded-lg text-white">
-                <Tag size={20} />
-             </div>
-             <div>
-                <h2 className="text-lg font-bold text-white">
-                  {isEditing ? "Editar Categoría" : "Nueva Categoría"}
-                </h2>
-                <p className="text-blue-200 text-xs mt-0.5">Definición de etiquetas</p>
-             </div>
+            <div className="p-2 bg-white/10 rounded-lg text-white">
+              <Tag size={20} />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">
+                {isEditing ? "Editar Categoría" : "Nueva Categoría"}
+              </h2>
+              <p className="text-blue-200 text-xs mt-0.5">Definición de etiquetas</p>
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -128,7 +129,7 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-8 bg-gray-50">
           <div className="space-y-6">
-            
+
             {/* Name Input */}
             <div>
               <label className={labelClass}>Nombre <span className="text-red-500">*</span></label>
@@ -139,7 +140,7 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
                 onChange={handleChange}
                 placeholder="Ej: Tecnología, Medio Ambiente"
                 className={inputClass}
-                style={{ 
+                style={{
                   "--tw-ring-color": BRAND.lightBlue,
                   borderColor: errors.name ? BRAND.orange : ''
                 }}
@@ -163,13 +164,13 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
                   placeholder="Breve descripción del propósito de esta categoría..."
                   rows={4}
                   className={`${inputClass} resize-none`}
-                  style={{ 
+                  style={{
                     "--tw-ring-color": BRAND.lightBlue,
                     borderColor: errors.description ? BRAND.orange : ''
                   }}
                   disabled={loading}
                 />
-                <FileText className="absolute right-3 top-3 text-gray-400" size={16}/>
+                <FileText className="absolute right-3 top-3 text-gray-400" size={16} />
               </div>
               {errors.description && (
                 <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}>

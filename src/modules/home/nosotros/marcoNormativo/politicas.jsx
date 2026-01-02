@@ -1,7 +1,7 @@
 import React from "react";
 
 // --- IMPORTAR ACTIVOS (PDFs) ---
-import pdfGestionResiduos from "../../../../assets/marconormativo/politicas/Política_para_la_gestión_integral_de_ residuos.pdf"; 
+import pdfGestionResiduos from "../../../../assets/marconormativo/politicas/Política_para_la_gestión_integral_de_ residuos.pdf";
 import pdfODS from "../../../../assets/marconormativo/politicas/CONPES 3918_638235471484658132.pdf";
 import pdfCrecimientoVerde from "../../../../assets/marconormativo/politicas/CONPES 3934.pdf";
 
@@ -10,7 +10,7 @@ import pdfCrecimientoVerde from "../../../../assets/marconormativo/politicas/CON
 const COLOR_AZUL_PRINCIPAL = '#1E305D';
 const COLOR_VERDE_PRINCIPAL = '#00AB6D';
 const COLOR_AZUL_SECUNDARIO = '#2C67B0';
-const COLOR_FONDO_CLARO = '#f9f9f9'; 
+
 
 
 // Datos de las políticas (sin cambios)
@@ -25,13 +25,13 @@ const politicas = [
     title: "Estrategia para la implementación de los Objetivos de Desarrollo Sostenible (ODS) en Colombia (CONPES 3918 de 2018)",
     description: "Consejo Nacional de Política Económica y Social | 2017 - 2030",
     pdf: pdfODS,
-    color: COLOR_AZUL_SECUNDARIO 
+    color: COLOR_AZUL_SECUNDARIO
   },
   {
     title: "Política de Crecimiento Verde (CONPES 3934 del 2018)",
     description: "Consejo Nacional de Política Económica y Social | 2018",
     pdf: pdfCrecimientoVerde,
-    color: COLOR_VERDE_PRINCIPAL 
+    color: COLOR_VERDE_PRINCIPAL
   }
 ];
 
@@ -48,11 +48,11 @@ const PoliticaCard = ({ title, description, pdf, color }) => {
     color: COLOR_AZUL_SECUNDARIO,
     textDecoration: 'none',
   };
-  
+
   return (
-    <div 
-        className="w-full text-left bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg border-t-4" 
-        style={{ borderColor: color }}
+    <div
+      className="w-full text-left bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg border-t-4"
+      style={{ borderColor: color }}
     >
       <h3 className="text-lg font-sans font-semibold mb-1" style={{ color: COLOR_AZUL_PRINCIPAL }}>
         {title}
@@ -60,10 +60,10 @@ const PoliticaCard = ({ title, description, pdf, color }) => {
       <p className="text-sm font-sans text-gray-600 mb-2">
         {description}
       </p>
-      
-      <a 
-        href={pdf} 
-        target="_blank" 
+
+      <a
+        href={pdf}
+        target="_blank"
         rel="noopener noreferrer"
         className="text-sm font-sans font-medium transition-colors hover:underline"
         style={linkStyle}
@@ -80,11 +80,11 @@ const PoliticaCard = ({ title, description, pdf, color }) => {
 export default function Index() {
   return (
     <div className="mt-24 font-sans min-h-screen" style={{ color: '#e6e6e6ff' }}>
-      
-     
+
+
 
       <div className="px-6 py-10 max-w-4xl mx-auto">
-        <h1 
+        <h1
           className="text-4xl font-sans font-extrabold text-center mb-12"
           style={{ color: COLOR_AZUL_PRINCIPAL }}
         >
@@ -93,7 +93,7 @@ export default function Index() {
 
         <div className="space-y-6">
           {politicas.map((politica, index) => (
-            <PoliticaCard 
+            <PoliticaCard
               key={index}
               title={politica.title}
               description={politica.description}
@@ -102,7 +102,7 @@ export default function Index() {
             />
           ))}
         </div>
-        
+
         <div className="h-10"></div>
       </div>
     </div>

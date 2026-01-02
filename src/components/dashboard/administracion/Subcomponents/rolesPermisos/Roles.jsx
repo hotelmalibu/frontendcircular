@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { getRoles, createRole, updateRole, deleteRole } from "../../../../../api/auth";
-import { 
-  Trash2, 
-  Edit, 
-  Plus, 
-  X, 
-  Shield, 
-  Users, 
-  MoreVertical,
-  CheckCircle,
+import {
+  Trash2,
+  Edit,
+  Plus,
+  X,
+  Shield,
+  Users,
   AlertCircle
 } from "lucide-react";
 
@@ -135,7 +133,7 @@ export default function Roles() {
 
   return (
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
-      
+
       {/* ESPACIADOR SUPERIOR */}
       <div className="w-full "></div>
 
@@ -151,7 +149,7 @@ export default function Roles() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        
+
         {/* Tarjeta de Crear Nuevo Rol */}
         <button
           onClick={() => openModal()}
@@ -176,36 +174,36 @@ export default function Roles() {
             <div className="p-6 flex-1">
               <div className="flex justify-between items-start mb-4">
                 <div className="p-2.5 bg-blue-50 rounded-xl text-blue-700">
-                   <Shield size={24} />
+                  <Shield size={24} />
                 </div>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                   <button 
-                     onClick={() => openModal(rol)} 
-                     className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-blue-600 transition"
-                     title="Editar"
-                   >
-                     <Edit size={18} />
-                   </button>
-                   <button 
-                     onClick={() => handleDelete(rol.id)} 
-                     className="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition"
-                     title="Eliminar"
-                   >
-                     <Trash2 size={18} />
-                   </button>
+                  <button
+                    onClick={() => openModal(rol)}
+                    className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-blue-600 transition"
+                    title="Editar"
+                  >
+                    <Edit size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(rol.id)}
+                    className="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition"
+                    title="Eliminar"
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
               </div>
 
               <h3 className="text-xl font-bold text-gray-800 mb-2">{rol.name}</h3>
-              
+
               <p className="text-sm text-gray-500 mb-4 line-clamp-2 h-10 leading-relaxed">
                 {rol.description || "Sin descripción definida para este rol."}
               </p>
 
               <div className="flex items-center gap-3 mt-auto pt-4 border-t border-gray-50">
                 <div className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
-                   <Users size={12} />
-                   <span>{rol.users_count || 0} Usuarios</span>
+                  <Users size={12} />
+                  <span>{rol.users_count || 0} Usuarios</span>
                 </div>
                 {rol.level && (
                   <span className="text-xs font-bold px-2 py-1 rounded-full bg-green-50 text-green-700 border border-green-100">
@@ -222,7 +220,7 @@ export default function Roles() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#005380] bg-opacity-60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fadeIn transform transition-all scale-100">
-            
+
             {/* Modal Header */}
             <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 bg-gray-50">
               <div>
@@ -231,8 +229,8 @@ export default function Roles() {
                 </h2>
                 <p className="text-xs text-gray-500 mt-0.5">Define los detalles del perfil de acceso</p>
               </div>
-              <button 
-                onClick={closeModal} 
+              <button
+                onClick={closeModal}
                 className="p-2 rounded-full text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition"
               >
                 <X size={20} />
@@ -272,17 +270,17 @@ export default function Roles() {
 
               {/* Slug (Opcional / Solo lectura si es necesario) */}
               {currentRole && (
-                 <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1.5 ml-1">
-                      Identificador (Slug)
-                    </label>
-                    <input
-                      type="text"
-                      disabled
-                      value={formData.slug || (formData.name.toLowerCase().replace(/\s+/g, '-'))}
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-500 cursor-not-allowed"
-                    />
-                 </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1.5 ml-1">
+                    Identificador (Slug)
+                  </label>
+                  <input
+                    type="text"
+                    disabled
+                    value={formData.slug || (formData.name.toLowerCase().replace(/\s+/g, '-'))}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-500 cursor-not-allowed"
+                  />
+                </div>
               )}
 
               <div className="flex gap-3 pt-2">
