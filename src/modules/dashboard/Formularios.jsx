@@ -13,7 +13,7 @@ export default function Formularios() {
 
   const tabs = [
     { name: "Dashboard", component: <Dashboard /> },
-    { name: "Editor", component: <Editor /> },
+    { name: "Editor", component: <Editor onNavigate={setActiveTab} /> },
     { name: "Respuestas", component: <Respuestas /> },
     { name: "Encuestas", component: <Encuestas /> },
     { name: "Exportacion", component: <Exportacion /> },
@@ -35,11 +35,10 @@ export default function Formularios() {
                   <button
                     key={tab.name}
                     onClick={() => setActiveTab(tab.name)}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${
-                      activeTab === tab.name
+                    className={`px-4 py-2 rounded-lg font-medium transition ${activeTab === tab.name
                         ? "bg-[#004b72] text-white shadow"
                         : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
+                      }`}
                   >
                     {tab.name}
                   </button>
