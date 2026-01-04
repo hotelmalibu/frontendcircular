@@ -10,13 +10,7 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* If user exists, show a compact greeting */}
-      {user && (
-        <div className="w-full bg-gray-100 py-0">
-          <div className="container mx-auto px-4 text-center">
-            
-          </div>
-        </div>
-      )}
+
       <IndexImagen />
       <FeaturedSection />
       <ProjectsSection />

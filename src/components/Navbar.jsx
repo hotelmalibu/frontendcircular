@@ -1,4 +1,5 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import LogoBlanco from "../assets/fondosYlogos/Logo_blanco.png";
@@ -11,7 +12,12 @@ import {
   Menu,
   ChevronDown,
   Bell,
-  MessageSquare
+  MessageSquare,
+  LayoutDashboard,
+  FileText,
+  ClipboardList,
+  Settings,
+  Building
 } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -417,14 +423,9 @@ export default function Navbar({ onMenuClick }) {
       `}</style>
 
       {/* NAVBAR HEADER */}
-      <header className={`flex items-center justify-between px-4 md:px-24 py-4 transition-all duration-300 ${!showWhiteBg ? "bg-transparent" : "bg-white shadow-md border-b border-gray-100"}`}>
+      <header className={`flex items-center justify-between px-4 md:px-8 lg:px-24 py-4 transition-all duration-300 ${!showWhiteBg ? "bg-transparent" : "bg-white shadow-md border-b border-gray-100"}`}>
 
-        {/* HAMBURGER MENU (Mobile) */}
-        {user && isPublicPage && (
-          <button onClick={onMenuClick} className="md:hidden text-white hover:text-gray-200 transition-colors mr-4" aria-label="Abrir menú">
-            <Menu size={24} />
-          </button>
-        )}
+
 
         {/* LOGO */}
         <div className="flex items-center slide-in shrink-0">
@@ -477,44 +478,82 @@ export default function Navbar({ onMenuClick }) {
           ) : null}
 
           {/* HAMBURGER (Mobile - Right) */}
-          {!isInternalPage && (
-            <button
-              className={`nav-mobile ml-2 hamburger ${mobileMenuOpen ? "active" : ""}`}
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Menú móvil"
-            >
-              <div className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-800"}`}></div>
-              <div className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-800"}`}></div>
-              <div className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-800"}`}></div>
-            </button>
-          )}
+          <button
+            className={`nav-mobile ml-2 hamburger ${mobileMenuOpen ? "active" : ""}`}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Menú móvil"
+          >
+            <div className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-800"}`}></div>
+            <div className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-800"}`}></div>
+            <div className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-800"}`}></div>
+          </button>
         </div>
       </header>
 
       {/* MENÚ MÓVIL */}
-      {mobileMenuOpen && !user && !isInternalPage && (
-        <div className="nav-mobile fixed inset-0 z-40 bg-gray-900/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
+      {/* MENÚ MÓVIL */}
+      {mobileMenuOpen && createPortal(
+        <div className="nav-mobile fixed inset-0 z-[60] bg-gray-900/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
           <div className="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-white shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="p-5 border-b border-gray-100 flex justify-end">
-              <button onClick={() => setMobileMenuOpen(false)} className="p-2 bg-gray-100 rounded-full text-gray-500">
+              <button onClick={() => setMobileMenuOpen(false)} className="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 transition-colors">
                 <LogOut size={20} className="rotate-180" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto py-4">
-              {menuSections.map((section) => (
-                <MobileMenuDropdown
-                  key={section.name}
-                  title={section.name}
-                  subsections={section.subsections}
-                  showWhiteBg={true}
-                  showHover={false}
-                  showWhiteText={false}
-                  onClose={handleMobileMenuClick}
-                />
-              ))}
+              {isInternalPage ? (
+                /* Menú Móvil Dashboard (Solo visible en páginas internas/dashboard) */
+                <div className="flex flex-col gap-2">
+                  {[
+                    { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+                    { name: "Documentos", path: "/documentos", icon: FileText },
+                    { name: "Empresas", path: "/companies", icon: Building },
+                    { name: "Formularios", path: "/formularios", icon: ClipboardList },
+                    { name: "Comunicaciones", path: "/comunicaciones", icon: MessageSquare },
+                    { name: "Administración", path: "/administracion", icon: Settings },
+                  ].map((link) => (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      onClick={handleMobileMenuClick}
+                      className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors font-medium border-b border-gray-50 last:border-0"
+                    >
+                      <link.icon size={20} className="text-gray-400 group-hover:text-blue-600" />
+                      <span>{link.name}</span>
+                    </Link>
+                  ))}
+
+                  {/* Separador */}
+                  <div className="my-2 border-t border-gray-100"></div>
+
+                  {/* Opción para volver al Home si se necesita */}
+                  <Link
+                    to="/"
+                    onClick={handleMobileMenuClick}
+                    className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-700 font-medium"
+                  >
+                    <Home size={20} className="text-gray-400" />
+                    <span>Ir al Inicio</span>
+                  </Link>
+                </div>
+              ) : (
+                /* Menú Móvil Público */
+                menuSections.map((section) => (
+                  <MobileMenuDropdown
+                    key={section.name}
+                    title={section.name}
+                    subsections={section.subsections}
+                    showWhiteBg={true}
+                    showHover={false}
+                    showWhiteText={false}
+                    onClose={handleMobileMenuClick}
+                  />
+                ))
+              )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

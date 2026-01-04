@@ -128,7 +128,13 @@ export default function EventsSection() {
   // Función para ir a una página específica
   const goToPage = (page) => {
     if (!scrollContainerRef.current) return;
-    const targetScroll = page * CARD_WIDTH_WITH_GAP * CARDS_PER_PAGE;
+
+    const isMobile = window.innerWidth < 768;
+    const cardWidth = isMobile ? 280 : 320;
+    const gap = 24;
+    const widthWithGap = cardWidth + gap;
+
+    const targetScroll = page * widthWithGap * CARDS_PER_PAGE;
     scrollContainerRef.current.scrollTo({
       left: targetScroll,
       behavior: "smooth",
@@ -143,7 +149,12 @@ export default function EventsSection() {
 
     const handleScroll = () => {
       const scrollLeft = container.scrollLeft;
-      const pageWidth = CARD_WIDTH_WITH_GAP * CARDS_PER_PAGE;
+      // Calculate dynamic width
+      const isMobile = window.innerWidth < 768;
+      const cardWidth = isMobile ? 280 : 320;
+      const gap = 24;
+      const pageWidth = (cardWidth + gap) * CARDS_PER_PAGE;
+
       let newPage = Math.round(scrollLeft / pageWidth);
 
       // Porque el contenedor es duplicado, ajustamos el índice real
@@ -245,7 +256,7 @@ export default function EventsSection() {
                       <div
                         key={`${event.id}-${index}`}
                         onClick={() => handleEventClick(event)}
-                        className="min-w-[320px] max-w-[320px] flex-shrink-0 bg-white rounded-xl p-5 shadow-sm hover:shadow-md border border-gray-100 hover:border-green-300 transition-all duration-200 cursor-pointer relative overflow-hidden"
+                        className="min-w-[280px] max-w-[280px] md:min-w-[320px] md:max-w-[320px] flex-shrink-0 bg-white rounded-xl p-5 shadow-sm hover:shadow-md border border-gray-100 hover:border-green-300 transition-all duration-200 cursor-pointer relative overflow-hidden"
                       >
                         <div
                           className={`absolute left-0 top-0 bottom-0 w-1 ${status.text === "En curso" ? "bg-green-500" :

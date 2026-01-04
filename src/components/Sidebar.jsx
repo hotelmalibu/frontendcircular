@@ -51,7 +51,7 @@ export default function Sidebar() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
                 ? "bg-blue-50 text-blue-700 font-medium shadow-sm ring-1 ring-blue-100"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                : "text-gray-600 hover:bg-blue-50 hover:text-blue-600"
               }`
             }
           >
