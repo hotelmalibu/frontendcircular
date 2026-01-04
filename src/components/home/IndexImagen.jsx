@@ -355,7 +355,7 @@ export default function IndexImagen() {
 
 
       {/* ========== INDICADORES LATERALES  ========== */}
-      <div className="absolute left-2 md:left-12  mt-6 lg:left-6 top-1/2 -translate-y-1/2 -translate-y-[125px] z-20 flex flex-col items-center gap-10 translate-x-16">
+      <div className="absolute left-2 md:left-12  mt-6 lg:left-6 top-1/2 -translate-y-1/2 -translate-y-[125px] z-20 flex flex-col items-center gap-10 md:translate-x-16 translate-x-0">
         {SLIDES.map((_, index) => (
           <div key={index} className="nav-indicator-item">
             {index === currentSlide ? (
@@ -421,14 +421,14 @@ export default function IndexImagen() {
 
 
       {/* Contenido principal */}
-      <div className="relative z-10 w-full min-h-[100vh] flex items-center pt-32 pb-20 translate-x-16">
+      <div className="relative z-10 w-full min-h-[100vh] flex items-center pt-32 pb-20 md:translate-x-16 translate-x-0">
 
-        <div className="w-full md:w-2/3 lg:w-1/2 pl-6 md:pl-24 text-left">
+        <div className="w-full md:w-2/3 lg:w-1/2 pl-16 md:pl-24 text-left">
           {/* Títulos con animación SOLO AL CARGAR */}
           <div className="mb-6">
             <h1 className={`animate-on-load ${hasLoaded ? 'loaded' : ''} text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-2`}>
-              <span className="block whitespace-nowrap">{SLIDES[currentSlide].title}</span>
-              <span className="block whitespace-nowrap">{SLIDES[currentSlide].subtitle}</span>
+              <span className="block whitespace-normal md:whitespace-nowrap">{SLIDES[currentSlide].title}</span>
+              <span className="block whitespace-normal md:whitespace-nowrap">{SLIDES[currentSlide].subtitle}</span>
             </h1>
           </div>
 

@@ -1,17 +1,17 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react"; 
+import { ArrowRight } from "lucide-react";
 import fondoCircularmente from "../../assets/fondosYlogos/fondo_circularmente.png";
 import { useNavigate } from "react-router-dom";
 
 export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) {
   const navigate = useNavigate();
   return (
-  <header
-  className="relative flex flex-col items-center justify-center text-center h-screen font-[Montserrat] bg-cover bg-center"
-  style={{
-    backgroundImage: `url(${fondoCircularmente})`,
-  }}
->
+    <header
+      className="relative flex flex-col items-center justify-center text-center h-screen font-[Montserrat] bg-cover bg-center"
+      style={{
+        backgroundImage: `url(${fondoCircularmente})`,
+      }}
+    >
 
 
       {/* Contenido animado */}
@@ -21,12 +21,12 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        
-        
+
+
 
         {/* Título Principal */}
         <motion.h1
-          className="text-6xl md:text-8xl lg:text-9xl font-extrabold text-white drop-shadow-2xl tracking-tight leading-tight mb-6"
+          className="text-4xl md:text-7xl lg:text-9xl font-extrabold text-white drop-shadow-2xl tracking-tight leading-tight mb-6"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
@@ -59,7 +59,7 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
         >
           {!user ? (
             <>
-             <button
+              <button
                 onClick={() => navigate("/login")}
                 className="group bg-gradient-to-b from-[#007f4f] to-[#00ab6d] justify-center text-white px-12 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 w-64"
               >
@@ -84,9 +84,9 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
 
             </>
           ) : (
-            <button 
-            onClick={() => navigate("/dashboard")}
-            className="group bg-[#B1D357] text-[#0a2342] px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="group bg-[#B1D357] text-[#0a2342] px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2">
               Ir al Dashboard
               <ArrowRight
                 size={18}
