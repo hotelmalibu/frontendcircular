@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Server,
   Zap,
@@ -9,8 +9,14 @@ import {
   Mail,
   FileImage,
   MoreHorizontal,
-  ArrowUpRight
+  ArrowUpRight,
+  BarChart3
 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { getAllCategories } from "../../../../../api/categoriesApi";
+import { getAllNews } from "../../../../../api/newsApi";
+import { getAllSchedules } from "../../../../../api/scheduleApi";
+import { getAllProjects } from "../../../../../api/projectsApi";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -25,6 +31,152 @@ const BRAND = {
 };
 
 export default function DashboardContenido() {
+  const [categoryStats, setCategoryStats] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch all data - increase per_page for schedules to get all events
+        const [categoriesRes, newsRes, schedulesRes, projectsRes] = await Promise.all([
+          getAllCategories(),
+          getAllNews(),
+          getAllSchedules(1, 100), // Fetch up to 100 events
+          getAllProjects()
+        ]);
+
+        console.log("=== RAW API RESPONSES ===");
+        console.log("Categories Response:", categoriesRes);
+        console.log("News Response:", newsRes);
+        console.log("Schedules Response:", schedulesRes);
+        console.log("Schedules Response.data:", schedulesRes?.data);
+        console.log("Schedules Response.data keys:", schedulesRes?.data ? Object.keys(schedulesRes.data) : 'N/A');
+        console.log("Projects Response:", projectsRes);
+
+        // Extract arrays from responses - try multiple paths
+        let categories = [];
+        if (Array.isArray(categoriesRes)) {
+          categories = categoriesRes;
+        } else if (categoriesRes?.data?.items && Array.isArray(categoriesRes.data.items)) {
+          categories = categoriesRes.data.items;
+        } else if (categoriesRes?.data && Array.isArray(categoriesRes.data)) {
+          categories = categoriesRes.data;
+        } else if (categoriesRes?.categories && Array.isArray(categoriesRes.categories)) {
+          categories = categoriesRes.categories;
+        }
+
+        let news = [];
+        if (Array.isArray(newsRes)) {
+          news = newsRes;
+        } else if (newsRes?.data?.news && Array.isArray(newsRes.data.news)) {
+          news = newsRes.data.news;
+        } else if (newsRes?.data && Array.isArray(newsRes.data)) {
+          news = newsRes.data;
+        } else if (newsRes?.news && Array.isArray(newsRes.news)) {
+          news = newsRes.news;
+        }
+
+        let schedules = [];
+        if (schedulesRes?.data?.schedules && Array.isArray(schedulesRes.data.schedules)) {
+          schedules = schedulesRes.data.schedules;
+        } else if (Array.isArray(schedulesRes)) {
+          schedules = schedulesRes;
+        } else if (schedulesRes?.data?.items && Array.isArray(schedulesRes.data.items)) {
+          schedules = schedulesRes.data.items;
+        } else if (schedulesRes?.data?.data && Array.isArray(schedulesRes.data.data)) {
+          schedules = schedulesRes.data.data;
+        } else if (schedulesRes?.data && Array.isArray(schedulesRes.data)) {
+          schedules = schedulesRes.data;
+        } else if (schedulesRes?.schedules && Array.isArray(schedulesRes.schedules)) {
+          schedules = schedulesRes.schedules;
+        } else if (schedulesRes?.items && Array.isArray(schedulesRes.items)) {
+          schedules = schedulesRes.items;
+        }
+
+        let projects = [];
+        if (Array.isArray(projectsRes)) {
+          projects = projectsRes;
+        } else if (projectsRes?.data?.items && Array.isArray(projectsRes.data.items)) {
+          projects = projectsRes.data.items;
+        } else if (projectsRes?.data && Array.isArray(projectsRes.data)) {
+          projects = projectsRes.data;
+        } else if (projectsRes?.projects && Array.isArray(projectsRes.projects)) {
+          projects = projectsRes.projects;
+        }
+
+        console.log("=== EXTRACTED ARRAYS ===");
+        console.log("Categories:", categories);
+        console.log("News:", news);
+        console.log("Schedules:", schedules);
+        console.log("Projects:", projects);
+
+        // Create a map to count items by category
+        const statsMap = {};
+
+        // Initialize with all categories
+        categories.forEach(cat => {
+          statsMap[cat.id] = {
+            name: cat.name,
+            Noticias: 0,
+            Eventos: 0,
+            Proyectos: 0
+          };
+        });
+
+        console.log("=== INITIAL STATS MAP ===", statsMap);
+
+        // Count news by category
+        news.forEach(item => {
+          const catId = item.category_id || (item.category?.id);
+          console.log(`News "${item.title || item.id}" - category_id: ${catId}`, item);
+          if (catId && statsMap[catId]) {
+            statsMap[catId].Noticias++;
+          } else if (catId) {
+            console.warn(`Category ID ${catId} not found in statsMap for news:`, item);
+          }
+        });
+
+        // Count schedules/events by category
+        schedules.forEach(item => {
+          const catId = item.category_id || (item.category?.id);
+          console.log(`Schedule "${item.title || item.id}" - category_id: ${catId}`, item);
+          if (catId && statsMap[catId]) {
+            statsMap[catId].Eventos++;
+          } else if (catId) {
+            console.warn(`Category ID ${catId} not found in statsMap for schedule:`, item);
+          }
+        });
+
+        // Count projects by category
+        projects.forEach(item => {
+          const catId = item.category_id || (item.category?.id);
+          console.log(`Project "${item.title || item.id}" - category_id: ${catId}`, item);
+          if (catId && statsMap[catId]) {
+            statsMap[catId].Proyectos++;
+          } else if (catId) {
+            console.warn(`Category ID ${catId} not found in statsMap for project:`, item);
+          }
+        });
+
+        console.log("=== FINAL STATS MAP ===", statsMap);
+
+        // Convert to array for recharts
+        const statsArray = Object.values(statsMap);
+        console.log("=== STATS ARRAY FOR CHART ===", statsArray);
+
+        setCategoryStats(statsArray);
+      } catch (error) {
+        console.error("Error fetching statistics:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const metricas = [
     { titulo: "Artículos Activos", valor: 145, icon: <PenTool size={20} />, color: BRAND.blue },
     { titulo: "Eventos Activos", valor: 8, icon: <Calendar size={20} />, color: BRAND.darkGreen },
@@ -86,170 +238,60 @@ export default function DashboardContenido() {
   return (
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
 
-      {/* Título de Sección */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: BRAND.darkBlue }}>Gestión de Contenidos</h1>
-        <p className="text-gray-500 text-sm mt-1">Administración de publicaciones y métricas sociales</p>
+      {/* Estadísticas por Categoría */}
+      <div className="mt-8 bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
+              <BarChart3 size={20} className="text-gray-400" /> Estadísticas por Categoría
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">Distribución de contenidos por categoría</p>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-4 mb-4" style={{ borderColor: BRAND.blue }}></div>
+            <p className="text-gray-500 font-medium">Cargando estadísticas...</p>
+          </div>
+        ) : categoryStats.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 text-center">
+            <BarChart3 size={48} className="text-gray-300 mb-4" />
+            <h4 className="text-lg font-bold text-gray-800 mb-2">No hay datos disponibles</h4>
+            <p className="text-sm text-gray-500">Crea categorías y asígnalas a tus contenidos para ver las estadísticas.</p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={categoryStats}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <XAxis
+                dataKey="name"
+                stroke="#6B7280"
+                style={{ fontSize: '12px', fontWeight: '500' }}
+              />
+              <YAxis
+                stroke="#6B7280"
+                style={{ fontSize: '12px', fontWeight: '500' }}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#fff',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+              <Legend
+                wrapperStyle={{ fontSize: '14px', fontWeight: '600' }}
+              />
+              <Bar dataKey="Noticias" fill={BRAND.blue} radius={[8, 8, 0, 0]} />
+              <Bar dataKey="Eventos" fill={BRAND.darkGreen} radius={[8, 8, 0, 0]} />
+              <Bar dataKey="Proyectos" fill={BRAND.orange} radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
-      {/* Acceso Rápido */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-        <h2 className="text-sm font-bold uppercase tracking-wider mb-4 flex items-center gap-2" style={{ color: BRAND.gray }}>
-          <Zap size={16} style={{ color: BRAND.yellow }} /> Acciones Rápidas
-        </h2>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50 transition group">
-            <div className="p-2 rounded-full bg-blue-100 text-blue-600 group-hover:bg-blue-200 transition">
-              <PenTool size={20} />
-            </div>
-            <span className="text-sm font-semibold text-gray-700">Nuevo Artículo</span>
-          </button>
-
-          <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-gray-300 hover:border-green-400 hover:bg-green-50 transition group">
-            <div className="p-2 rounded-full bg-[#E9F5E9] text-[#65A30D] group-hover:bg-green-200 transition">
-              <Calendar size={20} />
-            </div>
-            <span className="text-sm font-semibold text-gray-700">Nuevo Evento</span>
-          </button>
-
-          <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-gray-300 hover:border-orange-400 hover:bg-orange-50 transition group">
-            <div className="p-2 rounded-full bg-[#FFF7ED] text-[#EA580C] group-hover:bg-orange-200 transition">
-              <Mail size={20} />
-            </div>
-            <span className="text-sm font-semibold text-gray-700">Newsletter</span>
-          </button>
-
-          <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-gray-300 hover:border-purple-400 hover:bg-purple-50 transition group">
-            <div className="p-2 rounded-full bg-purple-100 text-purple-600 group-hover:bg-purple-200 transition">
-              <FileImage size={20} />
-            </div>
-            <span className="text-sm font-semibold text-gray-700">Subir Media</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Cuadrícula Principal */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-
-        {/* Métricas Principales */}
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 flex flex-col h-full">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
-              <Server size={20} className="text-gray-400" /> Rendimiento General
-            </h3>
-            <button className="text-gray-400 hover:text-gray-600"><MoreHorizontal size={20} /></button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 flex-grow">
-            {metricas.map((m, idx) => (
-              <div key={idx} className="flex flex-col justify-between bg-gray-50 rounded-xl p-5 hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="p-2 rounded-lg bg-white shadow-sm" style={{ color: m.color }}>
-                    {m.icon}
-                  </div>
-                  {idx === 3 && <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-bold">+1.2%</span>}
-                </div>
-                <div>
-                  <p className="text-2xl font-bold" style={{ color: BRAND.darkBlue }}>{m.valor}</p>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mt-1">{m.titulo}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Redes Sociales */}
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 flex flex-col h-full">
-          <h3 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
-            <Zap size={20} className="text-gray-400" /> Impacto Social
-          </h3>
-
-          <div className="space-y-4 flex-grow">
-            {redes.map((r, i) => (
-              <div key={i} className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition border border-transparent hover:border-gray-100">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-sm" style={{ backgroundColor: r.color }}>
-                    {r.icon}
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-800">{r.nombre}</p>
-                    <p className="text-xs text-gray-500">{r.seguidores} {r.label}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-gray-800">{r.engagement}</p>
-                  <p className="text-[10px] text-gray-400 uppercase">Eng.</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
-            <span className="text-sm text-gray-500">Alcance Mensual Total</span>
-            <span className="text-xl font-bold" style={{ color: BRAND.darkGreen }}>105,744</span>
-          </div>
-        </div>
-
-        {/* Contenido Pendiente */}
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
-              <Database size={20} className="text-gray-400" /> Cola de Publicación
-            </h3>
-            <button className="text-xs font-bold text-blue-600 hover:underline">VER CALENDARIO</button>
-          </div>
-
-          <div className="space-y-3">
-            {contenidoPendiente.map((c, i) => (
-              <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-sm transition bg-white">
-                <div className="mb-3 sm:mb-0">
-                  <h4 className="font-semibold text-gray-800 text-sm">{c.titulo}</h4>
-                  <p className="text-xs text-gray-500 mt-0.5">Autor: {c.autor}</p>
-                </div>
-                <span
-                  className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold w-fit"
-                  style={{ backgroundColor: c.bg, color: c.color }}
-                >
-                  {c.estado}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Actividad Reciente */}
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
-              <Clock size={20} className="text-gray-400" /> Bitácora de Actividad
-            </h3>
-            <button className="p-1 hover:bg-gray-100 rounded text-gray-400"><ArrowUpRight size={18} /></button>
-          </div>
-
-          <div className="relative pl-2">
-            {/* Línea conectora */}
-            <div className="absolute left-[11px] top-2 bottom-4 w-px bg-gray-200"></div>
-
-            <div className="space-y-6">
-              {actividad.map((a, i) => (
-                <div key={i} className="relative flex items-start gap-4">
-                  <div className="relative z-10 w-6 h-6 rounded-full border-2 border-white shadow-sm flex items-center justify-center bg-gray-50 text-white shrink-0" style={{ backgroundColor: a.color }}>
-                    {React.cloneElement(a.icon, { size: 12, className: "text-white" })}
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-800 leading-snug">
-                      <span className="font-semibold">{a.tipo}:</span> {a.texto}
-                    </p>
-                    <span className="text-xs text-gray-400 mt-1 block">{a.time}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-      </div>
     </div>
   );
 }

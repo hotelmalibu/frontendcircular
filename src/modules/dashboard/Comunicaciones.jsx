@@ -1,18 +1,18 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
-import Contenido from "../../components/dashboard/comunicaciones/Contenido";
 import Dashboard from "../../components/dashboard/comunicaciones/Dashboard";
 import Eventos from "../../components/dashboard/comunicaciones/Eventos";
 import News from "../../components/dashboard/comunicaciones/News";
+import Categories from "../../components/dashboard/comunicaciones/Categories";
 import Projects from "../../components/dashboard/comunicaciones/Projects";
-import { 
-  Megaphone, 
-  LayoutDashboard, 
-  Newspaper, 
-  Calendar, 
-  Briefcase, 
-  Layers,
+import {
+  Megaphone,
+  LayoutDashboard,
+  Newspaper,
+  Calendar,
+  Briefcase,
+  Tag,
   UserX
 } from "lucide-react";
 
@@ -30,11 +30,11 @@ export default function Comunicaciones() {
   const [activeTab, setActiveTab] = useState("Dashboard");
 
   const tabs = [
-    { name: "Dashboard", label: "Vista General", icon: <LayoutDashboard size={18} />, component: <Dashboard /> },
+    { name: "Dashboard", label: "Gestión de Contenidos", icon: <LayoutDashboard size={18} />, component: <Dashboard /> },
     { name: "Noticias", label: "Noticias", icon: <Newspaper size={18} />, component: <News /> },
+    { name: "Categorias", label: "Categorías", icon: <Tag size={18} />, component: <Categories /> },
     { name: "Eventos", label: "Eventos", icon: <Calendar size={18} />, component: <Eventos /> },
     { name: "Proyectos", label: "Proyectos", icon: <Briefcase size={18} />, component: <Projects /> },
-    { name: "Contenido", label: "Contenido", icon: <Layers size={18} />, component: <Contenido /> },
   ];
 
   return (
@@ -43,7 +43,7 @@ export default function Comunicaciones() {
 
       <main className="flex-1 p-4 sm:p-8 pt-24 lg:pt-28 transition-all duration-300">
         <div className="max-w-7xl mx-auto">
-          
+
           {/* Encabezado */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
@@ -51,7 +51,7 @@ export default function Comunicaciones() {
               Centro de Comunicaciones
             </h1>
             <p className="text-gray-500 mt-2 text-lg ml-11">
-              Gestión integral de noticias, agenda, proyectos y contenido digital
+              Gestión de noticias, categorías, agenda, proyectos y estadísticas
             </p>
           </div>
 
@@ -65,13 +65,12 @@ export default function Comunicaciones() {
                     <button
                       key={tab.name}
                       onClick={() => setActiveTab(tab.name)}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 flex-1 lg:flex-none justify-center whitespace-nowrap ${
-                        isActive
-                          ? "text-white shadow-md transform scale-105"
-                          : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"
-                      }`}
-                      style={{ 
-                        backgroundColor: isActive ? BRAND.blue : 'transparent' 
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 flex-1 lg:flex-none justify-center whitespace-nowrap ${isActive
+                        ? "text-white shadow-md transform scale-105"
+                        : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"
+                        }`}
+                      style={{
+                        backgroundColor: isActive ? BRAND.blue : 'transparent'
                       }}
                     >
                       {tab.icon}
