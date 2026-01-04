@@ -282,7 +282,7 @@ export default function Navbar({ onMenuClick }) {
   // --- LÓGICA DE VISIBILIDAD ---
   const isPublicPage = location.pathname === '/';
 
-  const internalPaths = ["/dashboard", "/documentos", "/seguimiento", "/formularios", "/comunicaciones", "/administracion", "/integracion", "/profile"];
+  const internalPaths = ["/dashboard", "/documentos", "/companies", "/seguimiento", "/formularios", "/comunicaciones", "/administracion", "/integracion", "/profile"];
   const isInternalPage = user && internalPaths.some(path => location.pathname.startsWith(path));
 
   const transparentPaths = ['/circularmente', '/explorar', '/contenido', '/proyectos/'];
