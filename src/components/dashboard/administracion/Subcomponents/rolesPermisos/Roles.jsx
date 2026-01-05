@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getRoles, createRole, updateRole, deleteRole } from "../../../../../api/auth";
+import { getRoles, createRole, updateRole, deleteRole, getPermissions, getUsers } from "../../../../../api/auth";
 import {
   Trash2,
   Edit,
@@ -7,7 +7,9 @@ import {
   X,
   Shield,
   Users,
-  AlertCircle
+  AlertCircle,
+  CheckSquare,
+  Square
 } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -24,6 +26,7 @@ const BRAND = {
 
 export default function Roles() {
   const [roles, setRoles] = useState([]);
+  const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,35 +37,78 @@ export default function Roles() {
     name: "",
     description: "",
     slug: "",
+    permissions: [] // Array of permission IDs
   });
 
   useEffect(() => {
-    fetchRoles();
+    fetchData();
   }, []);
 
-  const fetchRoles = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await getRoles();
-      console.log("Roles API Response:", res.data);
+      const [rolesRes, permissionsRes, usersRes] = await Promise.all([
+        getRoles(),
+        getPermissions().catch(e => ({ data: [] })),
+        getUsers().catch(e => ({ data: [] }))
+      ]);
 
+      // --- PARSE ROLES ---
       let rolesArray = [];
-      if (Array.isArray(res.data)) {
-        rolesArray = res.data;
-      } else if (res.data?.data && Array.isArray(res.data.data)) {
-        rolesArray = res.data.data;
-      } else if (res.data?.data?.data && Array.isArray(res.data.data.data)) {
-        rolesArray = res.data.data.data;
-      } else if (res.data && typeof res.data === 'object') {
-        console.warn("Could not identify roles array in response:", res.data);
+      if (Array.isArray(rolesRes.data)) {
+        rolesArray = rolesRes.data;
+      } else if (rolesRes.data?.data && Array.isArray(rolesRes.data.data)) {
+        rolesArray = rolesRes.data.data;
+      } else if (rolesRes.data?.data?.items && Array.isArray(rolesRes.data.data.items)) {
+        rolesArray = rolesRes.data.data.items;
+      } else if (rolesRes.data && typeof rolesRes.data === 'object') {
+        const possibleArray = Object.values(rolesRes.data).find(val => Array.isArray(val));
+        rolesArray = possibleArray || Object.values(rolesRes.data);
+      }
+      rolesArray = rolesArray.filter(item => typeof item === 'object');
+
+      // --- PARSE USERS FOR COUNT ---
+      let usersArray = [];
+      if (Array.isArray(usersRes.data)) {
+        usersArray = usersRes.data;
+      } else if (usersRes.data?.data && Array.isArray(usersRes.data.data)) {
+        usersArray = usersRes.data.data;
       }
 
+      // Merge counts into roles
+      rolesArray = rolesArray.map(role => {
+        // Find users that have this role. Assuming user has 'roles' array or 'role_id'
+        const count = usersArray.filter(u => {
+          // Check if user has 'roles' array containing this role ID
+          if (u.roles && Array.isArray(u.roles)) {
+            return u.roles.some(r => r.id === role.id);
+          }
+          // Check if user has 'role_id' property
+          if (u.role_id === role.id) return true;
+
+          return false;
+        }).length;
+
+        return { ...role, users_count: count };
+      });
+
       setRoles(rolesArray);
+
+      // --- PARSE PERMISSIONS ---
+      let permsArray = [];
+      if (Array.isArray(permissionsRes.data)) {
+        permsArray = permissionsRes.data;
+      } else if (permissionsRes.data?.data && Array.isArray(permissionsRes.data.data)) {
+        permsArray = permissionsRes.data.data;
+      } else if (permissionsRes.data?.data?.items && Array.isArray(permissionsRes.data.data.items)) {
+        permsArray = permissionsRes.data.data.items;
+      }
+      setPermissions(permsArray);
+
       setError(null);
     } catch (err) {
-      console.error("Error fetching roles:", err);
-      setError("No se pudieron cargar los roles.");
-      setRoles([]);
+      console.error("Error fetching data:", err);
+      setError("No se pudieron cargar los datos.");
     } finally {
       setLoading(false);
     }
@@ -71,10 +117,17 @@ export default function Roles() {
   const openModal = (role = null) => {
     if (role) {
       setCurrentRole(role);
-      setFormData({ name: role.name, description: role.description || "", slug: role.slug || "" });
+      // Map existing permissions if the API returns them nested in the role
+      const rolePerms = role.permissions ? role.permissions.map(p => p.id) : [];
+      setFormData({
+        name: role.name,
+        description: role.description || "",
+        slug: role.slug || "",
+        permissions: rolePerms
+      });
     } else {
       setCurrentRole(null);
-      setFormData({ name: "", description: "", slug: "" });
+      setFormData({ name: "", description: "", slug: "", permissions: [] });
     }
     setIsModalOpen(true);
   };
@@ -82,7 +135,18 @@ export default function Roles() {
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentRole(null);
-    setFormData({ name: "", description: "", slug: "" });
+    setFormData({ name: "", description: "", slug: "", permissions: [] });
+  };
+
+  const togglePermission = (permId) => {
+    setFormData(prev => {
+      const exists = prev.permissions.includes(permId);
+      if (exists) {
+        return { ...prev, permissions: prev.permissions.filter(id => id !== permId) };
+      } else {
+        return { ...prev, permissions: [...prev.permissions, permId] };
+      }
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -93,7 +157,7 @@ export default function Roles() {
       } else {
         await createRole(formData);
       }
-      fetchRoles();
+      fetchData(); // Reload all
       closeModal();
     } catch (err) {
       console.error("Error saving role:", err);
@@ -105,7 +169,7 @@ export default function Roles() {
     if (!window.confirm("¿Estás seguro de eliminar este rol?")) return;
     try {
       await deleteRole(id);
-      fetchRoles();
+      fetchData();
     } catch (err) {
       console.error("Error deleting role:", err);
       alert("No se pudo eliminar el rol.");
@@ -116,7 +180,7 @@ export default function Roles() {
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <div className="animate-spin rounded-full h-10 w-10 border-b-4 mb-4" style={{ borderColor: BRAND.blue }}></div>
-        <p className="text-gray-500 font-medium">Cargando roles...</p>
+        <p className="text-gray-500 font-medium">Cargando datos...</p>
       </div>
     );
   }
@@ -126,7 +190,7 @@ export default function Roles() {
       <div className="flex flex-col items-center justify-center h-64 p-4 text-center">
         <AlertCircle size={48} style={{ color: BRAND.orange }} className="mb-4" />
         <p className="text-gray-800 font-semibold text-lg">{error}</p>
-        <button onClick={fetchRoles} className="mt-4 text-blue-600 hover:underline">Intentar de nuevo</button>
+        <button onClick={fetchData} className="mt-4 text-blue-600 hover:underline">Intentar de nuevo</button>
       </div>
     );
   }
@@ -203,7 +267,7 @@ export default function Roles() {
               <div className="flex items-center gap-3 mt-auto pt-4 border-t border-gray-50">
                 <div className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
                   <Users size={12} />
-                  <span>{rol.users_count || 0} Usuarios</span>
+                  <span>{rol.users_count || (rol.users ? rol.users.length : 0)} Usuarios</span>
                 </div>
                 {rol.level && (
                   <span className="text-xs font-bold px-2 py-1 rounded-full bg-green-50 text-green-700 border border-green-100">
@@ -218,16 +282,16 @@ export default function Roles() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#005380] bg-opacity-60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fadeIn transform transition-all scale-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#005380] bg-opacity-60 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg my-8 animate-fadeIn transform transition-all scale-100 flex flex-col max-h-[90vh]">
 
             {/* Modal Header */}
-            <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 bg-gray-50">
+            <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 bg-gray-50 rounded-t-2xl">
               <div>
                 <h2 className="text-xl font-bold text-gray-800">
                   {currentRole ? "Editar Rol" : "Nuevo Rol"}
                 </h2>
-                <p className="text-xs text-gray-500 mt-0.5">Define los detalles del perfil de acceso</p>
+                <p className="text-xs text-gray-500 mt-0.5">Define los detalles y permisos</p>
               </div>
               <button
                 onClick={closeModal}
@@ -238,52 +302,80 @@ export default function Roles() {
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">
-                  Nombre del Rol <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm font-medium text-gray-700"
-                  style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  placeholder="Ej: Administrador, Editor..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">
-                  Descripción
-                </label>
-                <textarea
-                  rows="3"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm text-gray-700 resize-none"
-                  style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  placeholder="Describe las responsabilidades y alcance..."
-                />
-              </div>
-
-              {/* Slug (Opcional / Solo lectura si es necesario) */}
-              {currentRole && (
+            <div className="overflow-y-auto p-6 flex-1">
+              <form id="roleForm" onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1.5 ml-1">
-                    Identificador (Slug)
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">
+                    Nombre del Rol <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    disabled
-                    value={formData.slug || (formData.name.toLowerCase().replace(/\s+/g, '-'))}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-500 cursor-not-allowed"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm font-medium text-gray-700"
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    placeholder="Ej: Administrador, Editor..."
                   />
                 </div>
-              )}
 
-              <div className="flex gap-3 pt-2">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">
+                    Descripción
+                  </label>
+                  <textarea
+                    rows="2"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm text-gray-700 resize-none"
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    placeholder="Descripción del rol..."
+                  />
+                </div>
+
+                {/* PERMISOS SECTION */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-3 ml-1">
+                    Permisos del Sistema
+                  </label>
+
+                  {permissions.length === 0 ? (
+                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-center text-sm text-gray-500">
+                      No hay permisos definidos en el sistema.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto p-1">
+                      {permissions.map(perm => (
+                        <div
+                          key={perm.id}
+                          onClick={() => togglePermission(perm.id)}
+                          className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${formData.permissions.includes(perm.id)
+                            ? "bg-blue-50 border-blue-200"
+                            : "bg-white border-gray-100 hover:bg-gray-50"
+                            }`}
+                        >
+                          <div className={`mt-0.5 ${formData.permissions.includes(perm.id) ? "text-blue-600" : "text-gray-300"}`}>
+                            {formData.permissions.includes(perm.id) ? <CheckSquare size={18} /> : <Square size={18} />}
+                          </div>
+                          <div>
+                            <p className={`text-sm font-semibold ${formData.permissions.includes(perm.id) ? "text-blue-800" : "text-gray-700"}`}>
+                              {perm.name}
+                            </p>
+                            {perm.description && (
+                              <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{perm.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </form>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
+              <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={closeModal}
@@ -293,13 +385,15 @@ export default function Roles() {
                 </button>
                 <button
                   type="submit"
+                  form="roleForm"
                   className="flex-1 px-4 py-2.5 text-white rounded-xl shadow-md hover:shadow-lg hover:opacity-90 transition font-bold text-sm"
                   style={{ backgroundColor: BRAND.blue }}
                 >
                   {currentRole ? "Guardar Cambios" : "Crear Rol"}
                 </button>
               </div>
-            </form>
+            </div>
+
           </div>
         </div>
       )}

@@ -17,3 +17,7 @@ export const createRole = (data) => api.post(`/auth/roles`, data);
 export const updateRole = (id, data) => api.put(`/auth/roles/${id}`, data);
 
 export const deleteRole = (id) => api.delete(`/auth/roles/${id}`);
+
+export const getPermissions = () => api.get(`/auth/permissions`);
+
+export const getUsers = () => api.get(`/auth/users`);

@@ -24,14 +24,14 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
- 
+
   const login = useCallback((userData, tokenData) => {
-    
+
     const userWithRole = {
       ...userData,
-      // Asegurar que siempre hay un rol (fallback a "Sin rol")
-      role: userData?.role || "Sin rol",
-      role_slug: userData?.role_slug || null,
+      // Extraer rol del array 'roles' si existe (Laravel Roles lo devuelve así)
+      role: userData?.role || (userData?.roles && userData.roles.length > 0 ? userData.roles[0].name : "Sin rol"),
+      role_slug: userData?.role_slug || (userData?.roles && userData.roles.length > 0 ? userData.roles[0].slug : null),
     };
 
     setUser(userWithRole);
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  
+
   const updateUser = useCallback((updatedUserData) => {
     const mergedUser = {
       ...user,
@@ -78,8 +78,8 @@ export const AuthProvider = ({ children }) => {
     token,
     login,
     logout,
-    updateUser, 
-    isAuthenticated: !!user && !!token, 
+    updateUser,
+    isAuthenticated: !!user && !!token,
   };
 
   return (

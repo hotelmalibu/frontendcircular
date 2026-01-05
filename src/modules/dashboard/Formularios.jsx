@@ -58,19 +58,7 @@ export default function Formularios() {
               </p>
             </div>
 
-            {/* Widget de Fecha / Rol */}
-            <div className="flex flex-col items-end gap-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-500 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
-                <Calendar size={16} style={{ color: BRAND.green }} />
-                <span className="capitalize">{today}</span>
-              </div>
-              {user?.role && (
-                <div className="flex items-center gap-2 text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700">
-                  <ShieldCheck size={12} />
-                  <span className="uppercase">{user.role}</span>
-                </div>
-              )}
-            </div>
+          
           </div>
 
           {user ? (
