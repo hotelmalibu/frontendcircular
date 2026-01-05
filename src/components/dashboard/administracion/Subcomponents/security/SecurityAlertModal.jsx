@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import { X, ShieldAlert, User as UserIcon, MapPin, Calendar, Monitor } from "lucide-react";
 
 const BRAND = {
@@ -28,9 +29,9 @@ export default function SecurityAlertModal({ alert, onClose, onMarkAsViewed }) {
 
     const styles = getTypeStyles();
 
-    return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
-            <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-slideUp">
+    return ReactDOM.createPortal(
+        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fadeIn">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto animate-slideUp">
                 {/* Header con gradiente de marca */}
                 <div
                     className="relative p-8 text-white overflow-hidden"
@@ -137,22 +138,8 @@ export default function SecurityAlertModal({ alert, onClose, onMarkAsViewed }) {
                 </div>
             </div>
 
-            <style>{`
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes slideUp {
-                    from { opacity: 0; transform: translateY(20px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .animate-fadeIn {
-                    animation: fadeIn 0.2s ease-out;
-                }
-                .animate-slideUp {
-                    animation: slideUp 0.3s ease-out;
-                }
-            `}</style>
-        </div>
+
+        </div>,
+        document.body
     );
 }

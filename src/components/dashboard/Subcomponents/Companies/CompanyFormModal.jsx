@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import {
   X,
   Upload,
@@ -137,8 +138,8 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
   const inputClass = `w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm pl-10`;
   const labelClass = "block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1";
 
-  return (
-    <div className="fixed inset-0 z-50 bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-[9999] bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
 
         {/* Header con Azul Profundo */}
@@ -361,6 +362,7 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

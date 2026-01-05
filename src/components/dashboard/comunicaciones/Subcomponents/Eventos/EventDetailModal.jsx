@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import DOMPurify from 'dompurify';
 import {
   X,
@@ -167,8 +168,8 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
     );
   };
 
-  return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center backdrop-blur-sm p-4">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center backdrop-blur-sm p-4 animate-fadeIn">
       <div className="bg-white w-full max-w-4xl rounded-2xl shadow-lg overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 border-b bg-gradient-to-r from-green-600 to-green-700">
@@ -491,6 +492,7 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

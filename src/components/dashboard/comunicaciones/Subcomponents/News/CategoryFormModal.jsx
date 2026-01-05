@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import { X, Save, Tag, AlertCircle, FileText } from "lucide-react";
 import { createCategory, updateCategory } from "../../../../../api/categoriesApi";
 
@@ -100,8 +101,8 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
   const inputClass = `w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm ${errors.name ? "border-orange-300" : "border-gray-200"}`;
   const labelClass = "block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1";
 
-  return (
-    <div className="fixed inset-0 z-50 bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-[9999] bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-fadeIn flex flex-col">
 
         {/* Header con Azul Profundo */}
@@ -212,6 +213,7 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

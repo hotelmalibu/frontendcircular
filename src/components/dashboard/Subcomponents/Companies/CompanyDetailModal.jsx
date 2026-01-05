@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import { X, Edit, Phone, Mail, Globe, MapPin, Package, Clock, ExternalLink, Building } from "lucide-react";
 
 export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
@@ -16,8 +17,8 @@ export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
     });
   };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fadeIn">
       <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
@@ -55,7 +56,7 @@ export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
                   }}
                 />
               ) : null}
-              <div 
+              <div
                 className={`w-32 h-32 bg-gray-100 rounded-xl border border-gray-200 flex items-center justify-center ${companyData.logo && companyData.logo.url ? 'hidden' : ''}`}
               >
                 <Building className="text-gray-400" size={40} />
@@ -67,7 +68,7 @@ export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
               <h1 className="text-3xl font-bold text-gray-900 mb-3">
                 {companyData.name}
               </h1>
-              
+
               <div className="space-y-3">
                 {/* Created Date */}
                 <div className="flex items-center gap-2 text-gray-500">
@@ -125,7 +126,7 @@ export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <a 
+                    <a
                       href={`mailto:${companyData.email}`}
                       className="font-medium text-blue-600 hover:text-blue-800"
                     >
@@ -143,7 +144,7 @@ export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Sitio Web</p>
-                    <a 
+                    <a
                       href={companyData.website_url.startsWith('http') ? companyData.website_url : `https://${companyData.website_url}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -180,7 +181,7 @@ export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
                   Productos ({companyData.products.length})
                 </h3>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {companyData.products.map((product, index) => (
                   <div key={product.id || index} className="bg-white border border-gray-200 rounded-xl p-4">
@@ -199,6 +200,7 @@ export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

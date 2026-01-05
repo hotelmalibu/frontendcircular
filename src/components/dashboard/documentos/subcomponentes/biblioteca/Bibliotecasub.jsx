@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import ReactDOM from "react-dom";
 import {
   Upload,
   Image as ImageIcon,
@@ -323,11 +324,10 @@ export default function Bibliotecasub() {
         )}
       </div>
 
-      {/* --- MODAL UPLOAD --- */}
-      {isUploadModalOpen && (
-        <div className="fixed inset-0 bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity">
-          <div className="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl transform transition-all scale-100">
-            <div className="flex justify-between items-center mb-6">
+      {isUploadModalOpen && ReactDOM.createPortal(
+        <div className="fixed inset-0 bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 transition-opacity animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-3xl shadow-2xl transform transition-all scale-100 flex flex-col max-h-[90vh]">
+            <div className="flex justify-between items-center mb-6 pl-2 pr-2">
               <div>
                 <h2 className="text-2xl font-bold" style={{ color: BRAND.darkBlue }}>Subir Documento</h2>
                 <p className="text-sm text-gray-500">Completa la información para archivar</p>
@@ -340,8 +340,10 @@ export default function Bibliotecasub() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-5 overflow-y-auto px-2 pb-2">
+
+              {/* Row 1: Type, Version, Status (3 Cols) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo *</label>
                   <select
@@ -349,7 +351,7 @@ export default function Bibliotecasub() {
                     value={formData.document_type_id}
                     onChange={handleInputChange}
                     required
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:border-transparent outline-none text-sm transition-all"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm transition-all"
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
                   >
                     <option value="">Seleccionar...</option>
@@ -366,42 +368,11 @@ export default function Bibliotecasub() {
                     value={formData.version}
                     onChange={handleInputChange}
                     required
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:border-transparent outline-none text-sm"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm"
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
                     placeholder="Ej: 1.0"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre del Archivo *</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full border border-gray-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:border-transparent outline-none text-sm"
-                  style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  placeholder="Ej: Política de Sostenibilidad 2025"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Descripción</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  required
-                  rows={2}
-                  className="w-full border border-gray-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:border-transparent outline-none text-sm resize-none"
-                  style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  placeholder="Breve descripción del contenido..."
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Estado *</label>
                   <select
@@ -409,7 +380,7 @@ export default function Bibliotecasub() {
                     value={formData.status}
                     onChange={handleInputChange}
                     required
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:border-transparent outline-none text-sm"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm"
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
                   >
                     <option value="">Seleccionar...</option>
@@ -418,6 +389,23 @@ export default function Bibliotecasub() {
                     <option value="approved">Aprobado</option>
                   </select>
                 </div>
+              </div>
+
+              {/* Row 2: Name (2 Cols) & Expiration (1 Col) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre del Archivo *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm"
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    placeholder="Ej: Política de Sostenibilidad 2025"
+                  />
+                </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Expiración</label>
                   <input
@@ -425,13 +413,29 @@ export default function Bibliotecasub() {
                     name="expires_at"
                     value={formData.expires_at}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:border-transparent outline-none text-sm"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm"
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
                   />
                 </div>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300 text-center">
+              {/* Row 3: Description */}
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Descripción</label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  required
+                  rows={2}
+                  className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm resize-none"
+                  style={{ "--tw-ring-color": BRAND.lightBlue }}
+                  placeholder="Breve descripción del contenido..."
+                />
+              </div>
+
+              {/* Row 4: File Upload (Compact) */}
+              <div className="bg-gray-50 p-3 rounded-xl border border-dashed border-gray-300 text-center hover:bg-blue-50/30 hover:border-blue-300 transition-colors">
                 <input
                   type="file"
                   onChange={handleFileChange}
@@ -439,12 +443,16 @@ export default function Bibliotecasub() {
                   id="file-upload"
                   className="hidden"
                 />
-                <label htmlFor="file-upload" className="cursor-pointer block">
-                  <div className="text-blue-500 mb-2 mx-auto"><Upload size={24} className="mx-auto" /></div>
-                  <span className="text-sm font-medium text-gray-600">
-                    {formData.file ? formData.file.name : "Haga clic para subir el archivo"}
-                  </span>
-                  <p className="text-xs text-gray-400 mt-1">PDF, Imágenes o Word</p>
+                <label htmlFor="file-upload" className="cursor-pointer flex items-center justify-center gap-4">
+                  <div className="p-2 bg-blue-100 text-blue-600 rounded-full">
+                    <Upload size={20} />
+                  </div>
+                  <div className="text-left">
+                    <span className="block text-sm font-medium text-gray-700">
+                      {formData.file ? formData.file.name : "Seleccionar archivo"}
+                    </span>
+                    <span className="text-xs text-gray-400">PDF, Imágenes o Word (Máx 10MB)</span>
+                  </div>
                 </label>
               </div>
 
@@ -462,14 +470,14 @@ export default function Bibliotecasub() {
                 <button
                   type="button"
                   onClick={() => setIsUploadModalOpen(false)}
-                  className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition font-medium text-sm"
+                  className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition font-medium text-sm"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 px-4 py-3 text-white rounded-xl hover:shadow-lg disabled:opacity-70 transition font-medium text-sm flex justify-center items-center gap-2"
+                  className="flex-1 px-4 py-2.5 text-white rounded-xl hover:shadow-lg disabled:opacity-70 transition font-medium text-sm flex justify-center items-center gap-2"
                   style={{ backgroundColor: BRAND.blue }}
                 >
                   {isSubmitting ? (
@@ -486,12 +494,13 @@ export default function Bibliotecasub() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* --- MODAL VIEW --- */}
-      {isViewModalOpen && selectedDocument && (
-        <div className="fixed inset-0 bg-[#005380] bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      {isViewModalOpen && selectedDocument && ReactDOM.createPortal(
+        <div className="fixed inset-0 bg-[#005380] bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl overflow-hidden">
 
             {/* Modal Header */}
@@ -551,7 +560,8 @@ export default function Bibliotecasub() {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

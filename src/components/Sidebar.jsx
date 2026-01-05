@@ -33,7 +33,7 @@ export default function Sidebar() {
   const links = [
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
     { name: "Documentos", path: "/documentos", icon: <FileText size={20} /> },
-    { name: "Empresas", path: "/companies", icon: <Building size={20} /> },
+    { name: "Circularmente", path: "/companies", icon: <Building size={20} /> },
     { name: "Formularios", path: "/formularios", icon: <ClipboardList size={20} /> },
     { name: "Comunicaciones", path: "/comunicaciones", icon: <MessageSquare size={20} /> },
     isAdmin && { name: "Administración", path: "/administracion", icon: <Settings size={20} /> },

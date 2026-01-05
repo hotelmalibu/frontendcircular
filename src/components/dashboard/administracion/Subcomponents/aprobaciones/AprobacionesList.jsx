@@ -14,6 +14,8 @@ import {
   UserX
 } from "lucide-react";
 
+import FeedbackModal from "../../../../common/FeedbackModal";
+
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
   blue: "#2C67B0",       // Azul Principal
@@ -26,11 +28,21 @@ const BRAND = {
   gray: "#6B7280",
 };
 
+
+
 export default function AprobacionesList() {
   const [solicitudes, setSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("Todos");
   const [error, setError] = useState(null);
+
+  // Estados para el Modal de Feedback
+  const [feedback, setFeedback] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: ""
+  });
 
   useEffect(() => {
     fetchApprovals();
@@ -59,15 +71,40 @@ export default function AprobacionesList() {
       // Refresh list
       await fetchApprovals();
 
-      let msg = "Operación exitosa.";
-      if (newStatus === 'active') msg = "Usuario activado/aprobado con éxito.";
-      if (newStatus === 'rejected') msg = "Usuario rechazado con éxito.";
-      if (newStatus === 'suspended') msg = "Usuario suspendido con éxito.";
+      let title = "Operación Exitosa";
+      let msg = "La operación se completó correctamente.";
+      let type = "success";
 
-      alert(msg);
+      if (newStatus === 'active') {
+        title = "¡Usuario Aprobado!";
+        msg = "El usuario ha sido activado y aprobado con éxito.";
+      }
+      if (newStatus === 'rejected') {
+        title = "Usuario Rechazado";
+        msg = "La solicitud de registro ha sido rechazada.";
+        type = "error" // Aunque sea éxito de operación, visualmente puede ser rojo o warning. Usaremos error para indicar rechazo/baja.
+      }
+      if (newStatus === 'suspended') {
+        title = "Usuario Suspendido";
+        msg = "La cuenta del usuario ha sido suspendida.";
+        type = "warning";
+      }
+
+      setFeedback({
+        isOpen: true,
+        type: type,
+        title: title,
+        message: msg
+      });
+
     } catch (err) {
       console.error("Error updating status:", err);
-      alert("Error al procesar la solicitud: " + (err.response?.data?.message || err.message));
+      setFeedback({
+        isOpen: true,
+        type: "error",
+        title: "Error",
+        message: "Error al procesar la solicitud: " + (err.response?.data?.message || err.message)
+      });
     }
   };
 
@@ -119,7 +156,7 @@ export default function AprobacionesList() {
 
         {/* Tabs de Filtro */}
         <div className="flex gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 no-scrollbar">
-          {["Todos", "Pendiente", "Aprobado", "Suspendido"].map((status) => (
+          {["Todos", "Pendiente", "Aprobado", "Rechazado", "Suspendido"].map((status) => (
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
@@ -254,6 +291,14 @@ export default function AprobacionesList() {
           )}
         </div>
       )}
+      <FeedbackModal
+        isOpen={feedback.isOpen}
+        type={feedback.type}
+        title={feedback.title}
+        message={feedback.message}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+        autoClose={3000}
+      />
     </div>
   );
 }

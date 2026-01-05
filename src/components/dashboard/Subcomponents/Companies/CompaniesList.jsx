@@ -206,7 +206,7 @@ export default function CompaniesList() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
             <Building className="text-blue-400" size={32} />
-            Directorio de Empresas
+            Directorio Circularmente
           </h1>
           <p className="text-gray-500 mt-2 text-lg ml-11">
             Gestión de aliados estratégicos y organizaciones registradas

@@ -100,7 +100,14 @@ export default function SecurityLogs() {
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filteredLogs.map((log) => (
-                                    <tr key={log.id} className="hover:bg-gray-50/50 transition-colors group">
+                                    <tr
+                                        key={log.id}
+                                        className={`group transition-all duration-200 border-l-4 
+                                            ${!log.is_viewed
+                                                ? 'bg-blue-50/60 border-blue-500 hover:bg-blue-100/50'
+                                                : 'bg-white border-transparent hover:bg-gray-50/50'
+                                            }`}
+                                    >
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
                                                 {log.type === 'critical' ? (
