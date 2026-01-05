@@ -14,6 +14,7 @@ import {
   Bell,
   MessageSquare,
   LayoutDashboard,
+  ShieldAlert,
   FileText,
   ClipboardList,
   Settings,
@@ -386,6 +387,86 @@ export default function Navbar({ onMenuClick }) {
     }
   ];
 
+  // --- NOTIFICACIONES ---
+  const [pendingCount, setPendingCount] = useState(0);
+  const [alertCount, setAlertCount] = useState(0);
+  const [recentAlerts, setRecentAlerts] = useState([]);
+  const [showNotifMenu, setShowNotifMenu] = useState(false);
+  const [showAlertMenu, setShowAlertMenu] = useState(false);
+  const notifRef = useRef(null);
+  const alertRef = useRef(null);
+
+  const isAdmin = user && (
+    user.role?.toLowerCase() === 'admin' ||
+    user.role_slug?.toLowerCase() === 'admin' ||
+    user.role?.toLowerCase() === 'administrador'
+  );
+
+  useEffect(() => {
+    if (user && isAdmin) {
+      const fetchCounts = async () => {
+        try {
+          const { getUsers, getSecurityLogs } = await import("../api/auth");
+
+          // Notificaciones de Gestión (Usuarios pendientes y suspendidos)
+          const resUsers = await getUsers();
+          const users = Array.isArray(resUsers.data) ? resUsers.data : (resUsers.data?.data || []);
+          const pending = users.filter(u =>
+            u.status?.toLowerCase() === 'pending' ||
+            u.status?.toLowerCase() === 'pendiente' ||
+            u.status?.toLowerCase() === 'suspended' ||
+            u.status?.toLowerCase() === 'suspendido'
+          ).length;
+          setPendingCount(pending);
+
+          // Alertas de Seguridad
+          try {
+            const resAlerts = await getSecurityLogs();
+            const alerts = Array.isArray(resAlerts.data) ? resAlerts.data : (resAlerts.data?.data || []);
+            // Solo contar y mostrar las que no han sido vistas/revisadas
+            const activeAlerts = alerts.filter(a => !a.is_viewed);
+            setRecentAlerts(activeAlerts.slice(0, 5));
+            setAlertCount(activeAlerts.length);
+          } catch (e) {
+            console.log("Security logs endpoint not available yet.");
+          }
+
+        } catch (err) {
+          console.error("Error fetching notif counts:", err);
+        }
+      };
+
+      fetchCounts();
+      const interval = setInterval(fetchCounts, 60000); // Poll cada minuto
+
+      // Escuchar eventos cuando se marca una alerta como revisada
+      const handleSecurityLogReviewed = () => {
+        fetchCounts(); // Refrescar contadores inmediatamente
+      };
+
+      window.addEventListener('securityLogReviewed', handleSecurityLogReviewed);
+
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('securityLogReviewed', handleSecurityLogReviewed);
+      };
+    }
+  }, [user]);
+
+  // Cerrar menús al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotifMenu(false);
+      }
+      if (alertRef.current && !alertRef.current.contains(e.target)) {
+        setShowAlertMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div
       className={`fixed top-0 left-0 w-full z-50 font-sans ${user ? '' : 'transition-all duration-500 ease-in-out'} ${user ? 'translate-y-0 opacity-100' : (visible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0")
@@ -425,8 +506,6 @@ export default function Navbar({ onMenuClick }) {
       {/* NAVBAR HEADER */}
       <header className={`flex items-center justify-between px-4 md:px-8 lg:px-24 py-4 transition-all duration-300 ${!showWhiteBg ? "bg-transparent" : "bg-white shadow-md border-b border-gray-100"}`}>
 
-
-
         {/* LOGO */}
         <div className="flex items-center slide-in shrink-0">
           <Link to="/" className="flex items-center hover:scale-105 transition-transform duration-300">
@@ -457,16 +536,130 @@ export default function Navbar({ onMenuClick }) {
         {/* BOTONES Y USUARIO */}
         <div className="flex items-center gap-3 md:gap-5 ml-auto">
 
-          {/* Alertas (Solo si hay usuario) */}
+          {/* Alertas y Notificaciones */}
           {user && (
             <div className="flex items-center gap-1">
-              <button className={`relative p-2 rounded-full transition-all ${showWhiteText ? 'text-white hover:bg-white/20' : 'text-gray-500 hover:bg-gray-100 hover:text-blue-600'}`}>
-                <Bell size={20} />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-              </button>
-              <button className={`p-2 rounded-full transition-all ${showWhiteText ? 'text-white hover:bg-white/20' : 'text-gray-500 hover:bg-gray-100 hover:text-blue-600'}`}>
-                <MessageSquare size={20} />
-              </button>
+
+              {/* Alertas y Notificaciones solo para Admins */}
+              {isAdmin && (
+                <>
+                  {/* NOTIFICACIONES (Aprobaciones/Info) */}
+                  <div className="relative" ref={notifRef}>
+                    <button
+                      onClick={() => { setShowNotifMenu(!showNotifMenu); setShowAlertMenu(false); }}
+                      title="Notificaciones de Gestión"
+                      className={`relative p-2 rounded-full transition-all ${showWhiteText ? 'text-white hover:bg-white/20' : 'text-gray-500 hover:bg-gray-100 hover:text-blue-600'}`}>
+                      <Bell size={20} />
+                      {pendingCount > 0 && (
+                        <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                          {pendingCount}
+                        </span>
+                      )}
+                    </button>
+
+                    {/* DROPDOWN NOTIFICACIONES */}
+                    {showNotifMenu && (
+                      <div className="absolute right-0 mt-2 top-full w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[70] animate-fadeIn">
+                        <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                          <h4 className="font-bold text-gray-800">Notificaciones</h4>
+                          {pendingCount > 0 && (
+                            <span className="bg-red-100 text-red-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+                              {pendingCount} Pendientes
+                            </span>
+                          )}
+                        </div>
+                        <div className="max-h-80 overflow-y-auto">
+                          {pendingCount > 0 ? (
+                            <Link
+                              to="/administracion"
+                              onClick={() => setShowNotifMenu(false)}
+                              className="p-4 flex gap-3 hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0"
+                            >
+                              <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shrink-0">
+                                <User size={18} />
+                              </div>
+                              <div>
+                                <p className="text-sm font-semibold text-gray-800">Atención Requerida</p>
+                                <p className="text-xs text-gray-500 mt-0.5">Tienes {pendingCount} usuarios esperando revisión o suspendidos.</p>
+                                <p className="text-[10px] text-blue-600 font-bold mt-1">Ir a Centro de Aprobaciones →</p>
+                              </div>
+                            </Link>
+                          ) : (
+                            <div className="p-10 text-center">
+                              <div className="w-12 h-12 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <Bell size={24} />
+                              </div>
+                              <p className="text-sm text-gray-400">No tienes notificaciones pendientes.</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ALERTAS DE SEGURIDAD (ShieldAlert) */}
+                  <div className="relative" ref={alertRef}>
+                    <button
+                      onClick={() => { setShowAlertMenu(!showAlertMenu); setShowNotifMenu(false); }}
+                      title="Centro de Alertas de Seguridad"
+                      className={`relative p-2 rounded-full transition-all ${showWhiteText ? 'text-white hover:bg-white/20' : 'text-gray-500 hover:bg-gray-100 hover:text-orange-600'}`}>
+                      <ShieldAlert size={20} />
+                      {alertCount > 0 && (
+                        <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                          {alertCount}
+                        </span>
+                      )}
+                    </button>
+
+                    {/* DROPDOWN ALERTAS */}
+                    {showAlertMenu && (
+                      <div className="absolute right-0 mt-2 top-full w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[70] animate-fadeIn focus:outline-none">
+                        <div className="p-4 bg-orange-50 border-b border-orange-100 flex justify-between items-center">
+                          <h4 className="font-bold text-orange-800 flex items-center gap-2">
+                            <ShieldAlert size={16} /> Seguridad
+                          </h4>
+                          {alertCount > 0 && (
+                            <span className="bg-orange-100 text-orange-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+                              {alertCount} Alertas
+                            </span>
+                          )}
+                        </div>
+                        <div className="max-h-80 overflow-y-auto">
+                          {recentAlerts.length > 0 ? (
+                            <>
+                              <div className="divide-y divide-gray-50">
+                                {recentAlerts.map((alerta, idx) => (
+                                  <div key={idx} className="p-4 hover:bg-gray-50 transition-colors">
+                                    <p className="text-xs font-bold text-gray-800 truncate">{alerta.description}</p>
+                                    <div className="flex justify-between items-center mt-1">
+                                      <span className="text-[10px] text-gray-400">{new Date(alerta.created_at).toLocaleDateString()}</span>
+                                      <span className="text-[9px] font-bold uppercase text-orange-500 bg-orange-50 px-1.5 rounded">{alerta.type}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                              <Link
+                                to="/administracion"
+                                onClick={() => setShowAlertMenu(false)}
+                                className="block p-3 text-center text-xs font-bold text-orange-600 bg-orange-50/50 hover:bg-orange-50 transition-colors border-t border-orange-100"
+                              >
+                                Ver historial completo
+                              </Link>
+                            </>
+                          ) : (
+                            <div className="p-10 text-center">
+                              <div className="w-12 h-12 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <ShieldAlert size={24} />
+                              </div>
+                              <p className="text-sm text-gray-400">Todo se ve seguro por ahora.</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -510,8 +703,8 @@ export default function Navbar({ onMenuClick }) {
                     { name: "Empresas", path: "/companies", icon: Building },
                     { name: "Formularios", path: "/formularios", icon: ClipboardList },
                     { name: "Comunicaciones", path: "/comunicaciones", icon: MessageSquare },
-                    { name: "Administración", path: "/administracion", icon: Settings },
-                  ].map((link) => (
+                    isAdmin && { name: "Administración", path: "/administracion", icon: Settings },
+                  ].filter(Boolean).map((link) => (
                     <Link
                       key={link.path}
                       to={link.path}

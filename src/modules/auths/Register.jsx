@@ -12,7 +12,10 @@ import {
     Loader2,
     Eye,
     EyeOff,
-    AlertCircle
+    AlertCircle,
+    X,
+    Info,
+    CheckCircle
 } from "lucide-react";
 
 import Logo from "../../assets/fondosYlogos/Logo.png";
@@ -83,6 +86,8 @@ export default function Register() {
 
 
 
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -94,7 +99,7 @@ export default function Register() {
 
         setIsLoading(true);
         try {
-            const res = await register({
+            await register({
                 name: formData.name.trim(),
                 email: formData.email.trim(),
                 password: formData.password,
@@ -102,15 +107,8 @@ export default function Register() {
                 role_id: parseInt(formData.role_id),
             });
 
-            const user = res?.data?.data?.user;
-            const token = res?.data?.data?.token;
-
-            if (user && token) {
-                login(user, token);
-                navigate("/dashboard", { replace: true });
-            } else {
-                navigate("/login", { replace: true });
-            }
+            // No logueamos inmediatamente, mostramos modal de éxito
+            setShowSuccessModal(true);
 
         } catch (err) {
             console.error("Error registrando:", err);
@@ -331,6 +329,41 @@ export default function Register() {
                 </div>
             </div>
 
+            {/* MODAL DE ÉXITO PENDIENTE */}
+            {showSuccessModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#005380] bg-opacity-60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md animate-fadeIn transform transition-all p-8 text-center relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-2" style={{ backgroundColor: BRAND.green }}></div>
+
+                        <div className="flex justify-center mb-6">
+                            <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center text-green-500 shadow-inner">
+                                <CheckCircle size={40} />
+                            </div>
+                        </div>
+
+                        <h3 className="text-2xl font-bold text-gray-800 mb-3">¡Registro Recibido!</h3>
+
+                        <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 mb-6 text-left flex gap-3">
+                            <Info size={20} className="text-blue-500 shrink-0 mt-0.5" />
+                            <p className="text-sm text-blue-800 leading-relaxed">
+                                Tu cuenta ha sido creada exitosamente, pero requiere ser <strong>aprobada por un administrador</strong> antes de que puedas iniciar sesión.
+                            </p>
+                        </div>
+
+                        <p className="text-gray-500 text-sm mb-8">
+                            Recibirás un correo electrónico una vez que tu acceso sea habilitado.
+                        </p>
+
+                        <button
+                            onClick={() => navigate("/login")}
+                            className="w-full py-3.5 px-6 rounded-xl text-white font-bold transition-all shadow-md hover:shadow-lg active:scale-95"
+                            style={{ backgroundColor: BRAND.blue }}
+                        >
+                            Entendido, ir al Login
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

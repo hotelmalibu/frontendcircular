@@ -21,3 +21,10 @@ export const deleteRole = (id) => api.delete(`/auth/roles/${id}`);
 export const getPermissions = () => api.get(`/auth/permissions`);
 
 export const getUsers = () => api.get(`/auth/users`);
+
+// Approval Workflow
+export const getApprovals = () => api.get(`/auth/approvals`);
+export const updateUserStatus = (userId, status) => api.post(`/auth/users/${userId}/status`, { status });
+export const getSecurityLogs = () => api.get(`/auth/security-logs`);
+export const markSecurityLogAsViewed = (id) => api.patch(`/auth/security-logs/${id}/viewed`);
+export const getActiveSessions = () => api.get(`/auth/active-sessions`);
