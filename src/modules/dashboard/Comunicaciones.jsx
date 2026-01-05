@@ -32,9 +32,9 @@ export default function Comunicaciones() {
   const tabs = [
     { name: "Dashboard", label: "Gestión de Contenidos", icon: <LayoutDashboard size={18} />, component: <Dashboard /> },
     { name: "Noticias", label: "Noticias", icon: <Newspaper size={18} />, component: <News /> },
-    { name: "Categorias", label: "Categorías", icon: <Tag size={18} />, component: <Categories /> },
     { name: "Eventos", label: "Eventos", icon: <Calendar size={18} />, component: <Eventos /> },
     { name: "Proyectos", label: "Proyectos", icon: <Briefcase size={18} />, component: <Projects /> },
+    { name: "Categorias", label: "Categorías", icon: <Tag size={18} />, component: <Categories /> },
   ];
 
   return (

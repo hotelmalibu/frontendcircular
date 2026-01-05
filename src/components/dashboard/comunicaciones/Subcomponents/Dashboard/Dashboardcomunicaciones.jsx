@@ -239,7 +239,7 @@ export default function DashboardContenido() {
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
 
       {/* Estadísticas por Categoría */}
-      <div className="mt-8 bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
