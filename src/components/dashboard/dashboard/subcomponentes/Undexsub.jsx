@@ -1,37 +1,28 @@
 import {
   Bell,
-  ShieldAlert,
-  Shield,
   Activity,
   AlertTriangle,
   AlertOctagon,
-  Download,
-  Leaf,
-  RefreshCw,
-  Plus,
-  Building,
-  Edit,
-  Search,
-  FileText,
-  Eye,
-  Trash2
+  Shield,
+  Users,
+  BarChart as BarChartIcon
 } from "lucide-react";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
   Tooltip,
+  ResponsiveContainer,
   BarChart,
   Bar,
-  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  CartesianGrid
 } from "recharts";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { getAllProjects, deleteProject } from "../../../../api/projectsApi";
 import { getUsers, getSecurityLogs, getActiveSessions } from "../../../../api/auth";
-import ProjectFormModal from "../../../dashboard/comunicaciones/Subcomponents/Projects/ProjectFormModal";
-import ProjectDetailModal from "../../../dashboard/comunicaciones/Subcomponents/Projects/ProjectDetailModal";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -43,26 +34,15 @@ const BRAND = {
   orange: "#E15200",     // Naranja (Alertas Críticas)
   yellow: "#E8AD00",     // Amarillo (Advertencias)
   purple: "#9E1981",     // Morado (Acentos)
+  gray: "#6B7280",
 };
 
+const COLORS = [BRAND.blue, BRAND.green, BRAND.purple, BRAND.orange, BRAND.lightBlue, BRAND.darkGreen];
+
 export default function Undexsub() {
-  // Datos de ejemplo
-  const graficoImpacto = [
-    { mes: "Ene", valor: 100 },
-    { mes: "Feb", valor: 180 },
-    { mes: "Mar", valor: 250 },
-    { mes: "Abr", valor: 300 },
-    { mes: "May", valor: 340 },
-  ];
-
-  const graficoRed = [
-    { tipo: "Energía", valor: 80, fill: BRAND.darkGreen },
-    { tipo: "Residuos", valor: 65, fill: BRAND.blue },
-    { tipo: "Agua", valor: 90, fill: BRAND.lightBlue },
-    { tipo: "CO₂", valor: 75, fill: BRAND.green },
-  ];
-
-  const [alertas, setAlertas] = useState([]); // Iniciamos vacío para data real futura
+  const [alertas, setAlertas] = useState([]);
+  const [usersList, setUsersList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Dashboard Stats State
   const [dashboardStats, setDashboardStats] = useState({
@@ -72,29 +52,40 @@ export default function Undexsub() {
     blockedAccesses: "0"
   });
 
-  const loadStats = React.useCallback(async () => {
+  const loadData = React.useCallback(async () => {
     try {
-      // Usuarios y Bloqueados
-      const resUsers = await getUsers();
-      const userList = Array.isArray(resUsers.data) ? resUsers.data : (resUsers.data?.data || []);
+      setLoading(true);
 
-      // Sesiones Activas
+      // 1. Usuarios
+      const resUsers = await getUsers();
+      let userList = [];
+      if (Array.isArray(resUsers.data)) {
+        userList = resUsers.data;
+      } else if (resUsers.data?.data && Array.isArray(resUsers.data.data)) {
+        userList = resUsers.data.data;
+      } else if (resUsers.data && typeof resUsers.data === 'object') {
+        const possibleArray = Object.values(resUsers.data).find(val => Array.isArray(val));
+        if (possibleArray) userList = possibleArray;
+        else userList = Object.values(resUsers.data).filter(item => item && typeof item === 'object');
+      }
+
+      // Filter out non-user objects if necessary
+      userList = userList.filter(u => u.id && (u.name || u.email));
+      setUsersList(userList);
+
+      // 2. Sesiones
       let sessionsCount = 0;
       try {
         const resSessions = await getActiveSessions();
         sessionsCount = resSessions.data?.count || 0;
-      } catch (e) {
-        console.log("Sessions endpoint not available.");
-      }
+      } catch (e) { console.log("Sessions endpoint not available."); }
 
-      // Alertas de Seguridad
+      // 3. Alertas
       let realAlerts = [];
       try {
         const resAlerts = await getSecurityLogs();
         realAlerts = Array.isArray(resAlerts.data) ? resAlerts.data : (resAlerts.data?.data || []);
-      } catch (err) {
-        console.log("No security logs endpoint found yet.");
-      }
+      } catch (err) { console.log("No security logs endpoint found yet."); }
 
       setDashboardStats({
         totalUsers: userList.length.toLocaleString(),
@@ -102,16 +93,87 @@ export default function Undexsub() {
         criticalAlerts: realAlerts.filter(a => a.type === 'critical').length.toString(),
         blockedAccesses: userList.filter(u => u.status === 'rejected').length.toString()
       });
+
       setAlertas(realAlerts.map(a => ({
         titulo: a.description || "Alerta de seguridad",
         descripcion: a.user_email ? `Usuario: ${a.user_email}` : "Actividad sospechosa",
         fecha: new Date(a.created_at).toLocaleString('es-ES'),
         tipo: a.type || "info"
       })));
+
     } catch (err) {
-      console.error("Error loading dashboard stats:", err);
+      console.error("Error loading dashboard data:", err);
+    } finally {
+      setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+
+  // --- PROCESAMIENTO DE DATOS ---
+
+  // 1. Distribución de Roles (Pie Chart) - Lógica Robustecida
+  const userRolesData = useMemo(() => {
+    const roleCounts = {};
+    usersList.forEach(user => {
+      // Intenta extraer el nombre del rol de varias formas posibles
+      let roleName = "Sin Rol";
+      if (user.role) {
+        if (typeof user.role === 'string') roleName = user.role;
+        else if (user.role.name) roleName = user.role.name;
+      } else if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
+        roleName = user.roles[0].name || user.roles[0];
+      }
+
+      // Normalizar nombre del rol
+      roleName = roleName.charAt(0).toUpperCase() + roleName.slice(1).toLowerCase();
+
+      roleCounts[roleName] = (roleCounts[roleName] || 0) + 1;
+    });
+
+    return Object.keys(roleCounts).map(role => ({
+      name: role,
+      value: roleCounts[role]
+    }));
+  }, [usersList]);
+
+  // 2. Usuarios por Mes (Bar Chart)
+  const usersByMonthData = useMemo(() => {
+    const months = {};
+    usersList.forEach(user => {
+      if (!user.created_at) return;
+      const date = new Date(user.created_at);
+      // Clave ordenable: "2023-01"
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      months[key] = (months[key] || 0) + 1;
+    });
+
+    // Convertir a array y ordenar cronológicamente
+    let chartData = Object.keys(months).sort().map(key => {
+      const [year, month] = key.split('-');
+      const dateObj = new Date(parseInt(year), parseInt(month) - 1);
+      // Nombre corto: "Ene 24" o "Ene"
+      const monthName = dateObj.toLocaleString('es-ES', { month: 'short' });
+      const displayName = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${year.slice(2)}`; // Ene 24
+
+      return {
+        name: displayName,
+        fullDate: key,
+        cantidad: months[key]
+      };
+    });
+
+    // Si hay muchos datos, quizás mostrar solo los últimos 12 meses
+    if (chartData.length > 12) {
+      chartData = chartData.slice(chartData.length - 12);
+    }
+
+    return chartData;
+  }, [usersList]);
+
 
   const stats = [
     {
@@ -144,107 +206,10 @@ export default function Undexsub() {
     },
   ];
 
-  // Projects state management
-  const [projects, setProjects] = useState([]);
-  const [filteredProjects, setFilteredProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showFormModal, setShowFormModal] = useState(false);
-  const [showDetailModal, setShowDetailModal] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-
-  const loadProjects = React.useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await getAllProjects();
-      let projectsArray = [];
-      if (response?.data?.items && Array.isArray(response.data.items)) {
-        projectsArray = response.data.items;
-      } else if (Array.isArray(response)) {
-        projectsArray = response;
-      } else if (response?.data?.projects && Array.isArray(response.data.projects)) {
-        projectsArray = response.data.projects;
-      } else if (response?.data && Array.isArray(response.data)) {
-        projectsArray = response.data;
-      } else if (response?.projects && Array.isArray(response.projects)) {
-        projectsArray = response.projects;
-      }
-      setProjects(projectsArray);
-    } catch (err) {
-      console.error("Error loading projects for main dashboard:", err);
-      setProjects([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const filterProjectsData = React.useCallback(() => {
-    if (!Array.isArray(projects)) {
-      setFilteredProjects([]);
-      return;
-    }
-
-    let filtered = [...projects];
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (item) =>
-          item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.author?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    setFilteredProjects(filtered);
-  }, [projects, searchTerm]);
-
-  useEffect(() => {
-    loadProjects();
-    loadStats();
-  }, [loadProjects, loadStats]);
-
-  useEffect(() => {
-    filterProjectsData();
-  }, [searchTerm, projects, filterProjectsData]);
-
-  const handleCreate = () => {
-    setSelectedProject(null);
-    setIsEditing(false);
-    setShowFormModal(true);
-  };
-
-  const handleEdit = (projectItem) => {
-    setSelectedProject(projectItem);
-    setIsEditing(true);
-    setShowFormModal(true);
-  };
-
-  const handleView = (projectItem) => {
-    setSelectedProject(projectItem);
-    setShowDetailModal(true);
-  };
-
-  const handleDelete = async (projectId) => {
-    if (!window.confirm("¿Está seguro de eliminar este proyecto?")) {
-      return;
-    }
-    try {
-      await deleteProject(projectId);
-      await loadProjects();
-    } catch (err) {
-      alert(err.response?.data?.message || "Error al eliminar el proyecto");
-    }
-  };
-
-  const handleFormSuccess = () => {
-    setShowFormModal(false);
-    loadProjects();
-  };
-
   return (
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
 
-      {/* Header Superior - Simplificado */}
+      {/* Header Superior */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 px-2">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: BRAND.darkBlue }}>
@@ -254,6 +219,7 @@ export default function Undexsub() {
         </div>
       </div>
 
+      {/* Tarjetas de Estadísticas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {stats.map((item, index) => (
           <div
@@ -278,16 +244,15 @@ export default function Undexsub() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        {/* Columna Izquierda (2/3) */}
+        {/* Columna Izquierda (2/3) - Alertas */}
         <div className="lg:col-span-2 flex flex-col gap-8">
-          {/* Centro de Alertas - PASA A LA IZQUIERDA ABAJO */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full">
             <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
               <Shield style={{ color: BRAND.orange }} /> Centro de Alertas
             </h2>
             <div className="space-y-3">
               {alertas.length > 0 ? (
-                alertas.slice(0, 3).map((alerta, index) => (
+                alertas.slice(0, 4).map((alerta, index) => (
                   <div
                     key={index}
                     className="p-4 rounded-xl border-l-4 transition-all hover:bg-gray-50 bg-white border border-gray-100"
@@ -306,10 +271,9 @@ export default function Undexsub() {
                       >
                         {alerta.tipo}
                       </span>
-                      <span className="text-xs text-gray-400">{alerta.fecha.split('-')[1]}</span>
+                      <span className="text-xs text-gray-400">{alerta.fecha.split(',')[0]}</span>
                     </div>
                     <h4 className="font-semibold text-gray-800 text-sm">{alerta.titulo}</h4>
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">{alerta.descripcion}</p>
                   </div>
                 ))
               ) : (
@@ -318,107 +282,89 @@ export default function Undexsub() {
                 </div>
               )}
             </div>
-            <Link
-              to="/administracion"
-              className="block w-full mt-4 py-2 text-center text-sm font-medium rounded-lg hover:bg-gray-50 transition"
-              style={{ color: BRAND.blue }}
-            >
-              Ver historial de seguridad
-            </Link>
           </div>
         </div>
 
-        {/* Columna Derecha (1/3) */}
+        {/* Columna Derecha (1/3) - Distribución de Usuarios */}
         <div className="lg:col-span-1 flex flex-col gap-8">
-          {/* Resumen Eco - PASA ARRIBA A LA DERECHA */}
-          <div className="bg-[#2C67B0] rounded-2xl p-6 text-white shadow-lg relative overflow-hidden h-full flex flex-col justify-center min-h-[300px]">
-            {/* Elemento decorativo de fondo */}
-            <div className="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
-            <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-[#B1D357] opacity-20 rounded-full"></div>
-
-            <h3 className="text-lg font-bold mb-4 relative z-10 flex items-center gap-2">
-              <Leaf size={20} className="text-[#B1D357]" /> Resumen Eco
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm h-full flex flex-col">
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
+              <Users size={20} className="text-[#B1D357]" /> Usuarios por Rol
             </h3>
-            <div className="space-y-4 relative z-10">
-              <div className="flex justify-between items-center border-b border-white/20 pb-3">
-                <span className="text-blue-100 text-sm">Reducción CO₂</span>
-                <span className="font-bold text-xl">152.8 kg</span>
-              </div>
-              <div className="flex justify-between items-center border-b border-white/20 pb-3">
-                <span className="text-blue-100 text-sm">Ahorro Energía</span>
-                <span className="font-bold text-xl">45 MWh</span>
-              </div>
-              <div className="pt-2">
-                <div className="w-full bg-blue-900/30 rounded-full h-2 mb-2">
-                  <div className="bg-[#B1D357] h-2 rounded-full" style={{ width: '75%' }}></div>
-                </div>
-                <span className="text-xs text-blue-100">Meta mensual al 75%</span>
-              </div>
+            <div className="flex-1 min-h-[250px] relative">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={userRolesData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {userRolesData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                  />
+                  <Legend verticalAlign="bottom" height={36} />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Métricas de Impacto Ambiental - PASA ABAJO EN ANCHO COMPLETO */}
+      {/* Sección Inferior - Crecimiento de Usuarios (Gráfica de Barras) */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-        <h2 className="text-xl font-bold mb-6 flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
-          <Activity className="text-green-500" /> Métricas de Impacto Ambiental
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="h-64">
-            <h4 className="text-sm font-semibold text-gray-500 mb-4 text-center">Actividad Mensual</h4>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={graficoImpacto}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} dy={10} />
-                <Tooltip
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="valor"
-                  stroke={BRAND.blue}
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: BRAND.blue, strokeWidth: 2, stroke: '#fff' }}
-                  activeDot={{ r: 6, fill: BRAND.orange }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="h-64">
-            <h4 className="text-sm font-semibold text-gray-500 mb-4 text-center">Distribución por Tipo</h4>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={graficoRed}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                <XAxis dataKey="tipo" axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} dy={10} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px' }} />
-                <Bar dataKey="valor" radius={[6, 6, 0, 0]} barSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
+            <BarChartIcon className="text-blue-500" /> Crecimiento de Usuarios
+          </h2>
+          <div className="text-sm text-gray-400">
+            Registros por mes
           </div>
         </div>
+
+        <div className="h-80 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={usersByMonthData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#9CA3AF', fontSize: 12 }}
+                dy={10}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#9CA3AF', fontSize: 12 }}
+              />
+              <Tooltip
+                cursor={{ fill: 'transparent' }}
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+              />
+              <Bar
+                dataKey="cantidad"
+                name="Usuarios Registrados"
+                radius={[6, 6, 0, 0]}
+                barSize={50}
+                fill={BRAND.blue}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+          {usersByMonthData.length === 0 && (
+            <div className="flex h-full items-center justify-center -mt-80">
+              <p className="text-gray-400 italic">No hay datos de registro disponibles</p>
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* Project Modals */}
-      {showFormModal && (
-        <ProjectFormModal
-          projectData={selectedProject}
-          isEditing={isEditing}
-          onClose={() => setShowFormModal(false)}
-          onSuccess={handleFormSuccess}
-        />
-      )}
-
-      {showDetailModal && selectedProject && (
-        <ProjectDetailModal
-          projectData={selectedProject}
-          onClose={() => setShowDetailModal(false)}
-          onEdit={() => {
-            setShowDetailModal(false);
-            handleEdit(selectedProject);
-          }}
-        />
-      )}
     </div>
   );
 }
