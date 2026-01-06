@@ -2,28 +2,42 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { getAllProjects } from "../../api/projectsApi";
-import proyecto1 from "../../assets/home/Proyectos/proyecto1.png";
-import proyecto2 from "../../assets/home/Proyectos/proyecto2.png";
-import proyecto3 from "../../assets/home/Proyectos/proyecto3.png";
-import proyecto4 from "../../assets/home/Proyectos/proyecto4.png";
-import proyecto5 from "../../assets/home/Proyectos/proyecto5.png";
-import proyecto6 from "../../assets/home/Proyectos/proyecto6.png";
+
+// Import specific category images
+import imgFortalecimiento from "../../assets/home/Proyectos/Fortalecimiento.png";
+import imgInnovacion from "../../assets/home/Proyectos/Innovacion.png";
+import imgConsumo from "../../assets/home/Proyectos/ConsumoResponsable.png";
+import imgEstrategicos from "../../assets/home/Proyectos/ProyectosEstrategicos.png";
+import imgInclusion from "../../assets/home/Proyectos/Inclusion.png";
 
 // Category to image mapping
 const categoryImages = {
-  "Fortalecimiento": proyecto1,
-  "Innovacion": proyecto2,
-  "Sensibilizacion": proyecto3,
-  "Investigacion": proyecto4,
-  "Produccion": proyecto5,
-  "Economia": proyecto6,
+  "Fortalecimiento": imgFortalecimiento,
+  "Innovación": imgInnovacion,
+  "Innovacion": imgInnovacion,
+  "Consumo Responsable": imgConsumo,
+  "Consumo": imgConsumo,
+  "Proyectos Estratégicos": imgEstrategicos,
+  "Estratégicos": imgEstrategicos,
+  "Inclusión": imgInclusion,
+  "Inclusion": imgInclusion,
+  // Fallbacks or extra mappings
+  "Investigacion": imgInnovacion,
+  "Produccion": imgFortalecimiento,
+  "Economia": imgConsumo,
 };
 
 // Category to color mapping
 const categoryColors = {
   "Fortalecimiento": "#1E305D",
+  "Innovación": "#00AB6D",
   "Innovacion": "#00AB6D",
-  "Sensibilizacion": "#1E305D",
+  "Consumo Responsable": "#1E305D",
+  "Consumo": "#1E305D",
+  "Proyectos Estratégicos": "#00AB6D",
+  "Estratégicos": "#00AB6D",
+  "Inclusión": "#1E305D",
+  "Inclusion": "#1E305D",
   "Investigacion": "#00AB6D",
   "Produccion": "#1E305D",
   "Economia": "#00AB6D",
@@ -183,11 +197,7 @@ export default function ProjectsSection() {
               {/* Contenido de la tarjeta */}
               <div className="absolute inset-0 p-6 flex flex-col justify-end text-left">
                 <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
-                  <span
-                    className="inline-flex items-center gap-2 text-[10px] font-bold px-2 py-0.5 rounded-full text-white uppercase tracking-wider mb-3 border border-white/20 backdrop-blur-sm"
-                    style={{ backgroundColor: `${project.color}DD` }}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                  <span className="inline-block text-[12px] font-bold text-white uppercase tracking-wider mb-3 drop-shadow-md">
                     {project.type}
                   </span>
                 </div>

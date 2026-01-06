@@ -14,6 +14,30 @@ import {
 } from "lucide-react";
 import { getProjectById } from "../../api/projectsApi";
 
+// Import specific category images
+import imgFortalecimiento from "../../assets/home/Proyectos/Fortalecimiento.png";
+import imgInnovacion from "../../assets/home/Proyectos/Innovacion.png";
+import imgConsumo from "../../assets/home/Proyectos/ConsumoResponsable.png";
+import imgEstrategicos from "../../assets/home/Proyectos/ProyectosEstrategicos.png";
+import imgInclusion from "../../assets/home/Proyectos/Inclusion.png";
+
+// Category to image mapping
+const categoryImages = {
+  "Fortalecimiento": imgFortalecimiento,
+  "Innovación": imgInnovacion,
+  "Innovacion": imgInnovacion,
+  "Consumo Responsable": imgConsumo,
+  "Consumo": imgConsumo,
+  "Proyectos Estratégicos": imgEstrategicos,
+  "Estratégicos": imgEstrategicos,
+  "Inclusión": imgInclusion,
+  "Inclusion": imgInclusion,
+  // Fallbacks or extra mappings
+  "Investigacion": imgInnovacion,
+  "Produccion": imgFortalecimiento,
+  "Economia": imgConsumo,
+};
+
 
 
 export default function ContentDetailProject() {
@@ -40,11 +64,13 @@ export default function ContentDetailProject() {
         }
 
         // Map API data to expected format
+        // Map API data to expected format
+        const catName = projectData.category_name || projectData.category || "General";
         const mappedProject = {
           id: projectData.id,
           title: projectData.title,
-          type: projectData.category_name || projectData.category || "General",
-          image: projectData.image || "/assets/home/Proyectos/proyecto1.png", // fallback image
+          type: catName,
+          image: categoryImages[catName] || projectData.image || "/assets/home/Proyectos/proyecto1.png", // fallback image
           date: projectData.created_at ? new Date(projectData.created_at).toLocaleDateString() : "Fecha no disponible",
           location: projectData.location || "Ubicación no especificada",
           challenge: projectData.challenge || projectData.description || "Información del desafío no disponible",
@@ -161,7 +187,7 @@ export default function ContentDetailProject() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <span className="inline-block px-4 py-1 mb-4 text-xs font-bold tracking-widest text-white uppercase bg-[#00AB6D] rounded-full">
+                <span className="inline-block mb-4 text-xs font-bold tracking-widest text-white uppercase drop-shadow-md">
                   {project.type}
                 </span>
                 <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4 max-w-4xl">
