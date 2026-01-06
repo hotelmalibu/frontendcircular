@@ -18,8 +18,10 @@ import {
   Filter
 } from "lucide-react";
 import { getAllCompanies, deleteCompany } from "../../../../api/companiesApi";
+import toast from "react-hot-toast";
 import CompanyFormModal from "./CompanyFormModal";
 import CompanyDetailModal from "./CompanyDetailModal";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -48,8 +50,11 @@ export default function CompaniesList() {
   });
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [companyToDelete, setCompanyToDelete] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const loadCompanies = React.useCallback(async () => {
     try {
@@ -150,15 +155,25 @@ export default function CompaniesList() {
     setShowDetailModal(true);
   };
 
-  const handleDelete = async (companyId) => {
-    if (!window.confirm("¿Está seguro de eliminar esta empresa?")) {
-      return;
-    }
+  const handleDeleteClick = (company) => {
+    setCompanyToDelete(company);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!companyToDelete) return;
+
     try {
-      await deleteCompany(companyId);
+      setIsDeleting(true);
+      await deleteCompany(companyToDelete.id);
       await loadCompanies();
+      setShowDeleteModal(false);
+      setCompanyToDelete(null);
+      toast.success("Empresa eliminada correctamente");
     } catch (err) {
-      alert(err.response?.data?.message || "Error al eliminar la empresa");
+      toast.error(err.response?.data?.message || "Error al eliminar la empresa");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -166,9 +181,7 @@ export default function CompaniesList() {
     setShowFormModal(false);
     setCurrentPage(1);
     loadCompanies();
-    setTimeout(() => {
-      alert(isEditing ? "Empresa actualizada correctamente" : "Empresa creada correctamente");
-    }, 100);
+    toast.success(isEditing ? "Empresa actualizada correctamente" : "Empresa creada correctamente");
   };
 
   const handlePageChange = (page) => {
@@ -372,7 +385,7 @@ export default function CompaniesList() {
                     <Edit size={18} />
                   </button>
                   <button
-                    onClick={() => handleDelete(item.id)}
+                    onClick={() => handleDeleteClick(item)}
                     className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
                     title="Eliminar"
                     style={{ color: BRAND.orange }}
@@ -449,6 +462,15 @@ export default function CompaniesList() {
           }}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        companyName={companyToDelete?.name || "esta empresa"}
+        loading={isDeleting}
+      />
     </div>
   );
 }

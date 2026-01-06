@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Home from "./modules/home/Home";
 import Login from "./modules/auths/Login";
@@ -36,6 +37,7 @@ import ContentDetailProject from "./components/pagesProyectos/ContentDetailProje
 export default function App() {
   return (
     <div className="flex flex-col min-h-screen">
+      <Toaster position="top-center" reverseOrder={false} />
       <Navbar />
       <main className="flex-1">
         <Routes>
@@ -57,8 +59,8 @@ export default function App() {
           <Route path="/convocatorias" element={<Convocatorias />} />
           <Route path="/lineas-estrategicas" element={<LineasEstrategicasPage />} />
 
-          
-      
+
+
 
 
           {/* Rutas privadas: cada página del dashboard tiene su propia ruta directa */}
