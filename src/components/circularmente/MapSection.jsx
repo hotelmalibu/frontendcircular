@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import ReactDOM from 'react-dom';
 import { AuthContext } from '../../context/AuthContext';
 import {
   Search, MapPin, Mail, Phone, Globe, X,
@@ -353,9 +354,9 @@ export default function MapSection() {
 
 
         {/* MODAL DETALLE EMPRESA (Design matched with DirectorySection) */}
-        {selectedEmpresa && user && (
+        {selectedEmpresa && user && ReactDOM.createPortal(
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E305D]/70 backdrop-blur-sm animate-fadeIn"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#1E305D]/70 backdrop-blur-sm animate-fadeIn"
             onClick={() => setSelectedEmpresa(null)}
           >
             <div
@@ -472,7 +473,8 @@ export default function MapSection() {
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
       <style>{`

@@ -130,6 +130,7 @@ export default function AprobacionesList() {
     if (filterStatus === "Todos") return true;
     if (filterStatus === "Pendiente") return s.status === 'pending';
     if (filterStatus === "Aprobado") return s.status === 'active';
+    if (filterStatus === "Rechazado") return s.status === 'rejected';
     if (filterStatus === "Suspendido") return s.status === 'suspended';
     return s.status === filterStatus;
   });
