@@ -5,8 +5,6 @@ import {
   Search,
   Filter,
   MoreVertical,
-  User,
-  Download,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -91,17 +89,7 @@ export default function Table() {
           </h1>
           <p className="text-gray-500 mt-1">Gestión de acceso y roles de la plataforma</p>
         </div>
-        <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition shadow-sm font-medium text-sm">
-            <Download size={16} /> Exportar
-          </button>
-          <button
-            className="flex items-center gap-2 px-5 py-2 text-white rounded-xl shadow-md hover:shadow-lg transition font-bold text-sm"
-            style={{ backgroundColor: BRAND.blue }}
-          >
-            <User size={18} /> Nuevo Usuario
-          </button>
-        </div>
+
       </div>
 
       {/* Barra de Herramientas */}
