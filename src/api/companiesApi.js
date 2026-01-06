@@ -108,15 +108,23 @@ export const createCompany = async (companyData) => {
  */
 export const updateCompany = async (companyId, companyData) => {
   try {
-    // If FormData, let axios set the content-type automatically (multipart/form-data)
-    // If JSON data, explicitly set application/json
-    const config = companyData instanceof FormData ? {} : {
+    // Check if we are sending FormData (for files)
+    if (companyData instanceof FormData) {
+      // Method Spoofing: Add _method field for Laragon/PHP backend
+      companyData.append('_method', 'PUT');
+
+      // Use POST instead of PUT when sending FormData with method spoofing
+      // Axios automatically sets Content-Type: multipart/form-data
+      const response = await api.post(`${COMPANIES_ENDPOINT}/${companyId}`, companyData);
+      return response.data;
+    }
+
+    // Standard JSON update
+    const response = await api.put(`${COMPANIES_ENDPOINT}/${companyId}`, companyData, {
       headers: {
         'Content-Type': 'application/json',
       },
-    };
-
-    const response = await api.put(`${COMPANIES_ENDPOINT}/${companyId}`, companyData, config);
+    });
     return response.data;
   } catch (error) {
     console.error(`Error updating company ${companyId}:`, error);
