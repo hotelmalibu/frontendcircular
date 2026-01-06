@@ -45,7 +45,7 @@ export default function CompaniesList() {
   const [pagination, setPagination] = useState({
     current_page: 1,
     last_page: 1,
-    per_page: 15,
+    per_page: 8,
     total: 0
   });
   const [showFormModal, setShowFormModal] = useState(false);
@@ -92,7 +92,7 @@ export default function CompaniesList() {
             setPagination(prev => ({
               ...prev,
               total: response.meta.total,
-              last_page: response.meta.last_page || Math.ceil(response.meta.total / (prev.per_page || 15)),
+              last_page: response.meta.last_page || Math.ceil(response.meta.total / (prev.per_page || 8)),
               current_page: response.meta.current_page || 1
             }));
           }
