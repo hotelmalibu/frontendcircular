@@ -17,86 +17,75 @@ export default function Footer() {
       style={{ backgroundImage: `url(${fondoFooter})` }}
     >
       {/* CONTENIDO PRINCIPAL */}
-      <div className="relative z-10 container mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start text-center md:text-left">
-          {/* Logo */}
-          <div className="flex flex-col items-center md:items-start">
-            <img src={Logo} alt="EcoCircular Logo" className="h-20 w-auto object-contain mb-2" />
+      <div className="relative z-10 container mx-auto px-6 py-6">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-12">
+
+          {/* Logo & Intro - Left Side */}
+          <div className="flex flex-col items-center md:items-start text-center md:text-left max-w-sm">
+            <img src={Logo} alt="EcoCircular Logo" className="h-20 w-auto object-contain mb-4" />
+            <p className="text-white/80 text-sm leading-relaxed">
+              Impulsando la economía circular en Colombia a través de la innovación y la sostenibilidad.
+            </p>
           </div>
 
-          {/* Navegación */}
-          <div>
-            <h4 className="font-semibold mb-2">Navegación</h4>
-            <ul className="space-y-1 text-sm text-white/90">
-              <li><Link to="/about" className="hover:text-[#00AB6D] transition-colors">Conócenos</Link></li>
-              <li><Link to="/projects" className="hover:text-[#00AB6D] transition-colors">Proyectos</Link></li>
-              <li><Link to="/comunicaciones" className="hover:text-[#00AB6D] transition-colors">Comunicaciones</Link></li>
-              <li><Link to="/marco" className="hover:text-[#00AB6D] transition-colors">Marco Normativo</Link></li>
-            </ul>
-          </div>
+          {/* Info & Socials - Right Side Group */}
+          <div className="flex flex-col md:flex-row gap-10 md:gap-16 text-center md:text-left">
 
-          {/* Servicios */}
-          <div>
-            <h4 className="font-semibold mb-2">Servicios</h4>
-            <ul className="space-y-1 text-sm text-white/90">
-              <li><Link to="/cursos" className="hover:text-[#00AB6D] transition-colors">Cursos E-learning</Link></li>
-              <li><Link to="/herramientas" className="hover:text-[#00AB6D] transition-colors">Herramientas Digitales</Link></li>
-              <li><Link to="/directorio" className="hover:text-[#00AB6D] transition-colors">Directorio</Link></li>
-              <li><Link to="/contact" className="hover:text-[#00AB6D] transition-colors">Contacto</Link></li>
-            </ul>
-          </div>
-
-          {/* Contacto + Redes */}
-          <div className="flex flex-col items-center md:items-start">
-            <h4 className="font-semibold mb-2">Contáctenos</h4>
-            <address className="not-italic text-sm text-white/90 space-y-1 leading-relaxed mb-3">
-              <div>Carrera 13 # 25-405. Bogotá D.C.</div>
-              <div>+57 1 381-3000</div>
-              <div>
-                <a href="mailto:info@ecocircular.gov.co" className="hover:text-[#00AB6D] transition-colors">
-                  info@ecocircular.gov.co
-                </a>
-              </div>
-            </address>
-
-            {/* Redes Sociales */}
-            <div className="flex gap-4 mt-3">
-              <a
-                href="https://www.instagram.com/visioncircularandi/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center rounded-full 
-                          bg-white/20 hover:bg-[#00AB6D] transition-all duration-300"
-              >
-                <Instagram size={26} className="text-white" />
-              </a>
-
-              <a
-                href="https://www.facebook.com/VisionCircularANDI/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center rounded-full 
-                          bg-white/20 hover:bg-[#00AB6D] transition-all duration-300"
-              >
-                <Facebook size={26} className="text-white" />
-              </a>
-
-              <a
-                href="https://www.linkedin.com/in/andivision3030/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center rounded-full 
-                          bg-white/20 hover:bg-[#00AB6D] transition-all duration-300"
-              >
-                <Linkedin size={26} className="text-white" />
-              </a>
+            {/* Contacto */}
+            <div>
+              <h4 className="font-bold text-lg mb-4 text-white">Contáctenos</h4>
+              <address className="not-italic text-sm text-white/90 space-y-2 leading-relaxed flex flex-col items-center md:items-start">
+                <div>Carrera 13 # 25-405. Bogotá D.C.</div>
+                <div>+57 1 381-3000</div>
+                <div>
+                  <a href="mailto:info@ecocircular.gov.co" className="hover:text-[#00AB6D] transition-colors font-medium">
+                    info@ecocircular.gov.co
+                  </a>
+                </div>
+              </address>
             </div>
 
+            {/* Redes Sociales */}
+            <div>
+              <h4 className="font-bold text-lg mb-4 text-white">Síguenos</h4>
+              <div className="flex gap-4 justify-center md:justify-start">
+                <a
+                  href="https://www.instagram.com/visioncircularandi/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 flex items-center justify-center rounded-full 
+                            bg-white/10 border border-white/20 hover:bg-[#00AB6D] hover:border-[#00AB6D] transition-all duration-300"
+                >
+                  <Instagram size={20} className="text-white" />
+                </a>
+
+                <a
+                  href="https://www.facebook.com/VisionCircularANDI/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 flex items-center justify-center rounded-full 
+                            bg-white/10 border border-white/20 hover:bg-[#00AB6D] hover:border-[#00AB6D] transition-all duration-300"
+                >
+                  <Facebook size={20} className="text-white" />
+                </a>
+
+                <a
+                  href="https://www.linkedin.com/in/andivision3030/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 flex items-center justify-center rounded-full 
+                            bg-white/10 border border-white/20 hover:bg-[#00AB6D] hover:border-[#00AB6D] transition-all duration-300"
+                >
+                  <Linkedin size={20} className="text-white" />
+                </a>
+              </div>
+            </div>
           </div>
+
         </div>
 
         {/* Botón subir */}
-        <div className="flex justify-center md:justify-end mt-6">
+        <div className="flex justify-center md:justify-end mt-4">
           <button
             onClick={scrollToTop}
             className="group flex flex-col items-center justify-center gap-1 text-white/60 hover:text-[#00AB6D] transition-all duration-300"
@@ -125,6 +114,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+    </footer >
   );
 }
