@@ -21,17 +21,32 @@ export default function ExplorePage() {
     // Map news items to the expected shape
     return (newsItems || [])
       .filter(n => String(n.status).toLowerCase() === 'published')
-      .map(n => ({
-        id: n.id || n._id || Math.random(),
-        type: "Noticias",
-        category: n.category || "General",
-        title: n.title || n.name || "Sin título",
-        excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
-        image: (n.upload_file && n.upload_file.url) || n.image || n.thumbnail || n.cover || "",
-        date: n.published_at ? new Date(n.published_at).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : "",
-        slug: n.slug || (`noticia-${n.id || n._id || ''}`),
-      }));
-  }, [newsItems]);
+      .map(n => {
+        // Resolve category name from various possible fields
+        let catName = "General";
+        if (n.category && typeof n.category === 'object' && n.category.name) {
+          catName = n.category.name;
+        } else if (typeof n.category === 'string') {
+          catName = n.category;
+        } else if (n.category_name) {
+          catName = n.category_name;
+        } else if (n.category_id) {
+          const foundCat = categories.find(c => c.id === n.category_id || c.id === Number(n.category_id));
+          if (foundCat) catName = foundCat.name;
+        }
+
+        return {
+          id: n.id || n._id || Math.random(),
+          type: "Noticias",
+          category: catName,
+          title: n.title || n.name || "Sin título",
+          excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
+          image: (n.upload_file && n.upload_file.url) || n.image || n.thumbnail || n.cover || "",
+          date: n.published_at ? new Date(n.published_at).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : "",
+          slug: n.slug || (`noticia-${n.id || n._id || ''}`),
+        };
+      });
+  }, [newsItems, categories]);
 
   const allCategories = useMemo(() => categories.map(cat => cat.name), [categories]);
 

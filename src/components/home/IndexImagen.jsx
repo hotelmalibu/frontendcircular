@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import fondo1 from '../../assets/home/Carrusel/Index_imagen_1.png';
 import fondo2 from '../../assets/home/Carrusel/Index_imagen_2.jpeg';
 // import fondo3 from '../../assets/home/Carrusel/Index_imagen_3.jpg';
@@ -10,7 +11,8 @@ const SLIDES = [
     title: 'Impulsando el país hacia',
     subtitle: 'la economía circular',
     description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-    button1: 'Conoce nuestros proyectos', button2: 'Sobre Nosotros'
+    button1: 'Conoce nuestras noticias',
+    button2: 'Sobre Nosotros'
   },
   {
     image: fondo2,
@@ -442,25 +444,25 @@ export default function IndexImagen() {
           {/* Botones estilo Citeo */}
           <div className={`animate-buttons ${hasLoaded ? 'loaded' : ''} flex flex-wrap gap-4 `}>
             {/* Botón primario - */}
-            <button className="btn-primary group relative px-8 py-3 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <Link to="/explorar" className="btn-primary group relative px-8 py-3 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
               <span className="relative z-10 flex items-center gap-2">
                 {SLIDES[currentSlide].button1}
                 <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
-            </button>
+            </Link>
 
 
             {/* Botón secundario - Contorno limpio */}
-            <button className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
+            <Link to="/quines-somos" className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
               <span className="relative z-10 flex items-center gap-2">
                 {SLIDES[currentSlide].button2}
                 <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
-            </button>
+            </Link>
           </div>
         </div>
       </div>
