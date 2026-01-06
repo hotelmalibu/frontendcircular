@@ -3,16 +3,24 @@ import {
   Server,
   Zap,
   Database,
-  Clock,
+
   PenTool,
   Calendar,
   Mail,
   FileImage,
   MoreHorizontal,
   ArrowUpRight,
-  BarChart3
+  BarChart3,
+  PieChart as PieChartIcon,
+  Activity,
+  Layers,
+  Tag,
+  Briefcase
 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell
+} from 'recharts';
 import { getAllCategories } from "../../../../../api/categoriesApi";
 import { getAllNews } from "../../../../../api/newsApi";
 import { getAllSchedules } from "../../../../../api/scheduleApi";
@@ -30,8 +38,18 @@ const BRAND = {
   gray: "#6B7280",
 };
 
+const COLORS = [BRAND.blue, BRAND.darkGreen, BRAND.orange, BRAND.yellow];
+
 export default function DashboardContenido() {
   const [categoryStats, setCategoryStats] = useState([]);
+  const [pieData, setPieData] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [metrics, setMetrics] = useState({
+    news: 0,
+    events: 0,
+    projects: 0,
+    categories: 0
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,126 +65,81 @@ export default function DashboardContenido() {
           getAllProjects()
         ]);
 
-        console.log("=== RAW API RESPONSES ===");
-        console.log("Categories Response:", categoriesRes);
-        console.log("News Response:", newsRes);
-        console.log("Schedules Response:", schedulesRes);
-        console.log("Schedules Response.data:", schedulesRes?.data);
-        console.log("Schedules Response.data keys:", schedulesRes?.data ? Object.keys(schedulesRes.data) : 'N/A');
-        console.log("Projects Response:", projectsRes);
-
-        // Extract arrays from responses - try multiple paths
+        // Extract arrays from responses (using robust extraction logic from before)
         let categories = [];
-        if (Array.isArray(categoriesRes)) {
-          categories = categoriesRes;
-        } else if (categoriesRes?.data?.items && Array.isArray(categoriesRes.data.items)) {
-          categories = categoriesRes.data.items;
-        } else if (categoriesRes?.data && Array.isArray(categoriesRes.data)) {
-          categories = categoriesRes.data;
-        } else if (categoriesRes?.categories && Array.isArray(categoriesRes.categories)) {
-          categories = categoriesRes.categories;
-        }
+        if (Array.isArray(categoriesRes)) categories = categoriesRes;
+        else if (categoriesRes?.data?.items && Array.isArray(categoriesRes.data.items)) categories = categoriesRes.data.items;
+        else if (categoriesRes?.data && Array.isArray(categoriesRes.data)) categories = categoriesRes.data;
+        else if (categoriesRes?.categories && Array.isArray(categoriesRes.categories)) categories = categoriesRes.categories;
 
         let news = [];
-        if (Array.isArray(newsRes)) {
-          news = newsRes;
-        } else if (newsRes?.data?.news && Array.isArray(newsRes.data.news)) {
-          news = newsRes.data.news;
-        } else if (newsRes?.data && Array.isArray(newsRes.data)) {
-          news = newsRes.data;
-        } else if (newsRes?.news && Array.isArray(newsRes.news)) {
-          news = newsRes.news;
-        }
+        if (Array.isArray(newsRes)) news = newsRes;
+        else if (newsRes?.data?.news && Array.isArray(newsRes.data.news)) news = newsRes.data.news;
+        else if (newsRes?.data && Array.isArray(newsRes.data)) news = newsRes.data;
+        else if (newsRes?.news && Array.isArray(newsRes.news)) news = newsRes.news;
 
         let schedules = [];
-        if (schedulesRes?.data?.schedules && Array.isArray(schedulesRes.data.schedules)) {
-          schedules = schedulesRes.data.schedules;
-        } else if (Array.isArray(schedulesRes)) {
-          schedules = schedulesRes;
-        } else if (schedulesRes?.data?.items && Array.isArray(schedulesRes.data.items)) {
-          schedules = schedulesRes.data.items;
-        } else if (schedulesRes?.data?.data && Array.isArray(schedulesRes.data.data)) {
-          schedules = schedulesRes.data.data;
-        } else if (schedulesRes?.data && Array.isArray(schedulesRes.data)) {
-          schedules = schedulesRes.data;
-        } else if (schedulesRes?.schedules && Array.isArray(schedulesRes.schedules)) {
-          schedules = schedulesRes.schedules;
-        } else if (schedulesRes?.items && Array.isArray(schedulesRes.items)) {
-          schedules = schedulesRes.items;
-        }
+        if (schedulesRes?.data?.schedules && Array.isArray(schedulesRes.data.schedules)) schedules = schedulesRes.data.schedules;
+        else if (Array.isArray(schedulesRes)) schedules = schedulesRes;
+        else if (schedulesRes?.data?.items && Array.isArray(schedulesRes.data.items)) schedules = schedulesRes.data.items;
+        else if (schedulesRes?.data?.data && Array.isArray(schedulesRes.data.data)) schedules = schedulesRes.data.data;
+        else if (schedulesRes?.data && Array.isArray(schedulesRes.data)) schedules = schedulesRes.data;
 
         let projects = [];
-        if (Array.isArray(projectsRes)) {
-          projects = projectsRes;
-        } else if (projectsRes?.data?.items && Array.isArray(projectsRes.data.items)) {
-          projects = projectsRes.data.items;
-        } else if (projectsRes?.data && Array.isArray(projectsRes.data)) {
-          projects = projectsRes.data;
-        } else if (projectsRes?.projects && Array.isArray(projectsRes.projects)) {
-          projects = projectsRes.projects;
-        }
+        if (Array.isArray(projectsRes)) projects = projectsRes;
+        else if (projectsRes?.data?.items && Array.isArray(projectsRes.data.items)) projects = projectsRes.data.items;
+        else if (projectsRes?.data && Array.isArray(projectsRes.data)) projects = projectsRes.data;
+        else if (projectsRes?.projects && Array.isArray(projectsRes.projects)) projects = projectsRes.projects;
 
-        console.log("=== EXTRACTED ARRAYS ===");
-        console.log("Categories:", categories);
-        console.log("News:", news);
-        console.log("Schedules:", schedules);
-        console.log("Projects:", projects);
-
-        // Create a map to count items by category
-        const statsMap = {};
-
-        // Initialize with all categories
-        categories.forEach(cat => {
-          statsMap[cat.id] = {
-            name: cat.name,
-            Noticias: 0,
-            Eventos: 0,
-            Proyectos: 0
-          };
+        // --- 1. Metrics ---
+        setMetrics({
+          news: news.length,
+          events: schedules.length,
+          projects: projects.length,
+          categories: categories.length
         });
 
-        console.log("=== INITIAL STATS MAP ===", statsMap);
+        // --- 2. Category Stats (Bar Chart) ---
+        const statsMap = {};
+        categories.forEach(cat => {
+          statsMap[cat.id] = { name: cat.name, Noticias: 0, Eventos: 0, Proyectos: 0 };
+        });
 
-        // Count news by category
         news.forEach(item => {
           const catId = item.category_id || (item.category?.id);
-          console.log(`News "${item.title || item.id}" - category_id: ${catId}`, item);
-          if (catId && statsMap[catId]) {
-            statsMap[catId].Noticias++;
-          } else if (catId) {
-            console.warn(`Category ID ${catId} not found in statsMap for news:`, item);
-          }
+          if (catId && statsMap[catId]) statsMap[catId].Noticias++;
         });
 
-        // Count schedules/events by category
         schedules.forEach(item => {
           const catId = item.category_id || (item.category?.id);
-          console.log(`Schedule "${item.title || item.id}" - category_id: ${catId}`, item);
-          if (catId && statsMap[catId]) {
-            statsMap[catId].Eventos++;
-          } else if (catId) {
-            console.warn(`Category ID ${catId} not found in statsMap for schedule:`, item);
-          }
+          if (catId && statsMap[catId]) statsMap[catId].Eventos++;
         });
 
-        // Count projects by category
         projects.forEach(item => {
           const catId = item.category_id || (item.category?.id);
-          console.log(`Project "${item.title || item.id}" - category_id: ${catId}`, item);
-          if (catId && statsMap[catId]) {
-            statsMap[catId].Proyectos++;
-          } else if (catId) {
-            console.warn(`Category ID ${catId} not found in statsMap for project:`, item);
-          }
+          if (catId && statsMap[catId]) statsMap[catId].Proyectos++;
         });
 
-        console.log("=== FINAL STATS MAP ===", statsMap);
+        setCategoryStats(Object.values(statsMap));
 
-        // Convert to array for recharts
-        const statsArray = Object.values(statsMap);
-        console.log("=== STATS ARRAY FOR CHART ===", statsArray);
+        // --- 3. Content Distribution (Pie Chart) ---
+        const pData = [
+          { name: 'Noticias', value: news.length },
+          { name: 'Eventos', value: schedules.length },
+          { name: 'Proyectos', value: projects.length },
+        ].filter(item => item.value > 0);
+        setPieData(pData);
 
-        setCategoryStats(statsArray);
+        // --- 4. Recent Activity ---
+        const allItems = [
+          ...news.map(i => ({ ...i, type: 'Noticia', dataType: 'news', date: i.created_at })),
+          ...schedules.map(i => ({ ...i, type: 'Evento', dataType: 'event', date: i.created_at })),
+          ...projects.map(i => ({ ...i, type: 'Proyecto', dataType: 'project', date: i.created_at }))
+        ];
+        // Sort by date desc
+        allItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setRecentActivity(allItems.slice(0, 5));
+
       } catch (error) {
         console.error("Error fetching statistics:", error);
       } finally {
@@ -177,121 +150,164 @@ export default function DashboardContenido() {
     fetchData();
   }, []);
 
-  const metricas = [
-    { titulo: "Artículos Activos", valor: 145, icon: <PenTool size={20} />, color: BRAND.blue },
-    { titulo: "Eventos Activos", valor: 8, icon: <Calendar size={20} />, color: BRAND.darkGreen },
-    { titulo: "Newsletter Enviadas", valor: 23, icon: <Mail size={20} />, color: BRAND.orange },
-    { titulo: "Engagement Promedio", valor: "7.2%", icon: <Zap size={20} />, color: BRAND.darkBlue },
-  ];
 
-  const redes = [
-    {
-      nombre: "Facebook",
-      seguidores: "15,420",
-      label: "Seguidores",
-      engagement: "7.8%",
-      color: "#1877F2",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-          <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.797c0-3.007 1.792-4.668 4.533-4.668 1.312 0 2.686.235 2.686.235v2.97h-1.513c-1.491 0-1.953.93-1.953 1.887v2.259h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z" />
-        </svg>
-      ),
-    },
-    {
-      nombre: "X (Twitter)",
-      seguidores: "8,930",
-      label: "Seguidores",
-      engagement: "7.0%",
-      color: "#000000",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.33l-5.2-6.82-5.948 6.82H1.875l7.73-8.86L1.5 2.25h6.445l4.712 6.173L18.244 2.25zM17.1 19.692h1.833L7.002 4.177H5.03L17.1 19.692z" />
-        </svg>
-      ),
-    },
-    {
-      nombre: "Instagram",
-      seguidores: "5,670",
-      label: "Seguidores",
-      engagement: "7.3%",
-      color: "#E4405F",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-          <path d="M7.75 2C4.678 2 2 4.678 2 7.75v8.5C2 19.322 4.678 22 7.75 22h8.5C19.322 22 22 19.322 22 16.25v-8.5C22 4.678 19.322 2 16.25 2h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm6.5.75a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5zM12 9a3 3 0 100 6 3 3 0 000-6z" />
-        </svg>
-      ),
-    },
-  ];
 
-  const contenidoPendiente = [
-    { titulo: "Economía Circular en el Sector Textil", autor: "Carlos Ruiz", estado: "Pendiente revisión", color: BRAND.orange, bg: "#FFF5EB" },
-    { titulo: "Guía de Compostaje Doméstico", autor: "Ana Gómez", estado: "Por publicar", color: BRAND.blue, bg: "#EFF6FF" },
-    { titulo: "Reporte de Sostenibilidad Q3", autor: "Equipo Técnico", estado: "Borrador", color: BRAND.gray, bg: "#F3F4F6" },
-  ];
+  const getStatusColor = (type) => {
+    switch (type) {
+      case 'Noticia': return BRAND.blue;
+      case 'Evento': return BRAND.darkGreen;
+      case 'Proyecto': return BRAND.orange;
+      default: return BRAND.gray;
+    }
+  };
 
-  const actividad = [
-    { tipo: "Artículo", texto: "‘Innovaciones en Reciclaje’ publicado", time: "Hace 2h", icon: <PenTool size={14} />, color: BRAND.blue },
-    { tipo: "Newsletter", texto: "‘EcoFriendly’ enviada a 12.800 suscriptores", time: "Hace 5h", icon: <Mail size={14} />, color: BRAND.darkGreen },
-    { tipo: "Evento", texto: "‘Taller de Reaprovechamiento’ creado", time: "Ayer", icon: <Calendar size={14} />, color: BRAND.orange },
-  ];
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-4 mb-4" style={{ borderColor: BRAND.blue }}></div>
+        <p className="text-gray-500 font-medium">Cargando tablero...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
+    <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700 space-y-8">
 
-      {/* Estadísticas por Categoría */}
+      {/* 1. Metric Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { title: "Noticias Publicadas", value: metrics.news, icon: <PenTool size={24} />, color: BRAND.blue },
+          { title: "Eventos Programados", value: metrics.events, icon: <Calendar size={24} />, color: BRAND.darkGreen },
+          { title: "Proyectos Activos", value: metrics.projects, icon: <Briefcase size={24} />, color: BRAND.orange },
+          { title: "Categorías Totales", value: metrics.categories, icon: <Tag size={24} />, color: BRAND.darkBlue },
+        ].map((metric, index) => (
+          <div key={index} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow">
+            <div>
+              <p className="text-sm font-semibold text-gray-500 mb-1">{metric.title}</p>
+              <h4 className="text-3xl font-bold" style={{ color: metric.color }}>{metric.value}</h4>
+            </div>
+            <div className="p-3 rounded-xl bg-gray-50 text-gray-400">
+              {React.cloneElement(metric.icon, { style: { color: metric.color } })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 2. Bar Chart (Category Stats) - Full Width */}
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
-              <BarChart3 size={20} className="text-gray-400" /> Estadísticas por Categoría
-            </h3>
-            <p className="text-xs text-gray-500 mt-1">Distribución de contenidos por categoría</p>
-          </div>
+        <div className="mb-6">
+          <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
+            <BarChart3 size={20} className="text-gray-400" /> Estadísticas por Categoría
+          </h3>
+          <p className="text-xs text-gray-500 mt-1">Distribución de contenidos por temática</p>
         </div>
-
-        {loading ? (
-          <div className="flex flex-col items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-4 mb-4" style={{ borderColor: BRAND.blue }}></div>
-            <p className="text-gray-500 font-medium">Cargando estadísticas...</p>
-          </div>
-        ) : categoryStats.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-center">
-            <BarChart3 size={48} className="text-gray-300 mb-4" />
-            <h4 className="text-lg font-bold text-gray-800 mb-2">No hay datos disponibles</h4>
-            <p className="text-sm text-gray-500">Crea categorías y asígnalas a tus contenidos para ver las estadísticas.</p>
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height={400}>
+        {categoryStats.length > 0 ? (
+          <ResponsiveContainer width="100%" height={350}>
             <BarChart data={categoryStats}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis
-                dataKey="name"
-                stroke="#6B7280"
-                style={{ fontSize: '12px', fontWeight: '500' }}
-              />
-              <YAxis
-                stroke="#6B7280"
-                style={{ fontSize: '12px', fontWeight: '500' }}
-              />
+              <XAxis dataKey="name" stroke="#6B7280" style={{ fontSize: '12px', fontWeight: '500' }} />
+              <YAxis stroke="#6B7280" style={{ fontSize: '12px', fontWeight: '500' }} />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: '#fff',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                }}
+                contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E7EB', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
               />
-              <Legend
-                wrapperStyle={{ fontSize: '14px', fontWeight: '600' }}
-              />
-              <Bar dataKey="Noticias" fill={BRAND.blue} radius={[8, 8, 0, 0]} />
-              <Bar dataKey="Eventos" fill={BRAND.darkGreen} radius={[8, 8, 0, 0]} />
-              <Bar dataKey="Proyectos" fill={BRAND.orange} radius={[8, 8, 0, 0]} />
+              <Legend wrapperStyle={{ paddingTop: '10px' }} />
+              <Bar dataKey="Noticias" fill={BRAND.blue} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Eventos" fill={BRAND.darkGreen} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Proyectos" fill={BRAND.orange} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        ) : (
+          <div className="h-64 flex items-center justify-center text-gray-400 text-sm">No hay datos suficientes</div>
         )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* 3. Pie Chart (Content Distribution) */}
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+          <div className="mb-6">
+            <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
+              <PieChartIcon size={20} className="text-gray-400" /> Mix de Contenidos
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">Proporción por tipo de contenido</p>
+          </div>
+          {pieData.length > 0 ? (
+            <div className="h-[350px] w-full flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={[BRAND.blue, BRAND.darkGreen, BRAND.orange][index % 3]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value) => [value, "Cantidad"]}
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400 text-sm">No hay datos suficientes</div>
+          )}
+        </div>
+
+        {/* 4. Recent Activity List */}
+        <div className="lg:col-span-2 bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
+                <Activity size={20} className="text-gray-400" /> Actividad Reciente
+              </h3>
+              <p className="text-xs text-gray-500 mt-1">Últimos contenidos creados en la plataforma</p>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-gray-100 text-xs text-gray-500 uppercase">
+                  <th className="py-3 font-semibold">Tipo</th>
+                  <th className="py-3 font-semibold">Título / Nombre</th>
+                  <th className="py-3 font-semibold text-right">Estado</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50 text-sm">
+                {recentActivity.length > 0 ? (
+                  recentActivity.map((item, index) => (
+                    <tr key={`${item.dataType}-${item.id}`} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="py-4 font-medium" style={{ color: getStatusColor(item.type) }}>
+                        {item.type}
+                      </td>
+                      <td className="py-4 text-gray-800 font-medium">{item.name || item.title || "Sin título"}</td>
+                      <td className="py-4 text-right">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-600 border border-green-100">
+                          Activo
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="py-8 text-center text-gray-400">No hay actividad reciente registrada</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
     </div>
   );
 }
+
+
