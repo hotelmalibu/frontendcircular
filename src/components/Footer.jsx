@@ -24,7 +24,7 @@ export default function Footer() {
           <div className="flex flex-col items-center md:items-start text-center md:text-left max-w-sm">
             <img src={Logo} alt="EcoCircular Logo" className="h-20 w-auto object-contain mb-4" />
             <p className="text-white/80 text-sm leading-relaxed">
-              Impulsando la economía circular en Colombia a través de la innovación y la sostenibilidad.
+              Impulsando el país hacia la economía circular
             </p>
           </div>
 
