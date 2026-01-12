@@ -110,6 +110,7 @@ const CORSImage = ({
         ref={imgRef}
         src={currentSrc}
         alt={alt}
+        loading="lazy"
         className={`${className} ${loading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
         onLoad={handleImageLoad}
         onError={handleImageError}
