@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import fondo1 from '../../assets/home/Carrusel/Index_imagen_1.png';
+import fondo1 from '../../assets/home/Carrusel/Index_imagen_1.jpg';
 import fondo2 from '../../assets/home/Carrusel/Index_imagen_2.jpeg';
-// import fondo3 from '../../assets/home/Carrusel/Index_imagen_3.jpg';
 import fondo4 from '../../assets/home/Carrusel/Index_imagen_4.png';
 
 const SLIDES = [
@@ -357,7 +356,7 @@ export default function IndexImagen() {
 
 
       {/* ========== INDICADORES LATERALES  ========== */}
-      <div className="absolute left-2 md:left-12  mt-6 lg:left-6 top-1/2 -translate-y-1/2 -translate-y-[125px] z-20 flex flex-col items-center gap-10 md:translate-x-16 translate-x-0">
+      <div className="absolute left-2 md:left-12  mt-6 lg:left-6 top-1/2 -translate-y-[125px] z-20 flex flex-col items-center gap-10 md:translate-x-16 translate-x-0">
         {SLIDES.map((_, index) => (
           <div key={index} className="nav-indicator-item">
             {index === currentSlide ? (
