@@ -3,6 +3,7 @@ import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Home from "./modules/home/Home";
 import Login from "./modules/auths/Login";
+import ForgotPassword from "./modules/auths/ForgotPassword";
 import Register from "./modules/auths/Register";
 import Dashboard from "./modules/dashboard/Dashboard";
 import Documentos from "./modules/dashboard/Documentos";
@@ -44,6 +45,7 @@ export default function App() {
           {/* Rutas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/register" element={<Register />} />
           <Route path="/circularmente" element={<Circularmente />} />
           <Route path="/quines-somos" element={<QuienesSomos />} />

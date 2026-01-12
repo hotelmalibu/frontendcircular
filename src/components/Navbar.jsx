@@ -292,7 +292,7 @@ export default function Navbar({ onMenuClick }) {
   const isInteracted = scrolled || isHovered || hasOpenDropdown || mobileMenuOpen;
 
   const isDashboardView = (user && isPublicPage && !isInteracted);
-  const isAuthPage = ["/login", "/register", "/juntaDirecteEquipo"].includes(location.pathname);
+  const isAuthPage = ["/login", "/register", "/forgot-password", "/juntaDirecteEquipo"].includes(location.pathname);
 
 
 
