@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import fondoCircularmente from "../../assets/fondosYlogos/fondo_circularmente.png";
+import fondoCircularmente from "../../assets/fondosYlogos/fondo_circularmente.jpg";
 import { useNavigate } from "react-router-dom";
 
 export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) {

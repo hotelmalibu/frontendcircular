@@ -257,6 +257,7 @@ export default function ProjectList() {
                     <img
                       src={categoryImages[item.category_name] || categoryImages[item.category]}
                       alt={item.title}
+                      loading="lazy"
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.target.style.display = 'none';
