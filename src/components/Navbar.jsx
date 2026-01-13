@@ -9,7 +9,7 @@ import {
   User,
   LogOut,
   Home,
-  Menu,
+
   ChevronDown,
   Bell,
   MessageSquare,
@@ -451,7 +451,7 @@ export default function Navbar({ onMenuClick }) {
         window.removeEventListener('securityLogReviewed', handleSecurityLogReviewed);
       };
     }
-  }, [user]);
+  }, [user, isAdmin]);
 
   // Cerrar menús al hacer clic fuera
   useEffect(() => {

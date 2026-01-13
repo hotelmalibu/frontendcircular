@@ -10,24 +10,24 @@ const SLIDES = [
     title: 'Impulsando el país hacia',
     subtitle: 'la economía circular',
     description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-    button1: 'Conoce nuestras noticias',
-    button2: 'Sobre Nosotros'
+    button1: 'Sobre nosotros',
+    button2: 'Conoce nuestras estrategias'
   },
   {
     image: fondo2,
     title: 'Impulsando el país hacia',
     subtitle: 'la economía circular',
     description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-    button1: 'Conoce nuestros proyectos',
-    button2: 'Sobre Nosotros'
+    button1: 'Sobre nosotros',
+    button2: 'Conoce nuestras estrategias'
   },
   {
     image: fondo4,
     title: 'Impulsando el país hacia',
     subtitle: 'la economía circular',
     description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-    button1: 'Conoce nuestros proyectos',
-    button2: 'Sobre Nosotros'
+    button1: 'Sobre nosotros',
+    button2: 'Conoce nuestras estrategias'
   }
 ];
 
@@ -442,8 +442,8 @@ export default function IndexImagen() {
 
           {/* Botones estilo Citeo */}
           <div className={`animate-buttons ${hasLoaded ? 'loaded' : ''} flex flex-wrap gap-4 `}>
-            {/* Botón primario - */}
-            <Link to="/explorar" className="btn-primary group relative px-8 py-3 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            {/* Botón secundario - Contorno limpio */}
+            <Link to="/quines-somos" className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
               <span className="relative z-10 flex items-center gap-2">
                 {SLIDES[currentSlide].button1}
                 <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -453,8 +453,8 @@ export default function IndexImagen() {
             </Link>
 
 
-            {/* Botón secundario - Contorno limpio */}
-            <Link to="/quines-somos" className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
+            {/* Botón primario - */}
+            <Link to="/lineas-estrategicas" className="btn-primary group relative px-8 py-3 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
               <span className="relative z-10 flex items-center gap-2">
                 {SLIDES[currentSlide].button2}
                 <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
