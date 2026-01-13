@@ -4,7 +4,6 @@ import {
   Trash2,
   Search,
   Filter,
-  MoreVertical,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -14,8 +13,7 @@ import {
   User,
   Mail,
   Lock,
-  Shield,
-  CheckCircle2
+  Shield
 } from "lucide-react";
 import { getUsers, createUser, updateUser, deleteUser } from "../../../../../api/users";
 import { getPublicRoles } from "../../../../../api/auth";

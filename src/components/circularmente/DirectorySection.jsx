@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   Building2, MapPin, Phone, Mail, ExternalLink, X,
-  Globe, Tag, ChevronRight, Package, Wrench, ShoppingCart, User
+  Globe, Tag, ChevronRight
 } from "lucide-react";
 import { getAllCompanies } from "../../api/companiesApi";
 import { motion } from 'framer-motion';
@@ -80,11 +80,7 @@ export default function DirectorySection({ selectedRegion, user }) {
     );
   }
 
-  // Helper para iconos de categoría (si existiera el dato)
-  const getCategoryIcon = (categoria) => {
-    // Lógica placeholder si no hay categoría real en los datos de API aún
-    return <Package size={16} className="inline mr-1" />;
-  };
+
 
   if (!user) return null;
 

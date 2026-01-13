@@ -1,6 +1,6 @@
 import api from "./index";
 
-const RESOURCE_URL = "/users";
+
 
 // Based on existing api/auth.js and JSON request
 export const getUsers = (params) => {

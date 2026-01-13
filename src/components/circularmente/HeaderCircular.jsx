@@ -42,11 +42,10 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
         >
-          Conecta con transformadores líderes en reciclaje y sostenibilidad.
+          Conecta con transformadores líderes en economía circular.
           <br />
           <span className="font-semibold text-[#b9e31b]">
-            La plataforma que impulsa la economía circular en
-            Colombia.
+            La plataforma impulsa la economía circular de envases y empaques.
           </span>
         </motion.p>
 
