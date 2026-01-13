@@ -11,7 +11,8 @@ import {
   MoreVertical,
   AlertCircle,
   Calendar,
-  UserX
+  UserX,
+  Edit2
 } from "lucide-react";
 
 import FeedbackModal from "../../../../common/FeedbackModal";
@@ -35,6 +36,7 @@ export default function AprobacionesList() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("Todos");
   const [error, setError] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
   // Estados para el Modal de Feedback
   const [feedback, setFeedback] = useState({
@@ -244,17 +246,50 @@ export default function AprobacionesList() {
 
                       <div className="flex items-center gap-2 self-start lg:self-end">
                         <span className="text-xs text-gray-500 mr-1">Estado:</span>
-                        <span
-                          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border`}
-                          style={{
-                            backgroundColor: styles.bg,
-                            color: styles.text,
-                            borderColor: 'transparent'
-                          }}
-                        >
-                          {styles.icon}
-                          {s.status === 'pending' ? 'Pendiente' : (s.status === 'active' ? 'Activado' : (s.status === 'rejected' ? 'Rechazado' : (s.status === 'suspended' ? 'Suspendido' : s.status)))}
-                        </span>
+
+                        {editingId === s.id ? (
+                          <div className="flex items-center gap-2 animate-fadeIn">
+                            <select
+                              value={s.status}
+                              onChange={(e) => {
+                                handleAction(s.id, e.target.value);
+                                setEditingId(null);
+                              }}
+                              autoFocus
+                              onBlur={() => setEditingId(null)}
+                              className="text-xs border border-blue-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+                            >
+                              <option value="pending">Pendiente</option>
+                              <option value="active">Activo</option>
+                              <option value="suspended">Suspendido</option>
+                              <option value="rejected">Rechazado</option>
+                            </select>
+                            <button onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600">
+                              <XCircle size={16} />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 group/edit">
+                            <span
+                              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border`}
+                              style={{
+                                backgroundColor: styles.bg,
+                                color: styles.text,
+                                borderColor: 'transparent'
+                              }}
+                            >
+                              {styles.icon}
+                              {s.status === 'pending' ? 'Pendiente' : (s.status === 'active' ? 'Activado' : (s.status === 'rejected' ? 'Rechazado' : (s.status === 'suspended' ? 'Suspendido' : s.status)))}
+                            </span>
+                            <button
+                              onClick={() => setEditingId(s.id)}
+                              className="text-blue-500 hover:text-blue-700 transition-all p-1"
+                              title="Cambiar estado manualmente"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                          </div>
+                        )}
                       </div>
 
                       {s.status === 'pending' && (
