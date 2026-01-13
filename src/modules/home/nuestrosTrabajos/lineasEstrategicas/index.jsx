@@ -8,30 +8,48 @@ import ImpactSection from "../../../../components/home/nosotros/conocenos/quiene
 
 const DATA_LINEAS = [
   {
-    id: "proyectos",
-    title: "Proyectos Estratégicos",
-    description: "Estrategias para impulsar modelos circulares mediante procesos de generación de capacidades territoriales y sectoriales...",
-    detailedIntro: "Los proyectos estratégicos tienen dos componentes: 1) La estrategia territorial es un modelo integral que articula componentes ambientales, sociales y económicos, con una visión de escalabilidad en territorios marino-costeros (Cartagena - Bolívar, Santa Marta y Barranquilla – Puerto Colombia). 2) Estrategia Sectorial.",
-    articulation: "Los proyectos estratégicos en territorios marino-costeros buscan focalizar acciones desde la REP para crear modelos que, por un lado, contribuyan a las metas normativas de Responsabilidad Extendida del Productor, pero, más allá del cumplimiento, se trata de consolidar ecosistemas territoriales de economía circular que transformen la relación del territorio con sus residuos, impulse el desarrollo local y reduzca la presión sobre ecosistemas estratégicos como manglares, bahías y ciénagas.",
+    id: "cadenas",
+    title: "Fortalecimiento de las cadenas de valor",
+    description: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales...",
+    detailedIntro: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales de aprovechamiento mediante la generación de valor entre actores de la cadena para el cumplimiento normativo en REP, aportando a estrategias corporativas.",
+    articulation: "A través de la articulación de la cadena de valor de residuos aprovechables, garantizamos el cumplimiento de la normatividad vigente, por medio de proyectos territoriales, sectoriales y de inclusión social y productiva.",
     projects: [
-      "Proyectos marinos – costeros: Cartagena y Bolívar",
-      "Proyectos marinos – costeros: Santa Marta",
-      "Puerto Circular - Barranquilla y Puerto Colombia"
+      "Vinculación con proyectores territoriales y sectoriales"
     ],
-    img: imgProyectos,
+    img: imgCadenas,
     colorAcento: "#1E305D",
-    boxTitle: "Enfoque y Alcance",
-    boxText: "Los proyectos en Cartagena, Santa Marta y Barranquilla – Puerto Colombia tienen el objetivo de triple impacto (Económico, social, ambiental).",
+    boxTitle: "¿Qué hacemos?",
+    boxText: "Articular los actores de la cadena.",
     iconSvg: (
       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    )
+  },
+  {
+    id: "inclusion",
+    title: "Inclusión social y productiva",
+    detailedIntro: "La línea de Inclusión Social y Productiva de Visión Circular ANDI impulsa estrategias orientadas a cerrar brechas productivas y sociales, generando impacto en la competitividad, los ingresos y el bienestar de los actores de la cadena de envases y empaques.",
+    articulation: "A través del modelo de inclusión social y productiva, se desarrollan programas y proyectos con dos objetivos: Mejorar la competitividad y promover la transición justa y los empleos verdes en toda la cadena.",
+    projects: [
+      "Ruta de la productividad",
+      "Transforma más",
+      "Transición justa, empleos verdes"
+    ],
+    img: imgInclusion,
+    colorAcento: "#1E305D",
+    boxTitle: "Cierre de Brechas",
+    boxText: "Cierre de brechas de las organizaciones de recicladores y transformadores para fortalecer su competitividad.",
+    iconSvg: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
       </svg>
     )
   },
   {
     id: "innovacion",
-    title: "Línea de Innovación",
-    detailedIntro: "Si bien, la línea de innovación lleva 3 años operando de cara al ecosistema CTeI, nuestro trabajo comenzó en 2021 con la formulación del Plan de Innovación, una hoja de ruta que ha guiado cada una de nuestras acciones. En este tiempo, hemos perfeccionado nuestras metodologías, afinado los criterios de selección y formulación de proyectos para garantizando que cada iniciativa tenga un impacto tangible y alineado con nuestra visión de sostenibilidad y economía circular.",
+    title: "Innovación para el cierre de ciclo de envases y empaques",
+    detailedIntro: "Si bien, la línea de innovación lleva 3 años operando de cara al ecosistema CTeI, nuestro trabajo comenzó in 2021 con la formulación del Plan de Innovación, una hoja de ruta que ha guiado cada una de nuestras acciones. En este tiempo, hemos perfeccionado nuestras metodologías, afinado los criterios de selección y formulación de proyectos para garantizando que cada iniciativa tenga un impacto tangible y alineado con nuestra visión de sostenibilidad y economía circular.",
     articulationNode: (
       <div className="space-y-4">
         <p className="font-medium text-white/90">Desde 2023 hemos realizado dos convocatorias para activar el ecosistema de innovación, cofinanciando proyectos de investigación aplicada.</p>
@@ -86,28 +104,53 @@ const DATA_LINEAS = [
     )
   },
   {
-    id: "inclusion",
-    title: "Inclusión Social y Productiva",
-    detailedIntro: "La línea de Inclusión Social y Productiva de Visión Circular ANDI impulsa estrategias orientadas a cerrar brechas productivas y sociales, generando impacto en la competitividad, los ingresos y el bienestar de los actores de la cadena de envases y empaques.",
-    articulation: "A través del modelo de inclusión social y productiva, se desarrollan programas y proyectos con dos objetivos: Mejorar la competitividad y promover la transición justa y los empleos verdes en toda la cadena.",
+    id: "proyectos",
+    title: "Proyectos estratégicos: territoriales y sectoriales",
+    description: "Estrategias para impulsar modelos circulares mediante procesos de generación de capacidades territoriales y sectoriales que generen impactos económicos, sociales y ambientales.",
+    detailedIntroNode: (
+      <div className="space-y-4">
+        <p className="text-base text-gray-600 leading-relaxed">
+          Estrategias para impulsar modelos circulares mediante procesos de generación de capacidades territoriales y sectoriales que generen impactos económicos, sociales y ambientales.
+        </p>
+        <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#1E305D]">
+          <p className="font-semibold text-gray-800 mb-3">Los proyectos estratégicos tienen dos componentes:</p>
+          <div className="space-y-3">
+            <div className="flex gap-3">
+              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#1E305D] text-white flex items-center justify-center text-sm font-bold">1</span>
+              <div>
+                <p className="font-medium text-gray-800">Estrategia Territorial</p>
+                <p className="text-sm text-gray-600 mt-1">Modelo integral que articula componentes ambientales, sociales y económicos, con una visión de escalabilidad en territorios marino-costeros (Cartagena - Bolívar, Santa Marta y Barranquilla – Puerto Colombia).</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#1E305D] text-white flex items-center justify-center text-sm font-bold">2</span>
+              <div>
+                <p className="font-medium text-gray-800">Estrategia Sectorial</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    articulation: "Los proyectos estratégicos en territorios marino-costeros buscan focalizar acciones desde la REP para crear modelos que, por un lado, contribuyan a las metas normativas de Responsabilidad Extendida del Productor, pero, más allá del cumplimiento, se trata de consolidar ecosistemas territoriales de economía circular que transformen la relación del territorio con sus residuos, impulse el desarrollo local y reduzca la presión sobre ecosistemas estratégicos como manglares, bahías y ciénagas.",
     projects: [
-      "Ruta de la productividad",
-      "Transforma más",
-      "Transición justa, empleos verdes"
+      "Proyectos marinos – costeros: Cartagena y Bolívar",
+      "Proyectos marinos – costeros: Santa Marta",
+      "Puerto Circular - Barranquilla y Puerto Colombia"
     ],
-    img: imgInclusion,
+    img: imgProyectos,
     colorAcento: "#1E305D",
-    boxTitle: "Cierre de Brechas",
-    boxText: "Cierre de brechas de las organizaciones de recicladores y transformadores para fortalecer su competitividad.",
+    boxTitle: "Enfoque y Alcance",
+    boxText: "Los proyectos en Cartagena, Santa Marta y Barranquilla – Puerto Colombia tienen el objetivo de triple impacto (Económico, social, ambiental).",
     iconSvg: (
       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     )
   },
   {
     id: "consumo",
-    title: "Fomento del Consumo Responsable",
+    title: "Consumo responsable y pedagogía al consumidor",
     detailedIntro: "La línea de Consumo Responsable y Pedagogía al Consumidor busca sensibilizar y promover el cambio de hábitos y comportamientos de la ciudadanía, fomentando la correcta separación en la fuente como condición clave para el funcionamiento de la economía circular.",
     articulation: "Los proyectos de esta línea se articulan para activar el rol del consumidor desde distintos entornos hogar, empresa, comercio, industria y territorio, facilitando prácticas de separación en la fuente y consumo responsable mediante acciones pedagógicas, mensajes claros y experiencias prácticas.",
     projects: [
@@ -124,25 +167,6 @@ const DATA_LINEAS = [
     iconSvg: (
       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    )
-  },
-  {
-    id: "cadenas",
-    title: "Fortalecimiento de Cadenas de Valor",
-    description: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales...",
-    detailedIntro: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales de aprovechamiento mediante la generación de valor entre actores de la cadena para el cumplimiento normativo en REP, aportando a estrategias corporativas.",
-    articulation: "A través de la articulación de la cadena de valor de residuos aprovechables, garantizamos el cumplimiento de la normatividad vigente, por medio de proyectos territoriales, sectoriales y de inclusión social y productiva.",
-    projects: [
-      "Vinculación con proyectores territoriales y sectoriales"
-    ],
-    img: imgCadenas,
-    colorAcento: "#1E305D",
-    boxTitle: "¿Qué hacemos?",
-    boxText: "Articular los actores de la cadena.",
-    iconSvg: (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
       </svg>
     )
   }
@@ -189,7 +213,7 @@ export default function LineasEstrategicasPage() {
       </h1>
 
       <p className="text-gray-400 text-sm md:text-base font-medium uppercase tracking-wider">
-        Selecciona una línea para ver su gestión
+        Haz clic en cada línea estratégica para conocer más.
       </p>
 
       {/* --- MENU SUPERIOR (LOGOS GRANDES SIN FILTROS) --- */}
@@ -273,12 +297,16 @@ export default function LineasEstrategicasPage() {
                     {/* SLIDE 1: INFO GENERAL */}
                     {slide.type === "info" && (
                       <div className="animate-fadeIn w-full">
-                        <h3 className="text-lg md:text-xl font-bold text-[#1E305D] mb-2 text-center md:text-left">
+                        <h3 className="text-lg md:text-xl font-bold text-[#1E305D] mb-4 text-center md:text-left">
                           Visión General
                         </h3>
-                        <p className="text-base text-gray-600 leading-relaxed text-justify max-w-4xl mx-auto md:mx-0">
-                          {activeData.detailedIntro || activeData.description}
-                        </p>
+                        {activeData.detailedIntroNode ? (
+                          activeData.detailedIntroNode
+                        ) : (
+                          <p className="text-base text-gray-600 leading-relaxed text-justify max-w-4xl mx-auto md:mx-0">
+                            {activeData.detailedIntro || activeData.description}
+                          </p>
+                        )}
                       </div>
                     )}
 
