@@ -1,4 +1,5 @@
 import { useState, useContext } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { login as loginRequest } from "../../api/auth";
 import { AuthContext } from "../../context/AuthContext";
@@ -24,6 +25,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [showWarningModal, setShowWarningModal] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,7 +42,19 @@ export default function Login() {
         err.response?.data?.message ||
         err.message ||
         "Credenciales incorrectas. Inténtalo nuevamente.";
-      setError(message);
+      
+      const newAttempts = failedAttempts + 1;
+      setFailedAttempts(newAttempts);
+
+      if (message.toLowerCase().includes('suspen')) {
+          setError(message);
+      } else {
+           if (newAttempts === 3) {
+              setShowWarningModal(true);
+          }
+          setError(message);
+      }
+
     } finally {
       setIsLoading(false);
     }
@@ -154,7 +169,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-[#B1D357] hover:bg-[#9CB84D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B1D357] disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-300 transform active:scale-[0.99] text-[#005380]" // Texto azul oscuro para contraste en fondo verde
+              className="w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold bg-[#B1D357] hover:bg-[#9CB84D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B1D357] disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-300 transform active:scale-[0.99] text-[#005380]" // Texto azul oscuro para contraste en fondo verde
             >
               {isLoading ? (
                 <Loader2 className="animate-spin h-5 w-5" />
@@ -177,6 +192,38 @@ export default function Login() {
           </div>
         </div>
       </div>
+
+        {/* Modal Global de Advertencia de Suspensión */}
+        {showWarningModal && createPortal(
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+                <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform transition-all scale-100 border-l-4 border-yellow-500">
+                    <div className="flex flex-col items-center text-center">
+                        <div className="w-14 h-14 rounded-full bg-yellow-100 flex items-center justify-center mb-4 text-yellow-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">
+                            Advertencia de Seguridad
+                        </h3>
+                        <p className="text-gray-600 mb-6">
+                            Has fallado <strong>3 intentos</strong> de inicio de sesión. 
+                            <br/><br/>
+                            Si alcanzas los <strong>5 intentos fallidos</strong>, tu cuenta será suspendida temporalmente por seguridad.
+                            <br/>
+                            Podrás intentar de nuevo en algunas horas.
+                        </p>
+                        <button
+                            onClick={() => setShowWarningModal(false)}
+                            className="w-full px-4 py-3 bg-[#2C67B0] text-white rounded-xl font-bold hover:bg-[#005380] transition shadow-md"
+                        >
+                            Entendido
+                        </button>
+                    </div>
+                </div>
+            </div>,
+            document.body
+        )}
 
       <style>{`
         @keyframes blob {

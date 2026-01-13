@@ -13,6 +13,7 @@ import Formularios from "./modules/dashboard/Formularios";
 import Comunicaciones from "./modules/dashboard/Comunicaciones";
 import Administracion from "./modules/dashboard/Administracion";
 import Integracion from "./modules/dashboard/Integracion";
+import AxiosInterceptor from "./components/common/AxiosInterceptor";
 
 import PrivateRoute from "./components/PrivateRoute";
 import Footer from "./components/Footer";
@@ -38,6 +39,7 @@ import ContentDetailProject from "./components/pagesProyectos/ContentDetailProje
 export default function App() {
   return (
     <div className="flex flex-col min-h-screen">
+      <AxiosInterceptor />
       <Toaster position="top-center" reverseOrder={false} />
       <Navbar />
       <main className="flex-1">

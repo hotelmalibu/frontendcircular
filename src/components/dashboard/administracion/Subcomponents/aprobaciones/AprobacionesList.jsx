@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { getUsers, updateUserStatus } from "../../../../../api/auth";
 import {
   CheckCircle,
   XCircle,
-  Info,
   User,
   Shield,
-  FileText,
   Search,
-  MoreVertical,
   AlertCircle,
   Calendar,
   UserX,
-  Edit2
+  Unlock
 } from "lucide-react";
 
 import FeedbackModal from "../../../../common/FeedbackModal";
@@ -36,7 +34,14 @@ export default function AprobacionesList() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("Todos");
   const [error, setError] = useState(null);
-  const [editingId, setEditingId] = useState(null);
+  
+  // Estado para el modal de confirmación
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    userId: null,
+    action: null, // 'suspend'
+    userName: ''
+  });
 
   // Estados para el Modal de Feedback
   const [feedback, setFeedback] = useState({
@@ -91,6 +96,11 @@ export default function AprobacionesList() {
         msg = "La cuenta del usuario ha sido suspendida.";
         type = "warning";
       }
+      if (newStatus === 'pending') {
+          title = "Usuario Pendiente";
+          msg = "El usuario ha sido movido a estado pendiente.";
+          type = "info";
+      }
 
       setFeedback({
         isOpen: true,
@@ -108,6 +118,22 @@ export default function AprobacionesList() {
         message: "Error al procesar la solicitud: " + (err.response?.data?.message || err.message)
       });
     }
+  };
+
+  const openSuspendConfirmation = (user) => {
+    setConfirmModal({
+        isOpen: true,
+        userId: user.id,
+        action: 'suspend',
+        userName: user.name
+    });
+  };
+
+  const handleConfirmAction = () => {
+      if (confirmModal.action === 'suspend' && confirmModal.userId) {
+          handleAction(confirmModal.userId, 'suspended');
+      }
+      setConfirmModal({ isOpen: false, userId: null, action: null, userName: '' });
   };
 
   const getStatusStyles = (status) => {
@@ -247,28 +273,6 @@ export default function AprobacionesList() {
                       <div className="flex items-center gap-2 self-start lg:self-end">
                         <span className="text-xs text-gray-500 mr-1">Estado:</span>
 
-                        {editingId === s.id ? (
-                          <div className="flex items-center gap-2 animate-fadeIn">
-                            <select
-                              value={s.status}
-                              onChange={(e) => {
-                                handleAction(s.id, e.target.value);
-                                setEditingId(null);
-                              }}
-                              autoFocus
-                              onBlur={() => setEditingId(null)}
-                              className="text-xs border border-blue-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
-                            >
-                              <option value="pending">Pendiente</option>
-                              <option value="active">Activo</option>
-                              <option value="suspended">Suspendido</option>
-                              <option value="rejected">Rechazado</option>
-                            </select>
-                            <button onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600">
-                              <XCircle size={16} />
-                            </button>
-                          </div>
-                        ) : (
                           <div className="flex items-center gap-2 group/edit">
                             <span
                               className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border`}
@@ -281,15 +285,7 @@ export default function AprobacionesList() {
                               {styles.icon}
                               {s.status === 'pending' ? 'Pendiente' : (s.status === 'active' ? 'Activado' : (s.status === 'rejected' ? 'Rechazado' : (s.status === 'suspended' ? 'Suspendido' : s.status)))}
                             </span>
-                            <button
-                              onClick={() => setEditingId(s.id)}
-                              className="text-blue-500 hover:text-blue-700 transition-all p-1"
-                              title="Cambiar estado manualmente"
-                            >
-                              <Edit2 size={16} />
-                            </button>
                           </div>
-                        )}
                       </div>
 
                       {s.status === 'pending' && (
@@ -307,6 +303,34 @@ export default function AprobacionesList() {
                             </button>
                           </div>
                         </div>
+                      )}
+
+                      {s.status === 'active' && (
+                          <div className="flex flex-col gap-2 w-full">
+                              {(s.lockout_until && new Date(s.lockout_until) > new Date()) ? (
+                                  <button
+                                      onClick={() => handleAction(s.id, 'active')}
+                                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-orange-50 border border-orange-100 text-orange-700 rounded-lg hover:bg-orange-600 hover:text-white transition shadow-sm text-sm font-bold group">
+                                      <Unlock size={16} /> Desbloquear
+                                  </button>
+                              ) : (
+                                  <button
+                                      onClick={() => openSuspendConfirmation(s)}
+                                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-50 border border-red-100 text-red-700 rounded-lg hover:bg-red-600 hover:text-white transition shadow-sm text-sm font-bold group">
+                                      <UserX size={16} /> Suspender
+                                  </button>
+                              )}
+                          </div>
+                      )}
+
+                      {s.status === 'rejected' && (
+                          <div className="flex flex-col gap-2 w-full">
+                              <button
+                                  onClick={() => handleAction(s.id, 'pending')}
+                                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-600 hover:text-white transition shadow-sm text-sm font-bold group">
+                                  <AlertCircle size={16} /> Mover a Pendiente
+                              </button>
+                          </div>
                       )}
 
                       {s.status === 'suspended' && (
@@ -335,6 +359,41 @@ export default function AprobacionesList() {
         onClose={() => setFeedback({ ...feedback, isOpen: false })}
         autoClose={3000}
       />
+
+        {/* Modal de Confirmación de Suspensión */}
+        {confirmModal.isOpen && createPortal(
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+                <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform transition-all scale-100">
+                    <div className="flex flex-col items-center text-center">
+                        <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 text-red-600">
+                            <UserX size={24} />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">
+                            ¿Suspender Usuario?
+                        </h3>
+                        <p className="text-gray-500 mb-6">
+                            Estás a punto de suspender la cuenta de <strong>{confirmModal.userName}</strong>.
+                            El usuario perderá el acceso al sistema hasta que sea reactivado.
+                        </p>
+                        <div className="flex gap-3 w-full">
+                            <button
+                                onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+                                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleConfirmAction}
+                                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-200"
+                            >
+                                Sí, Suspender
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>,
+            document.body
+        )}
     </div>
   );
 }
