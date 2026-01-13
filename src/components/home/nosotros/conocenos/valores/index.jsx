@@ -168,7 +168,7 @@ export default function TransparencyPortal() {
               Trazabilidad y Apertura <br /> en nuestra Gestión
             </h2>
             <p className="text-slate-600 text-lg leading-relaxed">
-              La transparencia no es solo un valor, es el eje que permite que la **Economía Circular** sea real y medible. Garantizamos que cada alianza y proyecto operen bajo criterios de auditoría y rendición de cuentas pública.
+              La transparencia no es solo un valor, es el eje que permite que la <strong className="text-slate-900">Economía Circular</strong> sea real y medible. Garantizamos que cada alianza y proyecto operen bajo criterios de auditoría y rendición de cuentas pública.
             </p>
             
             <div className="grid sm:grid-cols-2 gap-6 pt-4">
