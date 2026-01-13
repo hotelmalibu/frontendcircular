@@ -286,13 +286,13 @@ export default function Navbar({ onMenuClick }) {
   const internalPaths = ["/dashboard", "/documentos", "/companies", "/seguimiento", "/formularios", "/comunicaciones", "/administracion", "/integracion", "/profile"];
   const isInternalPage = user && internalPaths.some(path => location.pathname.startsWith(path));
 
-  const transparentPaths = ['/circularmente', '/explorar', '/contenido', '/proyectos/'];
+  const transparentPaths = ['/circularmente', '/explorar', '/contenido', '/proyectos/', '/juntaDirecteEquipo'];
   const isTransparentNavPath = transparentPaths.some(path => location.pathname.startsWith(path));
 
   const isInteracted = scrolled || isHovered || hasOpenDropdown || mobileMenuOpen;
 
   const isDashboardView = (user && isPublicPage && !isInteracted);
-  const isAuthPage = ["/login", "/register", "/forgot-password", "/juntaDirecteEquipo"].includes(location.pathname);
+  const isAuthPage = ["/login", "/register", "/forgot-password"].includes(location.pathname);
 
 
 
