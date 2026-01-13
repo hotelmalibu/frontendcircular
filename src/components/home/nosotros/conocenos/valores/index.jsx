@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 // Importar la imagen de fondo generada (Oscura y sin texto)
-import ethicsHero from "../../../../../assets/home/nosotros/conocenos/valores/ethics_hero_dark.png";
+import ethicsHero from "../../../../../assets/home/nosotros/conocenos/valores/ethics_hero_dark.jpg";
 
 // --- PALETA DE COLORES DASHBOARD / BRAND ---
 const BRAND = {

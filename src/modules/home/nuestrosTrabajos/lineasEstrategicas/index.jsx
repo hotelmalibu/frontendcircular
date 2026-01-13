@@ -1,23 +1,31 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  ExternalLink, 
+  Download,
+  Info
+} from "lucide-react";
 import imgProyectos from "../../../../assets/lineasestrategicas/proyectos.png";
 import imgInnovacion from "../../../../assets/lineasestrategicas/innovacion.png";
 import imgInclusion from "../../../../assets/lineasestrategicas/inclusion.png";
 import imgConsumo from "../../../../assets/lineasestrategicas/consumoresponsable.png";
 import imgCadenas from "../../../../assets/lineasestrategicas/cadenasdevalor.png";
+import heroLineas from "../../../../assets/lineasestrategicas/hero_lineas_v2.jpg";
 import ImpactSection from "../../../../components/home/nosotros/conocenos/quienesSomos/ImpactSection.jsx";
 
 const DATA_LINEAS = [
   {
     id: "cadenas",
     title: "Fortalecimiento de las cadenas de valor",
-    description: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales...",
+    shortTitle: "Cadenas de Valor",
+    description: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales.",
     detailedIntro: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales de aprovechamiento mediante la generación de valor entre actores de la cadena para el cumplimiento normativo en REP, aportando a estrategias corporativas.",
     articulation: "A través de la articulación de la cadena de valor de residuos aprovechables, garantizamos el cumplimiento de la normatividad vigente, por medio de proyectos territoriales, sectoriales y de inclusión social y productiva.",
-    projects: [
-      "Vinculación con proyectores territoriales y sectoriales"
-    ],
+    projects: ["Vinculación con proyectores territoriales y sectoriales"],
     img: imgCadenas,
-    colorAcento: "#1E305D",
+    colorAcento: "#86B13D", // Greenish
     boxTitle: "¿Qué hacemos?",
     boxText: "Articular los actores de la cadena.",
     iconSvg: (
@@ -29,6 +37,7 @@ const DATA_LINEAS = [
   {
     id: "inclusion",
     title: "Inclusión social y productiva",
+    shortTitle: "Inclusión Social",
     detailedIntro: "La línea de Inclusión Social y Productiva de Visión Circular ANDI impulsa estrategias orientadas a cerrar brechas productivas y sociales, generando impacto en la competitividad, los ingresos y el bienestar de los actores de la cadena de envases y empaques.",
     articulation: "A través del modelo de inclusión social y productiva, se desarrollan programas y proyectos con dos objetivos: Mejorar la competitividad y promover la transición justa y los empleos verdes en toda la cadena.",
     projects: [
@@ -37,9 +46,9 @@ const DATA_LINEAS = [
       "Transición justa, empleos verdes"
     ],
     img: imgInclusion,
-    colorAcento: "#1E305D",
+    colorAcento: "#E15200",
     boxTitle: "Cierre de Brechas",
-    boxText: "Cierre de brechas de las organizaciones de recicladores y transformadores para fortalecer su competitividad.",
+    boxText: "Fortalecimiento de la competitividad en organizaciones de recicladores y transformadores.",
     iconSvg: (
       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -48,55 +57,32 @@ const DATA_LINEAS = [
   },
   {
     id: "innovacion",
-    title: "Innovación para el cierre de ciclo de envases y empaques",
-    detailedIntro: "Si bien, la línea de innovación lleva 3 años operando de cara al ecosistema CTeI, nuestro trabajo comenzó in 2021 con la formulación del Plan de Innovación, una hoja de ruta que ha guiado cada una de nuestras acciones. En este tiempo, hemos perfeccionado nuestras metodologías, afinado los criterios de selección y formulación de proyectos para garantizando que cada iniciativa tenga un impacto tangible y alineado con nuestra visión de sostenibilidad y economía circular.",
+    title: "Innovación para el cierre de ciclo de envases",
+    shortTitle: "Innovación",
+    detailedIntro: "Nuestra hoja de ruta ha guiado cada acción perfeccionando metodologías y criterios de selección para garantizar que cada iniciativa tenga un impacto tangible alineado con nuestra visión de sostenibilidad.",
     articulationNode: (
       <div className="space-y-4">
         <p className="font-medium text-white/90">Desde 2023 hemos realizado dos convocatorias para activar el ecosistema de innovación, cofinanciando proyectos de investigación aplicada.</p>
-        <div>
-          <p className="mb-2 text-sm text-white/80">Categorías de proyectos:</p>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-2 gap-y-1 list-disc pl-4 text-xs md:text-sm text-white/90">
-            <li>Tecnologías para la circularidad</li>
-            <li>Biomateriales y sustitutos</li>
-            <li>Ecodiseño y rediseño</li>
-            <li>Educación y cultura</li>
-            <li>Transformación productiva</li>
-            <li>Regulación y certificación</li>
-          </ul>
+        <div className="grid grid-cols-2 gap-2 text-xs md:text-sm text-white/90">
+          {["Ecodiseño", "Biomateriales", "Tecnologías", "Educación"].map(t => (
+            <div key={t} className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-white/40 rounded-full" /> {t}
+            </div>
+          ))}
         </div>
       </div>
     ),
     projects: [
-      "Viabilización del sistema HOMEKO (U. Javeriana)",
-      "Empaques compostables de biomasa (Bioplanet)",
-      "Empaques a base de orgánicos (U. Nacional)",
-      "Reutilización empaques retornables (Xiclo)",
-      "Modelo dispensación a granel / refill (CidPro)",
-      "Renting de vehículos eléctricos (Equirent)",
-      "Planta de retornabilidad de botellas de vidrio",
-      "Reciclaje molecular de PET (ANDERCOL)",
-      "Identificación de productos (Magma y MegaInn)",
-      "Guía incorporación de PCR (Biocírculo)",
-      "Cierre de ciclo de poliestireno (ICIPC)",
-      "Transformación residuos plásticos (CIDEP)",
-      "Fortalecimiento empresas transformadoras (PMTEC)",
-      "Potencial reciclabilidad (ARCO)"
+      "Viabilización HOMEKO", "Biomateriales compostables", "Xiclo: Reutilización", "Molecular PET ANDERCOL"
     ],
     documents: [
       { title: "Informe 2024 y perspectivas 2025", url: "https://www.andi.com.co/Uploads/ANDI_Econom%C3%ADaCircular_Informe2024_compressed_638990846971068830.pdf" },
-      { title: "Definición de condiciones normativas (REFILL)", url: "https://www.andi.com.co/Uploads/2025_01_14Dispensaci%C3%B3n%20a%20Granel.pdf" },
-      { title: "Potencial de Reciclabilidad de Envases y Empaques", url: "https://www.andi.com.co/Uploads/POTENCIAL%20DE%20RECICLABILIDAD%20DE%20ENVASES%20Y%20EMPAQUES%20EN%20COLOMBIA%20(003)_638602627756422428.pdf" },
-      { title: "Empaquetech", url: "https://www.andi.com.co/Uploads/Montaje%20final%20para%20aprobacion%20tecnologias%20cierre%20de%20ciclo%20(2).pdf" },
-      { title: "Guía para la incorporación de PCR", url: "https://www.andi.com.co/Uploads/Guia-para-la-incorporacion-de-PCR-resina-reciclada-posconsumo-de-PEAD-en-envases-de-diferentes-aplicaciones-OK_compressed.pdf" },
-      { title: "Seismic Performance con Recycled Tetra Pak", url: "https://www.mdpi.com/2075-5309/15/5/813" },
-      { title: "Review of Goldenberry Calyx as Reinforcing Fiber", url: "https://www.mdpi.com/2071-1050/17/13/5724" },
-      { title: "Informes 2023 y perspectiva de 2024", url: "https://www.andi.com.co/Uploads/Informe%202023%20&%20perspectivas%202024%20dise%C3%B1o.pdf" }
+      { title: "Potencial de Reciclabilidad", url: "https://www.andi.com.co/Uploads/POTENCIAL%20DE%20RECICLABILIDAD%20DE%20ENVASES%20Y%20EMPAQUES%20EN%20COLOMBIA%20(003)_638602627756422428.pdf" }
     ],
     img: imgInnovacion,
-    colorAcento: "#1E305D",
+    colorAcento: "#9E1981",
     boxTitle: "Investigación y Desarrollo",
-    boxText: "Investigación aplicada y desarrollo experimental enfocados en dinamizar el ecosistema de Ciencia, Tecnología e Innovación (CTeI).",
-    boxBgSpecific: "#1C2C5A",
+    boxText: "Investigación aplicada y desarrollo experimental para dinamizar el ecosistema CTeI.",
     iconSvg: (
       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -105,43 +91,17 @@ const DATA_LINEAS = [
   },
   {
     id: "proyectos",
-    title: "Proyectos estratégicos: territoriales y sectoriales",
-    description: "Estrategias para impulsar modelos circulares mediante procesos de generación de capacidades territoriales y sectoriales que generen impactos económicos, sociales y ambientales.",
-    detailedIntroNode: (
-      <div className="space-y-4">
-        <p className="text-base text-gray-600 leading-relaxed">
-          Estrategias para impulsar modelos circulares mediante procesos de generación de capacidades territoriales y sectoriales que generen impactos económicos, sociales y ambientales.
-        </p>
-        <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#1E305D]">
-          <p className="font-semibold text-gray-800 mb-3">Los proyectos estratégicos tienen dos componentes:</p>
-          <div className="space-y-3">
-            <div className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#1E305D] text-white flex items-center justify-center text-sm font-bold">1</span>
-              <div>
-                <p className="font-medium text-gray-800">Estrategia Territorial</p>
-                <p className="text-sm text-gray-600 mt-1">Modelo integral que articula componentes ambientales, sociales y económicos, con una visión de escalabilidad en territorios marino-costeros (Cartagena - Bolívar, Santa Marta y Barranquilla – Puerto Colombia).</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#1E305D] text-white flex items-center justify-center text-sm font-bold">2</span>
-              <div>
-                <p className="font-medium text-gray-800">Estrategia Sectorial</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
-    articulation: "Los proyectos estratégicos en territorios marino-costeros buscan focalizar acciones desde la REP para crear modelos que, por un lado, contribuyan a las metas normativas de Responsabilidad Extendida del Productor, pero, más allá del cumplimiento, se trata de consolidar ecosistemas territoriales de economía circular que transformen la relación del territorio con sus residuos, impulse el desarrollo local y reduzca la presión sobre ecosistemas estratégicos como manglares, bahías y ciénagas.",
+    title: "Proyectos estratégicos",
+    shortTitle: "Territoriales",
+    detailedIntro: "Estrategias para impulsar modelos circulares mediante procesos de generación de capacidades territoriales y sectoriales que generen impactos económicos, sociales y ambientales.",
+    articulation: "Los proyectos estratégicos en territorios marino-costeros buscan focalizar acciones desde la REP para crear modelos que consoliden ecosistemas territoriales de economía circular reales.",
     projects: [
-      "Proyectos marinos – costeros: Cartagena y Bolívar",
-      "Proyectos marinos – costeros: Santa Marta",
-      "Puerto Circular - Barranquilla y Puerto Colombia"
+      "Magdalena Arriba", "Cartagena y Bolívar", "Puerto Circular Barranquilla"
     ],
     img: imgProyectos,
-    colorAcento: "#1E305D",
-    boxTitle: "Enfoque y Alcance",
-    boxText: "Los proyectos en Cartagena, Santa Marta y Barranquilla – Puerto Colombia tienen el objetivo de triple impacto (Económico, social, ambiental).",
+    colorAcento: "#2C67B0", // Blue
+    boxTitle: "Enfoque Territorial",
+    boxText: "Acciones enfocadas en zonas marino-costeras con visión de impacto triple.",
     iconSvg: (
       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -150,20 +110,17 @@ const DATA_LINEAS = [
   },
   {
     id: "consumo",
-    title: "Consumo responsable y pedagogía al consumidor",
-    detailedIntro: "La línea de Consumo Responsable y Pedagogía al Consumidor busca sensibilizar y promover el cambio de hábitos y comportamientos de la ciudadanía, fomentando la correcta separación en la fuente como condición clave para el funcionamiento de la economía circular.",
-    articulation: "Los proyectos de esta línea se articulan para activar el rol del consumidor desde distintos entornos hogar, empresa, comercio, industria y territorio, facilitando prácticas de separación en la fuente y consumo responsable mediante acciones pedagógicas, mensajes claros y experiencias prácticas.",
+    title: "Consumo responsable y pedagogía",
+    shortTitle: "Pedagogía",
+    detailedIntro: "Buscamos sensibilizar y promover el cambio de hábitos, fomentando la correcta separación en la fuente como condición clave.",
+    articulation: "Activamos el rol del consumidor desde distintos entornos facilitando prácticas sostenibles mediante acciones pedagógicas y mensajes claros.",
     projects: [
-      "Evolución Circular",
-      "Tienda a tienda",
-      "Separo en casa, entrego en mi empresa",
-      "Industria arrocera unida por la economía circular",
-      "Campaña Para y Separa"
+      "Evolución Circular", "Tienda a tienda", "Separo en casa"
     ],
     img: imgConsumo,
-    colorAcento: "#1E305D",
+    colorAcento: "#F1B708", // Yellow
     boxTitle: "Cambio de Hábitos",
-    boxText: "Sensibilizar y contribuir al cambio de hábitos y comportamiento del consumidor fomentando la correcta separación en la fuente.",
+    boxText: "Promover la separación en la fuente mediante sensibilización ciudadana.",
     iconSvg: (
       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -172,244 +129,213 @@ const DATA_LINEAS = [
   }
 ];
 
-const COLOR_AZUL_PRINCIPAL = "#1E305D";
-
 export default function LineasEstrategicasPage() {
   const [selectedLineId, setSelectedLineId] = useState(DATA_LINEAS[0].id);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const activeData = DATA_LINEAS.find((item) => item.id === selectedLineId) || DATA_LINEAS[0];
 
-  // Reset slide cuando cambiamos de línea
+  const slides = [
+    { type: "info", title: "Visión General" },
+    { type: "articulation", title: activeData.boxTitle || "Enfoque" },
+  ];
+  if (activeData.projects?.length > 0) slides.push({ type: "projects", title: "Proyectos" });
+  if (activeData.documents?.length > 0) slides.push({ type: "documents", title: "Biblioteca" });
+
   useEffect(() => {
     setCurrentSlide(0);
   }, [selectedLineId]);
 
-  // Construir configuración de slides
-  const slides = [
-    { type: "info", title: "Visión General" }, // Título, intro, descripción
-    { type: "articulation", title: activeData.boxTitle || "Enfoque y Alcance" }, // Tarjeta de color
-  ];
-  if (activeData.projects && activeData.projects.length > 0) {
-    slides.push({ type: "projects", title: "Proyectos Destacados" });
-  }
-  if (activeData.documents && activeData.documents.length > 0) {
-    slides.push({ type: "documents", title: "Documentos e Informes" });
-  }
-
-  const handleNext = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const handlePrev = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
   return (
-    <div className="mt-20 md:mt-28 font-sans min-h-screen flex flex-col items-center p-2 lg:p-6 bg-gradient-to-b from-gray-100 to-[#7FB8D9]/10">
+    <div className="font-sans min-h-screen bg-gray-50 flex flex-col items-center">
+      
+      {/* HERO SECTION */}
+      <div className="relative h-[550px] md:h-[750px] w-full">
+        <img 
+          src={heroLineas} 
+          alt="Líneas Estratégicas" 
+          className="w-full h-full object-cover object-center brightness-[0.9]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1E305D]/70 via-transparent to-white/60 flex flex-col justify-center items-center text-center px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl"
+          >
+            <h1 className="text-white text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6 drop-shadow-2xl font-display">
+              Líneas Estratégicas
+            </h1>
+            <p className="text-white/90 text-sm md:text-xl max-w-2xl mx-auto leading-relaxed drop-shadow-lg opacity-80">
+              Estrategias integrales diseñadas para transformar el modelo productivo del país hacia una economía circular.
+            </p>
+          </motion.div>
+        </div>
 
-      <h1 className="text-2xl md:text-4xl font-bold text-[#1E305D] mb-2 text-center tracking-tight font-display">
-        Líneas Estratégicas
-      </h1>
+        {/* WHITE BOTTOM FILTER OVERLAY */}
+        <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-gray-50 via-white/20 to-transparent z-20" />
 
-      <p className="text-gray-400 text-sm md:text-base font-medium uppercase tracking-wider">
-        Haz clic en cada línea estratégica para conocer más.
-      </p>
+        {/* TABS DE SELECCIÓN (Overlapping at the bottom/edge) */}
+        <div className="absolute -bottom-10 md:-bottom-16 left-0 w-full z-40 px-6">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-10">
+            {DATA_LINEAS.map((item) => {
+              const isActive = selectedLineId === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setSelectedLineId(item.id)}
+                  className={`flex flex-col items-center transition-all duration-500 group relative ${
+                    isActive 
+                      ? "scale-110 -translate-y-2 text-[#1E305D]" 
+                      : "hover:scale-105"
+                  }`}
+                >
+                  <div className="w-24 h-16 md:w-48 md:h-24 transition-transform duration-500">
+                    <img 
+                      src={item.img} 
+                      alt={item.title} 
+                      className="w-full h-full object-contain filter drop-shadow-2xl" 
+                    />
+                  </div>
+                  {isActive && (
+                    <motion.div 
+                      layoutId="activeTab" 
+                      className="absolute -bottom-2 md:-bottom-4 w-20 h-1.5 bg-[#B1D357] rounded-full shadow-[0_0_20px_rgba(177,211,87,0.8)]" 
+                    />
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </div>
 
-      {/* --- MENU SUPERIOR (LOGOS GRANDES SIN FILTROS) --- */}
-      <div className="w-full">
-        <div className="grid grid-cols-2 gap-x-0 gap-y-0 justify-items-center md:flex md:flex-nowrap md:gap-10 md:justify-center">
-          {DATA_LINEAS.map((item) => {
-            const isActive = selectedLineId === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => { setSelectedLineId(item.id); setCurrentSlide(0); }}
-                className={`relative transition-transform duration-300 outline-none ${isActive ? "md:scale-110" : "hover:scale-105 "}`}
-              >
-                {/* Contenedor Limpio (Sin cards ni bordes, solo imagen grande) */}
-                <div className="w-28 h-28 md:w-40 md:h-40 flex items-center justify-center p-0 md:p-3">
-                  <img src={item.img} alt={item.title} className="w-full h-full object-contain scale-[1.15]" />
-                </div>
+      <div className="h-28 md:h-32 w-full" /> {/* Increased spacer to prevent clipping from below */}
+
+      {/* CONTENIDO INTERACTIVO */}
+      <div className="w-full max-w-6xl mx-auto px-6 mb-12">
+        <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 grid md:grid-cols-12">
+          
+          {/* Navegación lateral integrada (Mobile superior) */}
+          <div className="md:col-span-3 bg-gray-50/50 p-8 flex flex-col justify-between border-r border-gray-100">
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Información</p>
+              <div className="space-y-3">
+                {slides.map((s, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentSlide(idx)}
+                    className={`flex items-center gap-3 w-full text-left p-3 rounded-xl transition-all ${
+                      currentSlide === idx 
+                        ? "bg-white shadow-md text-[#1E305D] font-bold ring-1 ring-gray-100" 
+                        : "text-gray-400 hover:text-gray-600 font-medium"
+                    }`}
+                  >
+                    <div className={`w-1.5 h-6 rounded-full transition-all ${currentSlide === idx ? 'bg-[#1E305D]' : 'bg-gray-200 opacity-0'}`} />
+                    {s.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="hidden md:flex gap-2">
+              <button onClick={() => setCurrentSlide(p => (p - 1 + slides.length) % slides.length)} className="p-3 bg-white border border-gray-100 rounded-full hover:bg-gray-50 transition-colors">
+                <ChevronLeft size={20} className="text-gray-600" />
               </button>
-            )
-          })}
-        </div>
-      </div>
-
-
-      {/* --- CONTENEDOR DE CONTENIDO (SLIDESHOW INTERNO) --- */}
-      <div className="w-full max-w-5xl relative">
-
-        {/* Botones de Navegación del Slide */}
-        <button
-          onClick={handlePrev}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 md:-translate-x-14 z-20 p-2 md:p-3 rounded-full bg-white shadow-lg text-[#1E305D] hover:bg-[#1E305D] hover:text-white transition-all border border-gray-100"
-          title="Anterior diapositiva"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-
-        <button
-          onClick={handleNext}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 md:translate-x-14 z-20 p-2 md:p-3 rounded-full bg-white shadow-lg text-[#1E305D] hover:bg-[#1E305D] hover:text-white transition-all border border-gray-100"
-          title="Siguiente diapositiva"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-
-        {/* TARJETA PRINCIPAL */}
-        <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100 relative p-6 md:p-10 flex flex-col">
-
-          {/* Indicador de Título de Línea Permanente */}
-          <div className="w-full text-center border-b border-gray-50 pb-2 mb-2">
-            <h2 className="text-xl md:text-2xl font-bold font-display text-gray-800">
-              {activeData.title}
-            </h2>
+              <button onClick={() => setCurrentSlide(p => (p + 1) % slides.length)} className="p-3 bg-white border border-gray-100 rounded-full hover:bg-gray-50 transition-colors">
+                <ChevronRight size={20} className="text-gray-600" />
+              </button>
+            </div>
           </div>
 
-          <div className="animate-slideInUp flex-1 flex flex-col w-full">
+          {/* Contenido Dinámico */}
+          <div className="md:col-span-9 p-6 md:p-10 relative overflow-hidden">
+             {/* Background Decoration */}
+             <div className="absolute top-0 right-0 w-32 h-32 bg-[#1E305D]/5 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
+             
+             <AnimatePresence mode="wait">
+               <motion.div
+                 key={`${selectedLineId}-${currentSlide}`}
+                 initial={{ opacity: 0, x: 20 }}
+                 animate={{ opacity: 1, x: 0 }}
+                 exit={{ opacity: 0, x: -20 }}
+                 transition={{ duration: 0.3 }}
+                 className="relative z-10 h-full flex flex-col"
+               >
+                 <div className="flex items-center gap-4 mb-6">
+                    <div className="p-3 rounded-2xl border border-gray-100 bg-[#1E305D]/10 text-[#1E305D]">
+                      {React.cloneElement(activeData.iconSvg, { size: 28 })}
+                    </div>
+                    <h2 className="text-2xl md:text-4xl font-bold leading-tight text-black">
+                      {slides[currentSlide]?.title === "Visión General" ? activeData.title : (slides[currentSlide]?.title || "Cargando...")}
+                    </h2>
+                 </div>
 
-            {/* Indicador de qué slide estamos viendo (Puntos) */}
-            <div className="w-full flex justify-center gap-2 mb-6">
-              {slides.map((s, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`h-1.5 rounded-full transition-all cursor-pointer ${idx === currentSlide ? "w-8 bg-[#1E305D]" : "w-2 bg-gray-300"}`}
-                  title={s.title} // Tooltip para saber qué es cada punto
-                ></div>
-              ))}
-            </div>
+                 <div className="flex-1 flex flex-col justify-center">
+                   {slides[currentSlide].type === "info" && (
+                      <p className="text-lg text-[#1E305D] leading-relaxed font-light">
+                        {activeData.detailedIntro || activeData.description}
+                      </p>
+                   )}
 
-            {/* CONTENIDO DEL SLIDE ACTUAL */}
-            <div className="w-full flex flex-col justify-center" key={currentSlide}>
-              {(function () {
-                const slide = slides[currentSlide] || slides[0];
-                if (!slide) return null;
-
-                return (
-                  <>
-                    {/* SLIDE 1: INFO GENERAL */}
-                    {slide.type === "info" && (
-                      <div className="animate-fadeIn w-full">
-                        <h3 className="text-lg md:text-xl font-bold text-[#1E305D] mb-4 text-center md:text-left">
-                          Visión General
-                        </h3>
-                        {activeData.detailedIntroNode ? (
-                          activeData.detailedIntroNode
-                        ) : (
-                          <p className="text-base text-gray-600 leading-relaxed text-justify max-w-4xl mx-auto md:mx-0">
-                            {activeData.detailedIntro || activeData.description}
-                          </p>
-                        )}
+                   {slides[currentSlide].type === "articulation" && (
+                      <div className="p-10 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden bg-[#1E305D]">
+                         <div className="absolute top-0 left-0 w-full h-full bg-white/5" />
+                         <div className="relative z-10">
+                           <h4 className="flex items-center gap-2 text-white/70 font-bold uppercase text-xs tracking-widest mb-4">
+                             <Info size={16} /> Detalle Estratégico
+                           </h4>
+                           <div className="text-lg md:text-xl font-medium leading-relaxed italic opacity-95">
+                             {activeData.articulationNode ? activeData.articulationNode : activeData.articulation}
+                           </div>
+                         </div>
                       </div>
-                    )}
+                   )}
 
-                    {/* SLIDE 2: ARTICULACIÓN / ENFOQUE (Tarjeta de Color original) */}
-                    {slides[currentSlide].type === "articulation" && (
-                      <div className="animate-fadeIn w-full flex items-center justify-center">
-                        <div
-                          className="w-full md:w-11/12 rounded-2xl p-6 md:p-8 text-white shadow-xl transform transition-transform"
-                          style={{ backgroundColor: activeData.boxBgSpecific || activeData.colorAcento || COLOR_AZUL_PRINCIPAL }}
-                        >
-                          <div className="flex flex-col md:flex-row items-center gap-4 mb-4 border-b border-white/20 pb-4">
-                            <div className="p-3 bg-white/20 rounded-full">
-                              {React.cloneElement(activeData.iconSvg, { className: "w-8 h-8 md:w-10 md:h-10" })}
+                   {slides[currentSlide].type === "projects" && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {activeData.projects.map((p, i) => (
+                           <div key={i} className="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-[#1E305D]/30 transition-all">
+                              <div className="mt-1 w-2 h-2 rounded-full bg-[#1E305D] group-hover:scale-150 transition-transform" />
+                              <span className="text-[#1E305D] font-bold text-sm leading-tight">{p}</span>
+                           </div>
+                        ))}
+                      </div>
+                   )}
+
+                   {slides[currentSlide].type === "documents" && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {activeData.documents.map((doc, idx) => (
+                          <a key={idx} href={doc.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-5 p-5 bg-white border border-gray-200 rounded-3xl hover:shadow-xl hover:-translate-y-1 transition-all group">
+                            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 group-hover:bg-red-500 group-hover:text-white transition-all shadow-sm">
+                              <Download size={24} />
                             </div>
-                            <h3 className="text-xl md:text-2xl font-bold">
-                              {activeData.boxTitle || "Enfoque y Alcance"}
-                            </h3>
-                          </div>
-                          <div className="text-base font-light leading-relaxed text-justify opacity-95">
-                            {activeData.articulationNode ? activeData.articulationNode : (activeData.articulation || activeData.boxText)}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* SLIDE 3: PROYECTOS */}
-                    {slides[currentSlide].type === "projects" && (
-                      <div className="animate-fadeIn w-full">
-                        <h3 className="text-lg md:text-xl font-bold text-[#1E305D] mb-6 text-center">
-                          Proyectos Destacados
-                        </h3>
-                        {/* Grid Ajustable segun cantidad */}
-                        <div className={`grid gap-3 max-w-4xl mx-auto ${activeData.projects.length > 6 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-2' : 'grid-cols-1 md:grid-cols-2'}`}>
-                          {activeData.projects.map((proj, idx) => (
-                            <div key={idx} className="bg-gray-50 p-2.5 rounded-lg border border-gray-100 flex items-start gap-2.5 hover:shadow-sm transition-shadow">
-                              <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0"></div>
-                              <p className="text-gray-700 font-medium text-sm leading-snug">{proj}</p>
+                            <div className="min-w-0">
+                              <p className="text-sm font-bold text-[#1E305D] line-clamp-1 mb-1">{doc.title}</p>
+                              <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium">
+                                <ExternalLink size={12} /> Ver Documento
+                              </div>
                             </div>
-                          ))}
-                        </div>
+                          </a>
+                        ))}
                       </div>
-                    )}
-
-                    {/* SLIDE 4: DOCUMENTOS */}
-                    {slides[currentSlide].type === "documents" && (
-                      <div className="animate-fadeIn w-full">
-                        <h3 className="text-lg md:text-xl font-bold text-[#1E305D] mb-6 text-center">
-                          Documentos e Informes
-                        </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-4xl mx-auto">
-                          {activeData.documents.map((doc, idx) => (
-                            <a
-                              key={idx}
-                              href={doc.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 hover:border-red-200 hover:shadow-md transition-all group"
-                            >
-                              <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-500 group-hover:bg-red-500 group-hover:text-white transition-colors flex-shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-red-700 transition-colors">{doc.title}</p>
-                                <p className="text-xs text-gray-400 mt-0.5">Clic para descargar</p>
-                              </div>
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                  </>
-                );
-              })()}
-            </div>
+                   )}
+                 </div>
+               </motion.div>
+             </AnimatePresence>
           </div>
         </div>
       </div>
 
-      {/* Estilos Animación */}
+      {/* IMPACT SECTION */}
+      <div className="w-full bg-white pt-4 pb-8 border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-6">
+          <ImpactSection />
+        </div>
+      </div>
+
       <style>{`
-        @keyframes slideInUp {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slideInUp {
-          animation: slideInUp 0.5s ease-out forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .animate-fadeIn {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
+        .font-display { font-family: 'Montserrat', sans-serif; }
       `}</style>
-
-      <div className="mt-12 w-full max-w-6xl">
-        <ImpactSection />
-      </div>
-
     </div>
   );
 }

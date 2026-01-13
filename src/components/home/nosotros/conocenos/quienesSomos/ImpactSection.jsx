@@ -1,159 +1,251 @@
-import React, { useState, useEffect } from "react";
-import { MapPin, Activity, Leaf, Zap, Users, TrendingUp } from "lucide-react";
-import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  MapPin, 
+  Activity, 
+  Zap, 
+  Users, 
+  BarChart3, 
+  Globe2,
+  Anchor,
+  Compass
+} from "lucide-react";
+import { MapContainer, TileLayer, Marker, useMap, ZoomControl } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// --- DATOS ACTUALIZADOS ---
-const regions = [
-  { id: 1, name: "Región Pacífica", lat: 3.85, lng: -77.08, gestores: 108, description: "Mayor concentración de gestores y proyectos marino-costeros." },
-  { id: 2, name: "Región Caribe", lat: 10.40, lng: -75.50, gestores: 29, description: "Proyectos en Barranquilla, Cartagena y Puerto Colombia." },
-  { id: 3, name: "Región Andina", lat: 4.71, lng: -74.07, gestores: 11, description: "Centro de operaciones principal (Bogotá, Medellín)." },
-  { id: 4, name: "Región Orinoquía", lat: 4.15, lng: -73.63, gestores: 25, description: "Expansión en gestores y transformadores." },
-  { id: 5, name: "Amazonía", lat: -1.47, lng: -71.94, gestores: 3, description: "Presencia inicial con gestores locales." },
+// --- DATA: ZONAS DE INFLUENCIA ---
+const zones = [
+  { 
+    id: "atlantic", 
+    name: "Corredor Caribe", 
+    center: [10.6, -75.2], 
+    zoom: 8,
+    cities: ["Cartagena - Bolívar", "Barranquilla - Puerto Colombia", "Santa Marta"],
+    description: "Foco principal de estrategias marino-costeras. Integración de ecosistemas de aprovechamiento y protección de manglares.",
+    impact: 85
+  },
+  { 
+    id: "central", 
+    name: "Nodo Central", 
+    center: [5.5, -74.5], 
+    zoom: 7,
+    cities: ["Bogotá D.C.", "Medellín", "Cali"],
+    description: "Epicentro de innovación y transformación industrial. Desarrollo de biomateriales y fortalecimiento de transformadores.",
+    impact: 92
+  },
+  { 
+    id: "pacific", 
+    name: "Eje Pacífico", 
+    center: [3.8, -77.0], 
+    zoom: 8,
+    cities: ["Buenaventura", "Quibdó"],
+    description: "Programas de inclusión social y empleos verdes en comunidades costeras.",
+    impact: 78
+  }
 ];
 
-const ejes = [
-  { id: 1, name: "Innovación", icon: Zap, color: "#9E1981", percentage: 92 },
-  { id: 2, name: "Inclusión Social", icon: Users, color: "#E15200", percentage: 88 },
-  { id: 3, name: "Fortalecimiento", icon: TrendingUp, color: "#8CB200", percentage: 85 },
-  { id: 4, name: "Estrategias Territoriales", icon: Leaf, color: "#2B65AC", percentage: 80 },
-  { id: 5, name: "Sensibilización", icon: Activity, color: "#E8AD00", percentage: 75 },
+const impactLines = [
+  { id: 1, name: "Innovación CTeI", icon: Zap, percentage: 94 },
+  { id: 2, name: "Inclusión Social", icon: Users, percentage: 88 },
+  { id: 3, name: "Transformación", icon: BarChart3, percentage: 82 },
 ];
 
-// --- MAPA ---
-const customIcon = new L.Icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+// --- CUSTOM MAP ICON ---
+const createCustomIcon = (isActive) => new L.DivIcon({
+  html: `
+    <div class="relative flex items-center justify-center">
+      <div class="absolute w-12 h-12 bg-${isActive ? '[#B1D357]' : '[#2C67B0]'}/20 rounded-full animate-ping"></div>
+      <div class="relative w-6 h-6 bg-${isActive ? '[#B1D357]' : '[#2C67B0]'} rounded-full border-4 border-white shadow-xl flex items-center justify-center">
+        <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+      </div>
+    </div>
+  `,
+  className: '',
+  iconSize: [24, 24],
+  iconAnchor: [12, 12],
 });
 
-const MapController = ({ activeRegion }) => {
+const MapController = ({ zone }) => {
   const map = useMap();
-  useEffect(() => {
-    if (activeRegion) {
-      map.setView([activeRegion.lat, activeRegion.lng], 7, { animate: true });
-    } else {
-      map.setView([4.57, -74.29], 5, { animate: true });
+  React.useEffect(() => {
+    if (zone) {
+      map.flyTo(zone.center, zone.zoom, { duration: 1.5 });
     }
-  }, [activeRegion, map]);
+  }, [zone, map]);
   return null;
 };
 
-// --- COMPONENTE PRINCIPAL ---
-const ImpactWithMap = () => {
-  const [activeRegion, setActiveRegion] = useState(regions[0]);
+const ImpactSection = () => {
+  const [activeZone, setActiveZone] = useState(zones[0]);
 
   return (
-    <section className="py-16">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="pt-8 pb-24 bg-white relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#B1D357]/5 rounded-full blur-[120px] -mr-64 -mt-64" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#2C67B0]/5 rounded-full blur-[120px] -ml-64 -mb-64" />
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* HEADER */}
-        <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#1E305D] mb-3">
-            Nuestro Impacto Territorial
-          </h2>
-          <p className="text-gray-600 text-base max-w-3xl mx-auto">
-            Visualiza dónde estamos generando impacto y en qué ejes estratégicos trabajamos
-          </p>
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <span className="text-[#2C67B0] font-bold text-xs uppercase tracking-[0.4em] mb-4 block">Presencia Nacional</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-[#1E305D] mb-6">
+              Nuestro Impacto <span className="text-[#B1D357]">Territorial</span>
+            </h2>
+            <div className="w-24 h-1.5 bg-[#B1D357] mx-auto rounded-full mb-8" />
+            <p className="text-gray-500 text-lg max-w-2xl mx-auto font-light mb-12">
+              Articulamos acciones estratégicas en las regiones clave para consolidar nodos de economía circular escalables y sostenibles.
+            </p>
+
+            {/* Statistics moved to header */}
+            <div className="flex flex-wrap justify-center gap-6 md:gap-12">
+               {[
+                 { label: "Municipios", value: "+25", icon: Globe2 },
+                 { label: "Empresas", value: "350+", icon: Users },
+                 { label: "Proyectos", value: "14", icon: BarChart3 },
+               ].map((stat, i) => (
+                 <div key={i} className="flex items-center gap-4">
+                   <div className="p-3 bg-[#2C67B0]/10 rounded-xl text-[#2C67B0]">
+                     <stat.icon size={20} />
+                   </div>
+                   <div className="text-left">
+                      <span className="block text-xl font-bold text-[#1E305D] leading-none">{stat.value}</span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{stat.label}</span>
+                   </div>
+                 </div>
+               ))}
+            </div>
+          </motion.div>
         </div>
 
-        {/* CONTENEDOR PRINCIPAL */}
-        <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[520px]">
+        {/* MAIN CONTAINER */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           
-          {/* MAPA (7 columnas) */}
-          <div className="lg:col-span-7 relative h-[300px] lg:h-auto">
-            <MapContainer center={[4.57, -74.29]} zoom={5} style={{ height: "100%", width: "100%" }} zoomControl={false}>
-              <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
-              <MapController activeRegion={activeRegion} />
-              {regions.map((region) => (
+          {/* MAP COLUMN */}
+          <div className="lg:col-span-8 bg-gray-50 rounded-[3rem] overflow-hidden shadow-inner border border-gray-100 min-h-[500px] relative">
+            <MapContainer 
+              center={[4.5, -74.0]} 
+              zoom={5} 
+              style={{ height: "100%", width: "100%", background: "#f8fafc" }}
+              zoomControl={false}
+              scrollWheelZoom={false}
+            >
+              <TileLayer 
+                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              />
+              <MapController zone={activeZone} />
+              {zones.map((zone) => (
                 <Marker 
-                  key={region.id} 
-                  position={[region.lat, region.lng]} 
-                  icon={customIcon}
-                  eventHandlers={{ click: () => setActiveRegion(region) }}
+                  key={zone.id} 
+                  position={zone.center} 
+                  icon={createCustomIcon(activeZone.id === zone.id)}
+                  eventHandlers={{ click: () => setActiveZone(zone) }}
                 />
               ))}
+              <ZoomControl position="bottomright" />
             </MapContainer>
 
-            {/* Etiqueta región activa */}
-            <div className="absolute top-4 left-4 bg-white/90 px-4 py-2 rounded-lg shadow-md z-[1000]">
-              <p className="text-xs text-gray-500 uppercase font-bold">Región activa</p>
-              <p className="text-lg font-bold text-[#1E305D]">{activeRegion.name}</p>
+            {/* Floating Map Label */}
+            <div className="absolute top-8 left-8 p-6 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 max-w-xs z-[1000]">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-[#1E305D] rounded-xl text-white">
+                  <Compass size={18} />
+                </div>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Enfoque Actual</span>
+              </div>
+              <h3 className="text-xl font-bold text-[#1E305D] mb-2">{activeZone.name}</h3>
+              <p className="text-xs text-gray-500 leading-relaxed font-medium">
+                Ciudades clave: {activeZone.cities.join(", ")}
+              </p>
             </div>
           </div>
 
-          {/* PANEL DERECHO (5 columnas) */}
-          <div className="lg:col-span-5 p-6 flex flex-col">
+          {/* INFO COLUMN */}
+          <div className="lg:col-span-4 flex flex-col gap-6">
             
-            {/* Botones regiones en wrap */}
-            <div className="mb-6">
-              <h3 className="text-sm font-bold text-gray-500 mb-3 uppercase flex items-center gap-2">
-                <MapPin size={16} /> Selecciona una región
+            {/* Zone Selector Cards */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest pl-2 mb-4 flex items-center gap-2">
+                <MapPin size={14} className="text-[#2C67B0]" /> Seleccionar Nodo
               </h3>
-              <div className="flex flex-wrap gap-2">
-                {regions.map((region) => (
-                  <button
-                    key={region.id}
-                    onClick={() => setActiveRegion(region)}
-                    className={`px-4 py-2 text-sm font-semibold rounded-full transition-all border ${
-                      activeRegion.id === region.id
-                        ? "bg-[#00AB6D] text-white border-[#00AB6D]"
-                        : "bg-gray-50 text-gray-700 border-gray-200 hover:border-[#00AB6D]"
-                    }`}
-                  >
-                    {region.name}
-                  </button>
-                ))}
-              </div>
-
-              {/* Descripción dinámica */}
-              <div className="mt-5 p-4 bg-[#00AB6D]/10 rounded-xl border border-[#00AB6D]/20">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-bold text-[#1E305D] text-lg">{activeRegion.name}</h4>
-                    <p className="text-sm text-gray-700 leading-snug">{activeRegion.description}</p>
+              {zones.map((zone) => (
+                <button
+                  key={zone.id}
+                  onClick={() => setActiveZone(zone)}
+                  className={`w-full text-left p-5 rounded-3xl transition-all border ${
+                    activeZone.id === zone.id
+                      ? "bg-white shadow-xl border-[#B1D357] -translate-x-2"
+                      : "bg-gray-50 border-transparent hover:bg-white hover:shadow-md"
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className={`font-bold ${activeZone.id === zone.id ? 'text-[#1E305D]' : 'text-gray-400'}`}>
+                      {zone.name}
+                    </span>
+                    {activeZone.id === zone.id && (
+                      <div className="w-2 h-2 rounded-full bg-[#B1D357]" />
+                    )}
                   </div>
-                  <div className="text-center pl-4 border-l border-[#00AB6D]/30">
-                    <span className="block text-2xl font-bold text-[#00AB6D]">{activeRegion.gestores}</span>
-                    <span className="text-[10px] uppercase font-bold text-gray-500">Gestores</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Dynamic Details Area */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeZone.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="flex-1 bg-[#1E305D] rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-2xl"
+              >
+                <div className="absolute top-0 left-0 w-full h-full bg-[#B1D357]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative z-10 h-full flex flex-col">
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="p-3 bg-white/10 rounded-2xl">
+                       <Anchor size={24} className="text-[#B1D357]" />
+                    </div>
+                    <div className="text-right">
+                      <span className="block text-3xl font-bold text-[#B1D357]">{activeZone.impact}%</span>
+                      <span className="text-[10px] uppercase font-bold text-white/40 tracking-widest">Ejecución</span>
+                    </div>
+                  </div>
+                  <h4 className="text-xl font-bold mb-3">{activeZone.name}</h4>
+                  <p className="text-sm text-white/70 leading-relaxed font-light mb-8 italic">
+                    "{activeZone.description}"
+                  </p>
+
+                  <div className="mt-auto pt-6 border-t border-white/10">
+                    <h5 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                       <Activity size={14} /> Métricas por Línea
+                    </h5>
+                    <div className="space-y-4">
+                      {impactLines.map((line) => (
+                        <div key={line.id}>
+                          <div className="flex justify-between items-center mb-1.5">
+                            <span className="text-xs font-bold text-white/80">{line.name}</span>
+                            <span className="text-[10px] font-bold text-[#B1D357]">{line.percentage}%</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${line.percentage}%` }}
+                              className="h-full bg-gradient-to-r from-[#B1D357] to-[#8fb23a] rounded-full"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="w-full h-px bg-gray-200 mb-6"></div>
-
-            {/* Ejes estratégicos en grid 2 columnas */}
-            <div className="flex-1">
-              <h3 className="text-sm font-bold text-gray-500 mb-3 uppercase flex items-center gap-2">
-                <Activity size={16} /> Progreso por Eje Estratégico
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {ejes.map((eje) => {
-                  const Icon = eje.icon;
-                  return (
-                    <div key={eje.id}>
-                      <div className="flex justify-between items-center mb-1">
-                        <div className="flex items-center gap-1.5">
-                          <Icon size={14} style={{ color: eje.color }} />
-                          <span className="text-sm font-semibold text-gray-700">{eje.name}</span>
-                        </div>
-                        <span className="text-sm font-bold text-gray-600">{eje.percentage}%</span>
-                      </div>
-                      <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full rounded-full transition-all" 
-                          style={{ width: `${eje.percentage}%`, backgroundColor: eje.color }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -161,4 +253,4 @@ const ImpactWithMap = () => {
   );
 };
 
-export default ImpactWithMap;
+export default ImpactSection;

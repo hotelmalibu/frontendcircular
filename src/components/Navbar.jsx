@@ -439,6 +439,7 @@ export default function Navbar({ onMenuClick }) {
     "/proyectos/",
     "/juntaDirecteEquipo",
     "/valores",
+    "/lineas-estrategicas",
   ];
   const isTransparentNavPath = transparentPaths.some((path) =>
     location.pathname.startsWith(path)
