@@ -15,28 +15,17 @@ const AxiosInterceptor = () => {
       (response) => response,
       (error) => {
         // Verificar si es un error de suspensión o no autorizado crítico
-        // A menudo el backend devuelve 401 o 403.
-        // Si el usuario está "Suspendido", el backend debería devolver un mensaje específico o un código.
-        
         if (error.response) {
           const { status, data } = error.response;
 
-          // Caso: Usuario Suspendido (Backend debería devolver 403 o 401 con mensaje específico)
-          // Ajusta la condición 'data.message' según lo que devuelva tu backend real.
+          // Caso: Usuario Suspendido
           if (status === 403 && (data?.message?.toLowerCase().includes('suspen') || data?.error?.toLowerCase().includes('suspen'))) {
             toast.error("Tu cuenta ha sido suspendida por seguridad. Contacta al administrador.");
             logout();
             navigate('/login');
             return Promise.reject(error);
           }
-
-          // Caso: Token expirado o inválido (Opcional, si quieres logout automático)
-          // if (status === 401) {
-          //   logout();
-          //   navigate('/login');
-          // }
         }
-
         return Promise.reject(error);
       }
     );

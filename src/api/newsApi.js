@@ -63,14 +63,11 @@ export const getPublishedNewsWithImages = async () => {
           const detailedResponse = await getNewsById(newsItem.id);
           const detailedNews = detailedResponse.data?.news || detailedResponse.news || detailedResponse;
 
-          // Keep original URL for images
-          if (detailedNews.upload_file && detailedNews.upload_file.url) {
-            console.log(`News ${detailedNews.id} image URL:`, detailedNews.upload_file.url);
-          }
+
 
           return detailedNews;
         } catch (error) {
-          console.warn(`Failed to get detailed news for ID ${newsItem.id}:`, error);
+
           // Return the basic news item if detailed fetch fails
           return newsItem;
         }
@@ -108,37 +105,10 @@ export const createNews = async (newsData) => {
     },
   };
 
-  console.log("newsApi.js - createNews called with:", {
-    isFormData: newsData instanceof FormData,
-    config: config,
-    endpoint: NEWS_ENDPOINT
-  });
-
-  // Log FormData contents if it's FormData
-  if (newsData instanceof FormData) {
-    console.log("FormData contents:");
-    for (let [key, value] of newsData.entries()) {
-      if (value instanceof File) {
-        console.log(`  ${key}: [File] ${value.name} (${value.size} bytes, ${value.type})`);
-      } else {
-        console.log(`  ${key}: ${value}`);
-      }
-    }
-  }
-
   try {
-    console.log("🚀 Sending request to:", NEWS_ENDPOINT);
-    console.log("📤 Request config:", config);
     const response = await api.post(NEWS_ENDPOINT, newsData, config);
-    console.log("✅ API Response:", response);
     return response.data;
   } catch (error) {
-    console.error("❌ API Error Details:");
-    console.error("  Error object:", error);
-    console.error("  Response:", error.response);
-    console.error("  Response data:", error.response?.data);
-    console.error("  Status:", error.response?.status);
-    console.error("  Status text:", error.response?.statusText);
     throw error;
   }
 };

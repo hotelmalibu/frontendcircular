@@ -17,7 +17,7 @@ import EventDetailModal from "./EventDetailModal";
 
 // Configuración fija
 const CARDS_PER_PAGE = 3;
-const CARD_WIDTH_WITH_GAP = 320 + 24; // 320px + 24px gap
+
 
 export default function EventsSection() {
   const [events, setEvents] = useState([]);
@@ -403,7 +403,7 @@ export default function EventsSection() {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes scroll {
           0% {
             transform: translateX(0);
