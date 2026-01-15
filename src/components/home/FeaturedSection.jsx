@@ -13,8 +13,7 @@ export default function FeaturedSection() {
   const categories = [
     "Todos",
     "Noticias",
-    "Documentos de interés",
-    "Gestión documental"
+    "Documentos de interés"
   ];
 
   useEffect(() => {
@@ -46,8 +45,12 @@ export default function FeaturedSection() {
 
         // Process documents
         let documentsArray = [];
-        if (documentsResponse?.data && Array.isArray(documentsResponse.data)) {
+        if (documentsResponse?.data?.items && Array.isArray(documentsResponse.data.items)) {
+          documentsArray = documentsResponse.data.items;
+        } else if (Array.isArray(documentsResponse?.data)) {
           documentsArray = documentsResponse.data;
+        } else if (Array.isArray(documentsResponse)) {
+          documentsArray = documentsResponse;
         }
 
         // Map news items
@@ -100,16 +103,9 @@ export default function FeaturedSection() {
 
         const mappedDocuments = documentsArray.map(doc => {
           const documentType = documentTypes.find(type => type.id === doc.document_type_id);
-          let category = "Documentos de interés"; // Default category
 
-          // Map document types to categories
-          if (doc.document_type_id === "1") {
-            category = "Gestión documental"; // Normas y Políticas
-          } else if (doc.document_type_id === "2" || doc.document_type_id === "3") {
-            category = "Documentos de interés"; // Formatos, Actas
-          } else {
-            category = "Gestión documental"; // Pesajes, Contratos
-          }
+          // All documents go to "Documentos de interés"
+          const category = "Documentos de interés";
 
           return {
             id: `doc-${doc.id}`,

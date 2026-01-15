@@ -13,9 +13,11 @@ import {
   FolderOpen,
   CheckCircle2,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Trash2
 } from "lucide-react";
-import { createDocument, getDocuments } from "../../../../../api/documentsApi";
+import { createDocument, getDocuments, updateDocument, deleteDocument } from "../../../../../api/documentsApi";
+import { getAllCategories } from "../../../../../api/categoriesApi";
 import PDFViewer from "../../../../PDFViewer";
 import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 
@@ -36,9 +38,14 @@ export default function Bibliotecasub() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [documents, setDocuments] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     document_type_id: "",
+    category_id: "",
     name: "",
     description: "",
     version: "",
@@ -48,6 +55,13 @@ export default function Bibliotecasub() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
+
+  const [filters, setFilters] = useState({
+    search: "",
+    document_type_id: "",
+    sort_by: "created_at",
+    sort_order: "desc"
+  });
 
   const documentTypes = [
     { id: "1", name: "Normas y Políticas" },
@@ -64,17 +78,69 @@ export default function Bibliotecasub() {
     expired: { text: "Expirado", color: BRAND.orange, bg: "#FFF5EB", icon: <AlertCircle size={12} /> }
   };
 
+  const loadCategories = useCallback(async () => {
+    try {
+      setCategoriesLoading(true);
+      const response = await getAllCategories();
+      let categoriesArray = [];
+
+      // Handle multiple response structures (same as News component)
+      if (response?.data?.items && Array.isArray(response.data.items)) {
+        categoriesArray = response.data.items;
+      } else if (Array.isArray(response)) {
+        categoriesArray = response;
+      } else if (response?.data && Array.isArray(response.data)) {
+        categoriesArray = response.data;
+      } else if (response?.categories && Array.isArray(response.categories)) {
+        categoriesArray = response.categories;
+      } else {
+        categoriesArray = response ? [response] : [];
+      }
+
+      setCategories(categoriesArray);
+    } catch (err) {
+      console.error("Error loading categories:", err);
+      setCategories([]);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  }, []);
+
   const fetchDocuments = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await getDocuments();
-      setDocuments(response.data || []);
+      const params = {
+        search: filters.search,
+        document_type_id: filters.document_type_id === "Todos" ? "" : filters.document_type_id,
+        sort_by: filters.sort_by,
+        sort_order: filters.sort_order
+      };
+
+      const docsResponse = await getDocuments(params);
+
+      // Handle multiple response structures
+      let docsArray = [];
+
+      if (docsResponse?.data?.items && Array.isArray(docsResponse.data.items)) {
+        // Paginated response: { data: { items: [...], pagination: {...} } }
+        docsArray = docsResponse.data.items;
+      } else if (Array.isArray(docsResponse?.data)) {
+        // Direct array in data: { data: [...] }
+        docsArray = docsResponse.data;
+      } else if (Array.isArray(docsResponse)) {
+        // Direct array response: [...]
+        docsArray = docsResponse;
+      }
+
+      setDocuments(docsArray);
+
     } catch (error) {
-      console.error("Error fetching documents:", error);
+      console.error("Error fetching data:", error);
+      setDocuments([]);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [filters]);
 
   const handleDownload = (document) => {
     try {
@@ -92,6 +158,54 @@ export default function Bibliotecasub() {
     setSelectedDocument(document);
     setIsViewModalOpen(true);
   };
+
+  const handleEdit = (document) => {
+    setFormData({
+      document_type_id: document.document_type_id,
+      category_id: document.category_id || "",
+      name: document.name,
+      description: document.description || "",
+      version: document.version,
+      expires_at: document.expires_at || "",
+      status: document.status,
+      file: null // File is optional on update
+    });
+    setEditingId(document.id);
+    setIsEditMode(true);
+    setIsUploadModalOpen(true);
+  };
+
+  const handleDelete = async (document) => {
+    if (window.confirm(`¿Estás seguro de que deseas eliminar el documento "${document.name}"?`)) {
+      try {
+        await deleteDocument(document.id);
+        await fetchDocuments();
+      } catch (error) {
+        console.error("Error deleting document:", error);
+        alert("Error al eliminar el documento");
+      }
+    }
+  };
+
+  const openUploadModal = () => {
+    setFormData({
+      document_type_id: "",
+      category_id: "",
+      name: "",
+      description: "",
+      version: "",
+      expires_at: "",
+      status: "",
+      file: null
+    });
+    setEditingId(null);
+    setIsEditMode(false);
+    setIsUploadModalOpen(true);
+  };
+
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
 
   useEffect(() => {
     fetchDocuments();
@@ -121,6 +235,9 @@ export default function Bibliotecasub() {
     try {
       const submitData = new FormData();
       submitData.append('document_type_id', parseInt(formData.document_type_id));
+      if (formData.category_id) {
+        submitData.append('category_id', formData.category_id);
+      }
       submitData.append('name', formData.name);
       submitData.append('description', formData.description);
       submitData.append('version', formData.version);
@@ -128,33 +245,51 @@ export default function Bibliotecasub() {
         submitData.append('expires_at', formData.expires_at);
       }
       submitData.append('status', formData.status);
-      submitData.append('file', formData.file);
 
-      const response = await createDocument(submitData);
-      setSubmitMessage("Documento creado correctamente");
-      console.log("Document created:", response);
+      if (formData.file) {
+        submitData.append('file', formData.file);
+      }
 
-      setFormData({
-        document_type_id: "",
-        name: "",
-        description: "",
-        version: "",
-        expires_at: "",
-        status: "",
-        file: null
-      });
+      if (isEditMode) {
+        await updateDocument(editingId, submitData);
+        setSubmitMessage("Documento actualizado correctamente");
+      } else {
+        if (!formData.file) {
+          throw new Error("El archivo es obligatorio para nuevos documentos");
+        }
+        await createDocument(submitData);
+        setSubmitMessage("Documento creado correctamente");
+      }
+
+      console.log(`Document ${isEditMode ? 'updated' : 'created'}`);
+
+      // Clear form only if creating
+      if (!isEditMode) {
+        setFormData({
+          document_type_id: "",
+          category_id: "",
+          name: "",
+          description: "",
+          version: "",
+          expires_at: "",
+          status: "",
+          file: null
+        });
+      }
 
       await fetchDocuments();
 
       setTimeout(() => {
         setIsUploadModalOpen(false);
         setSubmitMessage("");
+        setIsEditMode(false);
+        setEditingId(null);
       }, 2000);
 
     } catch (error) {
-      console.error("Error creating document:", error);
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} document:`, error);
       const errorMessage = error.response?.data?.message || error.message || "Error desconocido";
-      setSubmitMessage(`Error al crear el documento: ${errorMessage}`);
+      setSubmitMessage(`Error al ${isEditMode ? 'actualizar' : 'crear'} el documento: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -166,6 +301,11 @@ export default function Bibliotecasub() {
     { title: "Activos", value: documents.filter(doc => doc.status === 'approved').length, icon: <CheckCircle2 />, color: BRAND.darkGreen },
     { title: "Pendientes", value: documents.filter(doc => doc.status === 'pending_review').length, icon: <Clock />, color: BRAND.yellow },
   ];
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans text-gray-700">
@@ -179,7 +319,7 @@ export default function Bibliotecasub() {
           <p className="text-gray-500 mt-1">Repositorio centralizado de documentación</p>
         </div>
         <button
-          onClick={() => setIsUploadModalOpen(true)}
+          onClick={openUploadModal}
           className="flex items-center gap-2 text-white px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:opacity-95 transition transform active:scale-95"
           style={{ backgroundColor: BRAND.blue }}
         >
@@ -209,6 +349,9 @@ export default function Bibliotecasub() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
+              name="search"
+              value={filters.search}
+              onChange={handleFilterChange}
               placeholder="Buscar por nombre de archivo..."
               className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm"
               style={{ "--tw-ring-color": BRAND.lightBlue }}
@@ -218,19 +361,30 @@ export default function Bibliotecasub() {
           <div className="md:col-span-3">
             <div className="relative">
               <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-              <select className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm bg-white appearance-none cursor-pointer">
-                <option>Todos los tipos</option>
-                <option>Documentos PDF</option>
-                <option>Imágenes</option>
+              <select
+                name="document_type_id"
+                value={filters.document_type_id}
+                onChange={handleFilterChange}
+                className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm bg-white appearance-none cursor-pointer"
+              >
+                <option value="">Todos los tipos</option>
+                {documentTypes.map(type => (
+                  <option key={type.id} value={type.id}>{type.name}</option>
+                ))}
               </select>
             </div>
           </div>
 
           <div className="md:col-span-3">
-            <select className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm bg-white cursor-pointer">
-              <option>Más recientes</option>
-              <option>Nombre (A-Z)</option>
-              <option>Tamaño</option>
+            <select
+              name="sort_by"
+              value={filters.sort_by}
+              onChange={handleFilterChange}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm bg-white cursor-pointer"
+            >
+              <option value="created_at">Más recientes</option>
+              <option value="name">Nombre</option>
+              <option value="size">Tamaño</option>
             </select>
           </div>
 
@@ -310,8 +464,11 @@ export default function Bibliotecasub() {
                     <button onClick={() => handleView(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-blue-600 hover:shadow-sm transition" title="Ver">
                       <Eye size={16} />
                     </button>
-                    <button className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-blue-600 hover:shadow-sm transition" title="Editar">
+                    <button onClick={() => handleEdit(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-blue-600 hover:shadow-sm transition" title="Editar">
                       <Edit size={16} />
+                    </button>
+                    <button onClick={() => handleDelete(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-red-600 hover:shadow-sm transition" title="Eliminar">
+                      <Trash2 size={16} />
                     </button>
                     <button onClick={() => handleDownload(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-green-600 hover:shadow-sm transition" title="Descargar">
                       <Download size={16} />
@@ -329,8 +486,8 @@ export default function Bibliotecasub() {
           <div className="bg-white rounded-3xl p-6 w-full max-w-3xl shadow-2xl transform transition-all scale-100 flex flex-col max-h-[90vh]">
             <div className="flex justify-between items-center mb-6 pl-2 pr-2">
               <div>
-                <h2 className="text-2xl font-bold" style={{ color: BRAND.darkBlue }}>Subir Documento</h2>
-                <p className="text-sm text-gray-500">Completa la información para archivar</p>
+                <h2 className="text-2xl font-bold" style={{ color: BRAND.darkBlue }}>{isEditMode ? "Editar Documento" : "Subir Documento"}</h2>
+                <p className="text-sm text-gray-500">{isEditMode ? "Modifica la información del documento" : "Completa la información para archivar"}</p>
               </div>
               <button
                 onClick={() => setIsUploadModalOpen(false)}
@@ -342,8 +499,8 @@ export default function Bibliotecasub() {
 
             <form onSubmit={handleSubmit} className="space-y-5 overflow-y-auto px-2 pb-2">
 
-              {/* Row 1: Type, Version, Status (3 Cols) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Row 1: Type, Category, Version, Status (4 Cols) */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo *</label>
                   <select
@@ -357,6 +514,22 @@ export default function Bibliotecasub() {
                     <option value="">Seleccionar...</option>
                     {documentTypes.map(type => (
                       <option key={type.id} value={type.id}>{type.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Categoría</label>
+                  <select
+                    name="category_id"
+                    value={formData.category_id}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm transition-all"
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    disabled={categoriesLoading}
+                  >
+                    <option value="">{categoriesLoading ? "Cargando..." : "-- Seleccione --"}</option>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
                   </select>
                 </div>
@@ -439,7 +612,7 @@ export default function Bibliotecasub() {
                 <input
                   type="file"
                   onChange={handleFileChange}
-                  required
+                  required={!isEditMode}
                   id="file-upload"
                   className="hidden"
                 />
@@ -487,7 +660,7 @@ export default function Bibliotecasub() {
                     </>
                   ) : (
                     <>
-                      <Upload size={18} /> Subir Documento
+                      <Upload size={18} /> {isEditMode ? "Actualizar Documento" : "Subir Documento"}
                     </>
                   )}
                 </button>
@@ -532,32 +705,42 @@ export default function Bibliotecasub() {
 
             {/* Modal Content */}
             <div className="flex-1 bg-gray-100 overflow-auto flex items-center justify-center p-4">
-              {selectedDocument.upload_file.filename.toLowerCase().endsWith('.pdf') ? (
-                <div className="w-full h-full shadow-lg rounded-lg overflow-hidden bg-white">
-                  {(() => {
-                    const directPdfUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${selectedDocument.upload_file.path}`;
-                    const proxyPdfUrl = getImageProxyUrl(directPdfUrl);
-                    return <PDFViewer file={proxyPdfUrl} />;
-                  })()}
-                </div>
-              ) : (
-                <div className="text-center p-10 bg-white rounded-2xl shadow-sm border border-gray-200 max-w-md">
-                  <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <ImageIcon size={32} className="text-gray-400" />
+              {(() => {
+                // Check if file is PDF by examining multiple properties
+                const uploadFile = selectedDocument.upload_file;
+                const isPdf =
+                  uploadFile?.filename?.toLowerCase().endsWith('.pdf') ||
+                  uploadFile?.original_name?.toLowerCase().endsWith('.pdf') ||
+                  uploadFile?.path?.toLowerCase().endsWith('.pdf') ||
+                  uploadFile?.url?.toLowerCase().includes('.pdf');
+
+                return isPdf ? (
+                  <div className="w-full h-full shadow-lg rounded-lg overflow-hidden bg-white">
+                    {(() => {
+                      const directPdfUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${uploadFile.path}`;
+                      const proxyPdfUrl = getImageProxyUrl(directPdfUrl);
+                      return <PDFViewer file={proxyPdfUrl} />;
+                    })()}
                   </div>
-                  <h3 className="text-gray-900 font-semibold mb-2">Vista previa no disponible</h3>
-                  <p className="text-gray-500 text-sm mb-6">
-                    Este tipo de archivo no se puede visualizar directamente en el navegador. Por favor, descárgalo para verlo.
-                  </p>
-                  <button
-                    onClick={() => handleDownload(selectedDocument)}
-                    className="w-full py-2.5 rounded-xl text-white font-medium shadow-sm hover:shadow-md transition"
-                    style={{ backgroundColor: BRAND.blue }}
-                  >
-                    Descargar Archivo
-                  </button>
-                </div>
-              )}
+                ) : (
+                  <div className="text-center p-10 bg-white rounded-2xl shadow-sm border border-gray-200 max-w-md">
+                    <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <ImageIcon size={32} className="text-gray-400" />
+                    </div>
+                    <h3 className="text-gray-900 font-semibold mb-2">Vista previa no disponible</h3>
+                    <p className="text-gray-500 text-sm mb-6">
+                      Este tipo de archivo no se puede visualizar directamente en el navegador. Por favor, descárgalo para verlo.
+                    </p>
+                    <button
+                      onClick={() => handleDownload(selectedDocument)}
+                      className="w-full py-2.5 rounded-xl text-white font-medium shadow-sm hover:shadow-md transition"
+                      style={{ backgroundColor: BRAND.blue }}
+                    >
+                      Descargar Archivo
+                    </button>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>,
