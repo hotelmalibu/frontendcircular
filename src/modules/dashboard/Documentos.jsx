@@ -3,13 +3,13 @@ import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
 import Biblioteca from "../../components/dashboard/documentos/Biblioteca";
 import Dashboard from "../../components/dashboard/documentos/Dashboard";
-import Versiones from "../../components/dashboard/documentos/Versiones";
-import { 
-  FileText, 
-  LayoutDashboard, 
-  History, 
-  Library, 
-  UserX 
+
+import {
+  FileText,
+  LayoutDashboard,
+  History,
+  Library,
+  UserX
 } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -27,7 +27,7 @@ export default function Documentos() {
 
   const tabs = [
     { name: "Dashboard", label: "Vista General", icon: <LayoutDashboard size={18} />, component: <Dashboard /> },
-    { name: "Versiones", label: "Control de Versiones", icon: <History size={18} />, component: <Versiones /> },
+
     { name: "Biblioteca", label: "Biblioteca Digital", icon: <Library size={18} />, component: <Biblioteca /> },
   ];
 
@@ -37,7 +37,7 @@ export default function Documentos() {
 
       <main className="flex-1 p-4 sm:p-8 pt-24 lg:pt-28 transition-all duration-300">
         <div className="max-w-7xl mx-auto">
-          
+
           {/* Encabezado */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
@@ -59,13 +59,12 @@ export default function Documentos() {
                     <button
                       key={tab.name}
                       onClick={() => setActiveTab(tab.name)}
-                      className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 flex-1 sm:flex-none justify-center ${
-                        isActive
+                      className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 flex-1 sm:flex-none justify-center ${isActive
                           ? "text-white shadow-md transform scale-105"
                           : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"
-                      }`}
-                      style={{ 
-                        backgroundColor: isActive ? BRAND.blue : 'transparent' 
+                        }`}
+                      style={{
+                        backgroundColor: isActive ? BRAND.blue : 'transparent'
                       }}
                     >
                       {tab.icon}
