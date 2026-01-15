@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  ExternalLink, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
   Download,
   Info
 } from "lucide-react";
@@ -148,12 +148,12 @@ export default function LineasEstrategicasPage() {
 
   return (
     <div className="font-sans min-h-screen bg-gray-50 flex flex-col items-center">
-      
+
       {/* HERO SECTION */}
       <div className="relative h-[550px] md:h-[750px] w-full">
-        <img 
-          src={heroLineas} 
-          alt="Líneas Estratégicas" 
+        <img
+          src={heroLineas}
+          alt="Líneas Estratégicas"
           className="w-full h-full object-cover object-center brightness-[0.9]"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#1E305D]/70 via-transparent to-white/60 flex flex-col justify-center items-center text-center px-6">
@@ -183,29 +183,39 @@ export default function LineasEstrategicasPage() {
                 <button
                   key={item.id}
                   onClick={() => setSelectedLineId(item.id)}
-                  className={`flex flex-col items-center transition-all duration-500 group relative ${
-                    isActive 
-                      ? "scale-110 -translate-y-2 text-[#1E305D]" 
-                      : "hover:scale-105"
-                  }`}
+                  className={`flex flex-col items-center transition-all duration-500 group relative ${isActive
+                    ? "scale-110 -translate-y-2 text-[#1E305D]"
+                    : "hover:scale-105"
+                    }`}
                 >
                   <div className="w-24 h-16 md:w-48 md:h-24 transition-transform duration-500">
-                    <img 
-                      src={item.img} 
-                      alt={item.title} 
-                      className="w-full h-full object-contain filter drop-shadow-2xl" 
+                    <img
+                      src={item.img}
+                      alt={item.title}
+                      className="w-full h-full object-contain filter drop-shadow-2xl"
                     />
                   </div>
                   {isActive && (
-                    <motion.div 
-                      layoutId="activeTab" 
-                      className="absolute -bottom-2 md:-bottom-4 w-20 h-1.5 bg-[#B1D357] rounded-full shadow-[0_0_20px_rgba(177,211,87,0.8)]" 
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute -bottom-2 md:-bottom-4 w-20 h-1.5 bg-[#B1D357] rounded-full shadow-[0_0_20px_rgba(177,211,87,0.8)]"
                     />
                   )}
                 </button>
               )
             })}
           </div>
+          {/* Texto informativo refinado */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex items-center justify-center gap-2 mt-6 md:mt-8 text-[#1E305D] font-bold"
+          >
+            <span className="text-[10px] md:text-xs tracking-widest uppercase opacity-80">
+              Haz clic en cada línea estratégica para conocer más
+            </span>
+          </motion.div>
         </div>
       </div>
 
@@ -214,7 +224,7 @@ export default function LineasEstrategicasPage() {
       {/* CONTENIDO INTERACTIVO */}
       <div className="w-full max-w-6xl mx-auto px-6 mb-12">
         <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 grid md:grid-cols-12">
-          
+
           {/* Navegación lateral integrada (Mobile superior) */}
           <div className="md:col-span-3 bg-gray-50/50 p-8 flex flex-col justify-between border-r border-gray-100">
             <div>
@@ -224,11 +234,10 @@ export default function LineasEstrategicasPage() {
                   <button
                     key={idx}
                     onClick={() => setCurrentSlide(idx)}
-                    className={`flex items-center gap-3 w-full text-left p-3 rounded-xl transition-all ${
-                      currentSlide === idx 
-                        ? "bg-white shadow-md text-[#1E305D] font-bold ring-1 ring-gray-100" 
-                        : "text-gray-400 hover:text-gray-600 font-medium"
-                    }`}
+                    className={`flex items-center gap-3 w-full text-left p-3 rounded-xl transition-all ${currentSlide === idx
+                      ? "bg-white shadow-md text-[#1E305D] font-bold ring-1 ring-gray-100"
+                      : "text-gray-400 hover:text-gray-600 font-medium"
+                      }`}
                   >
                     <div className={`w-1.5 h-6 rounded-full transition-all ${currentSlide === idx ? 'bg-[#1E305D]' : 'bg-gray-200 opacity-0'}`} />
                     {s.title}
@@ -236,7 +245,7 @@ export default function LineasEstrategicasPage() {
                 ))}
               </div>
             </div>
-            
+
             <div className="hidden md:flex gap-2">
               <button onClick={() => setCurrentSlide(p => (p - 1 + slides.length) % slides.length)} className="p-3 bg-white border border-gray-100 rounded-full hover:bg-gray-50 transition-colors">
                 <ChevronLeft size={20} className="text-gray-600" />
@@ -249,79 +258,79 @@ export default function LineasEstrategicasPage() {
 
           {/* Contenido Dinámico */}
           <div className="md:col-span-9 p-6 md:p-10 relative overflow-hidden">
-             {/* Background Decoration */}
-             <div className="absolute top-0 right-0 w-32 h-32 bg-[#1E305D]/5 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
-             
-             <AnimatePresence mode="wait">
-               <motion.div
-                 key={`${selectedLineId}-${currentSlide}`}
-                 initial={{ opacity: 0, x: 20 }}
-                 animate={{ opacity: 1, x: 0 }}
-                 exit={{ opacity: 0, x: -20 }}
-                 transition={{ duration: 0.3 }}
-                 className="relative z-10 h-full flex flex-col"
-               >
-                 <div className="flex items-center gap-4 mb-6">
-                    <div className="p-3 rounded-2xl border border-gray-100 bg-[#1E305D]/10 text-[#1E305D]">
-                      {React.cloneElement(activeData.iconSvg, { size: 28 })}
+            {/* Background Decoration */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#1E305D]/5 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${selectedLineId}-${currentSlide}`}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="relative z-10 h-full flex flex-col"
+              >
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="p-3 rounded-2xl border border-gray-100 bg-[#1E305D]/10 text-[#1E305D]">
+                    {React.cloneElement(activeData.iconSvg, { size: 28 })}
+                  </div>
+                  <h2 className="text-2xl md:text-4xl font-bold leading-tight text-black">
+                    {slides[currentSlide]?.title === "Visión General" ? activeData.title : (slides[currentSlide]?.title || "Cargando...")}
+                  </h2>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-center">
+                  {slides[currentSlide].type === "info" && (
+                    <p className="text-lg text-[#1E305D] leading-relaxed font-light">
+                      {activeData.detailedIntro || activeData.description}
+                    </p>
+                  )}
+
+                  {slides[currentSlide].type === "articulation" && (
+                    <div className="p-10 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden bg-[#1E305D]">
+                      <div className="absolute top-0 left-0 w-full h-full bg-white/5" />
+                      <div className="relative z-10">
+                        <h4 className="flex items-center gap-2 text-white/70 font-bold uppercase text-xs tracking-widest mb-4">
+                          <Info size={16} /> Detalle Estratégico
+                        </h4>
+                        <div className="text-lg md:text-xl font-medium leading-relaxed italic opacity-95">
+                          {activeData.articulationNode ? activeData.articulationNode : activeData.articulation}
+                        </div>
+                      </div>
                     </div>
-                    <h2 className="text-2xl md:text-4xl font-bold leading-tight text-black">
-                      {slides[currentSlide]?.title === "Visión General" ? activeData.title : (slides[currentSlide]?.title || "Cargando...")}
-                    </h2>
-                 </div>
+                  )}
 
-                 <div className="flex-1 flex flex-col justify-center">
-                   {slides[currentSlide].type === "info" && (
-                      <p className="text-lg text-[#1E305D] leading-relaxed font-light">
-                        {activeData.detailedIntro || activeData.description}
-                      </p>
-                   )}
+                  {slides[currentSlide].type === "projects" && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {activeData.projects.map((p, i) => (
+                        <div key={i} className="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-[#1E305D]/30 transition-all">
+                          <div className="mt-1 w-2 h-2 rounded-full bg-[#1E305D] group-hover:scale-150 transition-transform" />
+                          <span className="text-[#1E305D] font-bold text-sm leading-tight">{p}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-                   {slides[currentSlide].type === "articulation" && (
-                      <div className="p-10 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden bg-[#1E305D]">
-                         <div className="absolute top-0 left-0 w-full h-full bg-white/5" />
-                         <div className="relative z-10">
-                           <h4 className="flex items-center gap-2 text-white/70 font-bold uppercase text-xs tracking-widest mb-4">
-                             <Info size={16} /> Detalle Estratégico
-                           </h4>
-                           <div className="text-lg md:text-xl font-medium leading-relaxed italic opacity-95">
-                             {activeData.articulationNode ? activeData.articulationNode : activeData.articulation}
-                           </div>
-                         </div>
-                      </div>
-                   )}
-
-                   {slides[currentSlide].type === "projects" && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {activeData.projects.map((p, i) => (
-                           <div key={i} className="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-[#1E305D]/30 transition-all">
-                              <div className="mt-1 w-2 h-2 rounded-full bg-[#1E305D] group-hover:scale-150 transition-transform" />
-                              <span className="text-[#1E305D] font-bold text-sm leading-tight">{p}</span>
-                           </div>
-                        ))}
-                      </div>
-                   )}
-
-                   {slides[currentSlide].type === "documents" && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {activeData.documents.map((doc, idx) => (
-                          <a key={idx} href={doc.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-5 p-5 bg-white border border-gray-200 rounded-3xl hover:shadow-xl hover:-translate-y-1 transition-all group">
-                            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 group-hover:bg-red-500 group-hover:text-white transition-all shadow-sm">
-                              <Download size={24} />
+                  {slides[currentSlide].type === "documents" && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {activeData.documents.map((doc, idx) => (
+                        <a key={idx} href={doc.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-5 p-5 bg-white border border-gray-200 rounded-3xl hover:shadow-xl hover:-translate-y-1 transition-all group">
+                          <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 group-hover:bg-red-500 group-hover:text-white transition-all shadow-sm">
+                            <Download size={24} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-[#1E305D] line-clamp-1 mb-1">{doc.title}</p>
+                            <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium">
+                              <ExternalLink size={12} /> Ver Documento
                             </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-bold text-[#1E305D] line-clamp-1 mb-1">{doc.title}</p>
-                              <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium">
-                                <ExternalLink size={12} /> Ver Documento
-                              </div>
-                            </div>
-                          </a>
-                        ))}
-                      </div>
-                   )}
-                 </div>
-               </motion.div>
-             </AnimatePresence>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </div>

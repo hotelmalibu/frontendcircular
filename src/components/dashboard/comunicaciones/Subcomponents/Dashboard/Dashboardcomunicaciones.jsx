@@ -15,7 +15,8 @@ import {
   Activity,
   Layers,
   Tag,
-  Briefcase
+  Briefcase,
+  FileText
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -25,6 +26,7 @@ import { getAllCategories } from "../../../../../api/categoriesApi";
 import { getAllNews } from "../../../../../api/newsApi";
 import { getAllSchedules } from "../../../../../api/scheduleApi";
 import { getAllProjects } from "../../../../../api/projectsApi";
+import { getDocuments } from "../../../../../api/documentsApi";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -48,6 +50,7 @@ export default function DashboardContenido() {
     news: 0,
     events: 0,
     projects: 0,
+    documents: 0,
     categories: 0
   });
   const [loading, setLoading] = useState(true);
@@ -58,11 +61,12 @@ export default function DashboardContenido() {
         setLoading(true);
 
         // Fetch all data - increase per_page for schedules to get all events
-        const [categoriesRes, newsRes, schedulesRes, projectsRes] = await Promise.all([
+        const [categoriesRes, newsRes, schedulesRes, projectsRes, documentsRes] = await Promise.all([
           getAllCategories(),
           getAllNews(),
           getAllSchedules(1, 100), // Fetch up to 100 events
-          getAllProjects()
+          getAllProjects(),
+          getDocuments()
         ]);
 
         // Extract arrays from responses (using robust extraction logic from before)
@@ -91,18 +95,24 @@ export default function DashboardContenido() {
         else if (projectsRes?.data && Array.isArray(projectsRes.data)) projects = projectsRes.data;
         else if (projectsRes?.projects && Array.isArray(projectsRes.projects)) projects = projectsRes.projects;
 
+        let documents = [];
+        if (documentsRes?.data?.items && Array.isArray(documentsRes.data.items)) documents = documentsRes.data.items;
+        else if (Array.isArray(documentsRes?.data)) documents = documentsRes.data;
+        else if (Array.isArray(documentsRes)) documents = documentsRes;
+
         // --- 1. Metrics ---
         setMetrics({
           news: news.length,
           events: schedules.length,
           projects: projects.length,
+          documents: documents.length,
           categories: categories.length
         });
 
         // --- 2. Category Stats (Bar Chart) ---
         const statsMap = {};
         categories.forEach(cat => {
-          statsMap[cat.id] = { name: cat.name, Noticias: 0, Eventos: 0, Proyectos: 0 };
+          statsMap[cat.id] = { name: cat.name, Noticias: 0, Eventos: 0, Proyectos: 0, Documentos: 0 };
         });
 
         news.forEach(item => {
@@ -120,6 +130,11 @@ export default function DashboardContenido() {
           if (catId && statsMap[catId]) statsMap[catId].Proyectos++;
         });
 
+        documents.forEach(item => {
+          const catId = item.category_id || (item.category?.id);
+          if (catId && statsMap[catId]) statsMap[catId].Documentos++;
+        });
+
         setCategoryStats(Object.values(statsMap));
 
         // --- 3. Content Distribution (Pie Chart) ---
@@ -127,6 +142,7 @@ export default function DashboardContenido() {
           { name: 'Noticias', value: news.length },
           { name: 'Eventos', value: schedules.length },
           { name: 'Proyectos', value: projects.length },
+          { name: 'Documentos', value: documents.length },
         ].filter(item => item.value > 0);
         setPieData(pData);
 
@@ -134,7 +150,8 @@ export default function DashboardContenido() {
         const allItems = [
           ...news.map(i => ({ ...i, type: 'Noticia', dataType: 'news', date: i.created_at })),
           ...schedules.map(i => ({ ...i, type: 'Evento', dataType: 'event', date: i.created_at })),
-          ...projects.map(i => ({ ...i, type: 'Proyecto', dataType: 'project', date: i.created_at }))
+          ...projects.map(i => ({ ...i, type: 'Proyecto', dataType: 'project', date: i.created_at })),
+          ...documents.map(i => ({ ...i, type: 'Documento', dataType: 'document', date: i.created_at }))
         ];
         // Sort by date desc
         allItems.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -157,6 +174,7 @@ export default function DashboardContenido() {
       case 'Noticia': return BRAND.blue;
       case 'Evento': return BRAND.darkGreen;
       case 'Proyecto': return BRAND.orange;
+      case 'Documento': return BRAND.yellow;
       default: return BRAND.gray;
     }
   };
@@ -179,7 +197,7 @@ export default function DashboardContenido() {
           { title: "Noticias Publicadas", value: metrics.news, icon: <PenTool size={24} />, color: BRAND.blue },
           { title: "Eventos Programados", value: metrics.events, icon: <Calendar size={24} />, color: BRAND.darkGreen },
           { title: "Proyectos Activos", value: metrics.projects, icon: <Briefcase size={24} />, color: BRAND.orange },
-          { title: "Categorías Totales", value: metrics.categories, icon: <Tag size={24} />, color: BRAND.darkBlue },
+          { title: "Documentos Subidos", value: metrics.documents, icon: <FileText size={24} />, color: BRAND.yellow },
         ].map((metric, index) => (
           <div key={index} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow">
             <div>
@@ -214,6 +232,7 @@ export default function DashboardContenido() {
               <Bar dataKey="Noticias" fill={BRAND.blue} radius={[4, 4, 0, 0]} />
               <Bar dataKey="Eventos" fill={BRAND.darkGreen} radius={[4, 4, 0, 0]} />
               <Bar dataKey="Proyectos" fill={BRAND.orange} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Documentos" fill={BRAND.yellow} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -244,7 +263,7 @@ export default function DashboardContenido() {
                     dataKey="value"
                   >
                     {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={[BRAND.blue, BRAND.darkGreen, BRAND.orange][index % 3]} />
+                      <Cell key={`cell-${index}`} fill={[BRAND.blue, BRAND.darkGreen, BRAND.orange, BRAND.yellow][index % 4]} />
                     ))}
                   </Pie>
                   <Tooltip

@@ -21,54 +21,82 @@ export const getDocuments = async (params = {}) => {
 };
 
 /**
+ * Get a single document by ID
+ * @param {string} id - Document ID
+ * @returns {Promise} - Document object
+ */
+export const getDocument = async (id) => {
+  const response = await api.get(`${DOCUMENTS_ENDPOINT}/${id}`);
+  return response.data;
+};
+
+/**
  * Create a new document
  * @param {FormData} documentData - FormData containing document fields and file
- * @param {string} documentData.document_type_id - Document type ID (1-5)
- * @param {string} documentData.name - Document name
- * @param {string} documentData.description - Document description
- * @param {string} documentData.version - Document version
- * @param {string} documentData.expires_at - Expiration date
- * @param {string} documentData.status - Document status
- * @param {File} documentData.file - Document file
  * @returns {Promise} - Created document object
  */
 export const createDocument = async (documentData) => {
-  // Ensure it's FormData for file upload
   if (!(documentData instanceof FormData)) {
     throw new Error("Document data must be FormData for file upload");
   }
 
-  console.log("documentsApi.js - createDocument called with FormData");
+  try {
+    const response = await api.post(DOCUMENTS_ENDPOINT, documentData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating document:", error);
+    throw error;
+  }
+};
 
-  // Log FormData contents
-  console.log("FormData contents:");
-  for (let [key, value] of documentData.entries()) {
-    if (value instanceof File) {
-      console.log(`  ${key}: [File] ${value.name} (${value.size} bytes, ${value.type})`);
-    } else {
-      console.log(`  ${key}: ${value}`);
-    }
+/**
+ * Update an existing document
+ * @param {string} id - Document ID
+ * @param {FormData} documentData - FormData containing document fields and file
+ * @returns {Promise} - Updated document object
+ */
+export const updateDocument = async (id, documentData) => {
+  if (!(documentData instanceof FormData)) {
+    throw new Error("Document data must be FormData for file upload");
+  }
+
+  // Ensure _method is set to PUT for FormData handling in backend
+  if (!documentData.has('_method')) {
+    documentData.append('_method', 'PUT');
   }
 
   try {
-    console.log("🚀 Sending request to:", DOCUMENTS_ENDPOINT);
-    const response = await api.post(DOCUMENTS_ENDPOINT, documentData);
-    console.log("✅ API Response:", response);
+    // We utilize POST with _method called "method spoofing" because
+    // PHP/Laravel sometimes has issues with PUT requests containing files/FormData
+    const response = await api.post(`${DOCUMENTS_ENDPOINT}/${id}`, documentData);
     return response.data;
   } catch (error) {
-    console.error("❌ API Error Details:");
-    console.error("  Error object:", error);
-    console.error("  Response:", error.response);
-    console.error("  Response data:", error.response?.data);
-    console.error("  Status:", error.response?.status);
-    console.error("  Status text:", error.response?.statusText);
+    console.error("Error updating document:", error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a document
+ * @param {string} id - Document ID
+ * @returns {Promise} - Response data
+ */
+export const deleteDocument = async (id) => {
+  try {
+    const response = await api.delete(`${DOCUMENTS_ENDPOINT}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting document:", error);
     throw error;
   }
 };
 
 const documentsApi = {
   getDocuments,
+  getDocument,
   createDocument,
+  updateDocument,
+  deleteDocument
 };
 
 export default documentsApi;

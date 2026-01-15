@@ -34,7 +34,7 @@ export default function AprobacionesList() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("Todos");
   const [error, setError] = useState(null);
-  
+
   // Estado para el modal de confirmación
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
@@ -97,9 +97,9 @@ export default function AprobacionesList() {
         type = "warning";
       }
       if (newStatus === 'pending') {
-          title = "Usuario Pendiente";
-          msg = "El usuario ha sido movido a estado pendiente.";
-          type = "info";
+        title = "Usuario Pendiente";
+        msg = "El usuario ha sido movido a estado pendiente.";
+        type = "info";
       }
 
       setFeedback({
@@ -122,18 +122,18 @@ export default function AprobacionesList() {
 
   const openSuspendConfirmation = (user) => {
     setConfirmModal({
-        isOpen: true,
-        userId: user.id,
-        action: 'suspend',
-        userName: user.name
+      isOpen: true,
+      userId: user.id,
+      action: 'suspend',
+      userName: user.name
     });
   };
 
   const handleConfirmAction = () => {
-      if (confirmModal.action === 'suspend' && confirmModal.userId) {
-          handleAction(confirmModal.userId, 'suspended');
-      }
-      setConfirmModal({ isOpen: false, userId: null, action: null, userName: '' });
+    if (confirmModal.action === 'suspend' && confirmModal.userId) {
+      handleAction(confirmModal.userId, 'suspended');
+    }
+    setConfirmModal({ isOpen: false, userId: null, action: null, userName: '' });
   };
 
   const getStatusStyles = (status) => {
@@ -273,19 +273,19 @@ export default function AprobacionesList() {
                       <div className="flex items-center gap-2 self-start lg:self-end">
                         <span className="text-xs text-gray-500 mr-1">Estado:</span>
 
-                          <div className="flex items-center gap-2 group/edit">
-                            <span
-                              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border`}
-                              style={{
-                                backgroundColor: styles.bg,
-                                color: styles.text,
-                                borderColor: 'transparent'
-                              }}
-                            >
-                              {styles.icon}
-                              {s.status === 'pending' ? 'Pendiente' : (s.status === 'active' ? 'Activado' : (s.status === 'rejected' ? 'Rechazado' : (s.status === 'suspended' ? 'Suspendido' : s.status)))}
-                            </span>
-                          </div>
+                        <div className="flex items-center gap-2 group/edit">
+                          <span
+                            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border`}
+                            style={{
+                              backgroundColor: styles.bg,
+                              color: styles.text,
+                              borderColor: 'transparent'
+                            }}
+                          >
+                            {styles.icon}
+                            {s.status === 'pending' ? 'Pendiente' : (s.status === 'active' ? 'Activado' : (s.status === 'rejected' ? 'Rechazado' : (s.status === 'suspended' ? 'Suspendido' : s.status)))}
+                          </span>
+                        </div>
                       </div>
 
                       {s.status === 'pending' && (
@@ -293,44 +293,44 @@ export default function AprobacionesList() {
                           <div className="flex gap-2 w-full">
                             <button
                               onClick={() => handleAction(s.id, 'active')}
-                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-green-600 hover:border-green-200 transition shadow-sm text-sm font-medium group text-nowrap">
-                              <CheckCircle size={16} className="group-hover:text-green-600 text-gray-400 transition-colors" /> Aprobar
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-50 border border-green-100 text-green-700 rounded-xl hover:bg-green-600 hover:text-white transition shadow-sm text-sm font-bold group text-nowrap">
+                              <CheckCircle size={16} className="group-hover:text-white text-green-600 transition-colors" /> Aprobar
                             </button>
                             <button
                               onClick={() => handleAction(s.id, 'rejected')}
-                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-red-600 hover:border-red-200 transition shadow-sm text-sm font-medium group text-nowrap">
-                              <XCircle size={16} className="group-hover:text-red-600 text-gray-400 transition-colors" /> Rechazar
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 border border-red-100 text-red-700 rounded-xl hover:bg-red-600 hover:text-white transition shadow-sm text-sm font-bold group text-nowrap">
+                              <XCircle size={16} className="group-hover:text-white text-red-600 transition-colors" /> Rechazar
                             </button>
                           </div>
                         </div>
                       )}
 
                       {s.status === 'active' && (
-                          <div className="flex flex-col gap-2 w-full">
-                              {(s.lockout_until && new Date(s.lockout_until) > new Date()) ? (
-                                  <button
-                                      onClick={() => handleAction(s.id, 'active')}
-                                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-orange-50 border border-orange-100 text-orange-700 rounded-lg hover:bg-orange-600 hover:text-white transition shadow-sm text-sm font-bold group">
-                                      <Unlock size={16} /> Desbloquear
-                                  </button>
-                              ) : (
-                                  <button
-                                      onClick={() => openSuspendConfirmation(s)}
-                                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-50 border border-red-100 text-red-700 rounded-lg hover:bg-red-600 hover:text-white transition shadow-sm text-sm font-bold group">
-                                      <UserX size={16} /> Suspender
-                                  </button>
-                              )}
-                          </div>
+                        <div className="flex flex-col gap-2 w-full">
+                          {(s.lockout_until && new Date(s.lockout_until) > new Date()) ? (
+                            <button
+                              onClick={() => handleAction(s.id, 'active')}
+                              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-orange-50 border border-orange-100 text-orange-700 rounded-lg hover:bg-orange-600 hover:text-white transition shadow-sm text-sm font-bold group">
+                              <Unlock size={16} /> Desbloquear
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => openSuspendConfirmation(s)}
+                              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-50 border border-red-100 text-red-700 rounded-lg hover:bg-red-600 hover:text-white transition shadow-sm text-sm font-bold group">
+                              <UserX size={16} /> Suspender
+                            </button>
+                          )}
+                        </div>
                       )}
 
                       {s.status === 'rejected' && (
-                          <div className="flex flex-col gap-2 w-full">
-                              <button
-                                  onClick={() => handleAction(s.id, 'pending')}
-                                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-600 hover:text-white transition shadow-sm text-sm font-bold group">
-                                  <AlertCircle size={16} /> Mover a Pendiente
-                              </button>
-                          </div>
+                        <div className="flex flex-col gap-2 w-full">
+                          <button
+                            onClick={() => handleAction(s.id, 'pending')}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-600 hover:text-white transition shadow-sm text-sm font-bold group">
+                            <AlertCircle size={16} /> Mover a Pendiente
+                          </button>
+                        </div>
                       )}
 
                       {s.status === 'suspended' && (
@@ -360,40 +360,40 @@ export default function AprobacionesList() {
         autoClose={3000}
       />
 
-        {/* Modal de Confirmación de Suspensión */}
-        {confirmModal.isOpen && createPortal(
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
-                <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform transition-all scale-100">
-                    <div className="flex flex-col items-center text-center">
-                        <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 text-red-600">
-                            <UserX size={24} />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">
-                            ¿Suspender Usuario?
-                        </h3>
-                        <p className="text-gray-500 mb-6">
-                            Estás a punto de suspender la cuenta de <strong>{confirmModal.userName}</strong>.
-                            El usuario perderá el acceso al sistema hasta que sea reactivado.
-                        </p>
-                        <div className="flex gap-3 w-full">
-                            <button
-                                onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })}
-                                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleConfirmAction}
-                                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-200"
-                            >
-                                Sí, Suspender
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>,
-            document.body
-        )}
+      {/* Modal de Confirmación de Suspensión */}
+      {confirmModal.isOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform transition-all scale-100">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 text-red-600">
+                <UserX size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                ¿Suspender Usuario?
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Estás a punto de suspender la cuenta de <strong>{confirmModal.userName}</strong>.
+                El usuario perderá el acceso al sistema hasta que sea reactivado.
+              </p>
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+                  className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleConfirmAction}
+                  className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-200"
+                >
+                  Sí, Suspender
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
