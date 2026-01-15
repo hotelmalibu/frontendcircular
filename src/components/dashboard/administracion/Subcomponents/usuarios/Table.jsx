@@ -306,22 +306,21 @@ export default function Table() {
                         </td>
 
                         <td className="py-4 px-6 text-right">
-                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center justify-end gap-2 transition-all">
                             <button
                               onClick={() => openEditModal(user)}
-                              className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition"
+                              className="p-2 rounded-xl text-blue-600 bg-blue-50 border border-blue-100 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm"
                               title="Editar usuario"
                             >
-                              <Edit size={18} />
+                              <Edit size={16} />
                             </button>
                             <button
                               onClick={() => clickDelete(user)}
-                              className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
+                              className="p-2 rounded-xl text-red-600 bg-red-50 border border-red-100 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shadow-sm"
                               title="Eliminar usuario"
                             >
-                              <Trash2 size={18} />
+                              <Trash2 size={16} />
                             </button>
-
                           </div>
                         </td>
                       </tr>
