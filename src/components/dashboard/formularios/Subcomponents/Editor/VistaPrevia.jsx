@@ -17,11 +17,24 @@ import {
   Mail,
   List,
   CheckSquare,
-  Upload,
-  Eye
+  Upload
 } from "lucide-react";
 
-const FormBuilder = ({ onSuccess }) => {
+const DEFAULT_FIELD_TYPES = [
+  { name: 'Texto', slug: 'text', description: 'Campo de texto simple', component: 'text-input' },
+  { name: 'Email', slug: 'email', description: 'Campo de correo electrónico', component: 'email-input' },
+  { name: 'URL', slug: 'url', description: 'Campo de URL', component: 'url-input' },
+  { name: 'Teléfono', slug: 'phone', description: 'Campo de número de teléfono', component: 'phone-input' },
+  { name: 'Número', slug: 'number', description: 'Campo numérico', component: 'number-input' },
+  { name: 'Fecha', slug: 'date', description: 'Campo de fecha', component: 'date-input' },
+  { name: 'Checkbox', slug: 'checkbox', description: 'Casilla de verificación', component: 'checkbox-input' },
+  { name: 'Radio Buttons', slug: 'radio', description: 'Botones de opción única', component: 'radio-input', options_schema: { options: 'array' } },
+  { name: 'Menú Desplegable', slug: 'select', description: 'Menú desplegable', component: 'select-input', options_schema: { choices: { type: 'array' } } },
+  { name: 'Carga de Archivo', slug: 'file', description: 'Carga de archivos', component: 'file-input' },
+  { name: 'Área de Texto', slug: 'textarea', description: 'Texto multilínea', component: 'textarea-input' }
+];
+
+const FormBuilder = ({ formId, onSuccess }) => {
   const [formMeta, setFormMeta] = useState({
     title: "",
     description: "",
@@ -34,24 +47,84 @@ const FormBuilder = ({ onSuccess }) => {
   const [formFields, setFormFields] = useState([]);
   const [fieldTypes, setFieldTypes] = useState([]);
   const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchFieldTypes = async () => {
       try {
         const response = await formsApi.getFieldTypes();
-        // The API returns { data: { field_types: [...] } } or { data: [...] } or [...]
+        // Handle various response patterns: { data: { field_types: [] } }, { field_types: [] }, { data: [] }, or [...]
         const base = response.data || response;
-        const list = Array.isArray(base) ? base : (base.field_types || []);
-        setFieldTypes(list);
+        let list = [];
+        
+        if (base && base.field_types && Array.isArray(base.field_types)) {
+          list = base.field_types;
+        } else if (base && base.data && base.data.field_types && Array.isArray(base.data.field_types)) {
+          list = base.data.field_types;
+        } else if (base && base.data && Array.isArray(base.data)) {
+          list = base.data;
+        } else if (Array.isArray(base)) {
+          list = base;
+        }
+        
+        console.log("Field types parsed:", list);
+        setFieldTypes(list.length > 0 ? list : DEFAULT_FIELD_TYPES);
       } catch (error) {
-        console.error("Error fetching field types:", error);
-        toast.error("Error al cargar tipos de campos");
+        console.error("Error fetching field types, using defaults:", error);
+        // Fallback to defaults on error
+        setFieldTypes(DEFAULT_FIELD_TYPES);
       }
     };
     fetchFieldTypes();
   }, []);
+
+  useEffect(() => {
+    if (formId) {
+      const fetchFormDetails = async () => {
+        setLoading(true);
+        try {
+          const response = await formsApi.getForm(formId);
+          const form = response.data || response;
+          
+          setFormMeta({
+            title: form.title || "",
+            description: form.description || "",
+            version: form.version || 1,
+            expires_at: form.expires_at ? form.expires_at.split('T')[0] : "",
+            metadata: form.metadata || { category: "general" }
+          });
+
+          if (form.fields) {
+            const mappedFields = form.fields.map(field => ({
+              id: field.id,
+              field_type_id: field.field_type_id,
+              type_name: field.field_type?.name || "Campo",
+              type_slug: field.field_type?.slug || "text",
+              name: field.name,
+              label: field.label,
+              description: field.description || "",
+              placeholder: field.placeholder || "",
+              is_required: !!field.is_required,
+              is_visible: !!field.is_visible,
+              order: field.order,
+              validation_rules: field.validation_rules || [],
+              default_value: field.default_value,
+              options: field.options || {},
+              _schema: field.field_type?.options_schema
+            }));
+            setFormFields(mappedFields);
+          }
+        } catch (error) {
+          console.error("Error fetching form details:", error);
+          toast.error("Error al cargar los detalles del formulario");
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchFormDetails();
+    }
+  }, [formId]);
 
   const addField = (fieldType) => {
     // Determine default options based on options_schema
@@ -69,7 +142,7 @@ const FormBuilder = ({ onSuccess }) => {
     }
 
     const newField = {
-      field_type_id: fieldType.id,
+      field_type_id: fieldType.id, // This MUST have an ID
       type_name: fieldType.name,
       type_slug: fieldType.slug,
       name: `${fieldType.slug}_${Date.now()}`,
@@ -84,6 +157,13 @@ const FormBuilder = ({ onSuccess }) => {
       options: initialOptions,
       _schema: fieldType.options_schema // Keep track of schema for the UI
     };
+
+    if (!newField.field_type_id) {
+       console.error("Attempted to add field without type ID:", fieldType);
+       toast.error("Error: El tipo de campo seleccionado no tiene un ID válido");
+       return;
+    }
+
     setFormFields([...formFields, newField]);
     setSelectedFieldIndex(formFields.length);
   };
@@ -126,6 +206,15 @@ const FormBuilder = ({ onSuccess }) => {
     }
     setSaving(true);
     try {
+      // Validate that all fields have a field_type_id
+      const invalidFields = formFields.filter(f => !f.field_type_id);
+      if (invalidFields.length > 0) {
+        console.error("Cannot save: fields missing field_type_id", invalidFields);
+        toast.error("Error: Algunos campos no tienen un tipo válido configurado");
+        setSaving(false);
+        return;
+      }
+
       // Clean up fields for API (remove UI-only helpers like _schema)
       const cleanFields = formFields.map(({ _schema, type_name, type_slug, ...rest }) => rest);
 
@@ -135,21 +224,25 @@ const FormBuilder = ({ onSuccess }) => {
         fields: cleanFields
       };
 
-      const response = await formsApi.createForm(payload);
+      console.log("Pre-save Payload:", payload);
+
+      const response = formId 
+        ? await formsApi.updateForm(formId, payload)
+        : await formsApi.createForm(payload);
 
       // Robust ID extraction
       const body = response.data || response;
-      const formId = body.id || (body.data && body.data.id) || body.form?.id;
+      const responseId = body.id || (body.data && body.data.id) || body.form?.id;
 
-      if (!formId) {
+      if (!responseId && !formId) {
         console.error("Could not extract form ID from response:", body);
-        throw new Error("No se pudo obtener el ID del formulario creado");
+        throw new Error("No se pudo obtener el ID del formulario");
       }
 
       if (isPublish) {
         toast.success("Formulario publicado con éxito");
       } else {
-        toast.success("Borrador guardado con éxito");
+        toast.success(formId ? "Formulario actualizado con éxito" : "Borrador guardado con éxito");
       }
 
       // Trigger redirection
@@ -269,10 +362,11 @@ const FormBuilder = ({ onSuccess }) => {
     );
   };
 
+  const [activeTab, setActiveTab] = useState("canvas"); // palette, canvas, properties - for mobile
   const selectedField = selectedFieldIndex !== null ? formFields[selectedFieldIndex] : null;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-150px)] bg-gray-50 overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-150px)] md:h-[calc(100vh-120px)] bg-gray-50 overflow-hidden">
       {/* Top Header/Actions */}
       <div className="bg-white border-b px-6 py-3 flex justify-between items-center shadow-sm">
         <div className="flex items-center gap-4">
@@ -285,34 +379,68 @@ const FormBuilder = ({ onSuccess }) => {
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-2 md:gap-3">
           <button
             onClick={() => handleSave(false)}
             disabled={saving}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all font-semibold text-gray-700"
+            className="flex items-center gap-2 px-3 md:px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all font-semibold text-gray-700 text-sm md:text-base"
           >
             <Save size={18} />
-            {saving ? "Guardando..." : "Guardar Borrador"}
+            <span className="hidden sm:inline">{saving ? "Guardando..." : "Guardar Borrador"}</span>
+            <span className="sm:hidden">{saving ? "..." : "Borrador"}</span>
           </button>
           <button
             onClick={() => handleSave(true)}
             disabled={saving}
-            className="flex items-center gap-2 px-4 py-2 bg-[#004b72] text-white rounded-xl hover:bg-[#003a58] transition-all font-semibold shadow-md"
+            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-[#004b72] text-white rounded-xl hover:bg-[#003a58] transition-all font-semibold shadow-md text-sm md:text-base"
           >
             <Send size={18} />
-            Publicar
+            <span className="hidden sm:inline">Publicar</span>
+            <span className="sm:hidden">Pub.</span>
           </button>
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      {/* Mobile Tabs */}
+      <div className="md:hidden flex border-b bg-white">
+        <button 
+          onClick={() => setActiveTab("palette")}
+          className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${activeTab === "palette" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400"}`}
+        >
+          Elementos
+        </button>
+        <button 
+          onClick={() => setActiveTab("canvas")}
+          className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${activeTab === "canvas" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400"}`}
+        >
+          Lienzo
+        </button>
+        <button 
+          onClick={() => setActiveTab("properties")}
+          className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${activeTab === "properties" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400"}`}
+        >
+          Propiedades {selectedField && "•"}
+        </button>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Loading Overlay */}
+        {loading && (
+          <div className="absolute inset-0 z-[100] bg-white/60 backdrop-blur-sm flex items-center justify-center">
+             <div className="flex flex-col items-center gap-4">
+               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004b72]"></div>
+               <p className="text-gray-500 font-medium animate-pulse">Cargando formulario...</p>
+             </div>
+          </div>
+        )}
+
         {/* Left: Element Palette */}
-        <div className="w-72 bg-white border-r overflow-y-auto p-4 custom-scrollbar">
+        <div className={`${activeTab === "palette" ? "flex" : "hidden"} md:flex w-full md:w-72 bg-white border-r overflow-y-auto p-4 custom-scrollbar flex-col absolute inset-0 z-10 md:relative`}>
           <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">Elementos Disponibles</h3>
           <div className="space-y-2">
             {(Array.isArray(fieldTypes) ? fieldTypes : []).map((type) => (
               <button
-                key={type.id}
+                key={type.id || type.slug}
                 onClick={() => addField(type)}
                 className="w-full flex items-center gap-3 p-3 bg-gray-50 hover:bg-blue-50 hover:text-blue-600 border border-transparent hover:border-blue-100 rounded-xl transition-all group"
               >
@@ -330,32 +458,32 @@ const FormBuilder = ({ onSuccess }) => {
         </div>
 
         {/* Center: Canvas */}
-        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-gray-100/50">
+        <div className={`${activeTab === "canvas" ? "block" : "hidden md:block"} flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar bg-gray-100/50`}>
           <div className="max-w-3xl mx-auto space-y-6">
             {/* Form Meta Section */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 ring-1 ring-gray-200/50">
+            <div className="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 ring-1 ring-gray-200/50">
               <input
                 type="text"
                 value={formMeta.title}
                 onChange={(e) => setFormMeta({ ...formMeta, title: e.target.value })}
                 placeholder="Título del Formulario"
-                className="w-full text-3xl font-bold text-gray-800 placeholder-gray-300 border-none focus:ring-0 mb-4 p-0"
+                className="w-full text-2xl md:text-3xl font-bold text-gray-800 placeholder-gray-300 border-none focus:ring-0 mb-4 p-0"
               />
               <textarea
                 value={formMeta.description}
                 onChange={(e) => setFormMeta({ ...formMeta, description: e.target.value })}
                 placeholder="Descripción o propósito de este formulario..."
-                className="w-full text-gray-600 placeholder-gray-300 border-none focus:ring-0 resize-none p-0"
+                className="w-full text-sm md:text-base text-gray-600 placeholder-gray-300 border-none focus:ring-0 resize-none p-0"
                 rows={2}
               />
-              <div className="pt-4 mt-4 border-t border-gray-50 flex gap-6 text-sm">
+              <div className="pt-4 mt-4 border-t border-gray-50 flex flex-wrap gap-4 md:gap-6 text-sm">
                 <div className="flex items-center gap-2 text-gray-500">
                   <span className="font-semibold text-gray-700">Versión:</span>
                   <input
                     type="number"
                     value={formMeta.version}
                     onChange={(e) => setFormMeta({ ...formMeta, version: parseInt(e.target.value) })}
-                    className="w-12 border-none p-0 focus:ring-0 font-medium"
+                    className="w-10 md:w-12 border-none p-0 focus:ring-0 font-medium bg-transparent"
                   />
                 </div>
                 <div className="flex items-center gap-2 text-gray-500">
@@ -364,7 +492,7 @@ const FormBuilder = ({ onSuccess }) => {
                     type="date"
                     value={formMeta.expires_at}
                     onChange={(e) => setFormMeta({ ...formMeta, expires_at: e.target.value })}
-                    className="border-none p-0 focus:ring-0 font-medium"
+                    className="border-none p-0 focus:ring-0 font-medium bg-transparent"
                   />
                 </div>
               </div>
@@ -375,8 +503,11 @@ const FormBuilder = ({ onSuccess }) => {
               {(Array.isArray(formFields) ? formFields : []).map((field, idx) => (
                 <div
                   key={idx}
-                  onClick={() => setSelectedFieldIndex(idx)}
-                  className={`group relative bg-white p-6 rounded-2xl shadow-sm border transition-all cursor-pointer ${selectedFieldIndex === idx
+                  onClick={() => {
+                    setSelectedFieldIndex(idx);
+                    if (window.innerWidth < 768) setActiveTab("properties");
+                  }}
+                  className={`group relative bg-white p-4 md:p-6 rounded-2xl shadow-sm border transition-all cursor-pointer ${selectedFieldIndex === idx
                     ? "border-blue-500 ring-2 ring-blue-500/10 shadow-md"
                     : "border-gray-200 hover:border-gray-300"
                     }`}
@@ -388,8 +519,8 @@ const FormBuilder = ({ onSuccess }) => {
                       </div>
                       <span className="text-xs font-bold text-blue-600 uppercase tracking-tighter">{field.type_name}</span>
                     </div>
-                    <div className="flex gap-2">
-                      <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100 opacity-0 group-hover:opacity-100 transition-all">
+                    <div className="flex gap-1 md:gap-2">
+                      <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -416,14 +547,14 @@ const FormBuilder = ({ onSuccess }) => {
                           e.stopPropagation();
                           removeField(idx);
                         }}
-                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
                       >
                         <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
 
-                  <h4 className="text-lg font-semibold text-gray-800">{field.label || "Sin Etiqueta"}</h4>
+                  <h4 className="text-base md:text-lg font-semibold text-gray-800">{field.label || "Sin Etiqueta"}</h4>
                   {field.description && <p className="text-sm text-gray-500 mt-1">{field.description}</p>}
 
                   <div className="mt-4 pointer-events-none opacity-50">
@@ -452,7 +583,7 @@ const FormBuilder = ({ onSuccess }) => {
         </div>
 
         {/* Right: Properties Panel */}
-        <div className="w-80 bg-white border-l overflow-y-auto p-6 custom-scrollbar">
+        <div className={`${activeTab === "properties" ? "flex" : "hidden"} md:flex w-full md:w-80 bg-white border-l overflow-y-auto p-4 md:p-6 custom-scrollbar flex-col absolute inset-0 z-10 md:relative`}>
           <div className="flex items-center justify-between mb-6 pb-4 border-b">
             <h3 className="font-bold text-gray-800 flex items-center gap-2">
               <Settings2 size={18} className="text-blue-500" />

@@ -440,10 +440,15 @@ export default function Navbar({ onMenuClick }) {
     "/juntaDirecteEquipo",
     "/valores",
     "/lineas-estrategicas",
+    "/encuestas",
   ];
-  const isTransparentNavPath = transparentPaths.some((path) =>
-    location.pathname.startsWith(path)
-  );
+  const isTransparentNavPath = transparentPaths.some((path) => {
+    // Para encuestas, solo la raíz '/encuestas' es transparente, el detalle no.
+    if (path === "/encuestas") {
+      return location.pathname === "/encuestas";
+    }
+    return location.pathname.startsWith(path);
+  });
 
   const isInteracted =
     scrolled || isHovered || hasOpenDropdown || mobileMenuOpen;
@@ -509,6 +514,7 @@ export default function Navbar({ onMenuClick }) {
             { label: "Líneas estratégicas", path: "/lineas-estrategicas" },
             { label: "Junta Directiva - Equipo", path: "/juntaDirecteEquipo" },
             { label: "Informes", path: "/informes-anuales" },
+            { label: "Encuestas", path: "/encuestas" },
           ],
         },
         {

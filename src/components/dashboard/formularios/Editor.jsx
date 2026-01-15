@@ -1,10 +1,10 @@
 import React from "react";
 import VistaPrevia from "./Subcomponents/Editor/VistaPrevia";
 
-export default function Dashboard({ onNavigate }) {
+export default function Dashboard({ onNavigate, formId }) {
   return (
     <div>
-      <VistaPrevia onSuccess={() => onNavigate?.("Encuestas")} />
+      <VistaPrevia formId={formId} onSuccess={() => onNavigate?.("Encuestas")} />
     </div>
   );
 }

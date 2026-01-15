@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../../../../context/AuthContext";
 import formsApi from "../../../../../api/formsApi";
 import { toast } from "react-hot-toast";
 import ResponderFormulario from "./ResponderFormulario";
@@ -15,19 +16,21 @@ import {
   Cell,
 } from "recharts";
 import {
-  Plus,
   Search,
-  Filter,
   Calendar,
   Users,
   BarChart3,
   FileEdit,
-  Play
+  Play,
+  Archive,
+  UploadCloud
 } from "lucide-react";
 
-const DashboardSurveyAnalysis = () => {
+const DashboardSurveyAnalysis = ({ onEdit }) => {
+  const { user } = useContext(AuthContext);
+  const isAdmin = user?.role_slug === "admin";
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("published");
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedFormId, setSelectedFormId] = useState(null);
@@ -39,8 +42,10 @@ const DashboardSurveyAnalysis = () => {
       const params = {
         status: statusFilter === "all" ? undefined : statusFilter,
         search: search || undefined,
-        per_page: 50 // Increase limit to be sure
+        per_page: 50,
+        page: 1
       };
+      console.log("Fetching forms with params:", params);
       const response = await formsApi.listForms(params);
       console.log("Form list response:", response);
 
@@ -58,6 +63,10 @@ const DashboardSurveyAnalysis = () => {
       setForms(list);
     } catch (error) {
       console.error("Error fetching forms:", error);
+      if (error.response) {
+          console.error("Error response data:", error.response.data);
+          console.error("Error response status:", error.response.status);
+      }
       toast.error("Error al cargar los formularios");
     } finally {
       setLoading(false);
@@ -66,11 +75,34 @@ const DashboardSurveyAnalysis = () => {
 
   useEffect(() => {
     fetchForms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter]);
 
   // Handle search with debounce in a real app, here simple trigger on enter or button
   const handleSearch = (e) => {
     if (e.key === "Enter") fetchForms();
+  };
+
+  const handlePublish = async (id) => {
+    try {
+      await formsApi.publishForm(id);
+      toast.success("Formulario publicado correctamente");
+      fetchForms();
+    } catch (error) {
+      console.error("Error publishing form:", error);
+      toast.error("Error al publicar el formulario");
+    }
+  };
+
+  const handleArchive = async (id) => {
+    try {
+      await formsApi.updateForm(id, { status: 'archived' });
+      toast.success("Formulario archivado correctamente");
+      fetchForms();
+    } catch (error) {
+      console.error("Error archiving form:", error);
+      toast.error("Error al archivar el formulario");
+    }
   };
 
   // --- Datos para gráficos (Stubs for now, as they'd probably come from a separate analytics endpoint) ---
@@ -203,21 +235,56 @@ const DashboardSurveyAnalysis = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setSelectedFormId(form.id);
-                        setView("respond");
-                      }}
-                      className="flex-1 flex items-center justify-center gap-2 bg-[#004b72] text-white py-2.5 rounded-xl font-bold hover:bg-[#003a58] transition-all shadow-sm"
-                    >
-                      <Play size={16} />
-                      Responder
-                    </button>
-                    <button className="p-2.5 bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 transition-all">
-                      <BarChart3 size={20} />
-                    </button>
-                  </div>
+                    <div className="flex gap-2">
+                      {/* Action Buttons based on status */}
+                      {form.status === 'draft' && (
+                        <button
+                          onClick={() => handlePublish(form.id)}
+                          className="p-2.5 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-all tooltip"
+                          title="Publicar"
+                        >
+                          <UploadCloud size={20} />
+                        </button>
+                      )}
+
+                      {form.status === 'published' && (
+                        <>
+                          {!isAdmin && (
+                            <button
+                              onClick={() => {
+                                setSelectedFormId(form.id);
+                                setView("respond");
+                              }}
+                              className="flex-1 flex items-center justify-center gap-2 bg-[#004b72] text-white py-2.5 rounded-xl font-bold hover:bg-[#003a58] transition-all shadow-sm"
+                            >
+                              <Play size={16} />
+                              Responder
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => handleArchive(form.id)}
+                            className="p-2.5 bg-orange-50 text-orange-600 rounded-xl hover:bg-orange-100 transition-all"
+                            title="Archivar"
+                          >
+                            <Archive size={20} />
+                          </button>
+                        </>
+                      )}
+                      
+                      {form.status === 'draft' && (
+                         <button 
+                          onClick={() => onEdit?.(form.id)}
+                          className="flex-1 flex items-center justify-center gap-2 bg-blue-100 text-blue-600 py-2.5 rounded-xl font-bold hover:bg-blue-200 transition-all shadow-sm"
+                         >
+                           <FileEdit size={16} />
+                           Editar
+                         </button>
+                      )}
+
+                      <button className="p-2.5 bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 transition-all">
+                        <BarChart3 size={20} />
+                      </button>
+                    </div>
                 </div>
               );
             }) : (

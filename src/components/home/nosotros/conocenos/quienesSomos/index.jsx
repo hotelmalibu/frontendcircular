@@ -3,6 +3,17 @@ import { motion } from "framer-motion";
 import { Quote, Users, Recycle, Globe, Zap, Leaf, TrendingUp, Handshake, Target } from "lucide-react";
 import LogoVisionCircular from "../../../../../assets/fondosYlogos/Logo.png";
 
+// Importación de Logos de Alianzas
+import LogoExpra from "../../../../../assets/logosAlianza/expra.png";
+import LogoCtc from "../../../../../assets/logosAlianza/ctc.webp";
+import LogoBid from "../../../../../assets/logosAlianza/bid.jpg";
+import LogoEnec from "../../../../../assets/logosAlianza/enec.webp";
+import LogoGiz from "../../../../../assets/logosAlianza/giz.png";
+import LogoGpap from "../../../../../assets/logosAlianza/gpap.avif";
+import LogoPrevent from "../../../../../assets/logosAlianza/prevent.png";
+import LogoForum from "../../../../../assets/logosAlianza/forum.png";
+import LogoBogota from "../../../../../assets/logosAlianza/bogota_circular.webp";
+
 export default function Index() {
   const quotes = [
     {
@@ -182,6 +193,86 @@ export default function Index() {
               <span className="w-2.5 h-2.5 bg-[#B1D357] rounded-full animate-pulse"></span>
               Meta 30% aprovechamiento al 2030
             </span>
+          </div>
+        </motion.div>
+
+        {/* SECCIÓN 1: Alianzas Internacionales y Regionales */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="mt-16 mb-12"
+        >
+          <h3 className="text-2xl md:text-3xl font-bold text-[#1E305D] mb-8 text-center">
+            Alianzas y espacios estratégicos <br />
+            <span className="text-[#00AB6D]">internacionales y regionales</span>
+          </h3>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 items-center justify-items-center">
+            {[
+              { name: "EXPRA", logo: LogoExpra },
+              { name: "CTC", logo: LogoCtc },
+              { name: "BID", logo: LogoBid },
+              { name: "ENEC", logo: LogoEnec },
+              { name: "GIZ", logo: LogoGiz },
+              { name: "Global Plastic Action Partnership", logo: LogoGpap },
+              { name: "PREVENT Waste Alliance", logo: LogoPrevent },
+              { name: "The Consumer Goods Forum", logo: LogoForum },
+            ].map((partner, idx) => {
+              const needsExtraSize = ["GIZ", "ENEC", "PREVENT Waste Alliance", "BID", "The Consumer Goods Forum"].includes(partner.name);
+              return (
+                <div
+                  key={idx}
+                  className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 w-full h-32 flex items-center justify-center group hover:shadow-md transition-all duration-300"
+                >
+                  <img 
+                    src={partner.logo} 
+                    alt={partner.name}
+                    className={`max-h-full max-w-full object-contain transition-transform duration-300 ${needsExtraSize ? 'scale-110' : 'scale-90'}`}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* SECCIÓN 2: Alianzas Nacionales */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.5 }}
+          className="mb-12"
+        >
+          <h3 className="text-2xl md:text-3xl font-bold text-[#1E305D] mb-8 text-center">
+            Alianzas y espacios estratégicos <br />
+            <span className="text-[#00AB6D]">nacionales</span>
+          </h3>
+
+          <div className="flex flex-wrap justify-center gap-6">
+            {[
+              { name: "Bogotá Circular", logo: LogoBogota },
+              { name: "Mesa Distrital de Economía Circular de Cali", logo: null },
+            ].map((partner, idx) => (
+              <div
+                key={idx}
+                className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 w-full md:w-80 h-32 flex items-center justify-center group hover:shadow-md transition-all duration-300"
+              >
+                {partner.logo ? (
+                  <img 
+                    src={partner.logo} 
+                    alt={partner.name}
+                    className="max-h-full max-w-full object-contain scale-90"
+                  />
+                ) : (
+                  <div className="text-center">
+                    <p className="text-[10px] font-black text-[#00AB6D] uppercase tracking-widest mb-1 opacity-50">Próximamente</p>
+                    <p className="text-sm font-bold text-[#1E305D] leading-tight">{partner.name}</p>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>

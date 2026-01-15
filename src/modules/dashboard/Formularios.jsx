@@ -6,7 +6,7 @@ import Editor from "../../components/dashboard/formularios/Editor";
 import Respuestas from "../../components/dashboard/formularios/Respuestas";
 import Exportacion from "../../components/dashboard/formularios/Exportacion";
 import Encuestas from "../../components/dashboard/formularios/Encuestas";
-import { ClipboardList, Calendar, ShieldCheck } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -20,20 +20,22 @@ const BRAND = {
 export default function Formularios() {
   const { user } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("Dashboard");
+  const [editingFormId, setEditingFormId] = useState(null);
 
-  // Obtener fecha actual
-  const today = new Date().toLocaleDateString("es-CO", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const startEditing = (id) => {
+    setEditingFormId(id);
+    setActiveTab("Editor");
+  };
+
 
   const tabs = [
     { name: "Dashboard", component: <Dashboard /> },
-    { name: "Editor", component: <Editor onNavigate={setActiveTab} /> },
+    { name: "Editor", component: <Editor onNavigate={(target) => {
+      setActiveTab(target);
+      if (target !== "Editor") setEditingFormId(null);
+    }} formId={editingFormId} /> },
     { name: "Respuestas", component: <Respuestas /> },
-    { name: "Encuestas", component: <Encuestas /> },
+    { name: "Encuestas", component: <Encuestas onEdit={startEditing} /> },
     { name: "Exportacion", component: <Exportacion /> },
   ];
 

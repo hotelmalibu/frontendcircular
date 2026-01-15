@@ -57,7 +57,7 @@ const formsApi = {
      * @returns {Promise}
      */
     publishForm: async (id) => {
-        const response = await api.patch(`/forms/${id}/publish`);
+        const response = await api.post(`/forms/${id}/publish`);
         return response.data;
     },
 

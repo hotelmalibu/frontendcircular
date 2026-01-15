@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Home from "./modules/home/Home";
@@ -30,20 +30,35 @@ import InclusionSocial from "./modules/home/nuestrosTrabajos/proyectosAlianzas/i
 import CasosExitos from "./modules/home/nuestrosTrabajos/proyectosAlianzas/casosExitos";
 import Convocatorias from "./modules/home/nuestrosTrabajos/proyectosAlianzas/convocatorias";
 import LineasEstrategicasPage from "./modules/home/nuestrosTrabajos/lineasEstrategicas/index";
+import PublicSurveysPage from "./modules/home/nosotros/conocenos/PublicSurveysPage";
+import PublicSurveyDetail from "./modules/home/nosotros/conocenos/PublicSurveyDetail";
 import Profile from "./modules/dashboard/Profile";
 
 import ExplorePage from "./components/pagesExplorar/ExplorePage";
 import ContentDetailPage from "./components/pagesExplorar/ContentDetailPage";
 import ContentDetailProject from "./components/pagesProyectos/ContentDetailProject";
+import NotFound from "./modules/home/NotFound";
+
+// Helper component for pages with shared layout
+const MainLayout = () => (
+  <>
+    <Navbar />
+    <main className="flex-1">
+      <Outlet />
+    </main>
+    <Footer />
+  </>
+);
 
 export default function App() {
   return (
     <div className="flex flex-col min-h-screen">
       <AxiosInterceptor />
       <Toaster position="top-center" reverseOrder={false} />
-      <Navbar />
-      <main className="flex-1">
-        <Routes>
+      
+      <Routes>
+        {/* Pages with Navbar and Footer */}
+        <Route element={<MainLayout />}>
           {/* Rutas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -62,12 +77,9 @@ export default function App() {
           <Route path="/casos-de-xito" element={<CasosExitos />} />
           <Route path="/convocatorias" element={<Convocatorias />} />
           <Route path="/lineas-estrategicas" element={<LineasEstrategicasPage />} />
+          <Route path="/encuestas" element={<PublicSurveysPage />} />
 
-
-
-
-
-          {/* Rutas privadas: cada página del dashboard tiene su propia ruta directa */}
+          {/* Rutas privadas */}
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/documentos" element={<PrivateRoute><Documentos /></PrivateRoute>} />
           <Route path="/companies" element={<PrivateRoute><Empresas /></PrivateRoute>} />
@@ -81,14 +93,15 @@ export default function App() {
           {/* Rutas para explorar contenido */}
           <Route path="/explorar" element={<ExplorePage />} />
           <Route path="/contenido/:slug" element={<ContentDetailPage />} />
-
-          <Route path="/" element={<Home />} />
-          {/* Esta es la ruta mágica para que funcione el enlace */}
           <Route path="/proyectos/:id" element={<ContentDetailProject />} />
-        </Routes>
-      </main>
+        </Route>
 
-      <Footer />
+        {/* Survey Detail WITHOUT MainLayout to prevent 404 flash */}
+        <Route path="/encuestas/:id" element={<PublicSurveyDetail />} />
+
+        {/* Catch-all 404 WITHOUT Layout */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </div>
   );
 }
