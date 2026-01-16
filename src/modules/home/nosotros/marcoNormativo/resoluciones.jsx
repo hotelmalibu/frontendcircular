@@ -92,6 +92,10 @@ export default function Index() {
                 <span className="font-display font-bold text-7xl text-white">1342</span>
                 <span className="font-sans text-3xl text-gray-200 ml-3">de 2020</span>
               </div>
+              <div className="flex items-baseline mt-2">
+                <span className="font-display font-bold text-7xl text-white">803</span>
+                <span className="font-sans text-3xl text-gray-200 ml-3">de 2024</span>
+              </div>
               <p className="text-sm text-gray-300 mt-4">Ministerio de Ambiente y Desarrollo Sostenible.</p>
             </div>
 
@@ -215,7 +219,7 @@ export default function Index() {
           <h2 className="text-4xl font-display font-bold text-center mb-10" style={{ color: COLOR_AZUL_PRINCIPAL }}>
             3. ¿QUÉ ESTÁ REGULADO?
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
               <Box size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
               <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Papel y cartón</h4>
@@ -227,10 +231,6 @@ export default function Index() {
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
               <Trash2 size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
               <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Metal</h4>
-            </div>
-            <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Recycle size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
-              <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Plástico</h4>
             </div>
           </div>
         </section>
