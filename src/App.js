@@ -19,6 +19,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import Footer from "./components/Footer";
 import Circularmente from "./modules/micrositio/Circularmente";
 import QuienesSomos from "./modules/home/nosotros/conocenos/quienesSomos";
+import Alianzas from "./modules/home/nosotros/conocenos/alianzas";
+
 import Valores from "./modules/home/nosotros/conocenos/valores";
 import JuantaDirectiva from "./modules/home/nosotros/conocenos/juntaDirecteEquipo";
 import InformesAnuales from "./modules/home/nosotros/conocenos/informesAnuales";
@@ -66,6 +68,8 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/circularmente" element={<Circularmente />} />
           <Route path="/quines-somos" element={<QuienesSomos />} />
+          <Route path="/alianzas" element={<Alianzas />} />
+
           <Route path="/valores" element={<Valores />} />
           <Route path="/juntaDirecteEquipo" element={<JuantaDirectiva />} />
           <Route path="/informes-anuales" element={<InformesAnuales />} />

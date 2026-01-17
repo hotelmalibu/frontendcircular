@@ -515,6 +515,7 @@ export default function Navbar({ onMenuClick }) {
             { label: "Junta Directiva - Equipo", path: "/juntaDirecteEquipo" },
             { label: "Informes", path: "/informes-anuales" },
             { label: "Encuestas", path: "/encuestas" },
+            { label: "Alianzas", path: "/alianzas" },
           ],
         },
         {

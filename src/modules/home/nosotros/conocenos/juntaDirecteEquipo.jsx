@@ -218,7 +218,7 @@ export default function TeamOrgChart() {
         {/* --- SECCIÓN EQUIPO DE TRABAJO --- */}
         <div className="text-center mb-12 pt-8 border-t border-gray-100">
             <h3 className="text-[#1E305D] text-xl font-black uppercase tracking-[0.2em]">
-                Directorio de Trabajo
+                Equipo de Trabajo
             </h3>
             <div className="h-1.5 w-16 bg-[#1E305D] mx-auto mt-4 rounded-full" />
         </div>
