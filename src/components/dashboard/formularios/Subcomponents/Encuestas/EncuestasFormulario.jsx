@@ -96,7 +96,7 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
 
   const handleArchive = async (id) => {
     try {
-      await formsApi.updateForm(id, { status: 'archived' });
+      await formsApi.archiveForm(id);
       toast.success("Formulario archivado correctamente");
       fetchForms();
     } catch (error) {
@@ -198,9 +198,12 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
                     <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl group-hover:scale-110 transition-transform">
                       <FileEdit size={24} />
                     </div>
-                    <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${form.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
+                    <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${
+                        form.status === 'published' ? 'bg-green-100 text-green-700' : 
+                        form.status === 'archived' ? 'bg-gray-100 text-gray-700' :
+                        'bg-orange-100 text-orange-700'
                       }`}>
-                      {form.status === 'published' ? 'Activa' : 'Borrador'}
+                      {form.status === 'published' ? 'Activa' : form.status === 'archived' ? 'Archivado' : 'Borrador'}
                     </span>
                   </div>
 

@@ -43,12 +43,35 @@ const formsApi = {
     /**
      * Update an existing form
      * @param {string} id
-     * @param {Object} formData
+     * @param {Object|FormData} formData
+     * @param {string} method - HTTP method to use (PUT or PATCH)
      * @returns {Promise}
      */
-    updateForm: async (id, formData) => {
+    updateForm: async (id, formData, method = 'PUT') => {
+        // If it's FormData, use POST with _method spoofing
+        if (formData instanceof FormData) {
+            if (!formData.has('_method')) formData.append('_method', method);
+            const response = await api.post(`/forms/${id}`, formData);
+            return response.data;
+        }
+
+        // Standard JSON update
+        if (method === 'PATCH') {
+            const response = await api.patch(`/forms/${id}`, formData);
+            return response.data;
+        }
+        
         const response = await api.put(`/forms/${id}`, formData);
         return response.data;
+    },
+
+    /**
+     * Archive a form
+     * @param {string} id
+     * @returns {Promise}
+     */
+    archiveForm: async (id) => {
+        return await formsApi.updateForm(id, { status: 'archived' });
     },
 
     /**
@@ -71,6 +94,16 @@ const formsApi = {
         // If it's FormData, axios handles headers
         const response = await api.post(`/forms/${id}/submit`, submissionData);
         return response.data;
+    },
+
+    /**
+     * List public forms
+     * @param {Object} params
+     * @returns {Promise}
+     */
+    listPublicForms: async (params = {}) => {
+        // Now that the backend /forms is public, we just call it with status=published
+        return await formsApi.listForms({ ...params, status: 'published' });
     },
 };
 

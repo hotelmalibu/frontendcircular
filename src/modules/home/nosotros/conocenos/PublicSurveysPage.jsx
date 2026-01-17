@@ -36,11 +36,18 @@ export default function PublicSurveysPage() {
       
       let list = [];
       try {
-        const response = await formsApi.listForms(params);
-        const body = response.data || response;
-        list = Array.isArray(body)
-          ? body
-          : (body.forms || (body.data && (Array.isArray(body.data) ? body.data : body.data.forms)) || []);
+        const response = await formsApi.listPublicForms(params);
+        // Robust extraction from various common response structures
+        if (Array.isArray(response)) {
+          list = response;
+        } else if (response.data) {
+          const body = response.data;
+          list = Array.isArray(body)
+            ? body
+            : (body.forms || (body.data && (Array.isArray(body.data) ? body.data : body.data.forms)) || []);
+        } else {
+          list = (response.forms || (response.data && (Array.isArray(response.data) ? response.data : response.data.forms)) || []);
+        }
       } catch (err) {
         console.log("Error loading forms:", err);
       }
