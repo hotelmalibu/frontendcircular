@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { createProject, updateProject } from "../../../../../api/projectsApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
+import { getProjectTypes } from "../../../../../api/projectTypesApi";
+import { Upload, Layers } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -37,12 +39,16 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
     title: "",
     description: "",
     category_id: "",
+    project_type_id: "",
     author: "",
+    file: null,
   });
 
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [projectTypes, setProjectTypes] = useState([]);
+  const [projectTypesLoading, setProjectTypesLoading] = useState(true);
   const [errors, setErrors] = useState({});
 
   const fetchCategories = React.useCallback(async () => {
@@ -69,10 +75,34 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
     }
   }, []);
 
-  // Fetch categories on mount
+  const fetchProjectTypes = React.useCallback(async () => {
+    try {
+      setProjectTypesLoading(true);
+      const response = await getProjectTypes();
+      let typesArray = [];
+
+      // Handle response.data.items as per user feedback
+      if (response?.data?.items && Array.isArray(response.data.items)) {
+        typesArray = response.data.items;
+      } else if (response?.data && Array.isArray(response.data)) {
+        typesArray = response.data;
+      } else if (Array.isArray(response)) {
+        typesArray = response;
+      }
+
+      setProjectTypes(typesArray);
+    } catch (err) {
+      console.error("Error loading project types:", err);
+    } finally {
+      setProjectTypesLoading(false);
+    }
+  }, []);
+
+  // Fetch categories and project types on mount
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories]);
+    fetchProjectTypes();
+  }, [fetchCategories, fetchProjectTypes]);
 
   useEffect(() => {
     if (isEditing && projectData) {
@@ -90,7 +120,9 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
         title: projectData.title || "",
         description: description,
         category_id: catId,
+        project_type_id: projectData.project_type_id || "",
         author: projectData.author || "",
+        file: null, // Reset file on edit load
       });
     }
   }, [projectData, isEditing]);
@@ -156,9 +188,6 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'category_id') {
-      console.log("ProjectFormModal - Category ID Selected:", value);
-    }
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -169,6 +198,24 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
         [name]: null,
       }));
     }
+  };
+
+  // Clear project_type_id if category is not Fortalecimiento
+  useEffect(() => {
+    if (categories.length > 0 && formData.category_id) {
+      const selectedCategory = categories.find(c => String(c.id) === String(formData.category_id));
+      if (selectedCategory && selectedCategory.name !== "Fortalecimiento") {
+        setFormData(prev => ({ ...prev, project_type_id: "" }));
+      }
+    }
+  }, [formData.category_id, categories]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData((prev) => ({
+      ...prev,
+      file: file,
+    }));
   };
 
   const validateForm = () => {
@@ -194,19 +241,25 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
         }
       }
 
-      const dataToSend = {
-        title: formData.title,
-        description: descriptionContent || "",
-        category_id: formData.category_id || null,
-        author: formData.author || "",
-      };
+      const submitData = new FormData();
+      submitData.append('title', formData.title);
+      submitData.append('description', descriptionContent || "");
+      if (formData.category_id) {
+        submitData.append('category_id', formData.category_id);
+      }
+      if (formData.project_type_id) {
+        submitData.append('project_type_id', formData.project_type_id);
+      }
+      submitData.append('author', formData.author || "");
+
+      if (formData.file) {
+        submitData.append('file', formData.file);
+      }
 
       if (isEditing && projectData?.id) {
-        await updateProject(projectData.id, dataToSend);
-        // alert("Proyecto actualizado exitosamente"); // Removed alert for cleaner UX
+        await updateProject(projectData.id, submitData);
       } else {
-        await createProject(dataToSend);
-        // alert("Proyecto creado exitosamente"); // Removed alert for cleaner UX
+        await createProject(submitData);
       }
       onSuccess();
     } catch (err) {
@@ -322,8 +375,61 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                   </select>
                 </div>
 
+                {/* Project Type */}
+                <div className="relative group">
+                  <label
+                    className={labelClass}
+                    style={{ opacity: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? 1 : 0.5 }}
+                  >
+                    Tipo de Proyecto
+                  </label>
+                  <div className="relative group/tooltip">
+                    <Layers className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                    <select
+                      name="project_type_id"
+                      value={formData.project_type_id}
+                      onChange={handleChange}
+                      className={`${inputClass} pl-10`}
+                      style={{
+                        "--tw-ring-color": BRAND.lightBlue,
+                        opacity: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? 1 : 0.6,
+                        cursor: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? 'pointer' : 'help',
+                        borderColor: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? BRAND.green : '#E5E7EB'
+                      }}
+                      disabled={loading || projectTypesLoading || categories.find(c => String(c.id) === String(formData.category_id))?.name !== "Fortalecimiento"}
+                    >
+                      <option value="">
+                        {projectTypesLoading
+                          ? "Cargando..."
+                          : categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento"
+                            ? "-- Seleccionar Tipo --"
+                            : "-- No disponible --"
+                        }
+                      </option>
+                      {projectTypes.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.label || type.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    {/* Hover Tooltip for disabled state */}
+                    {categories.find(c => String(c.id) === String(formData.category_id))?.name !== "Fortalecimiento" && (
+                      <div className="absolute left-1/2 -bottom-2 translate-y-full -translate-x-1/2 w-64 p-3 rounded-xl bg-gray-900 text-white text-[11px] leading-relaxed shadow-xl opacity-0 group-hover/tooltip:opacity-100 invisible group-hover/tooltip:visible transition-all duration-200 z-50 pointer-events-none">
+                        <div className="absolute -top-1 left-1/2 -translate-x-1/2 border-left-4 border-right-4 border-bottom-4 border-transparent border-bottom-gray-900" style={{ borderBottomColor: '#111827', borderWidth: '0 6px 6px 6px' }}></div>
+                        <div className="flex items-start gap-2">
+                          <AlertCircle size={14} className="text-yellow-400 flex-shrink-0 mt-0.5" />
+                          <p>
+                            <span className="font-bold text-yellow-400">Acceso Restringido:</span> Los tipos de proyecto solo están disponibles para la categoría <span className="underline decoration-yellow-400/50">Fortalecimiento</span>.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {/* Author */}
-                <div>
+                <div className="md:col-span-2">
                   <label className={labelClass}>Autor</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
@@ -337,6 +443,30 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                       style={{ "--tw-ring-color": BRAND.lightBlue }}
                       disabled={loading}
                     />
+                  </div>
+                </div>
+
+                {/* File Upload */}
+                <div className="md:col-span-2">
+                  <label className={labelClass}>Documento / Archivo (Opcional)</label>
+                  <div className="relative">
+                    <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-blue-50 transition-colors cursor-pointer group">
+                      <input
+                        type="file"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        disabled={loading}
+                      />
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                          <Upload size={20} className="text-blue-500" />
+                        </div>
+                        <p className="text-sm font-medium text-gray-600">
+                          {formData.file ? formData.file.name : "Seleccionar archivo para el proyecto"}
+                        </p>
+                        <p className="text-xs text-gray-400">PDF, Imágenes o Word (Máx 10MB)</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -28,34 +28,37 @@ export const getProjectById = async (projectId) => {
 
 /**
  * Create a new project
- * @param {Object} projectData - Project data object
- * @param {string} projectData.title - Title of the project
- * @param {string} projectData.description - Description or content
- * @param {string} projectData.category - Category of the project
- * @param {string} projectData.author - Author of the project
+ * @param {FormData} projectData - FormData containing project fields and file
  * @returns {Promise} - Created project object
  */
 export const createProject = async (projectData) => {
-  const response = await api.post(PROJECTS_ENDPOINT, projectData, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  if (!(projectData instanceof FormData)) {
+    throw new Error("Project data must be FormData for file upload");
+  }
+
+  const response = await api.post(PROJECTS_ENDPOINT, projectData);
   return response.data;
 };
 
 /**
  * Update an existing project
  * @param {string} projectId - The project ID (ULID)
- * @param {Object} projectData - Updated project data
+ * @param {FormData} projectData - FormData containing project fields and file
  * @returns {Promise} - Updated project object
  */
 export const updateProject = async (projectId, projectData) => {
-  const response = await api.put(`${PROJECTS_ENDPOINT}/${projectId}`, projectData, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  if (!(projectData instanceof FormData)) {
+    throw new Error("Project data must be FormData for file upload");
+  }
+
+  // Method spoofing for PUT requests with FormData
+  if (!projectData.has('_method')) {
+    projectData.append('_method', 'PUT');
+  }
+
+  // Using POST with _method=PUT because some PHP servers/Laravel versions 
+  // struggle with true PUT/PATCH requests that contain files
+  const response = await api.post(`${PROJECTS_ENDPOINT}/${projectId}`, projectData);
   return response.data;
 };
 

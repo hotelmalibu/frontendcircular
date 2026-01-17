@@ -29,15 +29,7 @@ const BRAND = {
   gray: "#6B7280",
 };
 
-// Category to image mapping
-const categoryImages = {
-  "Fortalecimiento": "/assets/home/Proyectos/proyecto1.png",
-  "Innovacion": "/assets/home/Proyectos/proyecto2.png",
-  "Sensibilizacion": "/assets/home/Proyectos/proyecto3.png",
-  "Investigacion": "/assets/home/Proyectos/proyecto4.png",
-  "Produccion": "/assets/home/Proyectos/proyecto5.png",
-  "Economia": "/assets/home/Proyectos/proyecto6.png",
-};
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
 
 export default function ProjectList() {
   const [projects, setProjects] = useState([]);
@@ -111,7 +103,10 @@ export default function ProjectList() {
           item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.category_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.category?.toLowerCase().includes(searchTerm.toLowerCase())
+          item.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.project_type_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.project_type_label?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (typeof item.project_type === 'object' && (item.project_type?.label?.toLowerCase().includes(searchTerm.toLowerCase()) || item.project_type?.name?.toLowerCase().includes(searchTerm.toLowerCase())))
       );
     }
 
@@ -241,8 +236,15 @@ export default function ProjectList() {
               <div className="p-5 flex-1 flex flex-col">
                 {/* Header: Categoría */}
                 <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg uppercase tracking-wide bg-blue-50 text-blue-700">
-                    <span>{item.category_name || item.category || "General"}</span>
+                  <div className="flex flex-wrap gap-2">
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide bg-blue-50 text-blue-700 border border-blue-100">
+                      <span>{item.category_name || item.category || "General"}</span>
+                    </div>
+                    {(item.project_type_name || item.project_type_label || (typeof item.project_type === 'object' && (item.project_type?.label || item.project_type?.name))) && (
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide bg-green-50 text-green-700 border border-green-100">
+                        <span>{item.project_type_name || item.project_type_label || item.project_type?.label || item.project_type?.name}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -251,35 +253,18 @@ export default function ProjectList() {
                   {item.title}
                 </h3>
 
-                {/* Imagen del Proyecto */}
-                <div className="mb-4 rounded-xl overflow-hidden border border-gray-100 h-40 bg-gray-50 flex items-center justify-center relative">
-                  {categoryImages[item.category_name] || categoryImages[item.category] ? (
-                    <img
-                      src={categoryImages[item.category_name] || categoryImages[item.category]}
-                      alt={item.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                    />
-                  ) : item.image ? (
-                    <CORSImage
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-gray-400">
-                      <ImageIcon size={32} className="mb-2 opacity-50" />
-                      <span className="text-xs">Sin imagen</span>
-                    </div>
-                  )}
-                  {/* Fallback div si la imagen falla */}
-                  <div className="hidden absolute inset-0 flex-col items-center justify-center text-gray-400 bg-gray-50">
-                    <ImageIcon size={32} className="mb-2 opacity-50" />
-                    <span className="text-xs">Imagen no disponible</span>
+                {/* Placeholder para un diseño consistente, sin intentar cargar imágenes inexistentes */}
+                <div className="mb-4 rounded-xl border border-gray-100 h-32 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative overflow-hidden group-hover:from-blue-50 group-hover:to-blue-100 transition-colors">
+                  <div
+                    className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                    style={{
+                      backgroundImage: `radial-gradient(circle at 2px 2px, ${BRAND.blue} 1px, transparent 0)`,
+                      backgroundSize: '24px 24px'
+                    }}
+                  ></div>
+                  <div className="flex flex-col items-center justify-center text-gray-400 group-hover:text-blue-400 transition-colors transform group-hover:scale-110 duration-500">
+                    <FolderOpen size={48} className="mb-2 opacity-20" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Proyecto Ecocircular</span>
                   </div>
                 </div>
 

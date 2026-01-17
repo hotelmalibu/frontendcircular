@@ -9,18 +9,13 @@ import {
   Clock,
   FileText,
   AlertCircle,
+  Layers,
+  Download,
 } from "lucide-react";
 import CORSImage from "../../../../../components/common/CORSImage";
+import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 
-// Category to image mapping
-const categoryImages = {
-  "Fortalecimiento": "/assets/home/Proyectos/proyecto1.png",
-  "Innovacion": "/assets/home/Proyectos/proyecto2.png",
-  "Sensibilizacion": "/assets/home/Proyectos/proyecto3.png",
-  "Investigacion": "/assets/home/Proyectos/proyecto4.png",
-  "Produccion": "/assets/home/Proyectos/proyecto5.png",
-  "Economia": "/assets/home/Proyectos/proyecto6.png",
-};
+// Category to image mapping (Legacy - removed to avoid loading errors)
 
 export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
   const formatDate = (dateString) => {
@@ -66,41 +61,50 @@ export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
             {projectData.title}
           </h1>
 
-          {/* Category Image Section */}
-          {(categoryImages[projectData.category_name] || categoryImages[projectData.category]) && (
-            <div className="mb-6">
-              <div className="aspect-video rounded-xl overflow-hidden shadow-lg">
-                <CORSImage
-                  src={categoryImages[projectData.category_name] || categoryImages[projectData.category]}
-                  alt={`Categoría: ${projectData.category_name || projectData.category}`}
-                  className="w-full h-full object-cover"
-                  fallbackSrc="/assets/placeholder-news.jpg"
-                />
-              </div>
-              <p className="text-sm text-gray-500 mt-2">
-                Categoría: {projectData.category_name || projectData.category || "General"}
-              </p>
-            </div>
-          )}
+          {/* Category Display */}
+          <div className="mb-4">
+            <p className="text-sm text-gray-400 font-medium">
+              Categoría: <span className="text-blue-600 font-bold">{projectData.category_name || projectData.category || "General"}</span>
+            </p>
+          </div>
 
           {/* Metadata Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm">
             {/* Category */}
             <div className="flex items-start gap-3">
-              <Tag className="text-gray-500 mt-1 flex-shrink-0" size={20} />
+              <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                <Tag size={20} />
+              </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Categoría</p>
-                <p className="text-gray-900">{projectData.category_name || projectData.category || "General"}</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Categoría</p>
+                <p className="text-gray-900 font-medium">{projectData.category_name || projectData.category || "General"}</p>
               </div>
             </div>
+
+            {/* Project Type */}
+            {(projectData.project_type_name || projectData.project_type_label || (typeof projectData.project_type === 'object' && (projectData.project_type?.label || projectData.project_type?.name))) && (
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-green-50 rounded-lg text-green-600">
+                  <Layers size={20} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Tipo de Proyecto</p>
+                  <p className="text-gray-900 font-medium">
+                    {projectData.project_type_name || projectData.project_type_label || projectData.project_type?.label || projectData.project_type?.name}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Author */}
             {projectData.author && (
               <div className="flex items-start gap-3">
-                <User className="text-gray-500 mt-1 flex-shrink-0" size={20} />
+                <div className="p-2 bg-purple-50 rounded-lg text-purple-600">
+                  <User size={20} />
+                </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Autor</p>
-                  <p className="text-gray-900">{projectData.author}</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Autor</p>
+                  <p className="text-gray-900 font-medium">{projectData.author}</p>
                 </div>
               </div>
             )}
@@ -108,67 +112,86 @@ export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
             {/* Created At */}
             {projectData.created_at && (
               <div className="flex items-start gap-3">
-                <Clock className="text-gray-500 mt-1 flex-shrink-0" size={20} />
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Fecha de Creación</p>
-                  <p className="text-gray-900">{formatDate(projectData.created_at)}</p>
+                <div className="p-2 bg-orange-50 rounded-lg text-orange-600">
+                  <Clock size={20} />
                 </div>
-              </div>
-            )}
-
-            {/* Updated At */}
-            {projectData.updated_at && (
-              <div className="flex items-start gap-3">
-                <Clock className="text-gray-500 mt-1 flex-shrink-0" size={20} />
                 <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    Última Actualización
-                  </p>
-                  <p className="text-gray-900">{formatDate(projectData.updated_at)}</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Fecha de Creación</p>
+                  <p className="text-gray-900 font-medium">{formatDate(projectData.created_at)}</p>
                 </div>
               </div>
             )}
           </div>
 
           {/* Description/Content */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <FileText size={20} />
-              Descripción
+          <div className="mb-8">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+              <FileText size={20} className="text-blue-600" />
+              Descripción del Proyecto
             </h3>
             {projectData.description ? (
               <div className="prose max-w-none">
-                <div className="text-gray-700 whitespace-pre-wrap bg-white p-4 rounded-lg border border-gray-200">
+                <div className="text-gray-700 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm leading-relaxed">
                   <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(projectData.description)) }} />
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2 text-gray-500 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <AlertCircle size={20} />
-                <span>No hay descripción disponible</span>
+              <div className="flex items-center gap-3 text-gray-500 bg-gray-50 p-6 rounded-2xl border border-gray-100 italic">
+                <AlertCircle size={20} className="text-gray-400" />
+                <span>No hay descripción disponible para este proyecto.</span>
               </div>
             )}
           </div>
 
-          {/* Additional Info */}
-          <div className="border-t pt-4">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">
-              Información Adicional
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+          {/* Documentation Section */}
+          {projectData.upload_file && (
+            <div className="mb-8">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                <Download size={20} className="text-green-600" />
+                Documentación Adjunta
+              </h3>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-white rounded-xl text-blue-600 shadow-sm border border-blue-50">
+                    <FileText size={32} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-800">{projectData.upload_file.original_name || "Documento del Proyecto"}</p>
+                    <p className="text-xs text-blue-600 font-medium flex items-center gap-1">
+                      <Clock size={12} /> Subido el {formatDate(projectData.upload_file.created_at)}
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href={getImageProxyUrl(`https://api-ecocircular.creativostecnologicosit.com/storage/${projectData.upload_file.path}`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg transition-all font-bold text-sm transform active:scale-95"
+                >
+                  <Download size={18} /> Descargar Archivo
+                </a>
+              </div>
+            </div>
+          )}
 
+          {/* Additional Info */}
+          <div className="border-t pt-6 mb-4">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
+              Registro de Auditoría
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {projectData.created_by && (
-                <div className="flex justify-between p-2 bg-gray-50 rounded">
-                  <span className="text-gray-600">Creado por:</span>
-                  <span className="font-mono text-gray-900">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <span className="text-xs font-medium text-gray-500">ID de Creador:</span>
+                  <span className="text-xs font-mono font-bold text-gray-700 bg-white px-2 py-1 rounded border border-gray-200">
                     {projectData.created_by}
                   </span>
                 </div>
               )}
               {projectData.updated_by && (
-                <div className="flex justify-between p-2 bg-gray-50 rounded">
-                  <span className="text-gray-600">Actualizado por:</span>
-                  <span className="font-mono text-gray-900">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <span className="text-xs font-medium text-gray-500">ID de Editor:</span>
+                  <span className="text-xs font-mono font-bold text-gray-700 bg-white px-2 py-1 rounded border border-gray-200">
                     {projectData.updated_by}
                   </span>
                 </div>
