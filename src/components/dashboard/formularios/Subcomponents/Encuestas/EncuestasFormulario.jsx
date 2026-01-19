@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { AuthContext } from "../../../../../context/AuthContext";
 import formsApi from "../../../../../api/formsApi";
 import { toast } from "react-hot-toast";
@@ -34,44 +34,56 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
   const isAdmin = user?.role_slug === "admin";
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedFormId, setSelectedFormId] = useState(null);
   const [view, setView] = useState("list"); // list, respond, responses
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    total: 0
+  });
 
-  const fetchForms = async () => {
+  const fetchForms = useCallback(async (page = 1) => {
     setLoading(true);
     try {
       const params = {
         status: statusFilter === "all" ? undefined : statusFilter,
+        category: categoryFilter === "all" ? undefined : categoryFilter,
         search: search || undefined,
-        per_page: 50,
-        page: 1
+        per_page: 8,
+        page: page
       };
       
       const response = await formsApi.listForms(params);
       const body = response.data || response;
-      const list = Array.isArray(body)
-        ? body
-        : (body.forms || (body.data && (Array.isArray(body.data) ? body.data : body.data.forms)) || []);
+      
+      // Extract data based on common wrapper patterns
+      const list = body.forms || body.data?.forms || (Array.isArray(body.forms) ? body.forms : []);
+      const paginInfo = body.pagination || body.data?.pagination || { current_page: 1, last_page: 1, total: 0 };
 
-      setForms(list);
+      setForms(Array.isArray(list) ? list : []);
+      setPagination(paginInfo);
     } catch (error) {
       console.error("Error fetching forms:", error);
       toast.error("Error al cargar los formularios");
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, categoryFilter, search]);
 
   useEffect(() => {
-    fetchForms();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter]);
+    fetchForms(1);
+  }, [fetchForms]);
 
-  const handleSearch = (e) => {
-    if (e.key === "Enter") fetchForms();
-  };
+  // Handle search with a small delay for better UX
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchForms(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search, fetchForms]);
 
   const handlePublish = async (id) => {
     try {
@@ -205,29 +217,41 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
           <p className="text-sm text-gray-500">Gestión de encuestas técnicas y recolección de datos</p>
         </div>
 
-        <div className="flex flex-wrap gap-3 w-full md:w-auto">
-          <div className="relative flex-1 md:flex-none">
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          <div className="relative flex-1 md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
               placeholder="Buscar formulario..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={handleSearch}
-              className="w-full md:w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             />
           </div>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-200 rounded-xl bg-white text-sm font-semibold text-gray-700 outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">Ver Todos</option>
-            <option value="published">Publicados</option>
-            <option value="draft">Borradores</option>
-            <option value="archived">Archivados</option>
-          </select>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="flex-1 sm:flex-none px-4 py-2 border border-gray-200 rounded-xl bg-white text-sm font-semibold text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
+            >
+              <option value="all">Estado: Todos</option>
+              <option value="published">Publicados</option>
+              <option value="draft">Borradores</option>
+              <option value="archived">Archivados</option>
+            </select>
+
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="flex-1 sm:flex-none px-4 py-2 border border-gray-200 rounded-xl bg-white text-sm font-semibold text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
+            >
+              <option value="all">Tipo: Todos</option>
+              <option value="encuesta">Encuesta</option>
+              <option value="normativo">Normativo</option>
+              <option value="periodico">Periódico</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -256,22 +280,37 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
                       <div className="p-2 bg-blue-50/50 rounded-xl text-[#004b72]">
                          <FileEdit size={16} />
                       </div>
-                      <div className="flex-1 min-w-0">
-                         <div className="flex items-center justify-between mb-1">
-                             <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${
-                                form.status === 'published' ? 'bg-[#B1D357]/20 text-[#6a822b]' :
-                                form.status === 'draft' ? 'bg-amber-50 text-amber-600' :
-                                'bg-gray-100 text-gray-500'
-                              }`}>
-                                {form.status === 'published' ? 'Activa' : 
-                                 form.status === 'draft' ? 'Borrador' : 'Archivada'}
-                             </span>
-                             <span className="text-[10px] text-gray-400 font-bold">{new Date(form.created_at).toLocaleDateString()}</span>
-                         </div>
-                         <h3 className="text-sm font-bold text-gray-800 leading-tight truncate px-0.5">
-                            {form.title}
-                         </h3>
-                      </div>
+                       <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1 gap-2">
+                              <div className="flex gap-1.5 flex-wrap">
+                                <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                                    form.status === 'published' ? 'bg-[#B1D357]/20 text-[#6a822b]' :
+                                    form.status === 'draft' ? 'bg-amber-50 text-amber-600' :
+                                    'bg-gray-100 text-gray-500'
+                                }`}>
+                                    {form.status === 'published' ? 'Activa' : 
+                                    form.status === 'draft' ? 'Borrador' : 'Archivada'}
+                                </span>
+                                <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md flex items-center gap-1 ${
+                                    form.category === 'normativo' ? 'bg-purple-100 text-purple-700' :
+                                    form.category === 'periodico' ? 'bg-blue-100 text-blue-700' :
+                                    'bg-green-100 text-green-700'
+                                }`}>
+                                    <div className={`w-1 h-1 rounded-full ${
+                                      form.category === 'normativo' ? 'bg-purple-500' :
+                                      form.category === 'periodico' ? 'bg-blue-500' :
+                                      'bg-green-500'
+                                    }`} />
+                                    {form.category === 'normativo' ? 'Normativo' : 
+                                     form.category === 'periodico' ? 'Periódico' : 'Encuesta'}
+                                </span>
+                              </div>
+                              <span className="text-[9px] text-gray-400 font-bold whitespace-nowrap">{new Date(form.created_at).toLocaleDateString()}</span>
+                          </div>
+                          <h3 className="text-sm font-bold text-gray-800 leading-tight truncate px-0.5" title={form.title}>
+                             {form.title}
+                          </h3>
+                       </div>
                     </div>
                   </div>
 
@@ -389,6 +428,49 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
               </div>
             )}
           </div>
+
+          {/* PAGINATION */}
+          {pagination.last_page > 1 && (
+            <div className="flex justify-center items-center gap-4 mb-12">
+              <button
+                disabled={pagination.current_page === 1}
+                onClick={() => fetchForms(pagination.current_page - 1)}
+                className={`p-2 rounded-xl border transition-all ${
+                  pagination.current_page === 1 
+                    ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed' 
+                    : 'bg-white text-[#004b72] border-gray-200 hover:border-blue-400 hover:bg-blue-50'
+                }`}
+              >
+                <ChevronRight size={20} className="rotate-180" />
+              </button>
+              <div className="flex gap-2">
+                {[...Array(pagination.last_page)].map((_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => fetchForms(i + 1)}
+                    className={`w-10 h-10 rounded-xl font-bold transition-all ${
+                      pagination.current_page === i + 1
+                        ? 'bg-[#004b72] text-white shadow-lg shadow-blue-900/20'
+                        : 'bg-white text-gray-500 border border-gray-100 hover:border-blue-200'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+              <button
+                disabled={pagination.current_page === pagination.last_page}
+                onClick={() => fetchForms(pagination.current_page + 1)}
+                className={`p-2 rounded-xl border transition-all ${
+                  pagination.current_page === pagination.last_page 
+                    ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed' 
+                    : 'bg-white text-[#004b72] border-gray-200 hover:border-blue-400 hover:bg-blue-50'
+                }`}
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
 
           {/* ANALYSIS TITLE */}
           <div className="flex items-center gap-3 mb-8">

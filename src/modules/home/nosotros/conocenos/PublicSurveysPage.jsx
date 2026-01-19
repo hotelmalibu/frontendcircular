@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../../../context/AuthContext";
 import formsApi from "../../../../api/formsApi";
@@ -22,47 +22,52 @@ export default function PublicSurveysPage() {
   const isAdmin = user?.role_slug === "admin";
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    total: 0
+  });
 
   // BRAND COLORS
-  const fetchForms = async () => {
+  const fetchForms = useCallback(async (page = 1) => {
     setLoading(true);
     try {
       const params = {
         status: "published",
-        per_page: 50
+        category: categoryFilter === "all" ? undefined : categoryFilter,
+        search: search || undefined,
+        per_page: 8,
+        page: page
       };
       
-      let list = [];
-      try {
-        const response = await formsApi.listPublicForms(params);
-        // Robust extraction from various common response structures
-        if (Array.isArray(response)) {
-          list = response;
-        } else if (response.data) {
-          const body = response.data;
-          list = Array.isArray(body)
-            ? body
-            : (body.forms || (body.data && (Array.isArray(body.data) ? body.data : body.data.forms)) || []);
-        } else {
-          list = (response.forms || (response.data && (Array.isArray(response.data) ? response.data : response.data.forms)) || []);
-        }
-      } catch (err) {
-        console.log("Error loading forms:", err);
-      }
+      const response = await formsApi.listPublicForms(params);
+      const body = response.data || response;
+      
+      const list = body.forms || body.data?.forms || (Array.isArray(body.forms) ? body.forms : []);
+      const paginInfo = body.pagination || body.data?.pagination || { current_page: 1, last_page: 1, total: 0 };
 
-      setForms(list);
+      setForms(Array.isArray(list) ? list : []);
+      setPagination(paginInfo);
     } catch (error) {
       console.error("Error fetching forms:", error);
       toast.error("Error al cargar las encuestas");
     } finally {
       setTimeout(() => setLoading(false), 300);
     }
-  };
+  }, [categoryFilter, search]);
 
   useEffect(() => {
-    fetchForms();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fetchForms(1);
+  }, [fetchForms]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchForms(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search, fetchForms]);
 
 
   return (
@@ -101,9 +106,35 @@ export default function PublicSurveysPage() {
             <div className="space-y-2">
                 <h2 className="text-3xl font-black text-[#005380] flex items-center gap-3">
                     <div className="w-1.5 h-10 bg-[#B1D357] rounded-full"></div>
-                    Encuestas Disponibles
+                    Iniciativas Técnicas
                 </h2>
-                <p className="text-gray-500 font-medium ml-4">({forms.length}) Iniciativas activas para tu participación</p>
+                <p className="text-gray-500 font-medium ml-4">({pagination.total}) Encuestas y procesos activos</p>
+            </div>
+
+            <div className="flex flex-wrap gap-4 w-full md:w-auto mt-6 md:mt-0">
+                <div className="relative flex-1 md:flex-none">
+                    <input 
+                      type="text"
+                      placeholder="Buscar por título..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="w-full md:w-64 pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-[#B1D357] outline-none text-sm transition-all"
+                    />
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Play size={14} className="rotate-180" />
+                    </div>
+                </div>
+
+                <select 
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="px-6 py-3 bg-white border border-gray-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-[#B1D357] outline-none text-sm font-bold text-[#005380] transition-all cursor-pointer"
+                >
+                    <option value="all">Todas las Categorías</option>
+                    <option value="encuesta">Encuestas</option>
+                    <option value="normativo">Normativo</option>
+                    <option value="periodico">Periódico</option>
+                </select>
             </div>
         </div>
 
@@ -137,8 +168,10 @@ export default function PublicSurveysPage() {
                           <FileText size={22} />
                        </div>
                        <div className="flex flex-col items-end">
-                           <span className="text-[10px] font-black text-[#B1D357] uppercase tracking-wider bg-[#F4F9E6] px-2.5 py-1 rounded-md border border-[#B1D357]/20">
-                             Activa
+                           <span className="text-[10px] font-black text-[#B1D357] uppercase tracking-wider bg-[#F4F9E6] px-2.5 py-1 rounded-md border border-[#B1D357]/20 flex items-center gap-1">
+                             <div className="w-1 h-1 bg-[#B1D357] rounded-full animate-pulse" />
+                             {form.category === 'normativo' ? 'Normativo' : 
+                              form.category === 'periodico' ? 'Periódico' : 'Encuesta'}
                            </span>
                            <span className="text-[10px] text-gray-400 font-bold mt-1.5 uppercase tracking-tight">
                              {new Date(form.created_at).toLocaleDateString()}
@@ -195,6 +228,49 @@ export default function PublicSurveysPage() {
                 </div>
             )}
             </div>
+        )}
+
+        {/* PAGINATION */}
+        {pagination.last_page > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-20">
+            <button
+              disabled={pagination.current_page === 1}
+              onClick={() => fetchForms(pagination.current_page - 1)}
+              className={`p-3 rounded-2xl border bg-white shadow-sm transition-all ${
+                pagination.current_page === 1 
+                  ? 'text-gray-200 cursor-not-allowed border-gray-50' 
+                  : 'text-[#005380] border-gray-100 hover:border-[#B1D357] hover:bg-gray-50'
+              }`}
+            >
+              <Play size={16} className="rotate-180" />
+            </button>
+            <div className="flex gap-2">
+              {[...Array(pagination.last_page)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => fetchForms(i + 1)}
+                  className={`w-12 h-12 rounded-2xl font-black transition-all ${
+                    pagination.current_page === i + 1
+                      ? 'bg-[#B1D357] text-white shadow-lg shadow-[#B1D357]/20'
+                      : 'bg-white text-gray-500 border border-gray-100 hover:border-gray-200'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+            <button
+              disabled={pagination.current_page === pagination.last_page}
+              onClick={() => fetchForms(pagination.current_page + 1)}
+              className={`p-3 rounded-2xl border bg-white shadow-sm transition-all ${
+                pagination.current_page === pagination.last_page 
+                  ? 'text-gray-200 cursor-not-allowed border-gray-50' 
+                  : 'text-[#005380] border-gray-100 hover:border-[#B1D357] hover:bg-gray-50'
+              }`}
+            >
+              <Play size={16} />
+            </button>
+          </div>
         )}
       </div>
 

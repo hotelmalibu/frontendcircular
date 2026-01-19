@@ -38,11 +38,10 @@ const FormBuilder = ({ formId, onSuccess }) => {
   const [formMeta, setFormMeta] = useState({
     title: "",
     description: "",
+    category: "encuesta",
     version: 1,
     expires_at: "",
-    metadata: {
-      category: "general",
-    }
+    metadata: {}
   });
   const [formFields, setFormFields] = useState([]);
   const [fieldTypes, setFieldTypes] = useState([]);
@@ -102,14 +101,15 @@ const FormBuilder = ({ formId, onSuccess }) => {
         setLoading(true);
         try {
           const response = await formsApi.getForm(formId);
-          const form = response.data || response;
+          const form = response.data?.form || response.data || response;
           
           setFormMeta({
             title: form.title || "",
             description: form.description || "",
+            category: form.category || "encuesta",
             version: form.version || 1,
             expires_at: form.expires_at ? form.expires_at.split('T')[0] : "",
-            metadata: form.metadata || { category: "" }
+            metadata: form.metadata || {}
           });
 
           if (form.fields) {
@@ -140,6 +140,18 @@ const FormBuilder = ({ formId, onSuccess }) => {
         }
       };
       fetchFormDetails();
+    } else {
+      // RESET STATE when formId becomes null (creating new)
+      setFormMeta({
+        title: "",
+        description: "",
+        category: "encuesta",
+        version: 1,
+        expires_at: "",
+        metadata: {}
+      });
+      setFormFields([]);
+      setSelectedFieldIndex(null);
     }
   }, [formId]);
 
@@ -535,13 +547,28 @@ const FormBuilder = ({ formId, onSuccess }) => {
                   />
                 </div>
                 <div className="flex items-center gap-2 text-gray-500">
-                  <span className="font-semibold text-gray-700">Expira:</span>
+                  <span className="font-semibold text-gray-700">Expiración:</span>
                   <input
                     type="date"
                     value={formMeta.expires_at}
                     onChange={(e) => setFormMeta({ ...formMeta, expires_at: e.target.value })}
                     className="border-none p-0 focus:ring-0 font-medium bg-transparent"
                   />
+                </div>
+                <div className="flex items-center gap-2 text-gray-500 border-l pl-4 border-gray-100 group relative">
+                  <span className="font-semibold text-gray-700">Tipo:</span>
+                  <div className="relative flex items-center">
+                    <select
+                      value={formMeta.category}
+                      onChange={(e) => setFormMeta({ ...formMeta, category: e.target.value })}
+                      className="border-none p-0 pr-6 focus:ring-0 font-bold bg-transparent text-blue-600 cursor-pointer appearance-none relative z-10"
+                    >
+                      <option value="encuesta">Encuesta</option>
+                      <option value="normativo">Normativo</option>
+                      <option value="periodico">Periódico</option>
+                    </select>
+                    <ChevronDown size={14} className="absolute right-0 text-blue-600 pointer-events-none" />
+                  </div>
                 </div>
               </div>
             </div>
