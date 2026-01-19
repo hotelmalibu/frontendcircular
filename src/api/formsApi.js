@@ -97,13 +97,34 @@ const formsApi = {
     },
 
     /**
+     * Delete a form
+     * @param {string} id
+     * @returns {Promise}
+     */
+    deleteForm: async (id) => {
+        const response = await api.delete(`/forms/${id}`);
+        return response.data;
+    },
+
+    /**
+     * Get responses for a form
+     * @param {string} id
+     * @returns {Promise}
+     */
+    getFormResponses: async (id) => {
+        // Try 'responses' as 'submissions' returned 404
+        const response = await api.get(`/forms/${id}/responses`);
+        return response.data;
+    },
+
+    /**
      * List public forms
      * @param {Object} params
      * @returns {Promise}
      */
     listPublicForms: async (params = {}) => {
-        // Now that the backend /forms is public, we just call it with status=published
-        return await formsApi.listForms({ ...params, status: 'published' });
+        // Point to the dedicated public endpoint to avoid auth issues
+        return await api.get("/forms/public", { params });
     },
 };
 

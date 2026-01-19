@@ -1,162 +1,288 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import formsApi from "../../../../../api/formsApi";
+import { toast } from "react-hot-toast";
+import { 
+  Search, 
+  ArrowLeft, 
+  Calendar, 
+  User, 
+  X,
+  FileText,
+  Clock,
+  Download,
+  Eye
+} from "lucide-react";
 
-const ResponseManagement = () => {
+/**
+ * Modal de Detalle de Respuesta
+ * Diseño premium con efecto glassmorphism y disposición clara
+ */
+const ResponseDetailModal = ({ response, onClose }) => {
+  if (!response) return null;
+
+  const date = response.submitted_at || response.created_at;
+  const submissions = response.field_submissions || [];
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+      <div 
+        className="bg-white/90 backdrop-blur-md w-full max-w-2xl max-h-[90vh] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col border border-white/20 animate-slideUp"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header del Modal */}
+        <div className="p-8 border-b border-gray-100 flex justify-between items-start bg-gradient-to-br from-blue-50/50 to-transparent">
+          <div>
+            <div className="flex items-center gap-2 text-blue-600 mb-2">
+              <FileText size={20} className="animate-pulse" />
+              <span className="text-xs font-black uppercase tracking-widest">Detalle de Envío</span>
+            </div>
+            <h3 className="text-2xl font-black text-gray-800 leading-tight">
+              Respuesta #{response.id?.toString().slice(0, 8)}
+            </h3>
+            <div className="flex gap-4 mt-3 text-sm text-gray-400 font-medium">
+               <div className="flex items-center gap-1.5">
+                  <Calendar size={14} />
+                  {new Date(date).toLocaleDateString()}
+               </div>
+               <div className="flex items-center gap-1.5">
+                  <Clock size={14} />
+                  {new Date(date).toLocaleTimeString()}
+               </div>
+            </div>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-3 hover:bg-white rounded-2xl text-gray-400 hover:text-gray-900 transition-all shadow-sm hover:shadow-md active:scale-95"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Contenido del Modal */}
+        <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+          {submissions.length > 0 ? (
+            <div className="grid gap-6">
+              {submissions.map((sub, idx) => (
+                <div key={sub.id || idx} className="group flex flex-col gap-2 p-4 rounded-3xl hover:bg-blue-50/40 transition-all border border-transparent hover:border-blue-100/50">
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-blue-500 transition-colors">
+                    {sub.field?.label || "Pregunta Sin Título"}
+                  </span>
+                  <div className="text-sm text-gray-700 font-semibold bg-gray-50/50 p-3 rounded-2xl group-hover:bg-white group-hover:shadow-sm transition-all border border-gray-100">
+                    {sub.file_path ? (
+                      <a 
+                        href={`${process.env.REACT_APP_API_URL || ''}/storage/${sub.file_path}`} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="flex items-center gap-2 text-blue-600 hover:underline"
+                      >
+                        <Download size={14} />
+                        Descargar Archivo
+                      </a>
+                    ) : (
+                      sub.value || <span className="text-gray-300 italic">Sin respuesta</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+              <div className="p-4 bg-gray-50 rounded-full mb-4">
+                <FileText size={40} className="text-gray-200" />
+              </div>
+              <p className="font-medium italic">No se encontraron campos respondidos para este envío.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer del Modal */}
+        <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex justify-end">
+          <button 
+            onClick={onClose}
+            className="px-8 py-3 bg-[#004b72] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#2C67B0] transition-all shadow-lg shadow-blue-900/10 active:scale-95"
+          >
+            Cerrar Ventana
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ResponseManagement = ({ formId, onBack }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("Todos los estados");
-  const [selectedDate, setSelectedDate] = useState("");
+  const [responses, setResponses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedResponse, setSelectedResponse] = useState(null);
 
-  // Datos de ejemplo de respuestas
-  const responses = [
-    {
-      form: "Registro Productores Envasados",
-      companyUser: "EcoPlásticos Ltda. - S00012456-7",
-      status: "Aprobado",
-      completion: "100%",
-      date: "14/09/2025 15:30",
-      reviewer: "María González",
-      actions: null,
-    },
-    {
-      form: "Manifiesto RESPEL",
-      companyUser: "Químicos Industriales S.A. - 89022457-8",
-      status: "Requiere Corrección",
-      completion: "85%",
-      date: "13/09/2025 14:45",
-      reviewer: "Carlos Ruiz",
-      actions: null,
-    },
-    {
-      form: "Reporte Trimestral Aprovechamiento",
-      companyUser: "Reciclaje Verde Colombia - 83034567-9",
-      status: "En Revisión",
-      completion: "65%",
-      date: "12/09/2025 08:20",
-      reviewer: "David López",
-      actions: null,
-    },
-  ];
+  const fetchResponses = async () => {
+    if (!formId) return;
+    setLoading(true);
+    try {
+      const response = await formsApi.getFormResponses(formId);
+      // El nuevo controlador devuelve { message: ..., data: [...] }
+      const list = response.data || [];
+      setResponses(list);
+    } catch (error) {
+      console.error("Error fetching responses:", error);
+      toast.error("Error al cargar las respuestas");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Filtrar respuestas según el término de búsqueda, estado y fecha
+  useEffect(() => {
+    fetchResponses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formId]);
+
   const filteredResponses = responses.filter((response) => {
-    const matchesSearch = response.form.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         response.companyUser.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === "Todos los estados" || response.status === filterStatus;
-    const responseDate = new Date(response.date.split(" ")[0].split("/").reverse().join("-"));
-    const selected = selectedDate ? new Date(selectedDate.split("/").reverse().join("-")) : null;
-
-    const matchesDate = !selected || responseDate.toDateString() === selected.toDateString();
-    return matchesSearch && matchesStatus && matchesDate;
+    const searchString = JSON.stringify(response).toLowerCase();
+    return searchString.includes(searchTerm.toLowerCase());
   });
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Sección superior de filtros */}
-      <div className="mb-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-        <div className="flex justify-end items-center mb-4">
-          <div className="flex items-center space-x-2">
-            <input
-              type="text"
-              placeholder="Buscar Formulario"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-64 p-2 border border-gray-300 rounded"
-            />
-            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-              Buscar
+    <div className="bg-white/70 backdrop-blur-md rounded-[3rem] border border-white shadow-2xl p-8 animate-slideUp ring-1 ring-gray-900/[0.03]">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+        <div>
+           <button 
+             onClick={onBack}
+             className="mb-4 flex items-center gap-2 text-gray-400 hover:text-blue-600 font-bold text-xs uppercase tracking-widest group transition-all"
+           >
+             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+             Volver al Listado
+           </button>
+           <h3 className="text-3xl font-black text-gray-800 tracking-tight">Registro de Respuestas</h3>
+           <p className="text-sm text-gray-400 font-medium mt-1 uppercase tracking-tighter">Monitoreo de datos recolectados en tiempo real</p>
+        </div>
+        <div className="flex flex-wrap gap-3 w-full md:w-auto">
+            <div className="relative flex-1 md:flex-none">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+              <input
+                type="text"
+                placeholder="Filtrar registros..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full md:w-72 pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:bg-white outline-none text-sm font-medium transition-all"
+              />
+            </div>
+            <button
+               onClick={fetchResponses}
+               className="p-3 bg-white border border-gray-100 rounded-2xl hover:bg-blue-50 text-blue-600 transition-all shadow-sm hover:shadow-md"
+               title="Refrescar"
+            >
+               <Clock size={18} />
             </button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex flex-col justify-center items-center py-24 gap-4">
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#004b72]"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+               <div className="h-8 w-8 bg-blue-50 rounded-full animate-pulse"></div>
+            </div>
           </div>
+          <p className="text-sm font-bold text-gray-400 animate-pulse uppercase tracking-widest text-center">
+            Sincronizando Respuestas...
+          </p>
         </div>
-        <div className="flex flex-col space-y-2">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="p-2 border border-gray-300 rounded w-full"
-          >
-            <option value="Todos los estados">Todos los estados</option>
-            <option value="Aprobado">Aprobado</option>
-            <option value="Requiere Corrección">Requiere Corrección</option>
-            <option value="En Revisión">En Revisión</option>
-          </select>
-          <input
-            type="text"
-            placeholder="día/mes/año"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
+      ) : (
+        <div className="overflow-hidden rounded-[2rem] border border-gray-100 bg-white">
+          {filteredResponses.length === 0 ? (
+             <div className="flex flex-col items-center justify-center py-20 bg-gray-50/50">
+                <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mb-6 shadow-sm ring-1 ring-gray-100">
+                  <Search size={32} className="text-gray-200" />
+                </div>
+                <h3 className="text-lg font-black text-gray-400 uppercase tracking-widest italic">Sin resultados</h3>
+                <p className="text-gray-400 text-xs mt-2 font-medium">No se han encontrado respuestas que coincidan con la búsqueda.</p>
+             </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50/80 text-gray-400 text-[10px] uppercase tracking-widest font-black">
+                    <th className="p-6 border-b border-gray-100">Marca Temporal</th>
+                    <th className="p-6 border-b border-gray-100">Enviado Por</th>
+                    <th className="p-6 border-b border-gray-100">Resumen</th>
+                    <th className="p-6 border-b border-gray-100 text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm text-gray-600">
+                  {filteredResponses.map((response, index) => {
+                    const submissions = response.field_submissions || [];
+                    const userName = response.submitted_by_user?.name || "Invitado";
+                    
+                    return (
+                      <tr 
+                        key={response.id || index} 
+                        className="group border-b border-gray-50 hover:bg-blue-50/20 transition-all duration-300"
+                      >
+                        <td className="p-6">
+                           <div className="flex flex-col">
+                             <span className="font-black text-gray-700">{new Date(response.submitted_at || response.created_at).toLocaleDateString()}</span>
+                             <span className="text-[10px] font-bold text-gray-400 uppercase">{new Date(response.submitted_at || response.created_at).toLocaleTimeString()}</span>
+                           </div>
+                        </td>
+                        <td className="p-6">
+                           <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 font-bold text-xs ring-4 ring-blue-50/50">
+                                 <User size={14} />
+                              </div>
+                              <span className="font-bold text-gray-600">{userName}</span>
+                           </div>
+                        </td>
+                        <td className="p-6 max-w-xs">
+                           <div className="flex flex-wrap gap-2">
+                              {submissions.slice(0, 2).map((sub, sIdx) => (
+                                <span key={sIdx} className="px-3 py-1 bg-white border border-gray-200 rounded-full text-[10px] font-bold text-gray-400 truncate max-w-[120px]" title={sub.value}>
+                                  {sub.value}
+                                </span>
+                              ))}
+                              {submissions.length > 2 && <span className="text-[10px] font-black text-blue-400">+{submissions.length - 2}</span>}
+                           </div>
+                        </td>
+                        <td className="p-6">
+                           <div className="flex justify-center">
+                              <button 
+                                onClick={() => setSelectedResponse(response)}
+                                className="flex items-center gap-2 py-2 px-5 bg-white text-[#004b72] rounded-xl border border-gray-200 font-black text-[10px] uppercase tracking-widest hover:bg-[#004b72] hover:text-white hover:border-[#004b72] hover:shadow-xl hover:shadow-blue-900/10 transition-all active:scale-95 translate-y-0 group-hover:-translate-y-1"
+                              >
+                                <span>Ver Detalle</span>
+                                <Eye size={14} />
+                              </button>
+                           </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
-      {/* Sección de exportación */}
-      <div className="mb-4 flex justify-start">
-        <button
-          className="bg-[#34672A] text-white px-4 py-2 rounded hover:bg-[#2A4F20]"
-          style={{ backgroundColor: "#34672A" }}
-        >
-          Exportar Respuestas
-        </button>
-      </div>
+      {/* Modal Detalle */}
+      {selectedResponse && (
+        <ResponseDetailModal 
+          response={selectedResponse} 
+          onClose={() => setSelectedResponse(null)} 
+        />
+      )}
 
-      {/* Tabla de respuestas */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <h3 className="text-lg font-semibold mb-4">Gestión de Respuestas</h3>
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2 border-b">Formulario</th>
-              <th className="p-2 border-b">Empresa/Usuario</th>
-              <th className="p-2 border-b">Estado</th>
-              <th className="p-2 border-b">Completitud</th>
-              <th className="p-2 border-b">Fecha Envío</th>
-              <th className="p-2 border-b">Revisor</th>
-              <th className="p-2 border-b">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredResponses.map((response, index) => (
-              <tr key={index} className="border-b">
-                <td className="p-2">{response.form}</td>
-                <td className="p-2">{response.companyUser}</td>
-                <td className="p-2">
-                  <span
-                    className={`px-2 py-1 rounded ${
-                      response.status === "Aprobado"
-                        ? "bg-green-200 text-green-800"
-                        : response.status === "Requiere Corrección"
-                        ? "bg-red-200 text-red-800"
-                        : "bg-yellow-200 text-yellow-800"
-                    }`}
-                  >
-                    {response.status}
-                  </span>
-                </td>
-                <td className="p-2">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div
-                      className={`h-2.5 rounded-full ${
-                        response.status === "Aprobado"
-                          ? "bg-green-600"
-                          : response.status === "Requiere Corrección"
-                          ? "bg-red-600"
-                          : "bg-yellow-600"
-                      }`}
-                      style={{ width: response.completion }}
-                    ></div>
-                  </div>
-                  <span className="text-sm ml-2">{response.completion}</span>
-                </td>
-                <td className="p-2">{response.date}</td>
-                <td className="p-2">{response.reviewer}</td>
-                <td className="p-2">
-                  <button className="text-gray-500 hover:text-gray-700">
-                    ✏️
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-slideUp { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+      `}</style>
     </div>
   );
 };

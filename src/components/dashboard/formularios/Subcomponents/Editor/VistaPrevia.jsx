@@ -69,7 +69,24 @@ const FormBuilder = ({ formId, onSuccess }) => {
         }
         
         console.log("Field types parsed:", list);
-        setFieldTypes(list.length > 0 ? list : DEFAULT_FIELD_TYPES);
+        
+        // Custom sort to prioritize visual elements (Title, Paragraph)
+        const sortedList = list.sort((a, b) => {
+          const priority = ['title', 'paragraph'];
+          const slugA = (a.slug || '').toLowerCase();
+          const slugB = (b.slug || '').toLowerCase();
+          
+          const indexA = priority.indexOf(slugA);
+          const indexB = priority.indexOf(slugB);
+          
+          if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+          if (indexA !== -1) return -1;
+          if (indexB !== -1) return 1;
+          
+          return 0;
+        });
+
+        setFieldTypes(sortedList.length > 0 ? sortedList : DEFAULT_FIELD_TYPES);
       } catch (error) {
         console.error("Error fetching field types, using defaults:", error);
         // Fallback to defaults on error
@@ -92,7 +109,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
             description: form.description || "",
             version: form.version || 1,
             expires_at: form.expires_at ? form.expires_at.split('T')[0] : "",
-            metadata: form.metadata || { category: "general" }
+            metadata: form.metadata || { category: "" }
           });
 
           if (form.fields) {
@@ -135,7 +152,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
         const type = typeof schema === 'string' ? schema : schema.type;
 
         if (type === 'boolean') initialOptions[key] = false;
-        else if (type === 'integer' || type === 'numeric') initialOptions[key] = 0;
+        else if (type === 'integer' || type === 'numeric') initialOptions[key] = ""; // Start empty to avoid 0 validation issues
         else if (type === 'array') initialOptions[key] = [];
         else initialOptions[key] = "";
       });
@@ -286,7 +303,35 @@ const FormBuilder = ({ formId, onSuccess }) => {
 
   const renderSchemaInput = (key, schema, value, onChange) => {
     const type = typeof schema === 'string' ? schema : schema.type;
-    const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    
+    const PROPERTY_LABELS = {
+      placeholder: "Texto de Ayuda (Placeholder)",
+      min: "Valor Mínimo",
+      max: "Valor Máximo",
+      step: "Incremento (Paso)",
+      rows: "Altura (Filas)",
+      cols: "Ancho (Columnas)",
+      minlength: "Longitud Mínima",
+      maxlength: "Longitud Máxima",
+      pattern: "Patrón (Regex)",
+      accept: "Tipos de Archivo (ej: .pdf,.jpg)",
+      multiple: "Permitir Múltiples Archivos",
+      size_limit: "Límite de Tamaño (MB)",
+      choices: "Opciones de Selección",
+      options: "Opciones",
+      default: "Valor por Defecto",
+      readonly: "Solo Lectura",
+      disabled: "Deshabilitado",
+      autofocus: "Enfocar al Inicio",
+      autocomplete: "Autocompletar",
+      // Estilos para Títulos y Párrafos
+      tag: "Etiqueta HTML (h1-h6)",
+      color: "Clase de Color (Tailwind)",
+      size: "Clase de Tamaño (Tailwind)",
+      align: "Alineación (left, center, right)"
+    };
+
+    const label = PROPERTY_LABELS[key.toLowerCase()] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
     if (type === 'boolean') {
       return (
@@ -317,7 +362,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
                 <input
                   type="text"
                   value={choice.label || ""}
-                  placeholder="Etiqueta"
+                  placeholder="Texto visible de la opción"
                   onChange={(e) => {
                     const newChoices = [...choices];
                     newChoices[cIdx] = {
@@ -460,22 +505,25 @@ const FormBuilder = ({ formId, onSuccess }) => {
         {/* Center: Canvas */}
         <div className={`${activeTab === "canvas" ? "block" : "hidden md:block"} flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar bg-gray-100/50`}>
           <div className="max-w-3xl mx-auto space-y-6">
-            {/* Form Meta Section */}
-            <div className="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 ring-1 ring-gray-200/50">
+              <div className="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 ring-1 ring-gray-200/50">
               <input
                 type="text"
                 value={formMeta.title}
                 onChange={(e) => setFormMeta({ ...formMeta, title: e.target.value })}
                 placeholder="Título del Formulario"
-                className="w-full text-2xl md:text-3xl font-bold text-gray-800 placeholder-gray-300 border-none focus:ring-0 mb-4 p-0"
+                className="w-full text-2xl md:text-3xl font-bold text-gray-800 placeholder-gray-300 border-none focus:ring-0 mb-2 p-0"
               />
-              <textarea
-                value={formMeta.description}
-                onChange={(e) => setFormMeta({ ...formMeta, description: e.target.value })}
-                placeholder="Descripción o propósito de este formulario..."
-                className="w-full text-sm md:text-base text-gray-600 placeholder-gray-300 border-none focus:ring-0 resize-none p-0"
-                rows={2}
-              />
+              <div className="space-y-4">
+                <div>
+                  <textarea
+                    value={formMeta.description}
+                    onChange={(e) => setFormMeta({ ...formMeta, description: e.target.value })}
+                    placeholder="Descripción o propósito de este formulario..."
+                    className="w-full text-sm text-gray-600 placeholder-gray-300 border-none focus:ring-0 resize-none p-0 bg-gray-50/30 rounded-lg"
+                    rows={2}
+                  />
+                </div>
+              </div>
               <div className="pt-4 mt-4 border-t border-gray-50 flex flex-wrap gap-4 md:gap-6 text-sm">
                 <div className="flex items-center gap-2 text-gray-500">
                   <span className="font-semibold text-gray-700">Versión:</span>
@@ -609,7 +657,8 @@ const FormBuilder = ({ formId, onSuccess }) => {
                 />
               </div>
 
-              <div>
+              {/* ID Único (Key) - Hidden to prevent accidental edits */}
+              {/* <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-2">ID Único (Key)</label>
                 <input
                   type="text"
@@ -617,7 +666,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
                   onChange={(e) => updateField(selectedFieldIndex, { name: e.target.value })}
                   className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm font-mono"
                 />
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Descripción</label>

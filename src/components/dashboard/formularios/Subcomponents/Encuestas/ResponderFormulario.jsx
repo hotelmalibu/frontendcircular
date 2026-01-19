@@ -10,7 +10,9 @@ import {
     ArrowRight,
     ArrowLeft,
     CheckCircle,
-    ShieldCheck
+    ShieldCheck,
+    Mail,
+    Link as LinkIcon
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -26,7 +28,6 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
     const [errors, setErrors] = useState({});
     const [isNotFound, setIsNotFound] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
-    const fieldsPerPage = 6;
 
     useEffect(() => {
         const fetchForm = async () => {
@@ -109,9 +110,32 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const sortedFields = (form?.fields || []).sort((a, b) => a.order - b.order);
-    const totalSteps = Math.ceil(sortedFields.length / fieldsPerPage);
-    const currentFields = sortedFields.slice(currentStep * fieldsPerPage, (currentStep + 1) * fieldsPerPage);
+    // Auto-Pagination Logic based on Titles
+    const pages = React.useMemo(() => {
+        if (!form?.fields) return [];
+        const sorted = [...form.fields].sort((a, b) => a.order - b.order);
+        
+        const _pages = [];
+        let currentPage = [];
+        
+        sorted.forEach((field, index) => {
+            const type = (field.field_type?.slug || field.field_type?.name || field.type_name || "text").toLowerCase();
+            
+            // If it's a Title and not the very first item, break to new page
+            if (type === 'title' && index > 0) {
+                if (currentPage.length > 0) _pages.push(currentPage);
+                currentPage = [];
+            }
+            currentPage.push(field);
+        });
+        
+        if (currentPage.length > 0) _pages.push(currentPage);
+        
+        return _pages.length > 0 ? _pages : [sorted];
+    }, [form]);
+
+    const totalSteps = pages.length;
+    const currentFields = pages[currentStep] || [];
 
     const handleNext = () => {
         // Validate only fields in the current step
@@ -147,6 +171,8 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
 
         if (!validateForm()) {
             toast.error("Por favor complete los campos obligatorios");
+            const firstErrorField = document.querySelector('.animate-shake');
+            if (firstErrorField) firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
 
@@ -157,20 +183,58 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                 return type.includes("file") || type.includes("image");
             });
 
+            // Filter out decorative fields (titles, paragraphs, etc.)
+            const decorativeTypes = ['title', 'paragraph', 'divider', 'spacer', 'rich_text', 'section', 'header'];
+            
+            console.log("Filtering Form Data. Original keys:", Object.keys(formData));
+
+            const cleanFormData = Object.keys(formData).reduce((acc, key) => {
+                const field = form.fields.find(f => f.name === key);
+                const type = (field?.field_type?.name || field?.type_name || "").toLowerCase();
+                
+                // Debug log for each field
+                // console.log(`Field: ${key}, Type: ${type}, Is Decorative: ${decorativeTypes.includes(type)}`);
+
+                // SKIP if:
+                // 1. Field not found in definition
+                // 2. Type is decorative
+                // 3. Name starts with decorative prefixes (fallback)
+                if (!field) return acc;
+                
+                if (decorativeTypes.includes(type)) return acc;
+                
+                const lowerKey = key.toLowerCase();
+                if (lowerKey.startsWith('title') || lowerKey.startsWith('paragraph') || lowerKey.startsWith('divider')) {
+                    return acc;
+                }
+
+                acc[key] = formData[key];
+                return acc;
+            }, {});
+
+            console.log("Clean Form Data keys:", Object.keys(cleanFormData));
+
             let payload;
             if (hasFiles) {
                 payload = new FormData();
-                Object.keys(formData).forEach(key => {
-                    const value = formData[key];
+                Object.keys(cleanFormData).forEach(key => {
+                    const value = cleanFormData[key];
                     if (value !== undefined && value !== null) {
-                        payload.append(`fields[${key}]`, value);
+                        // Handle arrays for checkboxes
+                        if (Array.isArray(value)) {
+                            value.forEach((v, i) => {
+                                payload.append(`fields[${key}][${i}]`, v);
+                            });
+                        } else {
+                            payload.append(`fields[${key}]`, value);
+                        }
                     }
                 });
                 payload.append("metadata[submission_source]", "web");
                 payload.append("metadata[user_agent]", navigator.userAgent);
             } else {
                 payload = {
-                    fields: formData,
+                    fields: cleanFormData,
                     metadata: {
                         submission_source: "web",
                         user_agent: navigator.userAgent
@@ -182,8 +246,18 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
             toast.success("Respuestas enviadas con éxito");
             if (onSuccess) onSuccess();
         } catch (error) {
-            console.error("Error submitting form:", error);
-            const apiError = error.response?.data?.message || "Error al enviar las respuestas";
+            console.error("Error submitting form FULL:", error);
+            if (error.response?.data) {
+                console.error("Validation Errors:", error.response.data);
+            }
+            
+            let apiError = "Error al enviar las respuestas";
+            if (error.response?.data?.errors) {
+                 apiError = Object.values(error.response.data.errors).flat().join('\n');
+            } else if (error.response?.data?.message) {
+                 apiError = error.response.data.message;
+            }
+            
             toast.error(apiError);
         } finally {
             setSubmitting(false);
@@ -257,61 +331,80 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                 </div>
             )}
 
-            {/* Progress Bar */}
-            {totalSteps > 1 && (
-                <div className="bg-gray-50/50 px-8 md:px-16 py-4 border-b border-gray-100">
-                    <div className="flex justify-between items-center mb-2">
-                        <span className="text-[10px] font-black text-[#005380] uppercase tracking-widest">
-                            Progreso de la encuesta
-                        </span>
-                        <span className="text-[10px] font-black text-[#005380] uppercase tracking-widest">
-                            Paso {currentStep + 1} de {totalSteps}
-                        </span>
+            {/* Cleaner Progress Bar & Legend */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-8 md:px-12 py-6 border-b border-gray-100">
+                {totalSteps > 1 && (
+                    <div className="flex-1 max-w-md">
+                        <div className="flex justify-between items-end mb-2">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Progreso
+                            </span>
+                            <span className="text-[10px] font-black text-[#005380] uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-md">
+                                Paso {currentStep + 1} / {totalSteps}
+                            </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div 
+                                className="h-full bg-[#005380] transition-all duration-500 ease-out rounded-full"
+                                style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
+                            ></div>
+                        </div>
                     </div>
-                    <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                        <div 
-                            className="h-full bg-[#B1D357] transition-all duration-500 ease-out"
-                            style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
-                        ></div>
-                    </div>
+                )}
+                
+                {/* Subtle Mandatory Legend */}
+                <div className={`flex items-center gap-2 ${totalSteps > 1 ? '' : 'w-full'}`}>
+                    <span className="text-red-500 font-black text-lg leading-none">*</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                        Campos obligatorios
+                    </span>
                 </div>
-            )}
+            </div>
 
             <form onSubmit={handleSubmit} className="px-8 md:px-12 py-8">
-                {/* Top Actions & Information */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-gray-100 pb-6">
-                    <div className="flex items-center gap-2 text-red-500 bg-red-50 px-3 py-1 rounded-md border border-red-100/50">
-                        <span className="text-lg font-black leading-none">*</span>
-                        <span className="text-[10px] font-black uppercase tracking-wider">Campo Obligatorio</span>
-                    </div>
-                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                        Documento Versión {form.version || '1.0'}
-                    </div>
-                </div>
-
                 {/* Main Information Section - Compact */}
-                <div className="mb-10 space-y-4">
-                    <div className="p-6 bg-gray-50/50 rounded-xl border border-gray-100">
-                        <h3 className="text-sm font-black text-[#005380] uppercase tracking-widest mb-2">Gracias por tu interés</h3>
-                        <p className="text-[13px] text-gray-500 leading-relaxed font-medium">
-                            A través de este formulario recopilamos información básica que nos permitirá contactarlo y agendar un espacio para presentarle en detalle nuestro modelo, líneas estratégicas y oportunidades de articulación. Su información será utilizada únicamente para este fin y tratada con total confidencialidad.
-                        </p>
-                    </div>
-                    <div className="flex items-start gap-3 px-2">
-                        <Info size={14} className="text-[#B1D357] mt-0.5 shrink-0" />
-                        <p className="text-[11px] text-gray-400 font-medium leading-tight">
-                            Cuando envíe este formulario, no se recopilarán automáticamente sus detalles personales como nombre o correo, a menos que usted los proporcione en los campos correspondientes.
-                        </p>
-                    </div>
+                <div className="mb-0">
+                   {/* Content removed as requested */}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-10">
+                <div className="space-y-8">
                     {currentFields.map((field) => {
                             const type = (field.field_type?.slug || field.field_type?.name || field.type_name || "text").toLowerCase();
-                            const isFullWidth = type === "textarea" || type.includes("file");
                             const hasError = !!errors[field.name];
 
+                            // Render Logic for Display-Only Fields (Title, Paragraph)
+                            if (type === 'title') {
+                                return (
+                                    <div key={field.id} className="pt-4 pb-2 border-b border-gray-100">
+                                        <h3 
+                                            className={`font-black text-[#005380] ${
+                                                field.options?.tag === 'h1' ? 'text-3xl' :
+                                                field.options?.tag === 'h2' ? 'text-2xl' :
+                                                'text-xl'
+                                            } ${field.options?.align ? `text-${field.options.align}` : ''} ${field.options?.color ? field.options.color : ''}`}
+                                        >
+                                            {field.label || field.name}
+                                        </h3>
+                                        {field.description && <p className="text-gray-500 mt-1">{field.description}</p>}
+                                    </div>
+                                );
+                            }
+
+                            if (type === 'paragraph') {
+                                return (
+                                    <div key={field.id} className="py-2">
+                                        <div 
+                                            className={`prose max-w-none text-gray-600 ${
+                                                field.options?.size ? field.options.size : 'text-sm'
+                                            } ${field.options?.align ? `text-${field.options.align}` : ''} ${field.options?.color ? field.options.color : ''}`}
+                                            dangerouslySetInnerHTML={{ __html: field.label || field.description }} 
+                                        />
+                                    </div>
+                                );
+                            }
+
+                            // Standard Input Fields
                             return (
-                                <div key={field.id} className={`${isFullWidth ? "md:col-span-2" : ""} space-y-3 group`}>
+                                <div key={field.id} className="space-y-3 group">
                                     <div className="flex justify-between items-end px-1">
                                         <label className="block text-sm font-black text-[#005380] group-hover:text-[#2C67B0] transition-colors uppercase text-[10px] tracking-[0.1em]">
                                             {field.label} {field.is_required && <span className="text-red-500 font-black ml-0.5">*</span>}
@@ -378,18 +471,124 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                                                     <p className="text-[9px] text-gray-400 mt-1.5 font-medium tracking-tight">PDF, JPG, PNG (Máx 5MB)</p>
                                                 </div>
                                             </div>
+                                        ) : type === "radio" ? (
+                                            <div className="space-y-3">
+                                                {(() => {
+                                                    const rawOptions = field.options?.choices || field.options?.options || field.options || field.metadata?.options || [];
+                                                    const optionsList = Array.isArray(rawOptions) ? rawOptions : [];
+                                                    
+                                                    if (optionsList.length === 0) {
+                                                        return (
+                                                            <div className="p-2 bg-red-50 border border-red-100 rounded text-xs text-red-600 font-mono break-all">
+                                                                Debug: {JSON.stringify(field)}
+                                                            </div>
+                                                        );
+                                                    }
+
+                                                    return optionsList.map((opt, i) => {
+                                                        const val = typeof opt === 'object' ? opt.value : opt;
+                                                        const label = typeof opt === 'object' ? opt.label : opt;
+                                                        return (
+                                                            <label key={i} className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${
+                                                                formData[field.name] === val 
+                                                                ? 'border-[#005380] bg-blue-50/30 ring-1 ring-[#005380]' 
+                                                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                                            }`}>
+                                                                <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 transition-colors ${
+                                                                    formData[field.name] === val ? 'border-[#005380]' : 'border-gray-300'
+                                                                }`}>
+                                                                    {formData[field.name] === val && (
+                                                                        <div className="w-2.5 h-2.5 bg-[#005380] rounded-full" />
+                                                                    )}
+                                                                </div>
+                                                                <input
+                                                                    type="radio"
+                                                                    name={field.name}
+                                                                    value={val}
+                                                                    checked={formData[field.name] === val}
+                                                                    onChange={(e) => handleChange(field.name, val)}
+                                                                    className="hidden"
+                                                                />
+                                                                <span className={`text-sm font-bold ${
+                                                                    formData[field.name] === val ? 'text-[#005380]' : 'text-gray-600'
+                                                                }`}>{label}</span>
+                                                            </label>
+                                                        );
+                                                    });
+                                                })()}
+                                            </div>
+                                        ) : type === "checkbox" ? (
+                                            <div className="space-y-3">
+                                                {(() => {
+                                                     const rawOptions = field.options?.choices || field.options?.options || field.options || field.metadata?.options || [];
+                                                     const optionsList = Array.isArray(rawOptions) ? rawOptions : [];
+
+                                                    if (optionsList.length === 0) {
+                                                        return (
+                                                            <div className="p-2 bg-red-50 border border-red-100 rounded text-xs text-red-600 font-mono break-all">
+                                                                Debug: {JSON.stringify(field)}
+                                                            </div>
+                                                        );
+                                                    }
+
+                                                    return optionsList.map((opt, i) => {
+                                                        const val = typeof opt === 'object' ? opt.value : opt;
+                                                        const label = typeof opt === 'object' ? opt.label : opt;
+                                                        const currentValues = Array.isArray(formData[field.name]) ? formData[field.name] : [];
+                                                        const isChecked = currentValues.includes(val);
+                                                        
+                                                        return (
+                                                            <label key={i} className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${
+                                                                isChecked 
+                                                                ? 'border-[#005380] bg-blue-50/30 ring-1 ring-[#005380]' 
+                                                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                                            }`}>
+                                                                <div className={`w-5 h-5 rounded border flex items-center justify-center mr-3 transition-colors ${
+                                                                    isChecked ? 'bg-[#005380] border-[#005380]' : 'border-gray-300 bg-white'
+                                                                }`}>
+                                                                    {isChecked && <CheckCircle size={12} className="text-white" />}
+                                                                </div>
+                                                                <input
+                                                                    type="checkbox"
+                                                                    value={val}
+                                                                    checked={isChecked}
+                                                                    onChange={(e) => {
+                                                                        const newValues = e.target.checked
+                                                                            ? [...currentValues, val]
+                                                                            : currentValues.filter(v => v !== val);
+                                                                        handleChange(field.name, newValues);
+                                                                    }}
+                                                                    className="hidden"
+                                                                />
+                                                                <span className={`text-sm font-bold ${
+                                                                    isChecked ? 'text-[#005380]' : 'text-gray-600'
+                                                                }`}>{label}</span>
+                                                            </label>
+                                                        );
+                                                    });
+                                                })()}
+                                            </div>
                                         ) : (
-                                            <input
-                                                type={type.includes("email") ? "email" : type.includes("number") ? "number" : "text"}
-                                                value={formData[field.name] || ""}
-                                                onChange={(e) => handleChange(field.name, e.target.value)}
-                                                placeholder={field.placeholder || "Escriba aquí..."}
-                                                className={`w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-lg outline-none transition-all font-bold text-gray-600 placeholder-gray-300 text-sm ${
-                                                    hasError 
-                                                    ? "border-red-200 focus:border-red-400 bg-red-50/10" 
-                                                    : "focus:border-[#005380] focus:bg-white focus:ring-4 focus:ring-blue-500/5 group-hover:border-gray-200"
-                                                }`}
-                                            />
+                                            <div className="relative">
+                                                {/* Icon Wrapper based on Type */}
+                                                {(type.includes("email") || type.includes("url")) && (
+                                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                                                        {type.includes("email") ? <Mail size={16} /> : <LinkIcon size={16} />}
+                                                    </div>
+                                                )}
+                                                
+                                                <input
+                                                    type={type.includes("email") ? "email" : type.includes("number") ? "number" : "text"}
+                                                    value={formData[field.name] || ""}
+                                                    onChange={(e) => handleChange(field.name, e.target.value)}
+                                                    placeholder={field.placeholder || "Escriba aquí..."}
+                                                    className={`w-full ${type.includes("email") || type.includes("url") ? "pl-11" : "px-4"} pr-4 py-3 bg-gray-50 border border-gray-100 rounded-lg outline-none transition-all font-bold text-gray-600 placeholder-gray-300 text-sm ${
+                                                        hasError 
+                                                        ? "border-red-200 focus:border-red-400 bg-red-50/10" 
+                                                        : "focus:border-[#005380] focus:bg-white focus:ring-4 focus:ring-blue-500/5 group-hover:border-gray-200"
+                                                    }`}
+                                                />
+                                            </div>
                                         )}
 
                                         {hasError && (
@@ -491,3 +690,5 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
 };
 
 export default ResponderFormulario;
+
+// End of file

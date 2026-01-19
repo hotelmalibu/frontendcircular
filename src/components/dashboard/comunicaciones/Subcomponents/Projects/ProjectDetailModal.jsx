@@ -12,7 +12,7 @@ import {
   Layers,
   Download,
 } from "lucide-react";
-import CORSImage from "../../../../../components/common/CORSImage";
+
 import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 
 // Category to image mapping (Legacy - removed to avoid loading errors)

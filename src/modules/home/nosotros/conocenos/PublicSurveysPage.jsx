@@ -5,8 +5,6 @@ import { AuthContext } from "../../../../context/AuthContext";
 import formsApi from "../../../../api/formsApi";
 import { toast } from "react-hot-toast";
 import {
-  Calendar,
-  Users,
   Play,
   FileText
 } from "lucide-react";
@@ -129,55 +127,52 @@ export default function PublicSurveysPage() {
             {forms.length > 0 ? forms.map((form, idx) => (
                 <div
                 key={form.id}
-                className="group bg-white p-8 rounded-[2.5rem] shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_50px_-10px_rgba(44,103,176,0.15)] hover:-translate-y-2 transition-all duration-500 border border-gray-100 flex flex-col relative overflow-hidden"
+                className="group bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-1"
                 style={{ animation: `fadeIn 0.5s ease-out ${idx * 0.1}s both` }}
                 >
-                {/* New Card Design based on User Reference */}
-                <div className="relative z-10 flex justify-between items-start mb-6">
-                    <div className="w-14 h-14 bg-[#2C67B0]/10 border border-[#2C67B0]/20 text-[#2C67B0] rounded-2xl flex items-center justify-center shadow-sm">
-                        <FileText size={24} />
-                    </div>
-                    <div className="flex flex-col items-end">
-                        <span className="text-[9px] font-black text-[#B1D357] uppercase tracking-[0.2em] mb-1">Status</span>
-                        <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-[#B1D357]/30 shadow-sm">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#B1D357] shadow-[0_0_8px_rgba(177,211,87,0.8)]"></div>
-                            <span className="text-[10px] font-black text-[#5a7615] uppercase tracking-wider">Activa</span>
-                        </div>
-                    </div>
-                </div>
-
-                <h3 className="relative z-10 text-2xl font-black text-[#005380] mb-2 group-hover:text-[#2C67B0] transition-colors leading-tight">
-                    {form.title}
-                </h3>
-                
-                <p className="relative z-10 text-gray-400 text-sm mb-6 flex-1 leading-relaxed font-medium">
-                    {form.description || "Iniciativa diseñada para recolectar información valiosa sobre la implementación de modelos circulares."}
-                </p>
-
-                <div className="relative z-10 pt-6 border-t border-gray-50 mt-auto space-y-6">
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2 bg-gray-50/50 px-3 py-2 rounded-xl">
-                            <Calendar size={14} className="text-gray-300" />
-                            <span className="text-[11px] font-black text-gray-400 uppercase tracking-tight">
-                                {new Date(form.created_at).toLocaleDateString()}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-2 bg-gray-50/50 px-3 py-2 rounded-xl">
-                            <Users size={14} className="text-gray-300" />
-                            <span className="text-[11px] font-black text-gray-400 uppercase tracking-tight">
-                                {form.metadata?.category || "Técnica"}
-                            </span>
-                        </div>
+                  <div className="p-6 flex flex-col h-full bg-gradient-to-br from-white to-gray-50/50">
+                    {/* Header: Icon + Status + Date */}
+                    <div className="flex justify-between items-start mb-4">
+                       <div className="w-12 h-12 bg-[#2C67B0]/10 text-[#2C67B0] rounded-xl flex items-center justify-center shadow-sm shrink-0">
+                          <FileText size={22} />
+                       </div>
+                       <div className="flex flex-col items-end">
+                           <span className="text-[10px] font-black text-[#B1D357] uppercase tracking-wider bg-[#F4F9E6] px-2.5 py-1 rounded-md border border-[#B1D357]/20">
+                             Activa
+                           </span>
+                           <span className="text-[10px] text-gray-400 font-bold mt-1.5 uppercase tracking-tight">
+                             {new Date(form.created_at).toLocaleDateString()}
+                           </span>
+                       </div>
                     </div>
 
-                    <Link
-                    to={`/encuestas/${form.id}`}
-                    className={`w-full flex items-center justify-center gap-3 ${isAdmin ? 'bg-gray-100 text-gray-400' : 'bg-[#005380] text-white hover:bg-[#004b72]'} py-3.5 rounded-xl font-black transition-all text-xs uppercase tracking-widest shadow-lg shadow-blue-900/10 active:scale-[0.98] group/btn`}
-                    >
-                    {isAdmin ? 'Ver Vista Previa' : 'Participar Ahora'}
-                    <Play size={14} className={`${isAdmin ? 'text-gray-300' : 'text-white'} group-hover:translate-x-1 transition-transform`} fill="currentColor" />
-                    </Link>
-                </div>
+                    {/* Title & Desc */}
+                    <div className="flex-1 mb-6">
+                       <h3 className="text-lg font-black text-[#005380] mb-2 group-hover:text-[#2C67B0] transition-colors leading-tight line-clamp-2">
+                          {form.title}
+                       </h3>
+                       <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2">
+                          {form.description || "Iniciativa técnica disponible para consulta."}
+                       </p>
+                    </div>
+
+                    {/* Footer: Category + Action */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100/50 mt-auto gap-4">
+                        {/* Category removed as requested */}
+
+                        <Link
+                          to={`/encuestas/${form.id}`}
+                          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-sm ${
+                            isAdmin 
+                               ? 'bg-gray-100 text-gray-400 hover:bg-gray-200' 
+                               : 'bg-[#005380] text-white hover:bg-[#004b72] hover:shadow-md'
+                          }`}
+                        >
+                          {isAdmin ? 'Ver' : 'Participar'}
+                          <Play size={10} fill="currentColor" />
+                        </Link>
+                    </div>
+                  </div>
                 </div>
             )) : (
                 <div className="col-span-full py-20 text-center">

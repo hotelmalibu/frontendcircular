@@ -3,6 +3,7 @@ import { AuthContext } from "../../../../../context/AuthContext";
 import formsApi from "../../../../../api/formsApi";
 import { toast } from "react-hot-toast";
 import ResponderFormulario from "./ResponderFormulario";
+import ResponsesViewer from "../Respuestas/RespuestasFormulario";
 import {
   BarChart,
   Bar,
@@ -17,24 +18,26 @@ import {
 } from "recharts";
 import {
   Search,
-  Calendar,
-  Users,
   BarChart3,
   FileEdit,
-  Play,
   Archive,
-  UploadCloud
+  UploadCloud,
+  Edit,
+  RefreshCw,
+  ChevronRight,
+  Trash2,
+  Eye
 } from "lucide-react";
 
 const DashboardSurveyAnalysis = ({ onEdit }) => {
   const { user } = useContext(AuthContext);
   const isAdmin = user?.role_slug === "admin";
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("published");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedFormId, setSelectedFormId] = useState(null);
-  const [view, setView] = useState("list"); // list or respond
+  const [view, setView] = useState("list"); // list, respond, responses
 
   const fetchForms = async () => {
     setLoading(true);
@@ -45,28 +48,16 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
         per_page: 50,
         page: 1
       };
-      console.log("Fetching forms with params:", params);
+      
       const response = await formsApi.listForms(params);
-      console.log("Form list response:", response);
-
       const body = response.data || response;
-      // Handle various response patterns: [ ... ], { forms: [...] }, { data: { forms: [...] } }, { data: [...] }
       const list = Array.isArray(body)
         ? body
         : (body.forms || (body.data && (Array.isArray(body.data) ? body.data : body.data.forms)) || []);
 
-      console.log("Parsed forms list:", list);
-      console.log("Final form list to render:", list);
-      if (list.length === 0 && (search || statusFilter !== "all")) {
-        console.log("No forms found with current filters.");
-      }
       setForms(list);
     } catch (error) {
       console.error("Error fetching forms:", error);
-      if (error.response) {
-          console.error("Error response data:", error.response.data);
-          console.error("Error response status:", error.response.status);
-      }
       toast.error("Error al cargar los formularios");
     } finally {
       setLoading(false);
@@ -78,7 +69,6 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter]);
 
-  // Handle search with debounce in a real app, here simple trigger on enter or button
   const handleSearch = (e) => {
     if (e.key === "Enter") fetchForms();
   };
@@ -94,14 +84,64 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
     }
   };
 
-  const handleArchive = async (id) => {
+  const handleDelete = (id) => {
+      toast((t) => (
+          <div className="flex flex-col gap-4">
+              <span className="font-semibold text-gray-800">
+                  ¿Estás seguro de que deseas eliminar este formulario?
+                  <br />
+                  <span className="text-xs text-gray-500 font-normal">Esta acción eliminará todas las respuestas asociadas y no se puede deshacer.</span>
+              </span>
+              <div className="flex gap-2 justify-end">
+                  <button
+                      onClick={() => toast.dismiss(t.id)}
+                      className="px-3 py-1.5 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
+                  >
+                      Cancelar
+                  </button>
+                  <button
+                      onClick={async () => {
+                          toast.dismiss(t.id);
+                          try {
+                              await formsApi.deleteForm(id);
+                              toast.success("Formulario eliminado correctamente");
+                              fetchForms();
+                          } catch (error) {
+                              console.error("Error deleting form:", error);
+                              toast.error("Error al eliminar el formulario");
+                          }
+                      }}
+                      className="px-3 py-1.5 text-xs font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors shadow-sm cursor-pointer"
+                  >
+                      Sí, Eliminar
+                  </button>
+              </div>
+          </div>
+      ), {
+          duration: 10000, // Stay longer
+          style: {
+              background: '#fff',
+              border: '1px solid #fee2e2',
+              padding: '16px',
+          },
+      });
+  };
+
+  const handleToggleArchive = async (id, currentStatus) => {
     try {
-      await formsApi.archiveForm(id);
-      toast.success("Formulario archivado correctamente");
+      if (currentStatus === 'archived') {
+        // Restore to draft
+        await formsApi.updateForm(id, { status: 'draft' });
+        toast.success("Formulario restaurado a borradores");
+      } else {
+        // Archive
+        await formsApi.archiveForm(id);
+        toast.success("Formulario archivado correctamente");
+      }
       fetchForms();
     } catch (error) {
-      console.error("Error archiving form:", error);
-      toast.error("Error al archivar el formulario");
+      console.error("Error toggling archive status:", error);
+      toast.error("Error al procesar la solicitud");
     }
   };
 
@@ -137,6 +177,23 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
         />
       </div>
     );
+  }
+
+  if (view === "responses" && selectedFormId) {
+      return (
+          <div className="p-6">
+              <button
+                  onClick={() => setView("list")}
+                  className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 font-semibold"
+              >
+                  ← Volver al Listado
+              </button>
+              <ResponsesViewer
+                  formId={selectedFormId}
+                  onBack={() => setView("list")}
+              />
+          </div>
+      );
   }
 
   return (
@@ -184,119 +241,151 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
           {/* SURVEY CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {forms.length > 0 ? forms.map((form) => {
-              // Simulating some stats that might not be in the basic list API
-              const responseCount = form.responses_count || 0;
+              const responseCount = form.submissions_count || 0;
               const targetCount = form.metadata?.target_responses || 100;
               const pct = Math.min(100, Math.round((responseCount / targetCount) * 100));
 
               return (
                 <div
                   key={form.id}
-                  className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group"
+                  className="group bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,83,128,0.12)] transition-all duration-500 overflow-hidden flex flex-col h-full ring-1 ring-gray-900/[0.02]"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl group-hover:scale-110 transition-transform">
-                      <FileEdit size={24} />
-                    </div>
-                    <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${
-                        form.status === 'published' ? 'bg-green-100 text-green-700' : 
-                        form.status === 'archived' ? 'bg-gray-100 text-gray-700' :
-                        'bg-orange-100 text-orange-700'
-                      }`}>
-                      {form.status === 'published' ? 'Activa' : form.status === 'archived' ? 'Archivado' : 'Borrador'}
-                    </span>
-                  </div>
-
-                  <h3 className="text-lg font-bold text-gray-800 line-clamp-1 mb-1">
-                    {form.title}
-                  </h3>
-                  <p className="text-sm text-gray-500 line-clamp-2 min-h-[40px] mb-4">
-                    {form.description || "Sin descripción proporcionada."}
-                  </p>
-
-                  <div className="mb-4">
-                    <div className="flex justify-between text-xs font-semibold text-gray-600 mb-1.5">
-                      <span>Respuestas</span>
-                      <span>{responseCount} / {targetCount}</span>
-                    </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                      <div
-                        className="h-full bg-[#004b72] rounded-full transition-all duration-500"
-                        style={{ width: `${pct}%` }}
-                      />
+                  {/* Compact Header & Title */}
+                  <div className="p-4 pb-2">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="p-2 bg-blue-50/50 rounded-xl text-[#004b72]">
+                         <FileEdit size={16} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                         <div className="flex items-center justify-between mb-1">
+                             <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                                form.status === 'published' ? 'bg-[#B1D357]/20 text-[#6a822b]' :
+                                form.status === 'draft' ? 'bg-amber-50 text-amber-600' :
+                                'bg-gray-100 text-gray-500'
+                              }`}>
+                                {form.status === 'published' ? 'Activa' : 
+                                 form.status === 'draft' ? 'Borrador' : 'Archivada'}
+                             </span>
+                             <span className="text-[10px] text-gray-400 font-bold">{new Date(form.created_at).toLocaleDateString()}</span>
+                         </div>
+                         <h3 className="text-sm font-bold text-gray-800 leading-tight truncate px-0.5">
+                            {form.title}
+                         </h3>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-xs text-gray-400 mb-6">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar size={14} />
-                      <span>{new Date(form.created_at).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Users size={14} />
-                      <span>{form.metadata?.category || "Técnica"}</span>
-                    </div>
+                  {/* Compact Body & Metrics */}
+                  <div className="px-4 pb-4 flex-1 flex flex-col justify-end">
+                     {/* Description (Optional/Very Short) */}
+                     {form.description && (
+                       <p className="text-[10px] text-gray-400 line-clamp-1 mb-3">
+                         {form.description}
+                       </p>
+                     )}
+
+                     {/* Progress Compact */}
+                     <div className="bg-gray-50 rounded-xl p-2.5 border border-gray-100 relative overflow-hidden">
+                        <div className="flex justify-between items-center mb-1.5 relative z-10">
+                           <span className="text-[9px] font-bold text-gray-500 uppercase tracking-tight">Progreso</span>
+                           <span className="text-[10px] font-black text-[#004b72]">{responseCount}/{targetCount}</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                           <div className="h-full bg-gradient-to-r from-[#004b72] to-[#2C67B0]" style={{ width: `${pct}%` }}></div>
+                        </div>
+                     </div>
+
+                     {/* Category removed as requested */}
                   </div>
 
-                    <div className="flex gap-2">
-                      {/* Action Buttons based on status */}
+                  {/* Hover Panel / Actions */}
+                  <div className="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center gap-2 mt-auto group-hover:bg-white transition-colors duration-300 overflow-x-auto">
+                    <div className="flex gap-1.5">
+                      {/* Publish / Edit */}
                       {form.status === 'draft' && (
-                        <button
-                          onClick={() => handlePublish(form.id)}
-                          className="p-2.5 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-all tooltip"
-                          title="Publicar"
-                        >
-                          <UploadCloud size={20} />
-                        </button>
-                      )}
-
-                      {form.status === 'published' && (
                         <>
-                          {!isAdmin && (
-                            <button
-                              onClick={() => {
-                                setSelectedFormId(form.id);
-                                setView("respond");
-                              }}
-                              className="flex-1 flex items-center justify-center gap-2 bg-[#004b72] text-white py-2.5 rounded-xl font-bold hover:bg-[#003a58] transition-all shadow-sm"
-                            >
-                              <Play size={16} />
-                              Responder
-                            </button>
-                          )}
-                          <button 
-                            onClick={() => handleArchive(form.id)}
-                            className="p-2.5 bg-orange-50 text-orange-600 rounded-xl hover:bg-orange-100 transition-all"
-                            title="Archivar"
+                          <button
+                            onClick={() => handlePublish(form.id)}
+                            className="p-2.5 bg-white text-green-600 rounded-xl hover:bg-green-50 hover:shadow-md border border-gray-100 transition-all"
+                            title="Publicar encuesta"
                           >
-                            <Archive size={20} />
+                            <UploadCloud size={18} />
+                          </button>
+                          <button
+                            onClick={() => onEdit?.(form.id)}
+                            className="p-2.5 bg-white text-blue-600 rounded-xl hover:bg-blue-50 hover:shadow-md border border-gray-100 transition-all font-black"
+                            title="Editar estructura"
+                          >
+                            <Edit size={18} />
                           </button>
                         </>
                       )}
-                      
-                      {form.status === 'draft' && (
-                         <button 
-                          onClick={() => onEdit?.(form.id)}
-                          className="flex-1 flex items-center justify-center gap-2 bg-blue-100 text-blue-600 py-2.5 rounded-xl font-bold hover:bg-blue-200 transition-all shadow-sm"
+
+                      {/* Archive / Restore */}
+                      {form.status !== 'draft' && (
+                         <button
+                           onClick={() => handleToggleArchive(form.id, form.status)}
+                           className="p-2.5 bg-white text-orange-600 rounded-xl hover:bg-orange-50 hover:shadow-md border border-gray-100 transition-all"
+                           title={form.status === 'archived' ? 'Mover a borradores' : 'Archivar encuesta'}
                          >
-                           <FileEdit size={16} />
-                           Editar
+                           <Archive size={18} />
                          </button>
                       )}
 
-                      <button className="p-2.5 bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 transition-all">
-                        <BarChart3 size={20} />
+                      {/* View Responses */}
+                      <button
+                          onClick={() => {
+                              setSelectedFormId(form.id);
+                              setView("responses");
+                          }}
+                          className="p-2.5 bg-white text-[#004b72] rounded-xl hover:bg-blue-50 hover:shadow-md border border-gray-100 transition-all"
+                          title="Ver Respuestas"
+                      >
+                          <Eye size={18} />
+                      </button>
+
+                      {/* Delete */}
+                      <button
+                          onClick={() => handleDelete(form.id)}
+                          className="p-2.5 bg-white text-red-500 rounded-xl hover:bg-red-50 hover:shadow-md border border-gray-100 transition-all"
+                          title="Eliminar encuesta"
+                      >
+                          <Trash2 size={18} />
                       </button>
                     </div>
+
+                    {form.status === 'published' && !isAdmin && (
+                      <button
+                        onClick={() => {
+                          setSelectedFormId(form.id);
+                          setView("respond");
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-[#004b72] text-white rounded-xl hover:bg-[#2C67B0] transition-all font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-900/10 active:scale-95"
+                      >
+                        Responder
+                        <ChevronRight size={14} />
+                      </button>
+                    )}
+
+                    {form.status === 'archived' && (
+                       <button
+                        onClick={() => handleToggleArchive(form.id, form.status)}
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-orange-100 text-orange-700 rounded-xl hover:bg-orange-200 transition-all font-black text-[10px] uppercase tracking-widest active:scale-95"
+                      >
+                        <RefreshCw size={14} />
+                        Restaurar
+                      </button>
+                    )}
+                  </div>
                 </div>
               );
             }) : (
-              <div className="col-span-full py-20 text-center">
-                <div className="bg-white p-10 rounded-3xl shadow-sm border border-dashed border-gray-300 inline-block">
-                  <FileEdit size={48} className="mx-auto text-gray-300 mb-4" />
-                  <h3 className="text-xl font-bold text-gray-400">No se encontraron formularios</h3>
-                  <p className="text-gray-400 text-sm mt-1">Intenta con otros filtros o crea uno nuevo en el editor.</p>
+              <div className="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-[3rem] border border-dashed border-gray-200">
+                <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center mb-6">
+                  <Search size={40} className="text-gray-200" />
                 </div>
+                <h3 className="text-xl font-black text-gray-400 uppercase tracking-widest">No hay formularios</h3>
+                <p className="text-gray-400 text-xs mt-2 font-medium">Prueba con otros filtros o crea uno nuevo en el editor.</p>
               </div>
             )}
           </div>

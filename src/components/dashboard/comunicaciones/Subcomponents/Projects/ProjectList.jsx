@@ -7,7 +7,6 @@ import {
   Search,
   User,
   AlertCircle,
-  ImageIcon,
   FolderOpen
 } from "lucide-react";
 import { getAllProjects, deleteProject } from "../../../../../api/projectsApi";
@@ -15,7 +14,6 @@ import { getAllCategories } from "../../../../../api/categoriesApi";
 import DOMPurify from 'dompurify';
 import ProjectFormModal from "./ProjectFormModal";
 import ProjectDetailModal from "./ProjectDetailModal";
-import CORSImage from "../../../../../components/common/CORSImage";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {

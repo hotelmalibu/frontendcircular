@@ -3,7 +3,7 @@ import EncuestasFormulario from "./Subcomponents/Encuestas/EncuestasFormulario";
 export default function Exploracion({ onEdit }) {
   return (
      <div>
-     <EncuestasFormulario />
+     <EncuestasFormulario onEdit={onEdit} />
      </div>
   );
 }
