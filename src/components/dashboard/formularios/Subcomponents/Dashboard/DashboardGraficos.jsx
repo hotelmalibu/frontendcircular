@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -13,235 +13,314 @@ import {
   Legend,
 } from "recharts";
 import {
-  AlertTriangle,
   ClipboardList,
   FileCheck,
-  CheckCircle,
-  Info,
+  LayoutDashboard,
+  AlertTriangle,
+  History,
+  TrendingUp,
+  PieChart as PieChartIcon,
+  BarChart3,
+  Calendar
 } from "lucide-react";
+import formsApi from "../../../../../api/formsApi";
+import { toast } from "react-hot-toast";
+
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  darkBlue: "#005380",   // Azul Logo/Profundo
+  lightBlue: "#7FB8D9",  // Azul Claro
+  green: "#B1D357",      // Verde Principal
+  darkGreen: "#8CB200",  // Verde Secundario
+  orange: "#E15200",     // Naranja (Alertas)
+  purple: "#9E1981",     // Morado (Acentos)
+  gray: "#6B7280",
+};
+
+const CHART_COLORS = [BRAND.blue, BRAND.green, BRAND.purple, BRAND.orange, BRAND.lightBlue, BRAND.darkGreen];
 
 export default function DashboardGraficos() {
-  // Datos de ejemplo (simulan los que aparecen en tu dashboard)
-  const formulariosPorTipo = [
-    { name: "Periódico", value: 8 },
-    { name: "Normativo", value: 10 },
-    { name: "Encuesta", value: 5 },
-  ];
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const estadoFormularios = [
-    { name: "Publicado", value: 15 },
-    { name: "Borrador", value: 8 },
-  ];
+  const fetchStats = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await formsApi.getStats();
+      setStats(response.stats);
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      toast.error("Error al cargar las estadísticas");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const formulariosUsados = [
-    { name: "Ene", total: 30 },
-    { name: "Feb", total: 60 },
-    { name: "Mar", total: 85 },
-    { name: "Abr", total: 120 },
-    { name: "May", total: 160 },
-    { name: "Jun", total: 190 },
-    { name: "Jul", total: 220 },
-    { name: "Ago", total: 250 },
-    { name: "Sep", total: 280 },
-  ];
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
-  // Lista de formularios más utilizados (izquierda)
-  const formsMostUsed = [
+  const cards = useMemo(() => [
     {
-      title: "Reporte Trimestral de Aprovechamiento",
-      subtitle: "234 respuestas",
-      count: 234,
+      title: "Formularios Totales",
+      value: stats?.total_forms || 0,
+       icono: <ClipboardList size={22} />,
+      bgIcon: "bg-[#2C67B0]/10",
+      color: BRAND.blue
     },
     {
-      title: "Registro de Productores de Envases y Empaques",
-      subtitle: "156 respuestas",
-      count: 156,
+      title: "Respuestas Recibidas",
+      value: stats?.total_submissions || 0,
+      icono: <FileCheck size={22} />,
+      bgIcon: "bg-[#B1D357]/15",
+      color: BRAND.darkGreen
     },
     {
-      title: "Manifiesto de Residuos Peligrosos",
-      subtitle: "89 respuestas",
-      count: 89,
+      title: "Formularios Publicados",
+      value: stats?.published_forms || 0,
+      icono: <TrendingUp size={22} />,
+      bgIcon: "bg-[#9E1981]/10",
+      color: BRAND.purple
     },
     {
-      title: "Encuesta Recicladores Informales",
-      subtitle: "78 respuestas",
-      count: 78,
-    },
-  ];
+      title: "Borradores",
+      value: stats?.draft_forms || 0,
+      icono: <History size={22} />,
+      bgIcon: "bg-[#7FB8D9]/20",
+      color: BRAND.darkBlue
+    }
+  ], [stats]);
 
-  // Alertas (derecha)
-  const alerts = [
-    {
-      type: "vencimiento",
-      title: 'Formulario "Manifiesto RESPEL" vence en 15 días',
-      company: "Empresa: Químicos Industriales S.A.",
-      color: "bg-red-50 border-red-200 text-red-800",
-      iconColor: "text-red-600",
-    },
-    {
-      type: "campos",
-      title:
-        'Formulario "Registro Productores" requiere 3 campos adicionales',
-      company: "Empresa: Envases del Norte Ltda.",
-      color: "bg-blue-50 border-blue-200 text-blue-800",
-      iconColor: "text-blue-600",
-    },
-  ];
-
-  const COLORS = ["#00A88F", "#FFB703", "#E63946", "#3A86FF"];
+  if (loading && !stats) {
+     return (
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005380]"></div>
+            <p className="mt-4 text-gray-500 font-medium">Cargando estadísticas...</p>
+        </div>
+     );
+  }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Panel de Formularios</h1>
-
-      {/* Tarjetas superiores */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500">Formularios Activos</p>
-            <p className="text-2xl font-bold text-gray-800">23</p>
-          </div>
-          <ClipboardList className="text-blue-500" size={28} />
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500">Respuestas Recibidas</p>
-            <p className="text-2xl font-bold text-gray-800">1490</p>
-          </div>
-          <FileCheck className="text-green-500" size={28} />
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500">Tasa de Completadas</p>
-            <p className="text-2xl font-bold text-gray-800">45%</p>
-          </div>
-          <CheckCircle className="text-yellow-500" size={28} />
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500">Alertas de Vencimiento</p>
-            <p className="text-2xl font-bold text-gray-800">5</p>
-          </div>
-          <AlertTriangle className="text-red-500" size={28} />
-        </div>
-      </div>
-
-      {/* Gráficos principales */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Distribución por tipo */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">Distribución por tipos</h2>
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie
-                data={formulariosPorTipo}
-                dataKey="value"
-                nameKey="name"
-                innerRadius={50}
-                outerRadius={90}
-                paddingAngle={3}
-                label
-              >
-                {formulariosPorTipo.map((_, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Estado de formularios */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">Estado de Formularios</h2>
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie data={estadoFormularios} dataKey="value" nameKey="name" outerRadius={90} label>
-                {estadoFormularios.map((_, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen font-sans text-gray-700 animate-in fade-in duration-500">
       
-         {/* NUEVA SECCIÓN: Lista (izquierda) + Alertas (derecha) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: Formularios más Utilizados (lista compacta) */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Formularios más Utilizados</h3>
-
-          <div className="space-y-4">
-            {formsMostUsed.map((f, idx) => (
-              <div key={idx} className="border rounded-lg p-3 flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-gray-800">{f.title}</p>
-                  <p className="text-sm text-gray-500 mt-1">{f.subtitle}</p>
-                </div>
-
-                <div className="ml-4">
-                  <span className="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    {f.count}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Header Dashboard */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
+            <LayoutDashboard className="text-blue-500" size={32} />
+            Dashboard de Gestión
+          </h1>
+          <p className="text-gray-500 mt-1 font-medium">Métricas clave de formularios y participación</p>
         </div>
+        <button 
+           onClick={fetchStats}
+           className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-95"
+        >
+            <Calendar size={16} className="text-[#B1D357]" />
+            Actualizar Datos
+        </button>
+      </div>
 
-        {/* Right: Alertas y Notificaciones */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Alertas y Notificaciones</h3>
+      {/* Tarjetas de Estadísticas */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        {cards.map((card, idx) => (
+          <div key={idx} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-500 decoration-[#B1D357] decoration-2 transition-all">
+                  {card.title}
+                </p>
+                <h3 className="text-3xl font-black mt-2 leading-none" style={{ color: BRAND.darkBlue }}>
+                  {card.value.toLocaleString()}
+                </h3>
+              </div>
+              <div className={`p-3 rounded-2xl ${card.bgIcon} transition-transform group-hover:scale-110 duration-300`}>
+                {React.cloneElement(card.icono, { style: { color: card.color } })}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
 
-          <div className="space-y-4">
-            {alerts.map((a, i) => (
-              <div
-                key={i}
-                className={`flex items-start gap-4 p-4 rounded-lg border ${a.color} shadow-sm`}
-              >
-                <div className="mt-1">
-                  <AlertTriangle className={`${a.iconColor}`} size={20} />
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-800">{a.title}</p>
-                  <p className="text-sm text-gray-500 mt-1">{a.company}</p>
-                </div>
-                <div className="self-center">
-                  <button
-                    className="text-sm bg-white border border-gray-200 px-3 py-1 rounded-md hover:bg-gray-50"
-                    title="Ver detalles"
+      {/* Gráficos de Distribución */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        
+        {/* Distribución por Categoría */}
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+           <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-emerald-50 rounded-lg">
+                <PieChartIcon className="text-emerald-600" size={20} />
+              </div>
+              <h2 className="text-lg font-bold text-gray-800">Distribución por Categoría</h2>
+           </div>
+           
+           <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={stats?.categories_distribution || []}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={5}
+                    dataKey="value"
                   >
-                    <Info size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+                    {(stats?.categories_distribution || []).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                </PieChart>
+              </ResponsiveContainer>
+           </div>
         </div>
+
+        {/* Estado de Formularios */}
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+           <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <BarChart3 className="text-blue-600" size={20} />
+              </div>
+              <h2 className="text-lg font-bold text-gray-800">Estado de los Formularios</h2>
+           </div>
+           
+           <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={stats?.status_distribution || []}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {(stats?.status_distribution || []).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index === 0 ? BRAND.blue : BRAND.lightBlue} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                </PieChart>
+              </ResponsiveContainer>
+           </div>
+        </div>
+
       </div>
 
-      {/* Gráfico de formularios más utilizados */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-8">
-        <h2 className="text-lg font-semibold text-gray-700 mb-4">Formularios más utilizados</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={formulariosUsados}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="total" stroke="#00A88F" strokeWidth={3} dot={{ r: 4 }} />
-          </LineChart>
-        </ResponsiveContainer>
+      {/* Tendencia y Top 5 */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        
+        {/* Tendencia de Envíos */}
+        <div className="lg:col-span-2 bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+              <div className="flex items-center gap-3">
+                 <div className="p-2 bg-indigo-50 rounded-lg">
+                    <BarChart3 className="text-indigo-600" size={20} />
+                 </div>
+                 <h2 className="text-xl font-bold text-gray-800">Tendencia de Participación</h2>
+              </div>
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
+                 Últimos 6 meses
+              </span>
+           </div>
+
+           <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                 <BarChart data={stats?.submissions_trend || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                    <XAxis 
+                       dataKey="name" 
+                       axisLine={false} 
+                       tickLine={false} 
+                       tick={{ fill: BRAND.gray, fontSize: 11, fontWeight: 600 }} 
+                       dy={10}
+                    />
+                    <YAxis 
+                       axisLine={false} 
+                       tickLine={false} 
+                       tick={{ fill: BRAND.gray, fontSize: 11, fontWeight: 600 }}
+                    />
+                    <Tooltip 
+                       cursor={{ fill: '#F9FAFB' }}
+                       contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                    />
+                    <Bar 
+                       dataKey="total" 
+                       name="Envíos" 
+                       fill={BRAND.blue} 
+                       radius={[6, 6, 0, 0]} 
+                       barSize={32}
+                    />
+                 </BarChart>
+              </ResponsiveContainer>
+              {(!stats?.submissions_trend || stats.submissions_trend.length === 0) && (
+                <div className="flex h-full items-center justify-center -mt-[300px]">
+                   <p className="text-gray-400 italic text-sm">No hay datos históricos suficientes</p>
+                </div>
+              )}
+           </div>
+        </div>
+
+        {/* Top Formularios */}
+        <div className="lg:col-span-1 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col">
+           <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-amber-50 rounded-lg">
+                <AlertTriangle className="text-amber-600" size={20} />
+              </div>
+              <h2 className="text-lg font-bold text-gray-800">Más Utilizados</h2>
+           </div>
+
+           <div className="flex-1 space-y-4">
+              {(stats?.top_forms || []).map((form, idx) => (
+                <div key={idx} className="group p-4 rounded-2xl border border-gray-50 hover:bg-gray-50 hover:border-gray-100 transition-all duration-300">
+                   <div className="flex justify-between items-start mb-2">
+                       <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border ${
+                          form.category === 'normativo' ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                          form.category === 'periodico' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                          'bg-green-50 text-green-600 border-green-100'
+                       }`}>
+                          {form.category || 'Encuesta'}
+                       </span>
+                       <span className="text-xs font-bold text-gray-400">
+                          {form.count} respuestas
+                       </span>
+                   </div>
+                   <h4 className="text-sm font-bold text-gray-700 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">
+                      {form.title}
+                   </h4>
+                   
+                   {/* Mini progress bar decoration */}
+                   <div className="mt-3 w-full bg-gray-100 h-1 rounded-full overflow-hidden">
+                      <div 
+                         className="h-full rounded-full transition-all duration-1000"
+                         style={{ 
+                            width: `${(form.count / (stats?.top_forms[0]?.count || 1)) * 100}%`,
+                            backgroundColor: idx === 0 ? BRAND.blue : idx === 1 ? BRAND.green : BRAND.lightBlue
+                         }}
+                      />
+                   </div>
+                </div>
+              ))}
+              {(!stats?.top_forms || stats.top_forms.length === 0) && (
+                <div className="flex flex-col items-center justify-center h-full text-center py-10 opacity-60">
+                   <ClipboardList size={40} className="text-gray-300 mb-2" />
+                   <p className="text-xs text-gray-400">Aún no hay respuestas registradas</p>
+                </div>
+              )}
+           </div>
+        </div>
+
       </div>
 
-    
     </div>
   );
 }

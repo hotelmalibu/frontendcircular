@@ -5,20 +5,6 @@ import { toast } from "react-hot-toast";
 import ResponderFormulario from "./ResponderFormulario";
 import ResponsesViewer from "../Respuestas/RespuestasFormulario";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-import {
-  Search,
-  BarChart3,
   FileEdit,
   Archive,
   UploadCloud,
@@ -26,7 +12,8 @@ import {
   RefreshCw,
   ChevronRight,
   Trash2,
-  Eye
+  Eye,
+  Search
 } from "lucide-react";
 
 const DashboardSurveyAnalysis = ({ onEdit }) => {
@@ -59,7 +46,6 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
       const response = await formsApi.listForms(params);
       const body = response.data || response;
       
-      // Extract data based on common wrapper patterns
       const list = body.forms || body.data?.forms || (Array.isArray(body.forms) ? body.forms : []);
       const paginInfo = body.pagination || body.data?.pagination || { current_page: 1, last_page: 1, total: 0 };
 
@@ -77,7 +63,6 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
     fetchForms(1);
   }, [fetchForms]);
 
-  // Handle search with a small delay for better UX
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchForms(1);
@@ -130,7 +115,7 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
               </div>
           </div>
       ), {
-          duration: 10000, // Stay longer
+          duration: 10000,
           style: {
               background: '#fff',
               border: '1px solid #fee2e2',
@@ -142,11 +127,9 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
   const handleToggleArchive = async (id, currentStatus) => {
     try {
       if (currentStatus === 'archived') {
-        // Restore to draft
         await formsApi.updateForm(id, { status: 'draft' });
         toast.success("Formulario restaurado a borradores");
       } else {
-        // Archive
         await formsApi.archiveForm(id);
         toast.success("Formulario archivado correctamente");
       }
@@ -156,19 +139,6 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
       toast.error("Error al procesar la solicitud");
     }
   };
-
-  // --- Datos para gráficos (Stubs for now, as they'd probably come from a separate analytics endpoint) ---
-  const dataBar = [
-    { name: "Caracterización", respuestas: 40 },
-    { name: "Percepción", respuestas: 45 },
-  ];
-
-  const dataPie = [
-    { name: "Empresas", value: 40 },
-    { name: "Gestores", value: 60 },
-  ];
-
-  const PIE_COLORS = ["#00B6B6", "#FDBA74"];
 
   if (view === "respond" && selectedFormId) {
     return (
@@ -210,7 +180,6 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* HEADER & FILTERS */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Censo y Georreferenciación</h1>
@@ -255,14 +224,12 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
         </div>
       </div>
 
-      {/* LOADING STATE */}
       {loading ? (
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004b72]"></div>
         </div>
       ) : (
         <>
-          {/* SURVEY CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {forms.length > 0 ? forms.map((form) => {
               const responseCount = form.submissions_count || 0;
@@ -274,7 +241,6 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
                   key={form.id}
                   className="group bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,83,128,0.12)] transition-all duration-500 overflow-hidden flex flex-col h-full ring-1 ring-gray-900/[0.02]"
                 >
-                  {/* Compact Header & Title */}
                   <div className="p-4 pb-2">
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="p-2 bg-blue-50/50 rounded-xl text-[#004b72]">
@@ -314,16 +280,13 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
                     </div>
                   </div>
 
-                  {/* Compact Body & Metrics */}
                   <div className="px-4 pb-4 flex-1 flex flex-col justify-end">
-                     {/* Description (Optional/Very Short) */}
                      {form.description && (
                        <p className="text-[10px] text-gray-400 line-clamp-1 mb-3">
                          {form.description}
                        </p>
                      )}
 
-                     {/* Progress Compact */}
                      <div className="bg-gray-50 rounded-xl p-2.5 border border-gray-100 relative overflow-hidden">
                         <div className="flex justify-between items-center mb-1.5 relative z-10">
                            <span className="text-[9px] font-bold text-gray-500 uppercase tracking-tight">Progreso</span>
@@ -333,14 +296,10 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
                            <div className="h-full bg-gradient-to-r from-[#004b72] to-[#2C67B0]" style={{ width: `${pct}%` }}></div>
                         </div>
                      </div>
-
-                     {/* Category removed as requested */}
                   </div>
 
-                  {/* Hover Panel / Actions */}
                   <div className="p-4 bg-gray-50/50 border-t border-gray-100 flex items-center gap-2 mt-auto group-hover:bg-white transition-colors duration-300 overflow-x-auto">
                     <div className="flex gap-1.5">
-                      {/* Publish / Edit */}
                       {form.status === 'draft' && (
                         <>
                           <button
@@ -360,7 +319,6 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
                         </>
                       )}
 
-                      {/* Archive / Restore */}
                       {form.status !== 'draft' && (
                          <button
                            onClick={() => handleToggleArchive(form.id, form.status)}
@@ -371,7 +329,6 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
                          </button>
                       )}
 
-                      {/* View Responses */}
                       <button
                           onClick={() => {
                               setSelectedFormId(form.id);
@@ -383,7 +340,6 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
                           <Eye size={18} />
                       </button>
 
-                      {/* Delete */}
                       <button
                           onClick={() => handleDelete(form.id)}
                           className="p-2.5 bg-white text-red-500 rounded-xl hover:bg-red-50 hover:shadow-md border border-gray-100 transition-all"
@@ -429,9 +385,8 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
             )}
           </div>
 
-          {/* PAGINATION */}
           {pagination.last_page > 1 && (
-            <div className="flex justify-center items-center gap-4 mb-12">
+            <div className="flex justify-center items-center gap-4 mb-4">
               <button
                 disabled={pagination.current_page === 1}
                 onClick={() => fetchForms(pagination.current_page - 1)}
@@ -471,85 +426,6 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
               </button>
             </div>
           )}
-
-          {/* ANALYSIS TITLE */}
-          <div className="flex items-center gap-3 mb-8">
-            <BarChart3 className="text-[#004b72]" size={32} />
-            <h2 className="text-3xl font-bold text-gray-800">Impacto y Análisis</h2>
-          </div>
-
-          {/* CHARTS CONTAINER */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* BARS - Response Rate */}
-            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-              <h3 className="text-xl font-bold mb-6 text-gray-800">
-                Tasa de Respuesta por Tipo
-              </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={dataBar}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis
-                    dataKey="name"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: '#64748b', fontSize: 13 }}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: '#64748b', fontSize: 13 }}
-                  />
-                  <Tooltip
-                    cursor={{ fill: '#f8fafc' }}
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                  />
-                  <Bar dataKey="respuestas" radius={[6, 6, 0, 0]} barSize={40}>
-                    <Cell key="c1" fill="#00B6B6" />
-                    <Cell key="c2" fill="#FDBA74" />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* PIE - Population Distribution */}
-            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-              <h3 className="text-xl font-bold mb-6 text-gray-800">
-                Población Atendida
-              </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={dataPie}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={100}
-                    paddingAngle={8}
-                    dataKey="value"
-                  >
-                    {dataPie.map((entry, idx) => (
-                      <Cell
-                        key={`cell-${idx}`}
-                        fill={PIE_COLORS[idx % PIE_COLORS.length]}
-                        stroke="none"
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="flex justify-center gap-8 mt-4">
-                {dataPie.map((entry, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: PIE_COLORS[idx] }} />
-                    <span className="text-sm font-semibold text-gray-600">{entry.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
         </>
       )}
     </div>

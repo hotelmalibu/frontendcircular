@@ -126,6 +126,14 @@ const formsApi = {
         // Point to the dedicated public endpoint to avoid auth issues
         return await api.get("/forms/public", { params });
     },
+    /**
+     * Get statistics for the forms dashboard
+     * @returns {Promise}
+     */
+    getStats: async () => {
+        const response = await api.get("/forms/stats");
+        return response.data;
+    },
 };
 
 export default formsApi;
