@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import formsApi from "../../../../../api/formsApi";
 import { toast } from "react-hot-toast";
 import {
@@ -17,7 +18,9 @@ import {
   Mail,
   List,
   CheckSquare,
-  Upload
+  Upload,
+  Maximize2,
+  Minimize2
 } from "lucide-react";
 
 const DEFAULT_FIELD_TYPES = [
@@ -48,6 +51,33 @@ const FormBuilder = ({ formId, onSuccess }) => {
   const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  // Protection against accidental tab closure
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasChanges]);
+
+  // Track changes on formMeta or formFields updates
+  useEffect(() => {
+    // Only set hasChanges after initial load (when loading is false)
+    if (!loading && (formMeta.title !== "" || formFields.length > 0)) {
+       // Note: This is a simple check. For better accuracy we'd compare with initial state.
+       // But for a builder, any interaction usually implies modification intent.
+    }
+  }, [formMeta, formFields, loading]);
+
+  const markChanged = () => {
+    if (!hasChanges) setHasChanges(true);
+  };
 
   useEffect(() => {
     const fetchFieldTypes = async () => {
@@ -152,6 +182,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
       });
       setFormFields([]);
       setSelectedFieldIndex(null);
+      setHasChanges(false);
     }
   }, [formId]);
 
@@ -195,6 +226,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
 
     setFormFields([...formFields, newField]);
     setSelectedFieldIndex(formFields.length);
+    markChanged();
   };
 
   const moveField = (index, direction) => {
@@ -214,18 +246,22 @@ const FormBuilder = ({ formId, onSuccess }) => {
     // Maintain selection if it was the moved field
     if (selectedFieldIndex === index) setSelectedFieldIndex(targetIndex);
     else if (selectedFieldIndex === targetIndex) setSelectedFieldIndex(index);
+    
+    markChanged();
   };
 
   const removeField = (index) => {
     const newFields = formFields.filter((_, i) => i !== index);
     setFormFields(newFields.map((f, i) => ({ ...f, order: i + 1 })));
     setSelectedFieldIndex(null);
+    markChanged();
   };
 
   const updateField = (index, updates) => {
     const newFields = [...formFields];
     newFields[index] = { ...newFields[index], ...updates };
     setFormFields(newFields);
+    markChanged();
   };
 
   const handleSave = async (isPublish = false) => {
@@ -274,6 +310,8 @@ const FormBuilder = ({ formId, onSuccess }) => {
         toast.success(formId ? "Formulario actualizado con éxito" : "Borrador guardado con éxito");
       }
 
+      setHasChanges(false); // Reset changes after successful save
+
       // Trigger redirection
       if (onSuccess) {
         setTimeout(() => {
@@ -297,6 +335,40 @@ const FormBuilder = ({ formId, onSuccess }) => {
       toast.error(errorMsg);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (hasChanges) {
+      toast((t) => (
+        <div className="flex flex-col gap-4">
+          <span className="font-semibold text-gray-800">
+            Tienes cambios sin guardar.
+            <br />
+            <span className="text-xs text-gray-500 font-normal">¿Estás seguro de que deseas salir sin guardar?</span>
+          </span>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-3 py-1.5 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
+            >
+              Seguir Editando
+            </button>
+            <button
+              onClick={() => {
+                toast.dismiss(t.id);
+                setHasChanges(false);
+                if (onSuccess) onSuccess();
+              }}
+              className="px-3 py-1.5 text-xs font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors shadow-sm"
+            >
+              Salir sin Guardar
+            </button>
+          </div>
+        </div>
+      ), { duration: 6000 });
+    } else {
+      if (onSuccess) onSuccess();
     }
   };
 
@@ -422,21 +494,50 @@ const FormBuilder = ({ formId, onSuccess }) => {
   const [activeTab, setActiveTab] = useState("canvas"); // palette, canvas, properties - for mobile
   const selectedField = selectedFieldIndex !== null ? formFields[selectedFieldIndex] : null;
 
-  return (
-    <div className="flex flex-col h-[calc(100vh-150px)] md:h-[calc(100vh-120px)] bg-gray-50 overflow-hidden">
+  const editorContent = (
+    <div className={`flex flex-col bg-gray-50 overflow-hidden transition-all duration-300 ${
+      isFullscreen 
+        ? "fixed inset-0 z-[9999] h-screen w-screen" 
+        : "h-[calc(100vh-150px)] md:h-[calc(100vh-120px)]"
+    }`}>
       {/* Top Header/Actions */}
-      <div className="bg-white border-b px-6 py-3 flex justify-between items-center shadow-sm">
+      <div className="bg-white border-b px-6 py-3 flex justify-between items-center shadow-sm relative z-20">
         <div className="flex items-center gap-4">
-          <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-            <Settings2 size={24} />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">Constructor de Formularios</h2>
-            <p className="text-xs text-gray-500">Diseña y estructura tus encuestas técnicas</p>
+          {/* Close Button */}
+          <button 
+            onClick={handleClose}
+            className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-xl transition-all mr-2"
+            title="Cerrar editor"
+          >
+            <X size={24} />
+          </button>
+          <div className="hidden sm:flex items-center gap-4">
+            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+              <Settings2 size={24} />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">Constructor de Formularios</h2>
+              <p className="text-xs text-gray-500">Diseña y estructura tus encuestas técnicas</p>
+            </div>
           </div>
         </div>
 
-        <div className="flex gap-2 md:gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
+          {/* Fullscreen Toggle */}
+          <button
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className={`p-2.5 rounded-xl border transition-all ${
+              isFullscreen 
+                ? "bg-blue-50 text-blue-600 border-blue-200" 
+                : "bg-white text-gray-400 border-gray-100 hover:border-blue-100 hover:text-blue-500"
+            }`}
+            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+          >
+            {isFullscreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+          </button>
+          
+          <div className="w-px h-6 bg-gray-100 mx-1 hidden sm:block"></div>
+
           <button
             onClick={() => handleSave(false)}
             disabled={saving}
@@ -521,7 +622,10 @@ const FormBuilder = ({ formId, onSuccess }) => {
               <input
                 type="text"
                 value={formMeta.title}
-                onChange={(e) => setFormMeta({ ...formMeta, title: e.target.value })}
+                onChange={(e) => {
+                  setFormMeta({ ...formMeta, title: e.target.value });
+                  markChanged();
+                }}
                 placeholder="Título del Formulario"
                 className="w-full text-2xl md:text-3xl font-bold text-gray-800 placeholder-gray-300 border-none focus:ring-0 mb-2 p-0"
               />
@@ -529,7 +633,10 @@ const FormBuilder = ({ formId, onSuccess }) => {
                 <div>
                   <textarea
                     value={formMeta.description}
-                    onChange={(e) => setFormMeta({ ...formMeta, description: e.target.value })}
+                    onChange={(e) => {
+                      setFormMeta({ ...formMeta, description: e.target.value });
+                      markChanged();
+                    }}
                     placeholder="Descripción o propósito de este formulario..."
                     className="w-full text-sm text-gray-600 placeholder-gray-300 border-none focus:ring-0 resize-none p-0 bg-gray-50/30 rounded-lg"
                     rows={2}
@@ -542,7 +649,10 @@ const FormBuilder = ({ formId, onSuccess }) => {
                   <input
                     type="number"
                     value={formMeta.version}
-                    onChange={(e) => setFormMeta({ ...formMeta, version: parseInt(e.target.value) })}
+                    onChange={(e) => {
+                      setFormMeta({ ...formMeta, version: parseInt(e.target.value) });
+                      markChanged();
+                    }}
                     className="w-10 md:w-12 border-none p-0 focus:ring-0 font-medium bg-transparent"
                   />
                 </div>
@@ -551,7 +661,10 @@ const FormBuilder = ({ formId, onSuccess }) => {
                   <input
                     type="date"
                     value={formMeta.expires_at}
-                    onChange={(e) => setFormMeta({ ...formMeta, expires_at: e.target.value })}
+                    onChange={(e) => {
+                      setFormMeta({ ...formMeta, expires_at: e.target.value });
+                      markChanged();
+                    }}
                     className="border-none p-0 focus:ring-0 font-medium bg-transparent"
                   />
                 </div>
@@ -560,7 +673,10 @@ const FormBuilder = ({ formId, onSuccess }) => {
                   <div className="relative flex items-center">
                     <select
                       value={formMeta.category}
-                      onChange={(e) => setFormMeta({ ...formMeta, category: e.target.value })}
+                      onChange={(e) => {
+                        setFormMeta({ ...formMeta, category: e.target.value });
+                        markChanged();
+                      }}
                       className="border-none p-0 pr-6 focus:ring-0 font-bold bg-transparent text-blue-600 cursor-pointer appearance-none relative z-10"
                     >
                       <option value="encuesta">Encuesta</option>
@@ -766,6 +882,12 @@ const FormBuilder = ({ formId, onSuccess }) => {
       `}</style>
     </div>
   );
+
+  if (isFullscreen) {
+    return ReactDOM.createPortal(editorContent, document.body);
+  }
+
+  return editorContent;
 };
 
 export default FormBuilder;

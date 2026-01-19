@@ -18,7 +18,9 @@ import {
   ClipboardList,
   Settings,
   Building,
+  Menu,
 } from "lucide-react";
+import { useSidebar } from "../context/SidebarContext";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -405,6 +407,7 @@ function ProfileDropdown({ user, logout, showWhiteText }) {
 // --- COMPONENTE PRINCIPAL NAVBAR ---
 export default function Navbar({ onMenuClick }) {
   const { user, logout } = useContext(AuthContext);
+  const { isSidebarCollapsed, toggleSidebar } = useSidebar();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -697,11 +700,24 @@ export default function Navbar({ onMenuClick }) {
             : "bg-white shadow-md border-b border-gray-100"
         }`}
       >
-        {/* LOGO */}
-        <div className="flex items-center slide-in shrink-0">
+        {/* LOGO & TOGGLE */}
+        <div className="flex items-center slide-in shrink-0 relative">
+          {isInternalPage && (
+            <button
+              onClick={toggleSidebar}
+              className={`absolute -left-1 md:-left-6 lg:-left-20 p-2 rounded-xl transition-all duration-300 transform active:scale-95 flex items-center justify-center ${
+                showWhiteText 
+                  ? "text-white hover:bg-white/20" 
+                  : "text-gray-600 hover:bg-gray-50 hover:text-blue-600"
+              }`}
+              title={isSidebarCollapsed ? "Mostrar menú completo" : "Contraer menú"}
+            >
+              <Menu size={24} />
+            </button>
+          )}
           <Link
             to="/"
-            className="flex items-center hover:scale-105 transition-transform duration-300"
+            className="flex items-center hover:scale-105 transition-transform duration-300 ml-4 md:ml-0"
           >
             <img
               src={currentLogo}
