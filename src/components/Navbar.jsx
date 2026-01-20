@@ -4,7 +4,6 @@ import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import LogoBlanco from "../assets/fondosYlogos/Logo_blanco.png";
 import Logo from "../assets/fondosYlogos/Logo.png";
-import DefaultAvatar from "../assets/fondosYlogos/default-avatar.png";
 import {
   User,
   LogOut,
@@ -322,11 +321,24 @@ function ProfileDropdown({ user, logout, showWhiteText }) {
     }, 300);
   };
 
+// function ProfileDropdown (part of the file)
+
   const userFullName = user?.name
     ? `${user.name} ${user.lastName || ""}`.trim()
     : "Usuario";
   const userRole = user?.role || "Sin rol";
-  const userAvatar = user?.avatar || DefaultAvatar;
+  // Si no hay avatar, usamos null para luego mostrar las iniciales
+  const userAvatar = user?.avatar; 
+
+  const getInitials = (name) => {
+    if (!name) return "U";
+    const parts = name.split(" ");
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
   const isDashboardRoute = location.pathname === "/dashboard";
   const dashboardOrPortalPath = isDashboardRoute ? "/" : "/dashboard";
   const dashboardOrPortalLabel = isDashboardRoute ? "Portal" : "Dashboard";
@@ -350,13 +362,21 @@ function ProfileDropdown({ user, logout, showWhiteText }) {
             {userFullName}
           </p>
         </div>
-        <div className="w-10 h-10 rounded-full border-2 border-white/50 group-hover:border-blue-400 transition-colors shadow-sm bg-gray-100 flex items-center justify-center overflow-hidden">
-          <img
-            src={userAvatar}
-            alt={userFullName}
-            className="w-full h-full object-cover"
-            onError={(e) => (e.target.src = DefaultAvatar)}
-          />
+        <div className={`w-10 h-10 rounded-full border-2 border-white/50 group-hover:border-blue-400 transition-colors shadow-sm flex items-center justify-center overflow-hidden ${!userAvatar ? "bg-blue-600 text-white" : "bg-gray-100"}`}>
+          {userAvatar ? (
+            <img
+              src={userAvatar}
+              alt={userFullName}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.style.display = 'none'; // Hide broken image
+                e.target.parentNode.textContent = getInitials(userFullName); // Fallback to text
+                e.target.parentNode.classList.add('bg-blue-600', 'text-white');
+              }}
+            />
+          ) : (
+            <span className="font-bold text-sm tracking-widest">{getInitials(userFullName)}</span>
+          )}
         </div>
         <ChevronDown
           size={16}
@@ -702,10 +722,10 @@ export default function Navbar({ onMenuClick }) {
       >
         {/* LOGO & TOGGLE */}
         <div className="flex items-center slide-in shrink-0 relative">
-          {isInternalPage && (
+          {isInternalPage && !user?.role?.toLowerCase()?.includes("afiliado") && (
             <button
               onClick={toggleSidebar}
-              className={`absolute -left-1 md:-left-6 lg:-left-20 p-2 rounded-xl transition-all duration-300 transform active:scale-95 flex items-center justify-center ${
+              className={`hidden md:flex absolute -left-1 md:-left-6 lg:-left-20 p-2 rounded-xl transition-all duration-300 transform active:scale-95 items-center justify-center ${
                 showWhiteText 
                   ? "text-white hover:bg-white/20" 
                   : "text-gray-600 hover:bg-gray-50 hover:text-blue-600"
@@ -728,12 +748,12 @@ export default function Navbar({ onMenuClick }) {
         </div>
 
         {/* Espaciador flexible */}
-        {!(!user || (user && !isInternalPage)) && (
+        {user && isInternalPage && !user.role?.toLowerCase()?.includes("afiliado") && (
           <div className="flex-1"></div>
         )}
 
         {/* MENÚ DESKTOP */}
-        {(!user || (user && !isInternalPage)) && (
+        {(!user || (user && !isInternalPage) || (user && user.role?.toLowerCase()?.includes("afiliado"))) && (
           <nav className="nav-desktop flex items-center gap-8 lg:gap-16 flex-1 justify-center mx-4">
             {menuSections.map((section) => (
               <MegaMenuDropdown
