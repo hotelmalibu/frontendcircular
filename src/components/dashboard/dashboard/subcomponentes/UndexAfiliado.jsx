@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
     Leaf,
-    Activity,
-    FileText,
-    Search,
-    TrendingUp,
+    User,
+    BookOpen,
+    ClipboardCheck,
+    HelpCircle,
+    Info,
     Layout,
-    Award,
+    Search,
+    ChevronRight,
     Globe
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getAllProjects } from "../../../../api/projectsApi";
 
 const BRAND = {
     blue: "#2C67B0",
@@ -21,39 +22,46 @@ const BRAND = {
 };
 
 export default function UndexAfiliado() {
-    const [projectsCount, setProjectsCount] = useState(0);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await getAllProjects();
-                setProjectsCount(res.data?.length || 0);
-            } catch (e) {
-                console.error("Error fetching projects for affiliate", e);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
-
-    const stats = [
-        { title: "Mis Proyectos", value: projectsCount.toString(), icon: <FileText size={20} />, color: BRAND.blue },
-        { title: "Impacto Ambiental", value: "85%", icon: <Leaf size={20} />, color: BRAND.green },
-        { title: "Puntos Acumulados", value: "1,250", icon: <Award size={20} />, color: "#FBBF24" },
-        { title: "Eventos Próximos", value: "3", icon: <Globe size={20} />, color: BRAND.lightBlue },
+    const infoCards = [
+        {
+            title: "Mi Perfil",
+            description: "Actualiza tu información personal y de contacto para que el equipo de Visión Circular esté siempre conectado contigo.",
+            icon: <User size={20} />,
+            color: BRAND.blue,
+            link: "/profile"
+        },
+        {
+            title: "Biblioteca Digital",
+            description: "Accede a guías técnicas, normatividades y documentos clave sobre economía circular disponibles de forma libre.",
+            icon: <BookOpen size={20} />,
+            color: BRAND.green,
+            link: "/explorar"
+        },
+        {
+            title: "Conoce Proyectos",
+            description: "Explora las iniciativas de éxito y los proyectos activos que están impulsando la sostenibilidad en Colombia.",
+            icon: <Layout size={20} />,
+            color: "#FBBF24",
+            link: "/lineas-estrategicas"
+        },
+        {
+            title: "Participa",
+            description: "Participa en encuestas y convocatorias vigentes para influir en las futuras estrategias de economía circular.",
+            icon: <ClipboardCheck size={20} />,
+            color: BRAND.lightBlue,
+            link: "/encuestas"
+        },
     ];
 
     return (
         <div className="p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
 
-            {/* Saludo y Hero */}
+            {/* Saludo y Hero Refinado */}
             <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#005380] to-[#2C67B0] p-8 text-white shadow-xl">
                 <div className="relative z-10">
                     <h1 className="text-3xl font-bold mb-2">¡Bienvenido a Visión Circular!</h1>
                     <p className="text-blue-100 text-lg max-w-2xl">
-                        Como afiliado, eres parte fundamental del cambio. Aquí puedes monitorear tus proyectos y ver el impacto positivo que estamos generando juntos.
+                        Esta es tu plataforma para explorar el impacto de la economía circular. Como afiliado, tienes acceso a información clave y recursos para entender y promover la sostenibilidad.
                     </p>
                 </div>
                 <div className="absolute right-[-20px] top-[-20px] opacity-10">
@@ -61,75 +69,100 @@ export default function UndexAfiliado() {
                 </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, idx) => (
-                    <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-orange-50 hover:shadow-md transition-all group overflow-hidden relative">
-                        <div className="flex justify-between items-center relative z-10">
-                            <div>
-                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{stat.title}</p>
-                                <h3 className="text-3xl font-bold text-gray-800">{loading ? '...' : stat.value}</h3>
-                            </div>
-                            <div className="p-3 rounded-xl group-hover:scale-110 transition-transform" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
-                                {stat.icon}
+            {/* Pilares de Información */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {infoCards.map((card, idx) => (
+                    <Link to={card.link} key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-orange-50 hover:shadow-md transition-all group relative overflow-hidden flex flex-col h-full">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 rounded-xl group-hover:scale-110 transition-transform" style={{ backgroundColor: `${card.color}15`, color: card.color }}>
+                                {card.icon}
                             </div>
                         </div>
-                        <div className="absolute -right-2 -bottom-2 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
-                            {stat.icon}
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">{card.title}</h3>
+                        <p className="text-sm text-gray-500 flex-grow leading-relaxed">
+                            {card.description}
+                        </p>
+                        <div className="mt-4 flex items-center text-xs font-bold uppercase tracking-wider transition-all" style={{ color: card.color }}>
+                            Saber más <ChevronRight size={14} className="ml-1 group-hover:translate-x-1 transition-transform" />
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* News Section */}
+                {/* Sección informativa principal */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                            <Activity size={24} className="text-blue-500" />
-                            Notas y Actualizaciones
+                    <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+                        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                            <Info size={28} className="text-blue-500" />
+                            Guía de Inicio para Afiliados
                         </h2>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {[1, 2].map((i) => (
-                            <div key={i} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-blue-200 transition-colors cursor-pointer group">
-                                <div className="h-40 bg-gray-100 rounded-xl mb-4 overflow-hidden relative">
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                                    {/* Placeholder image representation */}
-                                    <div className="flex items-center justify-center h-full text-gray-300">
-                                        <Layout size={40} />
-                                    </div>
-                                </div>
-                                <h4 className="font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">Nuevo hito en sostenibilidad {i === 1 ? 'Regional' : 'Nacional'}</h4>
-                                <p className="text-sm text-gray-500 line-clamp-2">Explora cómo las nuevas normativas están ayudando a los afiliados a optimizar sus procesos circulares...</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
 
-                {/* Quick Help / Call to action */}
-                <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Recursos Rápidos</h2>
-                    <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-50 space-y-4">
-                        <Link to="/proyectos" className="flex items-center gap-4 p-4 rounded-2xl hover:bg-blue-50 transition-colors group">
-                            <div className="p-3 rounded-xl bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                <FileText size={20} />
+                        <div className="space-y-4 text-gray-600 leading-relaxed">
+                            <p>
+                                En <strong>Visión Circular</strong>, nuestra misión es acompañar a las organizaciones en su transición hacia modelos de negocio más sostenibles. Como miembro de esta plataforma, puedes navegar por diferentes recursos diseñados para informarte y conectar con otros actores del ecosistema.
+                            </p>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                                <div className="space-y-2">
+                                    <h4 className="font-bold text-gray-800 flex items-center gap-2">
+                                        <Search size={16} className="text-green-500" />
+                                        Búsqueda de Información
+                                    </h4>
+                                    <p className="text-sm">
+                                        Utiliza la sección de explorar para encontrar documentos técnicos, casos de éxito y normatividades actualizadas sobre la gestión de residuos y recursos.
+                                    </p>
+                                </div>
+                                <div className="space-y-2">
+                                    <h4 className="font-bold text-gray-800 flex items-center gap-2">
+                                        <Globe size={16} className="text-blue-500" />
+                                        Impacto Regional
+                                    </h4>
+                                    <p className="text-sm">
+                                        Consulta las líneas estratégicas para entender cómo nuestras acciones colectivas están impactando positivamente en el desarrollo económico del país.
+                                    </p>
+                                </div>
                             </div>
+                        </div>
+
+                        <div className="bg-blue-50 p-4 rounded-2xl flex items-start gap-4">
+                            <HelpCircle className="text-blue-600 flex-shrink-0 mt-1" size={20} />
                             <div>
-                                <p className="font-bold text-gray-800 text-sm">Gestionar Proyectos</p>
-                                <p className="text-xs text-gray-400 text-nowrap">Ver y editar tus iniciativas</p>
-                            </div>
-                        </Link>
-                        <div className="flex items-center gap-4 p-4 rounded-2xl hover:bg-green-50 transition-colors group cursor-pointer">
-                            <div className="p-3 rounded-xl bg-green-100 text-green-600 group-hover:bg-green-600 group-hover:text-white transition-all">
-                                <TrendingUp size={20} />
-                            </div>
-                            <div>
-                                <p className="font-bold text-gray-800 text-sm">Ver Indicadores</p>
-                                <p className="text-xs text-gray-400 text-nowrap">Analiza tu desempeño mensual</p>
+                                <p className="text-sm text-blue-800 font-medium">¿Necesitas ayuda adicional?</p>
+                                <p className="text-xs text-blue-600 mt-1">
+                                    Si tienes dudas sobre cómo navegar o necesitas soporte técnico, puedes contactarnos a través de los canales oficiales de soporte de Visión Circular.
+                                </p>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Resumen Informativo */}
+                <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl p-8 border border-gray-100 shadow-sm h-fit">
+                    <h3 className="text-xl font-bold text-gray-800 mb-6">Tu Compromiso</h3>
+                    <ul className="space-y-6">
+                        <li className="flex gap-4">
+                            <div className="h-2 w-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
+                            <p className="text-sm text-gray-600">
+                                <span className="font-bold text-gray-800 block mb-1">Actualización</span>
+                                Mantener tu perfil actualizado permite una mejor comunicación con el gremio.
+                            </p>
+                        </li>
+                        <li className="flex gap-4">
+                            <div className="h-2 w-2 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                            <p className="text-sm text-gray-600">
+                                <span className="font-bold text-gray-800 block mb-1">Participación</span>
+                                Tus respuestas en las encuestas ayudan a definir políticas nacionales de sostenibilidad.
+                            </p>
+                        </li>
+                        <li className="flex gap-4">
+                            <div className="h-2 w-2 rounded-full bg-orange-500 mt-2 flex-shrink-0" />
+                            <p className="text-sm text-gray-600">
+                                <span className="font-bold text-gray-800 block mb-1">Aprendizaje</span>
+                                El uso de la biblioteca técnica mejora las capacidades circulares de tu empresa.
+                            </p>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
