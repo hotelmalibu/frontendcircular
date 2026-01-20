@@ -167,7 +167,7 @@ export default function ContentDetailPage() {
   const encodedTitle = encodeURIComponent(rawTitle);
   const encodedTextAndUrl = encodeURIComponent(`${rawTitle} ${currentUrl}`);
 
-  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+  const facebookShareUrl = `https://www.facebook.com/sharer.php?u=${encodedUrl}`;
   const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
   const linkedinShareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedTextAndUrl}`;
   const instagramShareUrl = `https://www.instagram.com/share?url=${encodedUrl}&text=${encodedTextAndUrl}`;
@@ -229,58 +229,80 @@ export default function ContentDetailPage() {
       </div>
 
       {/* --- CONTENIDO PRINCIPAL --- */}
-      <div className="container mx-auto px-4 md:px-8 relative z-20">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 py-16">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-16">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
 
-          {/* COLUMNA IZQUIERDA (Social Share Sticky) */}
-          <div className="lg:w-24 flex-shrink-0">
-            <div className="sticky top-32 flex lg:flex-col gap-4 items-center lg:items-start">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest hidden lg:block mb-2">
-                Compartir
-              </span>
-
+          {/* COLUMNA IZQUIERDA: Social Share (Sticky) */}
+          <div className="lg:w-16 flex-shrink-0 order-2 lg:order-1">
+            <div className="sticky top-32 flex lg:flex-col gap-4 items-center">
               <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
               <SocialButton icon={X} color="#000000" url={xShareUrl} />
               <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
-              <SocialButton icon={Instagram} color="#E4405F" url={instagramShareUrl} />
               <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
               <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
+            </div>
+          </div>
 
-              {/* Móvil: Etiqueta compartir */}
-              <div className="lg:hidden flex items-center gap-2 text-gray-400 text-sm font-bold ml-auto">
-                <Share2 size={16} /> Compartir
+          {/* COLUMNA CENTRAL: Cuerpo del Artículo */}
+          <div className="flex-1 max-w-3xl order-1 lg:order-2">
+            <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-gray-100">
+              <h1 className="text-3xl md:text-5xl font-extrabold text-[#1E305D] mb-8 leading-tight">
+                {content.title}
+              </h1>
+
+              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed font-sans">
+                {content.body ? (
+                  /<[a-z][\s\S]*>/i.test(content.body) ? (
+                    <div dangerouslySetInnerHTML={{ __html: content.body }} className="news-content" />
+                  ) : (
+                    content.body.split(/\n\s*\n/).map((paragraph, idx) => (
+                      <p key={idx} className="mb-6">{paragraph}</p>
+                    ))
+                  )
+                ) : (
+                  <p className="text-xl italic text-gray-400">{content.excerpt || 'No hay contenido adicional disponible.'}</p>
+                )}
               </div>
             </div>
           </div>
 
-          {/* COLUMNA DERECHA (Texto del Artículo) */}
-          <div className="flex-1 max-w-3xl">
+          {/* COLUMNA DERECHA: Sidebar de Metadatos */}
+          <div className="lg:w-80 flex-shrink-0 order-3">
+            <div className="sticky top-32 space-y-6">
+              <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
+                Información
+              </h3>
 
-            {/* Cuerpo del texto */}
-            <div className="prose prose-lg prose-headings:text-[#1E305D] prose-a:text-[#00AB6D] text-gray-600">
-              {content.body ? (
-                // Si el body contiene HTML, renderizar como HTML
-                /<[a-z][\s\S]*>/i.test(content.body) ? (
-                  <div dangerouslySetInnerHTML={{ __html: content.body }} />
-                ) : (
-                  // Si es texto plano, dividir en párrafos
-                  content.body.split(/\n\s*\n/).map((paragraph, idx) => (
-                    <p key={idx}>{paragraph}</p>
-                  ))
-                )
-              ) : (
-                <p>{content.excerpt || 'No hay contenido detallado disponible.'}</p>
-              )}
-            </div>
+              <div className="space-y-8">
+                {content.author && (
+                  <SidebarItem
+                    icon={Mail}
+                    label="Escrito por"
+                    value={content.author}
+                  />
+                )}
 
-            {/* Footer del artículo: Categoría */}
-            <div className="mt-16 pt-8 border-t border-gray-100">
-              <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mr-4">Categoría:</span>
-              <Link to="/explorar" className="inline-block px-4 py-2 bg-gray-100 rounded-lg text-sm font-bold text-gray-600 hover:bg-[#00AB6D] hover:text-white transition-colors">
-                {content.topic}
-              </Link>
+                <SidebarItem
+                  icon={ArrowLeft}
+                  label="Tópico / Categoría"
+                  value={content.topic}
+                />
+
+                <SidebarItem
+                  icon={Calendar}
+                  label="Publicado el"
+                  value={content.date}
+                />
+
+                <SidebarItem
+                  icon={Share2}
+                  label="Tipo de contenido"
+                  value={content.type}
+                />
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -308,5 +330,19 @@ function SocialButton({ icon: Icon, url, color }) {
     >
       <Icon size={26} strokeWidth={2} />
     </a>
+  );
+}
+
+// Sub-component Item de Sidebar (ESTÁTICO)
+function SidebarItem({ icon: Icon, label, value }) {
+  if (!value) return null;
+  return (
+    <div className="group border-l-2 border-gray-100 pl-4 hover:border-[#00AB6D] transition-colors">
+      <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-[#00AB6D] transition-colors">
+        <Icon size={14} />
+        {label}
+      </div>
+      <p className="text-gray-900 font-bold leading-tight">{value}</p>
+    </div>
   );
 }

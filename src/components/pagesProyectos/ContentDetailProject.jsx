@@ -10,9 +10,17 @@ import {
   Mail,
   Share2,
   MessageCircle,
-  Instagram
+  Instagram,
+  Tag,
+  Clock,
+  User,
+  Layers,
+  Download,
+  FileText,
+  Bookmark
 } from "lucide-react";
 import { getProjectById } from "../../api/projectsApi";
+import { getImageProxyUrl } from "../../utils/imageUtils";
 
 // Import specific category images
 import imgFortalecimiento from "../../assets/home/Proyectos/Fortalecimiento.png";
@@ -64,18 +72,19 @@ export default function ContentDetailProject() {
         }
 
         // Map API data to expected format
-        // Map API data to expected format
         const catName = projectData.category_name || projectData.category || "General";
         const mappedProject = {
           id: projectData.id,
           title: projectData.title,
           type: catName,
-          image: categoryImages[catName] || projectData.image || "/assets/home/Proyectos/proyecto1.png", // fallback image
+          // Correctly access cover_image.url or fallback
+          image: getImageProxyUrl(projectData.cover_image?.url || projectData.cover_image_url || projectData.cover_image) || categoryImages[catName] || "/assets/home/Proyectos/proyecto1.png",
           date: projectData.created_at ? new Date(projectData.created_at).toLocaleDateString() : "Fecha no disponible",
-          location: projectData.location || "Ubicación no especificada",
-          challenge: projectData.challenge || projectData.description || "Información del desafío no disponible",
-          solution: projectData.solution || "Información de la solución no disponible",
-          impact: projectData.impact || "Información del impacto no disponible",
+          author: projectData.author || "Autor Desconocido",
+          classification: projectData.classification_type_label || projectData.classification_type?.label,
+          projectType: projectData.project_type_label || projectData.project_type?.label || projectData.project_type?.name,
+          description: projectData.description || "Sin descripción disponible",
+          uploadFile: projectData.upload_file,
           stats: projectData.stats || []
         };
 
@@ -136,7 +145,9 @@ export default function ContentDetailProject() {
   const encodedTitle = encodeURIComponent(project?.title || '');
   const encodedTextAndUrl = encodeURIComponent(`${project?.title || ''} ${currentUrl}`);
 
-  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+  // NOTE: Facebook sharing won't show a preview if the URL is "localhost".
+  // To test that it works, you can temporarily replace 'encodedUrl' with encodeURIComponent('https://www.google.com')
+  const facebookShareUrl = `https://www.facebook.com/sharer.php?u=${encodedUrl}`;
   const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
   const linkedinShareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedTextAndUrl}`;
   const instagramShareUrl = `https://www.instagram.com/share?url=${encodedUrl}&text=${encodedTextAndUrl}`;
@@ -203,56 +214,112 @@ export default function ContentDetailProject() {
           </div>
 
           {/* --- CONTENIDO PRINCIPAL --- */}
-          <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 md:py-12">
-            <div className="flex flex-col lg:flex-row gap-12 lg:gap-24">
+          <div className="max-w-7xl mx-auto px-6 md:px-12 py-16">
+            <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
 
-              {/* COLUMNA IZQUIERDA: Social Share Sticky */}
-              <div className="lg:w-24 flex-shrink-0">
-                <div className="sticky top-32 flex lg:flex-col gap-4 items-center lg:items-start">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest hidden lg:block mb-2">
-                    Compartir
-                  </span>
-
+              {/* COLUMNA IZQUIERDA: Social Share (Sticky) */}
+              <div className="lg:w-16 flex-shrink-0 order-2 lg:order-1">
+                <div className="sticky top-32 flex lg:flex-col gap-4 items-center">
                   <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
                   <SocialButton icon={X} color="#000000" url={xShareUrl} />
                   <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
-                  <SocialButton icon={Instagram} color="#E4405F" url={instagramShareUrl} />
                   <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
                   <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
-
-                  {/* Móvil: Etiqueta compartir */}
-                  <div className="lg:hidden flex items-center gap-2 text-gray-400 text-sm font-bold ml-auto">
-                    <Share2 size={16} /> Compartir
-                  </div>
                 </div>
               </div>
 
-              {/* COLUMNA DERECHA: Contenido del Proyecto */}
-              <div className="flex-1 max-w-4xl">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                  {/* Columna Izquierda: Descripción del Proyecto */}
-                  <div className="lg:col-span-8">
-                    <motion.section
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                    >
-                      <div className="prose prose-lg prose-headings:text-[#1E305D] prose-a:text-[#00AB6D] text-gray-600">
-                        {project.challenge ? (
-                          /<[a-z][\s\S]*>/i.test(project.challenge) ? (
-                            <div dangerouslySetInnerHTML={{ __html: project.challenge }} />
-                          ) : (
-                            <p className="text-lg leading-relaxed">{project.challenge}</p>
-                          )
-                        ) : (
-                          <p className="text-lg leading-relaxed text-gray-500">Descripción del proyecto no disponible.</p>
-                        )}
+              {/* COLUMNA CENTRAL: Cuerpo de la "Noticia" */}
+              <div className="flex-1 max-w-3xl order-1 lg:order-2">
+                <motion.article
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-gray-100"
+                >
+                  <h1 className="text-3xl md:text-4xl font-extrabold text-[#1E305D] mb-8 leading-tight">
+                    {project.title}
+                  </h1>
+                  <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed font-sans">
+                    {project.description ? (
+                      /<[a-z][\s\S]*>/i.test(project.description) ? (
+                        <div dangerouslySetInnerHTML={{ __html: project.description }} className="news-content" />
+                      ) : (
+                        <p className="text-xl">{project.description}</p>
+                      )
+                    ) : (
+                      <p className="italic text-gray-400">No hay detalles adicionales disponibles.</p>
+                    )}
+                  </div>
+
+                  {/* Documentation Section - Now simpler and more professional */}
+                  {project.uploadFile && (
+                    <div className="mt-16 pt-10 border-t border-gray-100">
+                      <h3 className="text-xl font-bold text-[#1E305D] mb-6 flex items-center gap-2">
+                        <Download size={20} className="text-[#00AB6D]" /> Recursos y Documentos
+                      </h3>
+                      <div className="group flex items-center justify-between p-6 bg-gray-50 hover:bg-[#1E305D] rounded-2xl border border-gray-200 transition-all duration-300">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#1E305D] shadow-sm">
+                            <FileText size={24} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-[#1E305D] group-hover:text-white transition-colors capitalize">
+                              {project.uploadFile.original_name?.toLowerCase() || "Documento adjunto"}
+                            </p>
+                            <p className="text-xs text-gray-500 group-hover:text-white/60 transition-colors uppercase tracking-widest font-bold">
+                              {project.uploadFile.extension || "PDF"} • {Math.round(project.uploadFile.size / 1024)} KB
+                            </p>
+                          </div>
+                        </div>
+                        <a
+                          href={getImageProxyUrl(project.uploadFile.url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-[#00AB6D] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#00965d] active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-[#00AB6D]/20"
+                        >
+                          <Download size={18} />
+                          <span className="hidden sm:inline">Descargar</span>
+                        </a>
                       </div>
-                    </motion.section>
-                  </div>
+                    </div>
+                  )}
+                </motion.article>
+              </div>
 
+              {/* COLUMNA DERECHA: Sidebar de Metadatos */}
+              <div className="lg:w-80 flex-shrink-0 order-3">
+                <div className="sticky top-32 space-y-6">
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
+                    Detalles técnicos
+                  </h3>
+
+                  <div className="space-y-8">
+                    <SidebarItem
+                      icon={User}
+                      label="Autor / Entidad"
+                      value={project.author}
+                    />
+
+                    <SidebarItem
+                      icon={Layers}
+                      label="Tipo de Proyecto"
+                      value={project.projectType}
+                    />
+
+                    <SidebarItem
+                      icon={Tag}
+                      label="Clasificación"
+                      value={project.classification}
+                    />
+
+                    <SidebarItem
+                      icon={Clock}
+                      label="Fecha de publicación"
+                      value={project.date}
+                    />
+                  </div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -281,5 +348,19 @@ function SocialButton({ icon: Icon, url, color }) {
     >
       <Icon size={26} strokeWidth={2} />
     </a>
+  );
+}
+
+// Sub-component Item de Sidebar
+function SidebarItem({ icon: Icon, label, value }) {
+  if (!value) return null;
+  return (
+    <div className="group border-l-2 border-gray-100 pl-4 hover:border-[#00AB6D] transition-colors">
+      <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-[#00AB6D] transition-colors">
+        <Icon size={14} />
+        {label}
+      </div>
+      <p className="text-gray-900 font-bold leading-tight">{value}</p>
+    </div>
   );
 }
