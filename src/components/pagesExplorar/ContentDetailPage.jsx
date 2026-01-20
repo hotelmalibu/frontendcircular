@@ -5,6 +5,7 @@ import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, Share2, MessageCircle
 import { allContentData, contentTypeConfig } from '../../data/mockContent';
 import { AuthContext } from '../../context/AuthContext';
 import { getAllNews, getNewsById } from '../../api/newsApi';
+import { getImageProxyUrl } from '../../utils/imageUtils.js';
 
 
 export default function ContentDetailPage() {
@@ -87,7 +88,7 @@ export default function ContentDetailPage() {
             body: found.content || found.body || found.html || found.text || found.description || "",
 
             // Image: prioritize upload_file.url from API, then fallback to other image fields
-            image: (found.upload_file && found.upload_file.url) || found.image || found.thumbnail || found.cover || "",
+            image: getImageProxyUrl((found.upload_file && found.upload_file.url) || found.image || found.thumbnail || found.cover || "", { width: 1200, quality: 85 }),
             date: found.published_at || found.publishedAt || found.created_at || found.createdAt || "",
             type: found.type ? (found.type === 'news' ? 'Noticias' : found.type) : 'Noticias',
             topic: found.category_name ||

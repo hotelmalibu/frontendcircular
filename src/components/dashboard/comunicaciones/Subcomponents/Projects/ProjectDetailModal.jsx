@@ -60,7 +60,7 @@ export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
           {(projectData.cover_image?.url || projectData.cover_image_url || (typeof projectData.cover_image === 'string' && projectData.cover_image)) && (
             <div className="mb-6 rounded-2xl overflow-hidden border border-gray-100 shadow-sm max-h-80">
               <img
-                src={getImageProxyUrl(projectData.cover_image?.url || projectData.cover_image_url || projectData.cover_image)}
+                src={getImageProxyUrl(projectData.cover_image?.url || projectData.cover_image_url || projectData.cover_image, { width: 800, quality: 80 })}
                 alt={projectData.title}
                 className="w-full h-full object-cover"
               />
@@ -189,7 +189,7 @@ export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
                   </div>
                 </div>
                 <a
-                  href={getImageProxyUrl(`https://api-ecocircular.creativostecnologicosit.com/storage/${projectData.upload_file.path}`)}
+                  href={`https://api-ecocircular.creativostecnologicosit.com/storage/${projectData.upload_file.path}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg transition-all font-bold text-sm transform active:scale-95"

@@ -263,7 +263,7 @@ export default function ProjectList() {
                 <div className="mb-4 rounded-xl border border-gray-100 h-32 bg-gray-50 flex items-center justify-center relative overflow-hidden transition-colors">
                   {(item.cover_image?.url || item.cover_image_url || (typeof item.cover_image === 'string' && item.cover_image)) ? (
                     <img
-                      src={getImageProxyUrl(item.cover_image?.url || item.cover_image_url || item.cover_image)}
+                      src={getImageProxyUrl(item.cover_image?.url || item.cover_image_url || item.cover_image, { width: 300, quality: 75 })}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {

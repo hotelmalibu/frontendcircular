@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
-import Companies from "../../components/dashboard/Companies";
+import Companies from "../../components/dashboard/Subcomponents/Companies";
 import { UserX } from "lucide-react";
 
 

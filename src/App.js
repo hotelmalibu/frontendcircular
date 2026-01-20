@@ -36,6 +36,7 @@ import PublicSurveysPage from "./modules/home/nosotros/conocenos/PublicSurveysPa
 import PublicSurveyDetail from "./modules/home/nosotros/conocenos/PublicSurveyDetail";
 import Profile from "./modules/dashboard/Profile";
 
+
 import ExplorePage from "./components/pagesExplorar/ExplorePage";
 import ContentDetailPage from "./components/pagesExplorar/ContentDetailPage";
 import ContentDetailProject from "./components/pagesProyectos/ContentDetailProject";
@@ -103,6 +104,7 @@ export default function App() {
           <Route path="/comunicaciones" element={<Comunicaciones />} />
           <Route path="/administracion" element={<Administracion />} />
           <Route path="/integracion" element={<Integracion />} />
+
         </Route>
 
         {/* Survey Detail WITHOUT MainLayout to prevent 404 flash */}

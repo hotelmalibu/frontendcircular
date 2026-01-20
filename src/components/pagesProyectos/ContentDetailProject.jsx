@@ -75,7 +75,7 @@ export default function ContentDetailProject() {
           title: projectData.title,
           type: catName,
           // Correctly access cover_image.url or fallback
-          image: getImageProxyUrl(projectData.cover_image?.url || projectData.cover_image_url || projectData.cover_image) || categoryImages[catName] || "/assets/home/Proyectos/proyecto1.png",
+          image: getImageProxyUrl(projectData.cover_image?.url || projectData.cover_image_url || projectData.cover_image, { width: 1200, quality: 85 }) || categoryImages[catName] || "/assets/home/Proyectos/proyecto1.png",
           date: projectData.created_at ? new Date(projectData.created_at).toLocaleDateString() : "Fecha no disponible",
           author: projectData.author || "Autor Desconocido",
           classification: projectData.classification_type_label || projectData.classification_type?.label,

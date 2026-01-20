@@ -3,10 +3,10 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Search, ChevronDown, FilterX } from "lucide-react";
 // Asegúrate que la ruta a mockContent sea correcta según tu estructura
 import { contentTypeConfig } from "../../data/mockContent";
-import DOMPurify from "dompurify";
 import { getAllNews } from "../../api/newsApi";
 import { getAllCategories } from "../../api/categoriesApi";
 import { stripHtml } from "../../utils/textUtils";
+import { getImageProxyUrl } from "../../utils/imageUtils.js";
 import explorarHeroImage from "../../assets/explorar-hero.jpg";
 
 export default function ExplorePage() {
@@ -44,12 +44,14 @@ export default function ExplorePage() {
           category: catName,
           title: n.title || n.name || "Sin título",
           excerpt: stripHtml(n.description || n.excerpt),
-          image:
+          image: getImageProxyUrl(
             (n.upload_file && n.upload_file.url) ||
             n.image ||
             n.thumbnail ||
             n.cover ||
             "",
+            { width: 600, quality: 80 }
+          ),
           date: n.published_at
             ? new Date(n.published_at).toLocaleDateString("es-ES", {
               year: "numeric",

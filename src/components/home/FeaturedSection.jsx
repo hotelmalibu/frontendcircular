@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { contentTypeConfig } from "../../data/mockContent";
-import DOMPurify from 'dompurify';
 import { getPublishedNewsWithImages } from "../../api/newsApi";
 import { getDocuments } from "../../api/documentsApi";
 import { stripHtml } from "../../utils/textUtils";
+import { getImageProxyUrl } from "../../utils/imageUtils.js";
 
 export default function FeaturedSection() {
   const [newsItems, setNewsItems] = useState([]);
@@ -87,7 +87,7 @@ export default function FeaturedSection() {
               "Sin categoría asignada",
             title: n.title || n.name || "Sin título",
             excerpt: stripHtml(n.description || n.excerpt),
-            image: imageUrl,
+            image: getImageProxyUrl(imageUrl, { width: 600, quality: 80 }),
             date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
             slug: n.slug || (`noticia-${n.id || n._id || ''}`),
             status: n.status || "",
@@ -205,7 +205,7 @@ export default function FeaturedSection() {
                 <div
                   key={item.id}
                   onClick={item.source === 'document' ? handleItemClick : undefined}
-                  className={`group block h-full flex flex-col ${item.source === 'document' ? 'cursor-pointer' : ''}`}
+                  className={`group h-full flex flex-col ${item.source === 'document' ? 'cursor-pointer' : ''}`}
                   {...(item.source !== 'document' && {
                     onClick: () => window.open(window.location.origin + `/contenido/${item.slug}`, '_blank')
                   })}

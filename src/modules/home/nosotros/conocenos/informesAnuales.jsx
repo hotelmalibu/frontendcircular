@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Search, ArrowRight, FileText, X } from "lucide-react";
 import { contentTypeConfig } from "../../../../data/mockContent";
-import DOMPurify from "dompurify";
 import { getPublishedNewsWithImages } from "../../../../api/newsApi";
 import { getDocuments } from "../../../../api/documentsApi";
 import { getAllProjects } from "../../../../api/projectsApi";
 import { stripHtml } from "../../../../utils/textUtils";
+import { getImageProxyUrl } from "../../../../utils/imageUtils.js";
 
 export default function InformesAnuales() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,7 +72,7 @@ export default function InformesAnuales() {
             topic: n.category_name || (n.category && typeof n.category === 'object' ? n.category.name : n.category) || "General",
             title: n.title || n.name || "Sin título",
             excerpt: stripHtml(n.description || n.excerpt),
-            image: imageUrl,
+            image: getImageProxyUrl(imageUrl, { width: 600, quality: 80 }),
             date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
             slug: n.slug || (`noticia-${n.id || n._id || ''}`),
             status: n.status || "",
@@ -134,7 +134,7 @@ export default function InformesAnuales() {
               topic: p.category_name || "Proyecto",
               title: p.title || "Proyecto sin título",
               excerpt: stripHtml(p.description),
-              image: p.cover_image?.url || p.cover_image_url || p.cover_image || "",
+              image: getImageProxyUrl(p.cover_image?.url || p.cover_image_url || p.cover_image || "", { width: 600, quality: 80 }),
               date: new Date(p.created_at).toLocaleDateString(),
               slug: p.id,
               status: p.status,

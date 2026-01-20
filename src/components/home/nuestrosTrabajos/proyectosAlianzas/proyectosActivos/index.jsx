@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, FileText, Download, X, BookOpen, MapPin, ChevronRight } from "lucide-react";
+import { ArrowRight, FileText, Download, BookOpen, MapPin, ChevronRight } from "lucide-react";
 
 // Skeleton loader components
 const SkeletonCard = ({ isWide }) => (
@@ -36,7 +36,6 @@ const SkeletonCard = ({ isWide }) => (
 );
 
 export default function ProyectosYAlianzas() {
-  const [pdfVisible, setPdfVisible] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
   const [activeSection, setActiveSection] = useState("sectoriales"); // "sectoriales" o "territoriales"
@@ -49,7 +48,6 @@ export default function ProyectosYAlianzas() {
       categoria: "Residuos",
       descripcion: "Documento técnico que orienta la gestión adecuada de residuos sólidos en establecimientos del sector restaurador, integrando prácticas alineadas con la economía circular.",
       img: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400",
-      pdf: "/docs/guia1.pdf",
     },
     {
       id: "metodologia-info",
@@ -58,7 +56,6 @@ export default function ProyectosYAlianzas() {
       categoria: "Metodología",
       descripcion: "Propuesta metodológica que facilita el diagnóstico de residuos mediante herramientas estandarizadas para la recolección y análisis de información.",
       img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400",
-      pdf: "/docs/guia2.pdf",
     },
   ];
 
@@ -70,7 +67,6 @@ export default function ProyectosYAlianzas() {
       categoria: "Política",
       descripcion: "Análisis detallado de oportunidades y estrategias para fortalecer la economía circular en las ciudades colombianas.",
       img: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400",
-      pdf: "/docs/territoriales/1.pdf",
     },
     {
       id: "reciclabilidad-envases",
@@ -78,7 +74,6 @@ export default function ProyectosYAlianzas() {
       categoria: "Envases",
       descripcion: "Evaluación técnica sobre reciclabilidad y aprovechamiento de envases y empaques en el país.",
       img: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=400",
-      pdf: "/docs/territoriales/2.pdf",
     },
     {
       id: "laboratorios-ensayos",
@@ -86,7 +81,6 @@ export default function ProyectosYAlianzas() {
       categoria: "Recursos",
       descripcion: "Directorio especializado con laboratorios certificados para pruebas, análisis y ensayos de envases.",
       img: "https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=400",
-      pdf: "/docs/territoriales/3.pdf",
     },
     {
       id: "cierre-ciclo-envases",
@@ -94,7 +88,6 @@ export default function ProyectosYAlianzas() {
       categoria: "Innovación",
       descripcion: "Documento técnico con estrategias y lineamientos para mejorar el cierre de ciclo de materiales.",
       img: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400",
-      pdf: "/docs/territoriales/4.pdf",
     },
     {
       id: "dispensacion-granel",
@@ -102,7 +95,6 @@ export default function ProyectosYAlianzas() {
       categoria: "Cosméticos",
       descripcion: "Lineamientos normativos para implementar modelos de dispensación a granel en cosmética y aseo.",
       img: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400",
-      pdf: "/docs/territoriales/5.pdf",
     },
     {
       id: "pcr-pead",
@@ -110,7 +102,6 @@ export default function ProyectosYAlianzas() {
       categoria: "Envases",
       descripcion: "Guía técnica para la inclusión segura y eficiente de resinas recicladas en envases PEAD.",
       img: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=400",
-      pdf: "/docs/territoriales/6.pdf",
     },
   ];
 
@@ -121,17 +112,7 @@ export default function ProyectosYAlianzas() {
       ? territoriales
       : territoriales.filter((p) => p.categoria === activeFilter);
 
-  const openPdf = (section, index) => {
-    setPdfVisible({ section, index });
-  };
 
-  const closePdf = () => setPdfVisible(null);
-
-  const currentPdf = pdfVisible
-    ? pdfVisible.section === "sectoriales"
-      ? sectoriales[pdfVisible.index]?.pdf
-      : territoriales[pdfVisible.index]?.pdf
-    : null;
 
   const handleFilterChange = (category) => {
     setIsLoading(true);
@@ -299,7 +280,6 @@ export default function ProyectosYAlianzas() {
                               <motion.button
                                 whileHover={{ scale: 1.05, x: 2 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => openPdf("sectoriales", i)}
                                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-[#006F63] to-[#00AB6D] text-white font-bold rounded-md hover:shadow-lg transition-all duration-300 text-xs w-fit mt-3"
                               >
                                 <FileText className="w-3 h-3" />
@@ -486,7 +466,6 @@ export default function ProyectosYAlianzas() {
                                 <motion.button
                                   whileHover={{ scale: 1.05, x: 2 }}
                                   whileTap={{ scale: 0.95 }}
-                                  onClick={() => openPdf("territoriales", territoriales.indexOf(p))}
                                   className="w-full inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-gradient-to-r from-[#00AB6D] to-[#00D68F] text-white font-bold rounded-md shadow-sm hover:shadow-md transition-all duration-300 text-xs"
                                 >
                                   <Download className="w-3 h-3" />
@@ -517,32 +496,6 @@ export default function ProyectosYAlianzas() {
         </div>
       </div>
 
-      {pdfVisible && currentPdf && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col"
-          >
-            <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="text-lg font-bold text-[#1E305D]">Documento PDF</h3>
-              <button
-                onClick={closePdf}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <iframe
-                src={currentPdf}
-                className="w-full h-full"
-                title="PDF Viewer"
-              />
-            </div>
-          </motion.div>
-        </div>
-      )}
     </>
   );
 }

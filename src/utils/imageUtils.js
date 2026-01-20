@@ -3,26 +3,48 @@
  */
 
 // List of reliable CORS proxy services
+// List of reliable CORS proxy services
 const CORS_PROXIES = [
-  'https://api.allorigins.win/raw?url=',
-  'https://corsproxy.io/?',
-  'https://images.weserv.nl/?url=',
-  'https://cors-anywhere.herokuapp.com/'
+  'https://images.weserv.nl/?url=',        // Fastest + supports resizing
+  'https://api.allorigins.win/raw?url=',   // Fallback 1
+  'https://corsproxy.io/?',                // Fallback 2
+  'https://cors-anywhere.herokuapp.com/'   // Fallback 3
 ];
 
 /**
  * Get proxy URL for images to avoid CORS issues
  * @param {string} imageUrl - Original image URL
- * @param {number} proxyIndex - Which proxy to use (0-3)
+ * @param {number|Object} optionsOrIndex - Proxy index (number) or Options object { width, height, quality }
  * @returns {string} - Proxy URL or original URL
  */
-export const getImageProxyUrl = (imageUrl, proxyIndex = 0) => {
+export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
   if (!imageUrl || typeof imageUrl !== 'string') return '';
+
+  let proxyIndex = 0;
+  let options = {};
+
+  if (typeof optionsOrIndex === 'number') {
+    proxyIndex = optionsOrIndex;
+  } else if (typeof optionsOrIndex === 'object') {
+    options = optionsOrIndex;
+    // default to 0 (weserv) if object passed
+  }
 
   // If the image is from our API domain, use a CORS proxy
   if (imageUrl.includes('api-ecocircular.creativostecnologicosit.com')) {
     const proxy = CORS_PROXIES[proxyIndex] || CORS_PROXIES[0];
-    return `${proxy}${encodeURIComponent(imageUrl)}`;
+    let finalUrl = `${proxy}${encodeURIComponent(imageUrl)}`;
+    
+    // Append Weserv specific parameters if using Weserv (index 0)
+    if (proxy.includes('weserv.nl')) {
+      if (options.width) finalUrl += `&w=${options.width}`;
+      if (options.height) finalUrl += `&h=${options.height}`;
+      if (options.quality) finalUrl += `&q=${options.quality}`;
+      if (options.output) finalUrl += `&output=${options.output}`;
+      else finalUrl += `&output=webp`; // Default to WebP for performance
+    }
+    
+    return finalUrl;
   }
 
   // Return original URL for other domains
