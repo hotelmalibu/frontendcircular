@@ -93,25 +93,14 @@ export default function FeaturedSection() {
           };
         });
 
-        // Map documents
-        const documentTypes = [
-          { id: "1", name: "Normas y Politicas" },
-          { id: "2", name: "Formatos" },
-          { id: "3", name: "Actas" },
-          { id: "4", name: "Pesajes" },
-          { id: "5", name: "Contratos" }
-        ];
-
         const mappedDocuments = documentsArray.map(doc => {
-          const documentType = documentTypes.find(type => type.id === doc.document_type_id);
-
           // All documents go to "Documentos de interés"
           const category = "Documentos de interés";
 
           return {
             id: `doc-${doc.id}`,
             type: category,
-            topic: documentType?.name || `Tipo ${doc.document_type_id}`,
+            topic: doc.category_name || (doc.category && typeof doc.category === 'object' ? doc.category.name : doc.category) || "Documento",
             title: doc.name,
             excerpt: doc.description,
             image: "", // Documents don't have images

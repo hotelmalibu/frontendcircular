@@ -20,6 +20,18 @@ export const contentTypeConfig = {
     color: "text-[#1E305D]",
     bgColor: "bg-gray-100",
     isSolid: false
+  },
+  "Documentos de interés": {
+    icon: Newspaper,
+    color: "text-[#1E305D]",
+    bgColor: "bg-[#005380]",
+    isSolid: true
+  },
+  "Gestión documental": {
+    icon: Newspaper,
+    color: "text-[#00AB6D]",
+    bgColor: "bg-[#00AB6D]",
+    isSolid: true
   }
 };
 

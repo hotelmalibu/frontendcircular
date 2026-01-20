@@ -4,6 +4,8 @@ import { contentTypeConfig } from "../../../../data/mockContent";
 import DOMPurify from "dompurify";
 import { getPublishedNewsWithImages } from "../../../../api/newsApi";
 import { getDocuments } from "../../../../api/documentsApi";
+import { getAllProjects } from "../../../../api/projectsApi";
+import { stripHtml } from "../../../../utils/textUtils";
 
 export default function InformesAnuales() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,9 +19,10 @@ export default function InformesAnuales() {
     const load = async () => {
       try {
         setLoading(true);
-        const [newsResponse, documentsResponse] = await Promise.all([
+        const [newsResponse, documentsResponse, projectsResponse] = await Promise.all([
           getPublishedNewsWithImages(),
-          getDocuments()
+          getDocuments(),
+          getAllProjects()
         ]);
 
         if (!mounted) return;
@@ -40,41 +43,41 @@ export default function InformesAnuales() {
         }
 
         const mappedNews = newsArray.map(n => {
-            const rawType = n.type || n.category || "";
-            let finalType = "Noticias";
-            
-            // Logic key: identify if it belongs to "Documentos de interés"
-            if (rawType.toLowerCase().includes("doc") || rawType.toLowerCase().includes("interés")) {
-              finalType = "Documentos de interés";
-            }
-            // We can also include "Gestión documental" if desired, as per FeaturedSection logic
-            else if (rawType.toLowerCase().includes("gesti") || rawType.toLowerCase().includes("gestion")) {
-               finalType = "Gestión documental";
-            }
+          const rawType = n.type || n.category || "";
+          let finalType = "Noticias";
 
-            let imageUrl = "";
-            if (n.upload_file && n.upload_file.url) {
-              imageUrl = n.upload_file.url;
-            } else if (n.image) {
-              imageUrl = n.image;
-            } else if (n.thumbnail) {
-              imageUrl = n.thumbnail;
-            } else if (n.cover) {
-              imageUrl = n.cover;
-            }
+          // Logic key: identify if it belongs to "Documentos de interés"
+          if (rawType.toLowerCase().includes("doc") || rawType.toLowerCase().includes("interés")) {
+            finalType = "Documentos de interés";
+          }
+          // We can also include "Gestión documental" if desired, as per FeaturedSection logic
+          else if (rawType.toLowerCase().includes("gesti") || rawType.toLowerCase().includes("gestion")) {
+            finalType = "Gestión documental";
+          }
 
-            return {
-              id: n.id || n._id || n.uid || Math.random(),
-              type: finalType,
-              topic: n.category_name || (n.category && typeof n.category === 'object' ? n.category.name : n.category) || "General",
-              title: n.title || n.name || "Sin título",
-              excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
-              image: imageUrl,
-              date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
-              slug: n.slug || (`noticia-${n.id || n._id || ''}`),
-              status: n.status || "",
-              source: 'news'
-            };
+          let imageUrl = "";
+          if (n.upload_file && n.upload_file.url) {
+            imageUrl = n.upload_file.url;
+          } else if (n.image) {
+            imageUrl = n.image;
+          } else if (n.thumbnail) {
+            imageUrl = n.thumbnail;
+          } else if (n.cover) {
+            imageUrl = n.cover;
+          }
+
+          return {
+            id: n.id || n._id || n.uid || Math.random(),
+            type: finalType,
+            topic: n.category_name || (n.category && typeof n.category === 'object' ? n.category.name : n.category) || "General",
+            title: n.title || n.name || "Sin título",
+            excerpt: stripHtml(n.description || n.excerpt),
+            image: imageUrl,
+            date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
+            slug: n.slug || (`noticia-${n.id || n._id || ''}`),
+            status: n.status || "",
+            source: 'news'
+          };
         });
 
         // --- Process Documents ---
@@ -84,41 +87,67 @@ export default function InformesAnuales() {
         } else if (Array.isArray(documentsResponse?.data)) {
           documentsArray = documentsResponse.data;
         } else if (Array.isArray(documentsResponse)) {
-            documentsArray = documentsResponse;
+          documentsArray = documentsResponse;
         }
 
-        const documentTypes = [
-            { id: "1", name: "Normas y Politicas" },
-            { id: "2", name: "Formatos" },
-            { id: "3", name: "Actas" },
-            { id: "4", name: "Pesajes" },
-            { id: "5", name: "Contratos" }
-        ];
-
         const mappedDocuments = documentsArray.map(doc => {
-            const documentType = documentTypes.find(type => type.id === String(doc.document_type_id));
-            const category = "Documentos de interés"; 
-  
-            return {
-              id: `doc-${doc.id}`,
-              type: category,
-              topic: documentType?.name || `Tipo ${doc.document_type_id}`,
-              title: doc.name,
-              excerpt: doc.description,
-              image: "", // Documents usually don't have covers
-              date: new Date(doc.created_at).toLocaleDateString(),
-              slug: `documento-${doc.id}`,
-              status: doc.status,
-              source: 'document',
-              documentData: doc 
-            };
+          const category = "Documentos de interés";
+
+          return {
+            id: `doc-${doc.id}`,
+            type: category,
+            topic: doc.category_name || (doc.category && typeof doc.category === 'object' ? doc.category.name : doc.category) || "Documento",
+            title: doc.name,
+            excerpt: doc.description,
+            image: "", // Documents usually don't have covers
+            date: new Date(doc.created_at).toLocaleDateString(),
+            slug: `documento-${doc.id}`,
+            status: doc.status,
+            source: 'document',
+            documentData: doc
+          };
         });
 
-        // Filter ONLY "Documentos de interés" from both sources
-        const combined = [...mappedNews, ...mappedDocuments];
-        const onlyDocsOfInterest = combined.filter(item => 
-            item.type === "Documentos de interés" || item.type === "Gestión documental"
-        );
+        // --- Process Projects ---
+        let projectsArray = [];
+        if (projectsResponse?.items && Array.isArray(projectsResponse.items)) {
+          projectsArray = projectsResponse.items;
+        } else if (Array.isArray(projectsResponse)) {
+          projectsArray = projectsResponse;
+        } else if (projectsResponse?.data?.items && Array.isArray(projectsResponse.data.items)) {
+          projectsArray = projectsResponse.data.items;
+        } else if (projectsResponse?.projects && Array.isArray(projectsResponse.projects)) {
+          projectsArray = projectsResponse.projects;
+        } else if (typeof projectsResponse === 'object' && projectsResponse !== null) {
+          const possibleArrays = Object.values(projectsResponse).filter(val => Array.isArray(val));
+          if (possibleArrays.length > 0) {
+            projectsArray = possibleArrays[0];
+          }
+        }
+
+        const mappedProjects = projectsArray
+          .filter(p => p && (p.upload_file || p.file)) // Only projects with files
+          .map(p => {
+            return {
+              id: `project-${p.id}`,
+              type: "Documentos de interés", // Categorize as documents for consistency
+              topic: p.category_name || "Proyecto",
+              title: p.title || "Proyecto sin título",
+              excerpt: stripHtml(p.description),
+              image: p.cover_image?.url || p.cover_image_url || p.cover_image || "",
+              date: new Date(p.created_at).toLocaleDateString(),
+              slug: p.id,
+              status: p.status,
+              source: 'project',
+              projectData: p
+            };
+          });
+
+        // Filter ONLY "Documentos de interés" from all sources
+        const combined = [...mappedNews, ...mappedDocuments, ...mappedProjects];
+        const onlyDocsOfInterest = combined.filter(item => {
+          return item.type === "Documentos de interés" || item.type === "Gestión documental";
+        });
 
         if (mounted) setItems(onlyDocsOfInterest);
 
@@ -160,8 +189,8 @@ export default function InformesAnuales() {
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat scale-105"
           style={{
-             backgroundImage: `url("https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2070&auto=format&fit=crop")`, // Placeholder generic office/doc image if needed, or re-use existing
-             filter: "brightness(0.4)"
+            backgroundImage: `url("https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2070&auto=format&fit=crop")`, // Placeholder generic office/doc image if needed, or re-use existing
+            filter: "brightness(0.4)"
           }}
         ></div>
 
@@ -192,24 +221,24 @@ export default function InformesAnuales() {
 
       {/* --- RESULTS GRID --- */}
       <div className="container mx-auto px-4 md:px-8 py-16">
-        
+
         <div className="flex items-center justify-between mb-8 border-b border-gray-100 pb-4">
-            <h2 className="text-2xl font-bold text-gray-800">Documentos Disponibles</h2>
-            <div className="text-sm text-gray-500 font-medium">
-                {filteredResults.length} documentos encontrados
-            </div>
+          <h2 className="text-2xl font-bold text-gray-800">Documentos Disponibles</h2>
+          <div className="text-sm text-gray-500 font-medium">
+            {filteredResults.length} documentos encontrados
+          </div>
         </div>
 
         {loading ? (
-             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {[...Array(4)].map((_, i) => (
-                    <div key={i} className="animate-pulse">
-                        <div className="bg-gray-200 h-48 rounded-xl mb-4"></div>
-                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                    </div>
-                ))}
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="bg-gray-200 h-48 rounded-xl mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
         ) : filteredResults.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
             {filteredResults.map((item) => (
@@ -218,11 +247,11 @@ export default function InformesAnuales() {
           </div>
         ) : (
           <div className="text-center py-20 bg-gray-50 rounded-2xl border border-gray-100">
-             <div className="mb-4 text-gray-300 flex justify-center">
-                 <FileText size={64} />
-             </div>
-             <h3 className="text-xl font-bold text-gray-700 mb-2">No se encontraron documentos</h3>
-             <p className="text-gray-500">Intenta con otros términos de búsqueda.</p>
+            <div className="mb-4 text-gray-300 flex justify-center">
+              <FileText size={64} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-700 mb-2">No se encontraron documentos</h3>
+            <p className="text-gray-500">Intenta con otros términos de búsqueda.</p>
           </div>
         )}
       </div>
@@ -231,12 +260,12 @@ export default function InformesAnuales() {
       {pdfVisible && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col relative animate-in fade-in zoom-in duration-300">
-            
+
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-bold text-[#1E305D] flex items-center gap-2">
-                 <FileText size={20} className="text-[#00AB6D]"/> 
-                 Visualizador de Documentos
+                <FileText size={20} className="text-[#00AB6D]" />
+                Visualizador de Documentos
               </h3>
               <button
                 onClick={closePdf}
@@ -245,14 +274,14 @@ export default function InformesAnuales() {
                 <X size={24} />
               </button>
             </div>
-            
+
             {/* Content (Iframe) */}
             <div className="flex-1 overflow-hidden bg-gray-50 relative">
-               <iframe
-                 src={pdfVisible}
-                 className="w-full h-full border-0"
-                 title="PDF Viewer"
-               />
+              <iframe
+                src={pdfVisible}
+                className="w-full h-full border-0"
+                title="PDF Viewer"
+              />
             </div>
           </div>
         </div>
@@ -265,35 +294,52 @@ export default function InformesAnuales() {
 // --- Sub-component: MinimalistCard (Adapted from ExplorePage logic) ---
 function MinimalistCard({ item, onOpenPdf }) {
   const config = contentTypeConfig[item.type] || contentTypeConfig["Documentos de interés"] || {};
-  const Icon = config.icon || FileText; 
+  const Icon = config.icon || FileText;
 
   const handleItemClick = (e) => {
     // If it's a raw document with a specific file path
     if (item.source === 'document' && item.documentData) {
-        e.preventDefault();
-        const fileUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${item.documentData.upload_file.path}`;
-        
-        // Use the modal opener
-        onOpenPdf(fileUrl);
+      e.preventDefault();
+      const fileUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${item.documentData.upload_file.path}`;
+      onOpenPdf(fileUrl);
     }
+    // If it's a project with a specific file path or object
+    else if (item.source === 'project' && (item.projectData?.upload_file || item.projectData?.file)) {
+      e.preventDefault();
+      const fileData = item.projectData.upload_file || item.projectData.file;
+      const filePath = typeof fileData === 'object' ? fileData.path : fileData;
+      const fileUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${filePath}`;
+      onOpenPdf(fileUrl);
+    }
+  };
+
+  const getHref = () => {
+    const hasFile = item.projectData?.upload_file || item.projectData?.file;
+    if (item.source === 'document' || (item.source === 'project' && hasFile)) {
+      return "#";
+    }
+    if (item.source === 'project') {
+      return window.location.origin + `/proyectos/${item.slug}`;
+    }
+    return window.location.origin + `/contenido/${item.slug}`;
   };
 
   return (
     <a
-      href={item.source === 'document' ? "#" : window.location.origin + `/contenido/${item.slug}`}
-      onClick={(e) => { 
-          if(item.source === 'document') {
-             handleItemClick(e);
-          }
+      href={getHref()}
+      onClick={(e) => {
+        const hasFile = item.projectData?.upload_file || item.projectData?.file;
+        if (item.source === 'document' || (item.source === 'project' && hasFile)) {
+          handleItemClick(e);
+        }
       }}
-      target={item.source === 'document' ? "_self" : "_self"}
+      target="_self"
       rel="noopener noreferrer"
-      className={`group h-full flex flex-col ${item.source === 'document' ? 'cursor-pointer' : ''}`}
+      className={`group h-full flex flex-col ${(item.source === 'document' || (item.source === 'project' && (item.projectData?.upload_file || item.projectData?.file))) ? 'cursor-pointer' : ''}`}
     >
       <div
-        className={`rounded-xl overflow-hidden mb-5 aspect-[16/10] relative shadow-sm transition-transform duration-500 group-hover:-translate-y-1 ${
-          config.isSolid ? config.bgColor : "bg-gray-100"
-        }`}
+        className={`rounded-xl overflow-hidden mb-5 aspect-[16/10] relative shadow-sm transition-transform duration-500 group-hover:-translate-y-1 ${config.isSolid ? config.bgColor : "bg-gray-100"
+          }`}
       >
         {config.isSolid ? (
           <div className="w-full h-full flex items-center justify-center relative p-6">
@@ -338,18 +384,18 @@ function MinimalistCard({ item, onOpenPdf }) {
           <span className="text-gray-300">/</span>
           <span>{item.topic}</span>
         </div>
-        
+
         <h3 className="text-lg font-bold text-[#1E305D] leading-snug mb-3 group-hover:text-[#00AB6D] transition-colors line-clamp-2">
           {item.title}
         </h3>
-        
+
         <p className="text-gray-500 text-sm line-clamp-3 leading-relaxed flex-1">
           {item.excerpt || "Sin descripción disponible."}
         </p>
 
         {/* Action hint */}
         <div className="mt-4 flex items-center text-[#00AB6D] text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
-            {item.source === 'document' ? 'Ver Documento' : 'Leer más'} <ArrowRight size={16} className="ml-1" />
+          {(item.source === 'document' || (item.source === 'project' && (item.projectData?.upload_file || item.projectData?.file))) ? 'Ver Documento' : 'Leer más'} <ArrowRight size={16} className="ml-1" />
         </div>
       </div>
     </a>
