@@ -463,6 +463,7 @@ export default function Navbar({ onMenuClick }) {
     "/juntaDirecteEquipo",
     "/valores",
     "/lineas-estrategicas",
+    "/informes-anuales",
     "/encuestas",
   ];
   const isTransparentNavPath = transparentPaths.some((path) => {
