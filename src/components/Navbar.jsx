@@ -478,7 +478,7 @@ export default function Navbar({ onMenuClick }) {
     scrolled || isHovered || hasOpenDropdown || mobileMenuOpen;
 
   const isDashboardView = user && isPublicPage && !isInteracted;
-  const isAuthPage = ["/login", "/register", "/forgot-password"].includes(
+  const isAuthPage = ["/login","/quines-somos", "/register", "/forgot-password"].includes(
     location.pathname
   );
 
@@ -1015,7 +1015,7 @@ export default function Navbar({ onMenuClick }) {
                         path: "/documentos",
                         icon: FileText,
                       },
-                      { name: "Empresas", path: "/companies", icon: Building },
+                      { name: "Circularmente", path: "/companies", icon: Building },
                       {
                         name: "Formularios",
                         path: "/formularios",
