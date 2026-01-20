@@ -12,7 +12,6 @@ import imgInnovacion from "../../../../assets/lineasestrategicas/innovacion.png"
 import imgInclusion from "../../../../assets/lineasestrategicas/inclusion.png";
 import imgConsumo from "../../../../assets/lineasestrategicas/consumoresponsable.png";
 import imgCadenas from "../../../../assets/lineasestrategicas/cadenasdevalor.png";
-import heroLineas from "../../../../assets/lineasestrategicas/hero_lineas_v2.jpg";
 import ImpactSection from "../../../../components/home/nosotros/conocenos/quienesSomos/ImpactSection.jsx";
 
 const DATA_LINEAS = [
@@ -150,76 +149,84 @@ export default function LineasEstrategicasPage() {
     <div className="font-sans min-h-screen bg-gray-50 flex flex-col items-center">
 
       {/* HERO SECTION */}
-      <div className="relative h-[550px] md:h-[750px] w-full">
-        <img
-          src={heroLineas}
-          alt="Líneas Estratégicas"
-          className="w-full h-full object-cover object-center brightness-[0.9]"
+      <div className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center bg-[#0D1B2A]">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{ 
+            backgroundImage: `url("https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2070&auto=format&fit=crop")`
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1E305D]/70 via-transparent to-white/60 flex flex-col justify-center items-center text-center px-6">
+
+        {/* Content Overlay */}
+        <div className="absolute inset-0 bg-[#1E305D]/60 flex flex-col justify-center items-center text-center px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-4xl"
+            className="max-w-4xl relative z-10"
           >
-            <h1 className="text-white text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6 drop-shadow-2xl font-display">
+            <h1 className="text-white text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6 drop-shadow-lg font-display">
               Líneas Estratégicas
             </h1>
-            <p className="text-white/90 text-sm md:text-xl max-w-2xl mx-auto leading-relaxed drop-shadow-lg opacity-80">
+            <p className="text-white/95 text-sm md:text-xl max-w-2xl mx-auto leading-relaxed drop-shadow-md font-medium">
               Estrategias integrales diseñadas para transformar el modelo productivo del país hacia una economía circular.
             </p>
           </motion.div>
         </div>
-
-        {/* WHITE BOTTOM FILTER OVERLAY */}
-        <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-gray-50 via-white/20 to-transparent z-20" />
-
-        {/* TABS DE SELECCIÓN (Overlapping at the bottom/edge) */}
-        <div className="absolute -bottom-10 md:-bottom-16 left-0 w-full z-40 px-6">
-          <div className="flex flex-wrap justify-center gap-4 md:gap-10">
-            {DATA_LINEAS.map((item) => {
-              const isActive = selectedLineId === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setSelectedLineId(item.id)}
-                  className={`flex flex-col items-center transition-all duration-500 group relative ${isActive
-                    ? "scale-110 -translate-y-2 text-[#1E305D]"
-                    : "hover:scale-105"
-                    }`}
-                >
-                  <div className="w-24 h-16 md:w-48 md:h-24 transition-transform duration-500">
-                    <img
-                      src={item.img}
-                      alt={item.title}
-                      className="w-full h-full object-contain filter drop-shadow-2xl"
-                    />
-                  </div>
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeTab"
-                      className="absolute -bottom-2 md:-bottom-4 w-20 h-1.5 bg-[#B1D357] rounded-full shadow-[0_0_20px_rgba(177,211,87,0.8)]"
-                    />
-                  )}
-                </button>
-              )
-            })}
-          </div>
-          {/* Texto informativo refinado */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex items-center justify-center gap-2 mt-6 md:mt-8 text-[#1E305D] font-bold"
-          >
-            <span className="text-[10px] md:text-xs tracking-widest uppercase opacity-80">
-              Haz clic en cada línea estratégica para conocer más
-            </span>
-          </motion.div>
-        </div>
       </div>
 
-      <div className="h-28 md:h-32 w-full" /> {/* Increased spacer to prevent clipping from below */}
+      {/* TABS DE SELECCIÓN (Single Card) - Positioned AFTER the banner */}
+      <div className="relative w-full z-40 px-4 md:px-6 py-4 md:py-8">
+        <motion.div 
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-[2rem] shadow-2xl border border-gray-100 p-2 md:p-4 flex flex-wrap justify-between items-center gap-2 md:gap-4 max-w-6xl mx-auto"
+        >
+          {DATA_LINEAS.map((item) => {
+            const isActive = selectedLineId === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setSelectedLineId(item.id)}
+                className={`flex flex-col items-center transition-all duration-300 group relative flex-1 min-w-[80px] md:min-w-[140px] ${isActive
+                  ? "scale-105" // Active state
+                  : "hover:scale-105" // Inactive state: no opacity/grayscale
+                  }`}
+              >
+                <div className="w-full h-12 md:h-20 flex items-center justify-center p-1">
+                  <img
+                    src={item.img}
+                    alt={item.title}
+                    className="w-full h-full object-contain filter"
+                  />
+                </div>
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute -bottom-2 md:-bottom-4 w-12 h-1 bg-[#B1D357] rounded-full"
+                  />
+                )}
+              </button>
+            )
+          })}
+        </motion.div>
+      
+        {/* Texto informativo */}
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="text-center mt-3"
+        >
+            <span className="text-[10px] md:text-xs tracking-widest uppercase text-gray-500 font-bold">
+              Haz clic en cada línea estratégica para conocer más
+            </span>
+        </motion.div>
+      </div>
+
+      {/* Spacer removed/reduced since we are in flow now */}
+      <div className="h-8 w-full" />
 
       {/* CONTENIDO INTERACTIVO */}
       <div className="w-full max-w-6xl mx-auto px-6 mb-12">

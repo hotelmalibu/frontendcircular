@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   Edit,
   Trash2,
@@ -353,8 +354,8 @@ export default function Table() {
       </div>
 
       {/* MODAL CREAR/EDITAR */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      {isModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-fadeIn">
             {/* Header */}
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center" style={{ backgroundColor: BRAND.darkBlue }}>
@@ -478,12 +479,13 @@ export default function Table() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* CONFIRM DELETE MODAL */}
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      {isDeleteModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center animate-fadeIn">
             <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <Trash2 size={32} />
@@ -509,7 +511,8 @@ export default function Table() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>
