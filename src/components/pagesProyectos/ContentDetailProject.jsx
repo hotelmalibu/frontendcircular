@@ -8,16 +8,13 @@ import {
   X,
   Linkedin,
   Mail,
-  Share2,
   MessageCircle,
-  Instagram,
   Tag,
   Clock,
   User,
   Layers,
   Download,
-  FileText,
-  Bookmark
+  FileText
 } from "lucide-react";
 import { getProjectById } from "../../api/projectsApi";
 import { getImageProxyUrl } from "../../utils/imageUtils";
@@ -150,8 +147,7 @@ export default function ContentDetailProject() {
   const facebookShareUrl = `https://www.facebook.com/sharer.php?u=${encodedUrl}`;
   const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
   const linkedinShareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedTextAndUrl}`;
-  const instagramShareUrl = `https://www.instagram.com/share?url=${encodedUrl}&text=${encodedTextAndUrl}`;
-  const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
+const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
   const mailShareUrl = `mailto:?subject=${encodedTitle}&body=${encodedTextAndUrl}`;
 
   return (

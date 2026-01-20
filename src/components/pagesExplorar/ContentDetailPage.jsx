@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import DOMPurify from 'dompurify';
 import { useParams, Link } from 'react-router-dom';
-import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, Share2, Instagram, MessageCircle } from 'lucide-react';
+import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, Share2, MessageCircle } from 'lucide-react';
 import { allContentData, contentTypeConfig } from '../../data/mockContent';
 import { AuthContext } from '../../context/AuthContext';
 import { getAllNews, getNewsById } from '../../api/newsApi';
@@ -170,8 +170,7 @@ export default function ContentDetailPage() {
   const facebookShareUrl = `https://www.facebook.com/sharer.php?u=${encodedUrl}`;
   const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
   const linkedinShareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedTextAndUrl}`;
-  const instagramShareUrl = `https://www.instagram.com/share?url=${encodedUrl}&text=${encodedTextAndUrl}`;
-  const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
+const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
   const mailShareUrl = `mailto:?subject=${encodedTitle}&body=${encodedTextAndUrl}`;
 
   return (

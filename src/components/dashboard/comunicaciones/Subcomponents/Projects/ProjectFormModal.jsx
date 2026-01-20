@@ -278,15 +278,53 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
     if (formData.classification_type_id && !filtered.some(t => String(t.id) === String(formData.classification_type_id))) {
       setFormData(prev => ({ ...prev, classification_type_id: "" }));
     }
-  }, [formData.project_type_id, classificationTypes, projectTypes]);
+  }, [formData.project_type_id, classificationTypes, projectTypes, formData.classification_type_id]);
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    const file = files[0];
-    setFormData((prev) => ({
-      ...prev,
-      [name]: file,
-    }));
+    if (files && files.length > 0) {
+      const file = files[0];
+      
+      // Validation thresholds
+      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+      const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+
+      let isValid = true;
+      let errorMessage = "";
+
+      if (name === "cover_image") {
+        if (file.size > MAX_IMAGE_SIZE) {
+          isValid = false;
+          errorMessage = "La imagen de portada no puede superar los 5MB.";
+        }
+      } else if (name === "file") {
+        if (file.size > MAX_FILE_SIZE) {
+          isValid = false;
+          errorMessage = "El archivo no puede superar los 10MB.";
+        }
+      }
+
+      if (!isValid) {
+        setErrors((prev) => ({
+          ...prev,
+          [name]: errorMessage,
+        }));
+        // Reset file input
+        e.target.value = "";
+        return;
+      }
+
+      // Clear error if valid
+      setErrors((prev) => ({
+        ...prev,
+        [name]: null,
+      }));
+
+      setFormData((prev) => ({
+        ...prev,
+        [name]: file,
+      }));
+    }
   };
 
   const validateForm = () => {
@@ -590,6 +628,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                         <p className="text-xs text-gray-400">JPG, PNG o WEBP (Máx 5MB)</p>
                       </div>
                     </div>
+                    {errors.cover_image && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.cover_image}</p>}
                   </div>
                 </div>
 
@@ -615,6 +654,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                         <p className="text-xs text-gray-400">PDF, Imágenes o Word (Máx 10MB)</p>
                       </div>
                     </div>
+                    {errors.file && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.file}</p>}
                   </div>
                 </div>
               </div>
