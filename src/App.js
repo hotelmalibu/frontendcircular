@@ -57,9 +57,10 @@ export default function App() {
     <div className="flex flex-col min-h-screen">
       <AxiosInterceptor />
       <Toaster position="top-center" reverseOrder={false} />
-      
+
       <Routes>
         {/* Pages with Navbar and Footer */}
+        {/* Rutas con Navbar y Footer (Públicas y Privadas generales) */}
         <Route element={<MainLayout />}>
           {/* Rutas públicas */}
           <Route path="/" element={<Home />} />
@@ -83,21 +84,25 @@ export default function App() {
           <Route path="/lineas-estrategicas" element={<LineasEstrategicasPage />} />
           <Route path="/encuestas" element={<PublicSurveysPage />} />
 
-          {/* Rutas privadas */}
+          {/* Rutas privadas generales */}
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/documentos" element={<PrivateRoute><Documentos /></PrivateRoute>} />
-          <Route path="/companies" element={<PrivateRoute><Empresas /></PrivateRoute>} />
-          <Route path="/trazabilidad" element={<PrivateRoute><Trazabilidad /></PrivateRoute>} />
-          <Route path="/formularios" element={<PrivateRoute><Formularios /></PrivateRoute>} />
-          <Route path="/comunicaciones" element={<PrivateRoute><Comunicaciones /></PrivateRoute>} />
-          <Route path="/administracion" element={<PrivateRoute><Administracion /></PrivateRoute>} />
-          <Route path="/integracion" element={<PrivateRoute><Integracion /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
 
           {/* Rutas para explorar contenido */}
           <Route path="/explorar" element={<ExplorePage />} />
           <Route path="/contenido/:slug" element={<ContentDetailPage />} />
           <Route path="/proyectos/:id" element={<ContentDetailProject />} />
+        </Route>
+
+        {/* Rutas de Administrador (Protección antes del Layout para permitir 404 limpio) */}
+        <Route element={<PrivateRoute adminOnly={true}><MainLayout /></PrivateRoute>}>
+          <Route path="/documentos" element={<Documentos />} />
+          <Route path="/companies" element={<Empresas />} />
+          <Route path="/trazabilidad" element={<Trazabilidad />} />
+          <Route path="/formularios" element={<Formularios />} />
+          <Route path="/comunicaciones" element={<Comunicaciones />} />
+          <Route path="/administracion" element={<Administracion />} />
+          <Route path="/integracion" element={<Integracion />} />
         </Route>
 
         {/* Survey Detail WITHOUT MainLayout to prevent 404 flash */}

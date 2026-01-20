@@ -1,14 +1,14 @@
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
-import { 
-  User, 
-  Mail, 
-  Shield, 
-  Edit3, 
-  Camera, 
-  Calendar, 
-  MapPin 
+import {
+  User,
+  Mail,
+  Shield,
+  Edit3,
+  Camera,
+  Calendar,
+  MapPin
 } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -25,32 +25,25 @@ export default function Profile() {
   const { user } = useContext(AuthContext);
 
   // Fallback seguro por si el contexto aún no carga
-  const userData = user || { 
-    name: "Usuario Cargando...", 
-    email: "cargando@ejemplo.com", 
-    role: "Invitado" 
+  const userData = user || {
+    name: "Usuario Cargando...",
+    email: "cargando@ejemplo.com",
+    role: "Invitado"
   };
 
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans text-gray-700">
       <Sidebar />
-      
+
       <main className="flex-1 p-4 sm:p-8 pt-24 md:pt-32">
         <div className="max-w-4xl mx-auto">
-          
-          {/* Encabezado de Página */}
-          <div className="mb-8 py-4" >
-            <h1 className="text-3xl font-bold" style={{ color: BRAND.darkBlue }}>
-              Mi Perfil
-            </h1>
-            <p className="text-gray-500 mt-1">Gestiona tu información personal y preferencias de cuenta</p>
-          </div>
+
 
           {/* Tarjeta Principal de Perfil */}
           <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
-            
+
             {/* Banner Decorativo */}
-            <div 
+            <div
               className="h-40 w-full relative"
               style={{ background: `linear-gradient(135deg, ${BRAND.darkBlue} 0%, ${BRAND.blue} 100%)` }}
             >
@@ -60,10 +53,10 @@ export default function Profile() {
 
             {/* Contenido del Perfil */}
             <div className="px-8 pb-8 relative">
-              
+
               {/* Sección Avatar y Nombre (Flotante sobre el banner) */}
               <div className="flex flex-col md:flex-row items-start md:items-end justify-between -mt-16 mb-8 gap-4">
-                
+
                 <div className="flex items-end gap-6">
                   {/* Avatar */}
                   <div className="relative group">
@@ -71,9 +64,6 @@ export default function Profile() {
                       {/* Si hubiera imagen: <img src={user.avatar} ... /> */}
                       {userData.name.charAt(0).toUpperCase()}
                     </div>
-                    <button className="absolute bottom-1 right-1 p-2 rounded-full bg-white text-gray-600 shadow-md border border-gray-100 hover:text-blue-600 transition group-hover:scale-110">
-                      <Camera size={18} />
-                    </button>
                   </div>
 
                   {/* Nombre y Rol */}
@@ -91,24 +81,17 @@ export default function Profile() {
                   </div>
                 </div>
 
-                {/* Botón Editar */}
-                <button 
-                  className="mb-2 flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-medium shadow-md hover:shadow-lg transition-all transform active:scale-95"
-                  style={{ backgroundColor: BRAND.darkGreen }}
-                >
-                  <Edit3 size={18} /> Editar Información
-                </button>
               </div>
 
               {/* Grid de Información Detallada */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
+
                 {/* Tarjeta de Información Básica */}
                 <div className="p-6 rounded-2xl border border-gray-100 bg-gray-50/50">
                   <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4 border-b border-gray-200 pb-2">
                     Detalles de Contacto
                   </h3>
-                  
+
                   <div className="space-y-4">
                     <div className="flex items-start gap-4">
                       <div className="p-2.5 bg-white rounded-lg text-blue-600 shadow-sm border border-gray-100">
@@ -137,7 +120,7 @@ export default function Profile() {
                   <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4 border-b border-gray-200 pb-2">
                     Información de Cuenta
                   </h3>
-                  
+
                   <div className="space-y-4">
                     <div className="flex items-start gap-4">
                       <div className="p-2.5 bg-white rounded-lg text-green-600 shadow-sm border border-gray-100">
