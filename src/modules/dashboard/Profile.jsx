@@ -5,8 +5,6 @@ import {
   User,
   Mail,
   Shield,
-  Edit3,
-  Camera,
   Calendar,
   MapPin
 } from "lucide-react";
