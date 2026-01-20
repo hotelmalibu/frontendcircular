@@ -1,5 +1,4 @@
 import React from "react";
-import { motion } from "framer-motion";
 
 // Importación de Logos de Alianzas
 import LogoExpra from "../../../../../assets/logosAlianza/expra.png";
@@ -17,11 +16,7 @@ export default function Index() {
     <section className="bg-gradient-to-b from-white via-[#E8F0F8] to-[#F0F7E8] py-12 px-6 md:px-12 lg:px-20">
       <div className="max-w-7xl mx-auto">
         {/* SECCIÓN 1: Alianzas Internacionales y Regionales */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.2 }}
+        <div
           className="mb-12"
         >
           <h3 className="text-2xl md:text-3xl font-bold text-[#1E305D] mb-8 text-center uppercase">
@@ -55,14 +50,10 @@ export default function Index() {
               );
             })}
           </div>
-        </motion.div>
+        </div>
 
         {/* SECCIÓN 2: Alianzas Nacionales */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.3 }}
+        <div
           className="mb-12"
         >
           <h3 className="text-2xl md:text-3xl font-bold text-[#1E305D] mb-8 text-center uppercase">
@@ -94,7 +85,7 @@ export default function Index() {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

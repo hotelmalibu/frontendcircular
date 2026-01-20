@@ -88,11 +88,7 @@ const ImpactSection = () => {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* HEADER */}
         <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
+          <div>
             <span className="text-[#2C67B0] font-bold text-xs uppercase tracking-[0.4em] mb-4 block">Presencia Nacional</span>
             <h2 className="text-4xl md:text-5xl font-bold text-[#1E305D] mb-6">
               Nuestro Impacto <span className="text-[#B1D357]">Territorial</span>
@@ -120,7 +116,7 @@ const ImpactSection = () => {
                  </div>
                ))}
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* MAIN CONTAINER */}

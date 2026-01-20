@@ -1,5 +1,5 @@
-import React from "react";
 import { motion } from "framer-motion";
+
 
 // --- IMPORTS LOGOS JUNTA DIRECTIVA ---
 import logoDarnel from "../../../../assets/LogosJuntaDirectiva/logo-darnel.png";
@@ -110,8 +110,7 @@ const sortedTeamMembers = [
 
 const CoronaTeamCard = ({ name, role, image, styles }) => {
   return (
-    <motion.div 
-      whileHover={{ scale: 1.02 }}
+    <div 
       className="relative aspect-[3/4] overflow-hidden bg-gray-200 group flex flex-col justify-end"
     >
       <img 
@@ -132,16 +131,13 @@ const CoronaTeamCard = ({ name, role, image, styles }) => {
       </div>
       
       <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20" />
-    </motion.div>
+    </div>
   );
 };
 
 // Componente para logos de la junta, más compacto y sin fondos grises
 const CompactBoardCard = ({ name, logo, isWhite }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.9 }}
-    whileInView={{ opacity: 1, scale: 1 }}
-    viewport={{ once: true }}
+  <div
     className={`p-1 flex items-center justify-center h-16 w-full transition-all duration-300 ${isWhite ? 'bg-[#DF0024] rounded-md' : 'bg-transparent'}`}
     title={name}
   >
@@ -150,7 +146,7 @@ const CompactBoardCard = ({ name, logo, isWhite }) => (
       alt={name}
       className={`max-h-full max-w-full object-contain transition-transform duration-300 hover:scale-110 ${isWhite ? 'brightness-200 contrast-200' : ''}`}
     />
-  </motion.div>
+  </div>
 );
 
 export default function TeamOrgChart() {

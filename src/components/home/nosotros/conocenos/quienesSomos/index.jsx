@@ -42,8 +42,7 @@ export default function Index() {
           {/* Logo Visión Circular */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
             className="relative group"
           >
@@ -62,8 +61,7 @@ export default function Index() {
           {/* Contenido - Alineado a la izquierda */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="space-y-4 text-left"
           >
@@ -109,8 +107,7 @@ export default function Index() {
         {/* Citas de Líderes - Más compacta y alineada izquierda */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           className="mb-8"
         >
@@ -143,8 +140,7 @@ export default function Index() {
         {/* Impacto y Métricas - Más compacta y alineada izquierda */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.3 }}
           className="bg-gradient-to-r from-[#2C67B0] to-[#00AB6D] rounded-2xl p-6 md:p-10 text-white shadow-xl"
         >

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { getAllProjects } from "../../api/projectsApi";
 import { getImageProxyUrl } from "../../utils/imageUtils";
@@ -152,43 +151,28 @@ export default function ProjectsSection() {
 
         {/* Encabezado */}
         <div className="text-center mb-12 space-y-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <div
             className="inline-block bg-[#00AB6D]/10 text-[#00AB6D] font-bold px-6 py-2 rounded-full text-sm tracking-widest uppercase border border-[#00AB6D]/20"
           >
             Nuestras Iniciativas
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
+          </div>
+          <h2
             className="text-4xl md:text-5xl font-extrabold text-[#1E305D] leading-tight"
           >
             Proyectos que <span className="text-[#00AB6D]">Transforman</span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
+          </h2>
+          <p
             className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed"
           >
             Descubre cómo estamos impulsando la economía circular en Colombia.
-          </motion.p>
+          </p>
         </div>
 
         {/* Grid de Proyectos */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {projects.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((project, index) => (
-            <motion.div
+            <div
               key={project.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
 
               // CAMBIO 1: Reduje la altura de h-[340px] a h-[280px] para que sea menos alta
               className="group relative w-full h-[280px] rounded-[1.5rem] overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
@@ -242,7 +226,7 @@ export default function ProjectsSection() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 

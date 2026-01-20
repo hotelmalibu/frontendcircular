@@ -1,5 +1,5 @@
-import React from "react";
 import { motion } from "framer-motion";
+
 import {
   ShieldAlert,
   FileText,
@@ -59,12 +59,7 @@ const transparenciaItems = [
 
 const TransparencyCard = ({ item, index }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.1 }}
-      whileHover={{ y: -8 }}
+    <div
       className={`group relative flex flex-col bg-white rounded-3xl p-8 transition-all duration-500 shadow-sm hover:shadow-2xl border border-slate-100 overflow-hidden ${item.highlight ? 'ring-2 ring-[#B1D357]/30' : ''}`}
     >
       {/* Background Gradient Strip */}
@@ -102,7 +97,7 @@ const TransparencyCard = ({ item, index }) => {
           </div>
         </a>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -154,10 +149,7 @@ export default function TransparencyPortal() {
 
         {/* SECCIÓN DETALLES CLARIDAD */}
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+          <div
             className="space-y-8"
           >
             <div className={`inline-flex items-center gap-3 font-bold uppercase tracking-widest text-xs`} style={{ color: BRAND.blue }}>
@@ -186,12 +178,9 @@ export default function TransparencyPortal() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+          <div
             className="relative"
           >
             <div className="bg-[#1E305D] rounded-[3rem] p-12 text-white relative overflow-hidden shadow-2xl">
@@ -229,7 +218,7 @@ export default function TransparencyPortal() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
 
       </div>

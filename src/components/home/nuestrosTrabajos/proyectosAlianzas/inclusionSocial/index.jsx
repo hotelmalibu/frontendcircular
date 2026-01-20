@@ -41,8 +41,7 @@ export default function InclusionSocial() {
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="
               group 

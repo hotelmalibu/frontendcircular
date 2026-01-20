@@ -1,5 +1,4 @@
 import React from "react";
-import { motion } from "framer-motion";
 import DepartmentBanner from "./DepartmentBanner";
 
 // Imágenes específicas de Circularidad
@@ -39,11 +38,8 @@ export default function DeptCircularidad() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-12 max-w-7xl">
         
         {members.map((member, idx) => (
-          <motion.div 
+          <div 
             key={idx} 
-            initial={{ opacity: 0, y: 20 }} 
-            whileInView={{ opacity: 1, y: 0 }} 
-            viewport={{ once: true }} 
             className="flex justify-center w-full"
           >
             <DepartmentBanner 
@@ -52,7 +48,7 @@ export default function DeptCircularidad() {
               image={member.image} 
               styles={styles} 
             />
-          </motion.div>
+          </div>
         ))}
 
       </div>

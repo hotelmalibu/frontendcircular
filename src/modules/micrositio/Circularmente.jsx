@@ -53,13 +53,7 @@ export default function Circularmente() {
 
       {/* 🔹 Panel de administración (solo visible si hay usuario logueado) */}
       {user && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-
-        </motion.div>
+        <div />
       )}
     </div>
   );
