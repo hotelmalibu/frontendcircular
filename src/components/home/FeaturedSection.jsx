@@ -10,6 +10,8 @@ import { stripHtml } from "../../utils/textUtils";
 export default function FeaturedSection() {
   const [newsItems, setNewsItems] = useState([]);
   const [activeTab, setActiveTab] = useState("Todos");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const categories = [
     "Todos",
@@ -128,11 +130,22 @@ export default function FeaturedSection() {
   // Filtro
   const filteredItems = newsItems.filter(item => {
     if (activeTab === "Todos") return true;
-    return item.type === activeTab; // Ahora coincidirán exactamente
+    return item.type === activeTab;
   });
 
+  // Reset pagination on tab change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
+
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const currentItems = filteredItems.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
-    <section className="py-20 bg-white border-t border-gray-100">
+    <section id="featured-section" className="py-20 bg-white border-t border-gray-100">
       <div className="container mx-auto px-4 md:px-8">
 
         {/* HEADER */}
@@ -175,9 +188,9 @@ export default function FeaturedSection() {
         </div>
 
         {/* GRID */}
-        {filteredItems.length > 0 ? (
+        {currentItems.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
-            {filteredItems.map((item) => {
+            {currentItems.map((item) => {
               const config = contentTypeConfig[item.type] || contentTypeConfig["Noticias"] || {};
               const Icon = config.icon;
 
@@ -253,6 +266,51 @@ export default function FeaturedSection() {
             <p className="text-gray-500 font-medium">No se encontró contenido en la categoría "{activeTab}".</p>
             <button onClick={() => setActiveTab("Todos")} className="mt-2 text-sm text-[#00AB6D] underline">
               Ver todo el contenido
+            </button>
+          </div>
+        )}
+
+        {/* Paginación */}
+        {totalPages > 1 && (
+          <div className="mt-16 flex justify-center items-center gap-3">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={`p-3 rounded-full border-2 transition-all ${currentPage === 1
+                  ? "border-gray-100 text-gray-300 cursor-not-allowed"
+                  : "border-[#00AB6D] text-[#00AB6D] hover:bg-[#00AB6D] hover:text-white"
+                }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+
+            <div className="flex gap-2">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setCurrentPage(i + 1);
+                    window.scrollTo({ top: document.getElementById('featured-section')?.offsetTop - 100, behavior: 'smooth' });
+                  }}
+                  className={`w-10 h-10 rounded-full font-bold transition-all ${currentPage === i + 1
+                      ? "bg-[#1E305D] text-white shadow-lg"
+                      : "text-gray-400 hover:text-[#1E305D] hover:bg-gray-100"
+                    }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className={`p-3 rounded-full border-2 transition-all ${currentPage === totalPages
+                  ? "border-gray-100 text-gray-300 cursor-not-allowed"
+                  : "border-[#00AB6D] text-[#00AB6D] hover:bg-[#00AB6D] hover:text-white"
+                }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
           </div>
         )}

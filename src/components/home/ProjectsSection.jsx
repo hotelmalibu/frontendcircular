@@ -57,6 +57,8 @@ export default function ProjectsSection() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -143,7 +145,7 @@ export default function ProjectsSection() {
   }
 
   return (
-    <section className="relative py-20 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center">
+    <section id="projects-section" className="relative py-20 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center">
       <div className="absolute inset-0 bg-[#F4F7F6]/90 mix-blend-overlay z-0 pointer-events-none"></div>
 
       <div className="relative z-10 max-w-[1400px] mx-auto">
@@ -180,7 +182,7 @@ export default function ProjectsSection() {
 
         {/* Grid de Proyectos */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {projects.map((project, index) => (
+          {projects.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((project, index) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 30 }}
@@ -243,6 +245,51 @@ export default function ProjectsSection() {
             </motion.div>
           ))}
         </div>
+
+        {/* Paginación */}
+        {projects.length > itemsPerPage && (
+          <div className="mt-16 flex justify-center items-center gap-3">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={`p-3 rounded-full border-2 transition-all ${currentPage === 1
+                ? "border-gray-100 text-gray-300 cursor-not-allowed"
+                : "border-[#00AB6D] text-[#00AB6D] hover:bg-[#00AB6D] hover:text-white"
+                }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+
+            <div className="flex gap-2">
+              {[...Array(Math.ceil(projects.length / itemsPerPage))].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setCurrentPage(i + 1);
+                    window.scrollTo({ top: document.getElementById('projects-section')?.offsetTop - 100, behavior: 'smooth' });
+                  }}
+                  className={`w-10 h-10 rounded-full font-bold transition-all ${currentPage === i + 1
+                      ? "bg-[#1E305D] text-white shadow-lg"
+                      : "text-gray-400 hover:text-[#1E305D] hover:bg-gray-100"
+                    }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(projects.length / itemsPerPage)))}
+              disabled={currentPage === Math.ceil(projects.length / itemsPerPage)}
+              className={`p-3 rounded-full border-2 transition-all ${currentPage === Math.ceil(projects.length / itemsPerPage)
+                ? "border-gray-100 text-gray-300 cursor-not-allowed"
+                : "border-[#00AB6D] text-[#00AB6D] hover:bg-[#00AB6D] hover:text-white"
+                }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
