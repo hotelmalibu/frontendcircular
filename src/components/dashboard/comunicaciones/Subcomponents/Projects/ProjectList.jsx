@@ -14,6 +14,7 @@ import { getAllCategories } from "../../../../../api/categoriesApi";
 import DOMPurify from 'dompurify';
 import ProjectFormModal from "./ProjectFormModal";
 import ProjectDetailModal from "./ProjectDetailModal";
+import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -104,6 +105,8 @@ export default function ProjectList() {
           item.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.project_type_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.project_type_label?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.classification_type_label?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (item.classification_type && typeof item.classification_type === 'object' && item.classification_type.label?.toLowerCase().includes(searchTerm.toLowerCase())) ||
           (typeof item.project_type === 'object' && (item.project_type?.label?.toLowerCase().includes(searchTerm.toLowerCase()) || item.project_type?.name?.toLowerCase().includes(searchTerm.toLowerCase())))
       );
     }
@@ -243,6 +246,11 @@ export default function ProjectList() {
                         <span>{item.project_type_name || item.project_type_label || item.project_type?.label || item.project_type?.name}</span>
                       </div>
                     )}
+                    {(item.classification_type_label || (item.classification_type && typeof item.classification_type === 'object' && item.classification_type.label)) && (
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide bg-orange-50 text-orange-700 border border-orange-100">
+                        <span>{item.classification_type_label || item.classification_type?.label}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -251,16 +259,31 @@ export default function ProjectList() {
                   {item.title}
                 </h3>
 
-                {/* Placeholder para un diseño consistente, sin intentar cargar imágenes inexistentes */}
-                <div className="mb-4 rounded-xl border border-gray-100 h-32 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative overflow-hidden group-hover:from-blue-50 group-hover:to-blue-100 transition-colors">
+                {/* Imagen o Placeholder */}
+                <div className="mb-4 rounded-xl border border-gray-100 h-32 bg-gray-50 flex items-center justify-center relative overflow-hidden transition-colors">
+                  {(item.cover_image?.url || item.cover_image_url || (typeof item.cover_image === 'string' && item.cover_image)) ? (
+                    <img
+                      src={getImageProxyUrl(item.cover_image?.url || item.cover_image_url || item.cover_image)}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = ""; // Clear src to show placeholder if image fails
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
                   <div
-                    className="absolute inset-0 opacity-[0.03] pointer-events-none"
-                    style={{
-                      backgroundImage: `radial-gradient(circle at 2px 2px, ${BRAND.blue} 1px, transparent 0)`,
-                      backgroundSize: '24px 24px'
-                    }}
-                  ></div>
-                  <div className="flex flex-col items-center justify-center text-gray-400 group-hover:text-blue-400 transition-colors transform group-hover:scale-110 duration-500">
+                    className={`${(item.cover_image?.url || item.cover_image_url || (typeof item.cover_image === 'string' && item.cover_image)) ? 'hidden' : 'flex'} absolute inset-0 flex-col items-center justify-center text-gray-400 group-hover:text-blue-400 transition-colors transform group-hover:scale-110 duration-500`}
+                  >
+                    <div
+                      className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                      style={{
+                        backgroundImage: `radial-gradient(circle at 2px 2px, ${BRAND.blue} 1px, transparent 0)`,
+                        backgroundSize: '24px 24px'
+                      }}
+                    ></div>
                     <FolderOpen size={48} className="mb-2 opacity-20" />
                     <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Proyecto Ecocircular</span>
                   </div>

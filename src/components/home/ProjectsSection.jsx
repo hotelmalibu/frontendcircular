@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { getAllProjects } from "../../api/projectsApi";
+import { getImageProxyUrl } from "../../utils/imageUtils";
 
 // Import specific category images
 import imgFortalecimiento from "../../assets/home/Proyectos/Fortalecimiento.png";
@@ -61,21 +62,21 @@ export default function ProjectsSection() {
       try {
         setLoading(true);
         setError(null);
-        const response = await getAllProjects();
+        const responseData = await getAllProjects();
 
         let projectsArray = [];
-        if (response?.data?.items && Array.isArray(response.data.items)) {
-          projectsArray = response.data.items;
-        } else if (Array.isArray(response)) {
-          projectsArray = response;
-        } else if (response?.data?.projects && Array.isArray(response.data.projects)) {
-          projectsArray = response.data.projects;
-        } else if (response?.data && Array.isArray(response.data)) {
-          projectsArray = response.data;
-        } else if (response?.projects && Array.isArray(response.projects)) {
-          projectsArray = response.projects;
-        } else if (typeof response === 'object' && response !== null) {
-          const possibleArrays = Object.values(response).filter(val => Array.isArray(val));
+        // Since getAllProjects returns response.data, responseData is the body
+        if (responseData?.items && Array.isArray(responseData.items)) {
+          projectsArray = responseData.items;
+        } else if (Array.isArray(responseData)) {
+          projectsArray = responseData;
+        } else if (responseData?.data?.items && Array.isArray(responseData.data.items)) {
+          // Fallback just in case api-index interceptor or similar is involved
+          projectsArray = responseData.data.items;
+        } else if (responseData?.projects && Array.isArray(responseData.projects)) {
+          projectsArray = responseData.projects;
+        } else if (typeof responseData === 'object' && responseData !== null) {
+          const possibleArrays = Object.values(responseData).filter(val => Array.isArray(val));
           if (possibleArrays.length > 0) {
             projectsArray = possibleArrays[0];
           }
@@ -83,16 +84,24 @@ export default function ProjectsSection() {
 
         // Map API data to component expected format
         const mappedProjects = projectsArray.map(project => {
-          const catName = project.category_name || project.category;
+          if (!project) return null;
+
+          // Handle category as string or object
+          let catName = project.category_name || "";
+          if (!catName && project.category) {
+            catName = typeof project.category === 'object' ? project.category.name : project.category;
+          }
+
           return {
             id: project.id,
-            title: project.title,
+            title: project.title || "Sin título",
             type: catName || "General",
             color: categoryColors[catName] || "#1E305D",
-            image: categoryImages[catName] || "/assets/home/Proyectos/proyecto1.png",
+            customImage: getImageProxyUrl(project.cover_image?.url || project.cover_image_url || project.cover_image),
+            defaultImage: categoryImages[catName] || "/assets/home/Proyectos/proyecto1.png",
             shortDescription: project.description || "Sin descripción disponible",
           };
-        });
+        }).filter(Boolean); // Remote potential nulls
 
         setProjects(mappedProjects);
       } catch (err) {
@@ -184,8 +193,12 @@ export default function ProjectsSection() {
               {/* Imagen de fondo */}
               <div className="absolute inset-0 w-full h-full overflow-hidden">
                 <img
-                  src={project.image}
+                  src={project.customImage || project.defaultImage}
                   alt={project.title}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = project.defaultImage;
+                  }}
                   // CAMBIO 2: Agregué 'object-bottom'. Esto fuerza a que se vea la parte de abajo de la imagen.
                   className="w-full h-full object-cover object-bottom transition-transform duration-700 group-hover:scale-110"
                 />

@@ -17,7 +17,7 @@ const CORS_PROXIES = [
  * @returns {string} - Proxy URL or original URL
  */
 export const getImageProxyUrl = (imageUrl, proxyIndex = 0) => {
-  if (!imageUrl) return '';
+  if (!imageUrl || typeof imageUrl !== 'string') return '';
 
   // If the image is from our API domain, use a CORS proxy
   if (imageUrl.includes('api-ecocircular.creativostecnologicosit.com')) {

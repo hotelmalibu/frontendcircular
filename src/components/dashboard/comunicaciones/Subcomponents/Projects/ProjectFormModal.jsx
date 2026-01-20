@@ -9,12 +9,15 @@ import {
   AlertCircle,
   Type,
   AlignLeft,
-  FileText
+  FileText,
+  Upload,
+  Layers,
+  Image
 } from "lucide-react";
 import { createProject, updateProject } from "../../../../../api/projectsApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
 import { getProjectTypes } from "../../../../../api/projectTypesApi";
-import { Upload, Layers } from "lucide-react";
+import { getClassificationTypes } from "../../../../../api/classificationTypesApi";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -40,8 +43,10 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
     description: "",
     category_id: "",
     project_type_id: "",
+    classification_type_id: "",
     author: "",
     file: null,
+    cover_image: null,
   });
 
   const [loading, setLoading] = useState(false);
@@ -49,6 +54,9 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [projectTypes, setProjectTypes] = useState([]);
   const [projectTypesLoading, setProjectTypesLoading] = useState(true);
+  const [classificationTypes, setClassificationTypes] = useState([]);
+  const [classificationTypesLoading, setClassificationTypesLoading] = useState(true);
+  const [filteredClassificationTypes, setFilteredClassificationTypes] = useState([]);
   const [errors, setErrors] = useState({});
 
   const fetchCategories = React.useCallback(async () => {
@@ -98,11 +106,34 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
     }
   }, []);
 
-  // Fetch categories and project types on mount
+  const fetchClassificationTypes = React.useCallback(async () => {
+    try {
+      setClassificationTypesLoading(true);
+      const response = await getClassificationTypes();
+      let typesArray = [];
+
+      if (response?.data?.items && Array.isArray(response.data.items)) {
+        typesArray = response.data.items;
+      } else if (response?.data && Array.isArray(response.data)) {
+        typesArray = response.data;
+      } else if (Array.isArray(response)) {
+        typesArray = response;
+      }
+
+      setClassificationTypes(typesArray);
+    } catch (err) {
+      console.error("Error loading classification types:", err);
+    } finally {
+      setClassificationTypesLoading(false);
+    }
+  }, []);
+
+  // Fetch categories, project types and classification types on mount
   useEffect(() => {
     fetchCategories();
     fetchProjectTypes();
-  }, [fetchCategories, fetchProjectTypes]);
+    fetchClassificationTypes();
+  }, [fetchCategories, fetchProjectTypes, fetchClassificationTypes]);
 
   useEffect(() => {
     if (isEditing && projectData) {
@@ -121,8 +152,10 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
         description: description,
         category_id: catId,
         project_type_id: projectData.project_type_id || "",
+        classification_type_id: projectData.classification_type_id || "",
         author: projectData.author || "",
         file: null, // Reset file on edit load
+        cover_image: null, // Reset image on edit load
       });
     }
   }, [projectData, isEditing]);
@@ -200,21 +233,59 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
     }
   };
 
-  // Clear project_type_id if category is not Fortalecimiento
+  // Clear project_type_id and classification_type_id if category is not Fortalecimiento
   useEffect(() => {
     if (categories.length > 0 && formData.category_id) {
       const selectedCategory = categories.find(c => String(c.id) === String(formData.category_id));
       if (selectedCategory && selectedCategory.name !== "Fortalecimiento") {
-        setFormData(prev => ({ ...prev, project_type_id: "" }));
+        setFormData(prev => ({ ...prev, project_type_id: "", classification_type_id: "" }));
       }
     }
   }, [formData.category_id, categories]);
 
+  // Dynamic filtering for classification types based on project type
+  useEffect(() => {
+    if (!formData.project_type_id) {
+      setFilteredClassificationTypes(classificationTypes);
+      return;
+    }
+
+    const selectedProjectType = projectTypes.find(t => String(t.id) === String(formData.project_type_id));
+    const projectTypeLabel = (selectedProjectType?.label || selectedProjectType?.name || "").toLowerCase();
+
+    let filtered = [];
+    if (projectTypeLabel.includes("sectorial")) {
+      // Sectorial: only Residuos and Metodología
+      filtered = classificationTypes.filter(t =>
+        t.label.toLowerCase().includes("residuos") ||
+        t.label.toLowerCase().includes("metodología") ||
+        t.label.toLowerCase().includes("metodologia")
+      );
+    } else if (projectTypeLabel.includes("territorial")) {
+      // Territorial: the rest (Política, Envases, Recursos, Innovación, Cosméticos)
+      filtered = classificationTypes.filter(t =>
+        !t.label.toLowerCase().includes("residuos") &&
+        !t.label.toLowerCase().includes("metodología") &&
+        !t.label.toLowerCase().includes("metodologia")
+      );
+    } else {
+      filtered = classificationTypes;
+    }
+
+    setFilteredClassificationTypes(filtered);
+
+    // Reset classification_type_id if it's no longer in the filtered list
+    if (formData.classification_type_id && !filtered.some(t => String(t.id) === String(formData.classification_type_id))) {
+      setFormData(prev => ({ ...prev, classification_type_id: "" }));
+    }
+  }, [formData.project_type_id, classificationTypes, projectTypes]);
+
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const { name, files } = e.target;
+    const file = files[0];
     setFormData((prev) => ({
       ...prev,
-      file: file,
+      [name]: file,
     }));
   };
 
@@ -250,10 +321,17 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
       if (formData.project_type_id) {
         submitData.append('project_type_id', formData.project_type_id);
       }
+      if (formData.classification_type_id) {
+        submitData.append('classification_type_id', formData.classification_type_id);
+      }
       submitData.append('author', formData.author || "");
 
       if (formData.file) {
         submitData.append('file', formData.file);
+      }
+
+      if (formData.cover_image) {
+        submitData.append('cover_image', formData.cover_image);
       }
 
       if (isEditing && projectData?.id) {
@@ -428,6 +506,49 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                   </div>
                 </div>
 
+                {/* Classification Type (Only for Fortalecimiento) */}
+                {categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" && (
+                  <div className="md:col-span-2">
+                    <label className={labelClass}>Tipo de Clasificación</label>
+                    <div className="relative">
+                      <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                      <select
+                        name="classification_type_id"
+                        value={formData.classification_type_id}
+                        onChange={handleChange}
+                        className={`${inputClass} pl-10`}
+                        style={{
+                          "--tw-ring-color": BRAND.lightBlue,
+                          opacity: formData.project_type_id ? 1 : 0.6,
+                          cursor: formData.project_type_id ? 'pointer' : 'help'
+                        }}
+                        disabled={loading || classificationTypesLoading || !formData.project_type_id}
+                      >
+                        <option value="">
+                          {classificationTypesLoading
+                            ? "Cargando..."
+                            : !formData.project_type_id
+                              ? "-- Deber seleccionar un Tipo de Proyecto --"
+                              : "-- Seleccionar Clasificación --"
+                          }
+                        </option>
+                        {filteredClassificationTypes.map((type) => (
+                          <option key={type.id} value={type.id}>
+                            {type.label}
+                          </option>
+                        ))}
+                      </select>
+
+                      {/* Tooltip for when Project Type is not selected */}
+                      {!formData.project_type_id && (
+                        <div className="absolute left-1/2 -bottom-2 translate-y-full -translate-x-1/2 w-64 p-3 rounded-xl bg-gray-900 text-white text-[11px] leading-relaxed shadow-xl opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-50 pointer-events-none">
+                          <p>Debe seleccionar primero un <span className="font-bold text-yellow-400">Tipo de Proyecto</span> para filtrar las clasificaciones.</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Author */}
                 <div className="md:col-span-2">
                   <label className={labelClass}>Autor</label>
@@ -446,6 +567,32 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                   </div>
                 </div>
 
+                {/* Cover Image Upload */}
+                <div className="md:col-span-2">
+                  <label className={labelClass}>Imagen de Portada (Opcional)</label>
+                  <div className="relative">
+                    <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-green-50 transition-colors cursor-pointer group">
+                      <input
+                        type="file"
+                        name="cover_image"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        disabled={loading}
+                      />
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                          <Image size={20} className="text-green-500" />
+                        </div>
+                        <p className="text-sm font-medium text-gray-600">
+                          {formData.cover_image ? formData.cover_image.name : "Seleccionar imagen de portada"}
+                        </p>
+                        <p className="text-xs text-gray-400">JPG, PNG o WEBP (Máx 5MB)</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* File Upload */}
                 <div className="md:col-span-2">
                   <label className={labelClass}>Documento / Archivo (Opcional)</label>
@@ -453,6 +600,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                     <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-blue-50 transition-colors cursor-pointer group">
                       <input
                         type="file"
+                        name="file"
                         onChange={handleFileChange}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         disabled={loading}

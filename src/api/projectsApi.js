@@ -9,10 +9,18 @@ const PROJECTS_ENDPOINT = "/projects";
 
 /**
  * Get all projects
+ * @param {Object} params - Query parameters for filtering (title, author, category_id, etc.)
  * @returns {Promise} - List of all projects
  */
-export const getAllProjects = async () => {
-  const response = await api.get(`${PROJECTS_ENDPOINT}?sort_by=created_at&sort_order=desc&per_page=15`);
+export const getAllProjects = async (params = {}) => {
+  const defaultParams = {
+    sort_by: 'created_at',
+    sort_order: 'desc',
+    per_page: 15,
+    ...params
+  };
+
+  const response = await api.get(PROJECTS_ENDPOINT, { params: defaultParams });
   return response.data;
 };
 

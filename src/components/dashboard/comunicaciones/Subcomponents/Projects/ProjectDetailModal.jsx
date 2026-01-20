@@ -56,6 +56,17 @@ export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
+          {/* Cover Image */}
+          {(projectData.cover_image?.url || projectData.cover_image_url || (typeof projectData.cover_image === 'string' && projectData.cover_image)) && (
+            <div className="mb-6 rounded-2xl overflow-hidden border border-gray-100 shadow-sm max-h-80">
+              <img
+                src={getImageProxyUrl(projectData.cover_image?.url || projectData.cover_image_url || projectData.cover_image)}
+                alt={projectData.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+
           {/* Title */}
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
             {projectData.title}
@@ -105,6 +116,21 @@ export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
                 <div>
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Autor</p>
                   <p className="text-gray-900 font-medium">{projectData.author}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Classification Type */}
+            {(projectData.classification_type_label || (projectData.classification_type && typeof projectData.classification_type === 'object' && projectData.classification_type.label)) && (
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-orange-50 rounded-lg text-orange-600">
+                  <Tag size={20} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Clasificación</p>
+                  <p className="text-gray-900 font-medium">
+                    {projectData.classification_type_label || projectData.classification_type?.label}
+                  </p>
                 </div>
               </div>
             )}
