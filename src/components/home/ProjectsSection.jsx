@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { getAllProjects } from "../../api/projectsApi";
 import { getImageProxyUrl } from "../../utils/imageUtils";
+import { stripHtml } from "../../utils/textUtils";
 
 // Import specific category images
 import imgFortalecimiento from "../../assets/home/Proyectos/Fortalecimiento.png";
@@ -99,7 +100,7 @@ export default function ProjectsSection() {
             color: categoryColors[catName] || "#1E305D",
             customImage: getImageProxyUrl(project.cover_image?.url || project.cover_image_url || project.cover_image),
             defaultImage: categoryImages[catName] || "/assets/home/Proyectos/proyecto1.png",
-            shortDescription: project.description || "Sin descripción disponible",
+            shortDescription: stripHtml(project.description) || "Sin descripción disponible",
           };
         }).filter(Boolean); // Remote potential nulls
 

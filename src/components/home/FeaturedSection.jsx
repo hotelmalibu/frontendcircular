@@ -5,6 +5,7 @@ import { contentTypeConfig } from "../../data/mockContent";
 import DOMPurify from 'dompurify';
 import { getPublishedNewsWithImages } from "../../api/newsApi";
 import { getDocuments } from "../../api/documentsApi";
+import { stripHtml } from "../../utils/textUtils";
 
 export default function FeaturedSection() {
   const [newsItems, setNewsItems] = useState([]);
@@ -83,7 +84,7 @@ export default function FeaturedSection() {
               (n.category && typeof n.category === 'object' ? n.category.name : n.category) ||
               "Sin categoría asignada",
             title: n.title || n.name || "Sin título",
-            excerpt: (n.description || n.excerpt || "") ? DOMPurify.sanitize(String(n.description || n.excerpt || "")).replace(/<[^>]+>/g, '') : "",
+            excerpt: stripHtml(n.description || n.excerpt),
             image: imageUrl,
             date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
             slug: n.slug || (`noticia-${n.id || n._id || ''}`),

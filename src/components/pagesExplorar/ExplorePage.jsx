@@ -6,6 +6,7 @@ import { contentTypeConfig } from "../../data/mockContent";
 import DOMPurify from "dompurify";
 import { getAllNews } from "../../api/newsApi";
 import { getAllCategories } from "../../api/categoriesApi";
+import { stripHtml } from "../../utils/textUtils";
 import explorarHeroImage from "../../assets/explorar-hero.jpg";
 
 export default function ExplorePage() {
@@ -42,12 +43,7 @@ export default function ExplorePage() {
           type: "Noticias",
           category: catName,
           title: n.title || n.name || "Sin título",
-          excerpt:
-            n.description || n.excerpt || ""
-              ? DOMPurify.sanitize(
-                  String(n.description || n.excerpt || "")
-                ).replace(/<[^>]+>/g, "")
-              : "",
+          excerpt: stripHtml(n.description || n.excerpt),
           image:
             (n.upload_file && n.upload_file.url) ||
             n.image ||
@@ -56,10 +52,10 @@ export default function ExplorePage() {
             "",
           date: n.published_at
             ? new Date(n.published_at).toLocaleDateString("es-ES", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })
             : "",
           slug: n.slug || `noticia-${n.id || n._id || ""}`,
         };
@@ -293,9 +289,8 @@ function MinimalistCard({ item }) {
       className="group h-full flex flex-col"
     >
       <div
-        className={`rounded-xl overflow-hidden mb-5 aspect-[16/10] relative shadow-sm transition-transform duration-500 group-hover:-translate-y-1 ${
-          config.isSolid ? config.bgColor : "bg-gray-100"
-        }`}
+        className={`rounded-xl overflow-hidden mb-5 aspect-[16/10] relative shadow-sm transition-transform duration-500 group-hover:-translate-y-1 ${config.isSolid ? config.bgColor : "bg-gray-100"
+          }`}
       >
         {config.isSolid ? (
           <div className="w-full h-full flex items-center justify-center relative p-6">
