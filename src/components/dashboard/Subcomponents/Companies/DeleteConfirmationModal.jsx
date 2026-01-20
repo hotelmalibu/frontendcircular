@@ -1,13 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { AlertTriangle, Trash2, X } from 'lucide-react';
+import { AlertTriangle, Trash2 } from 'lucide-react';
 
-const BRAND = {
-  blue: "#2C67B0",
-  orange: "#E15200",
-  red: "#DC2626",
-  darkBlue: "#005380",
-};
+
 
 const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, companyName, loading }) => {
   if (!isOpen) return null;

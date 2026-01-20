@@ -21,7 +21,6 @@ import {
   CartesianGrid
 } from "recharts";
 import React, { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
 import { getUsers, getSecurityLogs, getActiveSessions } from "../../../../api/auth";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -42,7 +41,6 @@ const COLORS = [BRAND.blue, BRAND.green, BRAND.purple, BRAND.orange, BRAND.light
 export default function Undexsub() {
   const [alertas, setAlertas] = useState([]);
   const [usersList, setUsersList] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   // Dashboard Stats State
   const [dashboardStats, setDashboardStats] = useState({
@@ -54,8 +52,6 @@ export default function Undexsub() {
 
   const loadData = React.useCallback(async () => {
     try {
-      setLoading(true);
-
       // 1. Usuarios
       const resUsers = await getUsers();
       let userList = [];
@@ -103,14 +99,13 @@ export default function Undexsub() {
 
     } catch (err) {
       console.error("Error loading dashboard data:", err);
-    } finally {
-      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
 
 
   // --- PROCESAMIENTO DE DATOS ---

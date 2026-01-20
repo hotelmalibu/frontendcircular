@@ -3,14 +3,7 @@ import ReactDOM from "react-dom";
 import { X, ShieldAlert, User, MapPin, Calendar, Monitor, Copy, Check, Terminal, Globe } from "lucide-react";
 
 // Brand colors matching the theme
-const BRAND = {
-    blue: "#2C67B0",
-    darkBlue: "#005380",
-    lightBlue: "#7FB8D9",
-    green: "#B1D357",
-    orange: "#E15200",
-    gray: "#F3F4F6"
-};
+
 
 const CopyButton = ({ text, label }) => {
     const [copied, setCopied] = useState(false);

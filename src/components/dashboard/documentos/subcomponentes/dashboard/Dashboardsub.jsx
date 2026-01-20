@@ -15,10 +15,9 @@ import {
 import {
   FileText,
   Clock,
-  HardDrive,
   Files,
-  MoreVertical,
   CheckCircle2,
+  MoreVertical,
   AlertCircle
 } from "lucide-react";
 import { getDocuments } from "../../../../../api/documentsApi";
@@ -62,7 +61,6 @@ const getStatusStyles = (status) => {
 };
 
 export default function Dashboardsub() {
-  const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     total: 0,
@@ -71,7 +69,6 @@ export default function Dashboardsub() {
     approved: 0
   });
   const [statusData, setStatusData] = useState([]);
-  const [typeData, setTypeData] = useState([]);
   const [monthlyData, setMonthlyData] = useState([]);
   const [recentDocs, setRecentDocs] = useState([]);
 
@@ -89,8 +86,6 @@ export default function Dashboardsub() {
         } else if (Array.isArray(response)) {
           docsArray = response;
         }
-
-        setDocuments(docsArray);
 
         // Calculate statistics
         const total = docsArray.length;
@@ -140,13 +135,6 @@ export default function Dashboardsub() {
           const typeName = documentTypes.find(t => t.id === typeId)?.name || `Tipo ${typeId}`;
           typeCounts[typeName] = (typeCounts[typeName] || 0) + 1;
         });
-
-        const typeChartData = Object.entries(typeCounts).map(([name, value]) => ({
-          name,
-          value
-        }));
-
-        setTypeData(typeChartData);
 
         // Calculate monthly uploads (last 6 months)
         const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];

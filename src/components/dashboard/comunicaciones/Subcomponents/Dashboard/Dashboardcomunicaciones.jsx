@@ -1,20 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
-  Server,
-  Zap,
-  Database,
-
   PenTool,
   Calendar,
-  Mail,
-  FileImage,
-  MoreHorizontal,
-  ArrowUpRight,
   BarChart3,
   PieChart as PieChartIcon,
   Activity,
-  Layers,
-  Tag,
   Briefcase,
   FileText
 } from "lucide-react";
@@ -40,7 +30,7 @@ const BRAND = {
   gray: "#6B7280",
 };
 
-const COLORS = [BRAND.blue, BRAND.darkGreen, BRAND.orange, BRAND.yellow];
+
 
 export default function DashboardContenido() {
   const [categoryStats, setCategoryStats] = useState([]);

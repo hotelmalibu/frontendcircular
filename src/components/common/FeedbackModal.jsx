@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { CheckCircle, XCircle, AlertTriangle, X } from "lucide-react";
 
-const BRAND = {
-    blue: "#2C67B0",
-    green: "#B1D357",
-    orange: "#E15200",
-    red: "#DC2626",
-};
+
 
 export default function FeedbackModal({ type = "success", title, message, isOpen, onClose, autoClose = 0 }) {
     const [visible, setVisible] = useState(false);
+
+    const handleClose = React.useCallback(() => {
+        setVisible(false);
+        setTimeout(onClose, 300); // Wait for animation
+    }, [onClose]);
 
     useEffect(() => {
         if (isOpen) {
@@ -24,12 +24,8 @@ export default function FeedbackModal({ type = "success", title, message, isOpen
         } else {
             setVisible(false);
         }
-    }, [isOpen, autoClose]);
+    }, [isOpen, autoClose, handleClose]);
 
-    const handleClose = () => {
-        setVisible(false);
-        setTimeout(onClose, 300); // Wait for animation
-    };
 
     if (!isOpen && !visible) return null;
 

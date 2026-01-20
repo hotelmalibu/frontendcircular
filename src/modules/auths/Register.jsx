@@ -1,7 +1,6 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register, getPublicRoles } from "../../api/auth";
-import { AuthContext } from "../../context/AuthContext";
 import {
     User,
     Mail,
@@ -13,7 +12,6 @@ import {
     Eye,
     EyeOff,
     AlertCircle,
-    X,
     Info,
     CheckCircle
 } from "lucide-react";
@@ -33,7 +31,6 @@ const BRAND = {
 
 export default function Register() {
     const navigate = useNavigate();
-    const { login } = useContext(AuthContext);
 
     const [formData, setFormData] = useState({
         name: "",

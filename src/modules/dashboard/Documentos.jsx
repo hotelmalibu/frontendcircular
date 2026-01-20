@@ -7,7 +7,6 @@ import Dashboard from "../../components/dashboard/documentos/Dashboard";
 import {
   FileText,
   LayoutDashboard,
-  History,
   Library,
   UserX
 } from "lucide-react";

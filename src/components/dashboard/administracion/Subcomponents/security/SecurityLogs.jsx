@@ -3,12 +3,7 @@ import { getSecurityLogs, markSecurityLogAsViewed } from "../../../../../api/aut
 import { ShieldAlert, ShieldCheck, ShieldEllipsis, Search, RefreshCw, Eye } from "lucide-react";
 import SecurityAlertModal from "./SecurityAlertModal";
 
-const BRAND = {
-    blue: "#2C67B0",
-    orange: "#E15200",
-    yellow: "#FBBF24",
-    darkBlue: "#005380",
-};
+
 
 export default function SecurityLogs() {
     const [logs, setLogs] = useState([]);

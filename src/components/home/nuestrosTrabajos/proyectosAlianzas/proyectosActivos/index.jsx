@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, FileText, Download, BookOpen, MapPin, ChevronRight } from "lucide-react";
+import { getImageProxyUrl } from "../../../../../utils/imageUtils.js";
 
 // Skeleton loader components
 const SkeletonCard = ({ isWide }) => (
@@ -242,7 +243,7 @@ export default function ProyectosYAlianzas() {
                               <motion.img
                                 whileHover={{ scale: 1.08 }}
                                 transition={{ duration: 0.6 }}
-                                src={p.img}
+                                src={getImageProxyUrl(p.img, { width: 400, quality: 80 })}
                                 alt={p.titulo}
                                 className="w-full h-full object-cover"
                               />
@@ -432,7 +433,7 @@ export default function ProyectosYAlianzas() {
                                 <motion.img
                                   whileHover={{ scale: 1.1 }}
                                   transition={{ duration: 0.6 }}
-                                  src={p.img}
+                                  src={getImageProxyUrl(p.img, { width: 400, quality: 80 })}
                                   alt={p.titulo}
                                   className="w-full h-full object-cover"
                                 />
