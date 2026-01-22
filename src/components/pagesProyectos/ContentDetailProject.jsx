@@ -147,7 +147,7 @@ export default function ContentDetailProject() {
   const facebookShareUrl = `https://www.facebook.com/sharer.php?u=${encodedUrl}`;
   const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
   const linkedinShareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedTextAndUrl}`;
-const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
+  const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
   const mailShareUrl = `mailto:?subject=${encodedTitle}&body=${encodedTextAndUrl}`;
 
   return (
@@ -267,7 +267,7 @@ const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
                           </div>
                         </div>
                         <a
-                          href={getImageProxyUrl(project.uploadFile.url)}
+                          href={project.uploadFile.path ? `https://api-ecocircular.creativostecnologicosit.com/storage/${project.uploadFile.path}` : project.uploadFile.url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="bg-[#00AB6D] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#00965d] active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-[#00AB6D]/20"
