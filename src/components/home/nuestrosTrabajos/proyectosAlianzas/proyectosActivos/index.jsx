@@ -1,41 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowRight, Download, MapPin } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Download, MapPin, Globe, Briefcase, Filter } from "lucide-react";
 import { getImageProxyUrl } from "../../../../../utils/imageUtils.js";
 import { getAllProjects } from "../../../../../api/projectsApi.js";
 import { getProjectTypes } from "../../../../../api/projectTypesApi.js";
+import { getAllCategories } from "../../../../../api/categoriesApi.js";
 
-const FORTALECIMIENTO_CATEGORY_ID = "01ke5g3mwyt6q8fx5e4n9x3z7h";
+const FORTALECIMIENTO_CATEGORY_NAME = "Fortalecimiento";
 
 // Skeleton loader components
-const SkeletonCard = ({ isWide }) => (
+const SkeletonCard = () => (
   <motion.div
     initial={{ opacity: 0.5 }}
     animate={{ opacity: 1 }}
     transition={{ duration: 1.5, repeat: Infinity }}
-    className={`bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 backdrop-blur-xl rounded-xl shadow-sm border border-gray-300 overflow-hidden ${isWide ? "h-48 sm:h-56" : "h-full flex flex-col"
-      }`}
+    className="bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 backdrop-blur-xl rounded-xl shadow-sm border border-gray-300 overflow-hidden h-full flex flex-col"
   >
-    {!isWide && (
-      <>
-        <div className="h-28 bg-gradient-to-br from-gray-300 to-gray-200"></div>
-        <div className="p-3 space-y-3 flex-1">
-          <div className="h-3 bg-gray-300 rounded w-3/4"></div>
-          <div className="h-3 bg-gray-300 rounded w-full"></div>
-          <div className="h-8 bg-gray-300 rounded mt-auto"></div>
-        </div>
-      </>
-    )}
+    <div className="h-40 bg-gradient-to-br from-gray-300 to-gray-200"></div>
+    <div className="p-5 space-y-3 flex-1">
+      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+      <div className="h-3 bg-gray-300 rounded w-full"></div>
+      <div className="h-3 bg-gray-300 rounded w-5/6"></div>
+      <div className="h-10 bg-gray-300 rounded mt-auto"></div>
+    </div>
   </motion.div>
 );
 
 const ProjectCard = ({ p, i }) => {
-  // Extract text for preview if it's HTML
-  const plainDescription = p.description ? p.description.replace(/<[^>]*>?/gm, '') : (p.descripcion || "");
+  const plainDescription = p.description ? p.description.replace(/<[^>]*>?/gm, "") : (p.descripcion || "");
   const imageUrl = p.cover_image?.url || p.cover_image_url || p.img || "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400";
 
-  // Construct file URL based on Communications module logic
   const fileUrl = p.upload_file?.path
     ? `https://api-ecocircular.creativostecnologicosit.com/storage/${p.upload_file.path}`
     : (p.file_url || null);
@@ -64,7 +59,7 @@ const ProjectCard = ({ p, i }) => {
           }}
         />
 
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
           <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-[#2B65AC] font-bold text-[10px] rounded-full shadow-sm border border-gray-100 uppercase tracking-wider">
             <MapPin className="w-2.5 h-2.5" />
             {p.classification_type?.label || p.categoria || "Proyecto"}
@@ -103,10 +98,13 @@ const ProjectCard = ({ p, i }) => {
 
 export default function ProyectosYAlianzas() {
   const [isLoading, setIsLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [territorialProjects, setTerritorialProjects] = useState([]);
-  const [sectorialProjects, setSectorialProjects] = useState([]);
-  const [categories, setCategories] = useState(["all"]);
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [activeCategory, setActiveCategory] = useState({ id: "all", name: "Todos" });
+  const [activeSection, setActiveSection] = useState("territorial"); // 'territorial' | 'sectorial'
+  const [allProjects, setAllProjects] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [territorialTypeId, setTerritorialTypeId] = useState(null);
+  const [sectorialTypeId, setSectorialTypeId] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -114,28 +112,23 @@ export default function ProyectosYAlianzas() {
       try {
         setIsLoading(true);
 
-        // Fetch project types
-        const typesResponse = await getProjectTypes();
+        const [catsResponse, projectsResponse, typesResponse] = await Promise.all([
+          getAllCategories(),
+          getAllProjects({ per_page: 100 }),
+          getProjectTypes()
+        ]);
+
+        const cats = catsResponse?.data?.items || [];
+        setCategories([{ id: "all", name: "Todos los proyectos" }, ...cats]);
+
+        const projects = projectsResponse?.data?.items || [];
+        setAllProjects(projects);
+
         const types = typesResponse?.data?.items || [];
-
-        const territorialType = types.find(t => t.label?.toLowerCase().includes("territorial"));
-        const sectorialType = types.find(t => t.label?.toLowerCase().includes("sectorial"));
-
-        // Fetch projects for Fortalecimiento category
-        const projectsResponse = await getAllProjects({
-          category_id: FORTALECIMIENTO_CATEGORY_ID,
-          per_page: 100 // Get all for filtering
-        });
-
-        const allProjects = projectsResponse?.data?.items || [];
-
-        // Extract classifications for the filter bar
-        const classifications = ["all", ...new Set(allProjects.map(p => p.classification_type?.label).filter(Boolean))];
-        setCategories(classifications);
-
-        // Group projects
-        setTerritorialProjects(allProjects.filter(p => p.project_type_id === territorialType?.id));
-        setSectorialProjects(allProjects.filter(p => p.project_type_id === sectorialType?.id));
+        const tType = types.find(t => t.label?.toLowerCase().includes("territorial"));
+        const sType = types.find(t => t.label?.toLowerCase().includes("sectorial"));
+        setTerritorialTypeId(tType?.id);
+        setSectorialTypeId(sType?.id);
 
       } catch (err) {
         console.error("Error fetching projects:", err);
@@ -148,14 +141,33 @@ export default function ProyectosYAlianzas() {
     fetchData();
   }, []);
 
-  const handleFilterChange = (category) => {
-    setActiveFilter(category);
+  const handleCategoryChange = (cat) => {
+    setIsFiltering(true);
+    setActiveCategory(cat);
+    if (cat.name !== FORTALECIMIENTO_CATEGORY_NAME) {
+      setActiveSection(null);
+    } else {
+      setActiveSection("territorial");
+    }
+    setTimeout(() => setIsFiltering(false), 400);
   };
 
-  const filterFn = (p) => activeFilter === "all" || p.classification_type?.label === activeFilter;
+  const handleSectionChange = (section) => {
+    setIsFiltering(true);
+    setActiveSection(section);
+    setTimeout(() => setIsFiltering(false), 300);
+  };
 
-  const filteredTerritorial = territorialProjects.filter(filterFn);
-  const filteredSectorial = sectorialProjects.filter(filterFn);
+  let filteredProjects = activeCategory.id === "all"
+    ? allProjects
+    : allProjects.filter(p => p.category_id === activeCategory.id);
+
+  if (activeCategory.name === FORTALECIMIENTO_CATEGORY_NAME) {
+    const typeId = activeSection === "territorial" ? territorialTypeId : sectorialTypeId;
+    filteredProjects = filteredProjects.filter(p => p.project_type_id === typeId);
+  }
+
+  const isFortalecimiento = activeCategory.name === FORTALECIMIENTO_CATEGORY_NAME;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-[#F8FAFB] to-white font-sans">
@@ -171,95 +183,130 @@ export default function ProyectosYAlianzas() {
             Portafolio de Proyectos
           </h1>
           <div className="w-24 h-1.5 bg-gradient-to-r from-[#2B65AC] to-[#00AB6D] mx-auto rounded-full"></div>
-          <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto font-light">
-            Documentos estratégicos y herramientas técnicas para impulsar la economía circular en los territorios.
+          <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto font-light leading-relaxed">
+            Explora nuestras iniciativas y herramientas técnicas diseñadas para impulsar la economía circular.
           </p>
         </motion.div>
       </div>
 
       {/* CONTENIDO PRINCIPAL */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-20 mt-12">
-        {/* Filtros (Diseño original) */}
-        {!isLoading && categories.length > 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-12 flex flex-wrap justify-center gap-2"
-          >
-            {categories.map((category) => (
-              <motion.button
-                key={category}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleFilterChange(category)}
-                className={`px-5 py-2 rounded-full font-bold text-sm transition-all duration-300 ${activeFilter === category
-                  ? "bg-gradient-to-r from-[#2B65AC] to-[#00AB6D] text-white shadow-lg"
-                  : "bg-white border border-gray-200 text-gray-600 hover:border-[#00AB6D] hover:text-[#00AB6D] shadow-sm"
-                  }`}
+
+        {/* FILTRO DE CATEGORÍAS GLOBALES */}
+        <div className="mb-12">
+          <div className="flex items-center gap-2 mb-6 justify-center">
+            <Filter className="w-4 h-4 text-[#2B65AC]" />
+            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Filtrar por Categoría</span>
+          </div>
+          <div className="flex flex-wrap justify-center gap-3">
+            {isLoading ? (
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="h-10 w-32 bg-gray-100 animate-pulse rounded-full"></div>
+              ))
+            ) : (
+              categories.map((cat) => (
+                <motion.button
+                  key={cat.id}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleCategoryChange(cat)}
+                  className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-300 shadow-sm border ${activeCategory.id === cat.id
+                    ? "bg-[#2B65AC] text-white border-[#2B65AC] shadow-md"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-[#2B65AC] hover:text-[#2B65AC]"
+                    }`}
+                >
+                  {cat.name}
+                </motion.button>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* SELECTOR DE SECCIÓN (SOLO SI ES FORTALECIMIENTO) */}
+        <AnimatePresence>
+          {isFortalecimiento && !isLoading && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, y: -20 }}
+              animate={{ opacity: 1, height: "auto", y: 0 }}
+              exit={{ opacity: 0, height: 0, y: -20 }}
+              className="flex justify-center items-center mb-12 overflow-hidden"
+            >
+              <div className="bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 flex gap-1 w-full sm:w-auto">
+                <button
+                  onClick={() => handleSectionChange("territorial")}
+                  className={`flex-1 sm:flex-none px-8 py-3 rounded-xl font-bold text-sm transition-all duration-500 flex items-center justify-center gap-2 ${activeSection === "territorial"
+                    ? "bg-[#2B65AC] text-white shadow-lg"
+                    : "text-gray-500 hover:bg-gray-50"
+                    }`}
+                >
+                  <Globe className="w-4 h-4" />
+                  Territoriales
+                </button>
+                <button
+                  onClick={() => handleSectionChange("sectorial")}
+                  className={`flex-1 sm:flex-none px-8 py-3 rounded-xl font-bold text-sm transition-all duration-500 flex items-center justify-center gap-2 ${activeSection === "sectorial"
+                    ? "bg-[#00AB6D] text-white shadow-lg"
+                    : "text-gray-500 hover:bg-gray-50"
+                    }`}
+                >
+                  <Briefcase className="w-4 h-4" />
+                  Sectoriales
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Grid de Proyectos */}
+        <div className="min-h-[400px] relative">
+          <AnimatePresence mode="wait">
+            {(isLoading || isFiltering) ? (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
               >
-                {category === "all" ? "Todos los proyectos" : category}
-              </motion.button>
-            ))}
-          </motion.div>
-        )}
-
-        <div className="space-y-20">
-          {/* SECCIÓN TERRITORIAL */}
-          <section id="territorial">
-            <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-3xl font-bold text-[#1E305D]">Proyectos Territoriales</h2>
-              <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
-            </div>
-
-            <div className="min-h-[200px]">
-              {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {[...Array(3)].map((_, i) => <SkeletonCard key={i} />)}
+                {[...Array(6)].map((_, i) => (
+                  <SkeletonCard key={i} />
+                ))}
+              </motion.div>
+            ) : filteredProjects.length > 0 ? (
+              <motion.div
+                key={`${activeCategory.id}-${activeSection}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+              >
+                {filteredProjects.map((p, i) => (
+                  <ProjectCard key={p.id} p={p} i={i} />
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-center py-24 bg-white rounded-3xl border border-gray-100 shadow-sm"
+              >
+                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Filter className="w-8 h-8 text-gray-300" />
                 </div>
-              ) : filteredTerritorial.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {filteredTerritorial.map((p, i) => (
-                    <ProjectCard key={p.id} p={p} i={i} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                  <p className="text-gray-400">No hay proyectos territoriales disponibles.</p>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* SECCIÓN SECTORIAL */}
-          <section id="sectorial">
-            <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-3xl font-bold text-[#1E305D]">Proyectos Sectoriales</h2>
-              <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
-            </div>
-
-            <div className="min-h-[200px]">
-              {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {[...Array(3)].map((_, i) => <SkeletonCard key={i} />)}
-                </div>
-              ) : filteredSectorial.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {filteredSectorial.map((p, i) => (
-                    <ProjectCard key={p.id} p={p} i={i} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                  <p className="text-gray-400">No hay proyectos sectoriales disponibles.</p>
-                </div>
-              )}
-            </div>
-          </section>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">No se encontraron proyectos</h3>
+                <p className="text-gray-500 max-w-xs mx-auto">
+                  Actualmente no hay proyectos disponibles en la categoría seleccionada.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {error && (
-          <div className="text-center p-4 bg-red-50 text-red-600 rounded-xl mt-8">
+          <div className="text-center p-6 bg-red-50 text-red-600 rounded-2xl mt-8 font-medium border border-red-100 shadow-sm">
             {error}
           </div>
         )}
