@@ -138,7 +138,7 @@ const CoronaTeamCard = ({ name, role, image, styles }) => {
 // Componente para logos de la junta, más compacto y sin fondos grises
 const CompactBoardCard = ({ name, logo, isWhite }) => (
   <div
-    className={`p-1 flex items-center justify-center h-16 w-full transition-all duration-300 ${isWhite ? 'bg-[#DF0024] rounded-md' : 'bg-transparent'}`}
+    className={`p-1 flex items-center justify-center h-24 w-full transition-all duration-300 ${isWhite ? 'bg-[#DF0024] rounded-md' : 'bg-transparent'}`}
     title={name}
   >
     <img
