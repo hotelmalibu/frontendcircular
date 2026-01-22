@@ -558,7 +558,7 @@ export default function Navbar({ onMenuClick }) {
         {
           title: "Proyectos y alianzas",
           items: [
-            { label: "Proyectos activos", path: "/proyectos-activos" },
+            { label: "Portafolio de proyectos", path: "/proyectos-activos" },
             { label: "Inclusión Social", path: "/inclusion-social" },
             { label: "Casos de éxito", path: "/casos-de-exito" },
             { label: "Convocatorias", path: "/convocatorias" },
