@@ -134,6 +134,16 @@ const formsApi = {
         const response = await api.get("/forms/stats");
         return response.data;
     },
+
+    /**
+     * Get analytics data for a specific form (charts, frequencies)
+     * @param {string} id
+     * @returns {Promise}
+     */
+    getFormAnalytics: async (id) => {
+        const response = await api.get(`/forms/${id}/analytics`);
+        return response.data;
+    },
 };
 
 export default formsApi;

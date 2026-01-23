@@ -156,7 +156,7 @@ export default function DashboardGraficos() {
            </div>
            
            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                 <PieChart>
                   <Pie
                     data={stats?.categories_distribution || []}
@@ -190,7 +190,7 @@ export default function DashboardGraficos() {
            </div>
            
            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                 <PieChart>
                   <Pie
                     data={stats?.status_distribution || []}

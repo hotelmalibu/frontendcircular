@@ -20,7 +20,8 @@ import {
   CheckSquare,
   Upload,
   Maximize2,
-  Minimize2
+  Minimize2,
+  LayoutGrid
 } from "lucide-react";
 
 const DEFAULT_FIELD_TYPES = [
@@ -33,7 +34,15 @@ const DEFAULT_FIELD_TYPES = [
   { name: 'Checkbox', slug: 'checkbox', description: 'Casilla de verificación', component: 'checkbox-input' },
   { name: 'Radio Buttons', slug: 'radio', description: 'Botones de opción única', component: 'radio-input', options_schema: { options: 'array' } },
   { name: 'Menú Desplegable', slug: 'select', description: 'Menú desplegable', component: 'select-input', options_schema: { choices: { type: 'array' } } },
-  { name: 'Carga de Archivo', slug: 'file', description: 'Carga de archivos', component: 'file-input' },
+  { name: 'Hora', slug: 'time', description: 'Selector de hora', component: 'time-input' },
+  { name: 'Escala Lineal', slug: 'linear_scale', description: 'Escala numérica (ej. 1 a 5)', component: 'scale-input', options_schema: { min: { type: 'integer', default: 1 }, max: { type: 'integer', default: 5 }, min_label: "Etiqueta Min", max_label: "Etiqueta Max" } },
+  { name: 'Sección', slug: 'section', description: 'Dividir formulario en páginas', component: 'section-break' },
+  { name: 'Título y Descripción', slug: 'title', description: 'Bloque de texto sin input', component: 'title-display', options_schema: { tag: 'h2', align: 'left' } },
+  { name: 'Imagen', slug: 'image', description: 'Imagen ilustrativa', component: 'image-display' },
+  { name: 'Video', slug: 'video', description: 'Video de YouTube', component: 'video-display' },
+  { name: 'Cuadrícula de opción múltiple', slug: 'grid', description: 'Selecciona una opción por fila', component: 'grid-input', options_schema: { rows: { type: 'array' }, columns: { type: 'array' } } },
+  { name: 'Cuadrícula de casillas', slug: 'checkbox_grid', description: 'Selecciona varias opciones por fila', component: 'checkbox-grid-input', options_schema: { rows: { type: 'array' }, columns: { type: 'array' } } },
+  { name: 'Carga de Archivo', slug: 'file', description: 'Carga de archivos', component: 'file-input', options_schema: { accept: ".pdf,.doc,.docx,.jpg,.png", size_limit: { type: 'integer', default: 5 } } },
   { name: 'Área de Texto', slug: 'textarea', description: 'Texto multilínea', component: 'textarea-input' }
 ];
 
@@ -382,6 +391,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
     if (slug.includes("file") || slug.includes("image") || slug.includes("upload")) return <Upload size={18} />;
     if (slug.includes("select") || slug.includes("choice") || slug.includes("dropdown") || slug.includes("radio")) return <List size={18} />;
     if (slug.includes("checkbox")) return <CheckSquare size={18} />;
+    if (slug.includes("grid")) return <LayoutGrid size={18} />;
     return <Type size={18} />;
   };
 
@@ -393,16 +403,22 @@ const FormBuilder = ({ formId, onSuccess }) => {
       min: "Valor Mínimo",
       max: "Valor Máximo",
       step: "Incremento (Paso)",
-      rows: "Altura (Filas)",
-      cols: "Ancho (Columnas)",
       minlength: "Longitud Mínima",
       maxlength: "Longitud Máxima",
       pattern: "Patrón (Regex)",
       accept: "Tipos de Archivo (ej: .pdf,.jpg)",
       multiple: "Permitir Múltiples Archivos",
       size_limit: "Límite de Tamaño (MB)",
-      choices: "Opciones de Selección",
-      options: "Opciones",
+      choices: "Opciones de Respuesta",
+      options: "Opciones (Radio/Checkbox)",
+      rows: "Filas (o Altura)",
+      columns: "Columnas (Configuración)",
+      cols: "Ancho (Columnas)",
+      min_label: "Etiqueta para el mínimo (ej: Bajo)",
+      max_label: "Etiqueta para el máximo (ej: Excelente)",
+      src: "URL de la Imagen",
+      url: "URL del Video (YouTube)",
+      alt: "Texto alternativo (Accesibilidad)",
       default: "Valor por Defecto",
       readonly: "Solo Lectura",
       disabled: "Deshabilitado",
@@ -415,7 +431,74 @@ const FormBuilder = ({ formId, onSuccess }) => {
       align: "Alineación (left, center, right)"
     };
 
+    const getPropertyHelp = (key, typeSlug) => {
+        const helpMap = {
+            placeholder: {
+                default: "Texto gris de ejemplo que desaparece al escribir.",
+                example: "Ej: Escribe aquí tu respuesta...",
+                text: "Ej: Nombre completo",
+                email: "Ej: nombre@correo.com",
+                phone: "Ej: 300 123 4567",
+                number: "Ej: 0",
+                url: "Ej: https://sitio.com",
+                date: "Ej: Selecciona una fecha"
+            },
+            min: {
+                default: "Valor mínimo permitido.",
+                example: "Ej: 0",
+                date: "Ej: 2024-01-01"
+            },
+            max: {
+                default: "Valor máximo permitido.",
+                example: "Ej: 100",
+                date: "Ej: 2025-12-31"
+            },
+            minlength: { default: "Mínimo caracteres requeridos.", example: "Ej: 3" },
+            maxlength: { default: "Máximo caracteres permitidos.", example: "Ej: 255" },
+            pattern: { 
+                default: "Regex para validación.",
+                example: "Ej: [A-Za-z]+",
+                phone: "Ej: [0-9]{10}"
+            },
+            step: { default: "Saltos entre números.", example: "Ej: 1 o 0.5" },
+            accept: { default: "Tipos de archivo.", example: "Ej: .pdf,.jpg,.png" },
+            multiple: { default: "Permitir múltiples archivos." },
+            size_limit: { default: "Límite en MB.", example: "Ej: 5" },
+            
+            choices: { default: "Opciones del menú.", example: "Ej: Opción 1" },
+            options: { default: "Opciones a seleccionar.", example: "Ej: Sí" },
+            
+            rows: { default: "Filas de la cuadrícula.", example: "Ej: Calidad del Servicio" },
+            columns: { default: "Columnas de la cuadrícula.", example: "Ej: Bueno" },
+            cols: { default: "Ancho textbox.", example: "Ej: 30" },
+            
+            min_label: { default: "Etiqueta nivel bajo.", example: "Ej: Malo" },
+            max_label: { default: "Etiqueta nivel alto.", example: "Ej: Bueno" },
+            
+            src: { default: "URL Imagen.", example: "Ej: https://imgur.com/image.jpg" },
+            url: { default: "URL YouTube.", example: "Ej: https://youtube.com/watch?v=..." },
+            alt: { default: "Descripción Alt.", example: "Ej: Logo de la empresa" },
+            
+            default: { default: "Valor por defecto.", example: "Ej: N/A" },
+            tag: { default: "Etiqueta HTML.", example: "Ej: h2" },
+            align: { default: "Alineación.", example: "Ej: center" },
+            color: { default: "Clase Color.", example: "Ej: text-blue-500" },
+            size: { default: "Clase Tamaño.", example: "Ej: text-xl" }
+        };
+
+        const keyLower = key.toLowerCase();
+        if (!helpMap[keyLower]) return null;
+        
+        const config = helpMap[keyLower];
+        const specific = config[typeSlug] || config.default;
+        // If specific is an object (rarely needed but good for safety), standardise
+        return typeof specific === 'string' ? { text: specific, example: config.example || "" } : specific;
+    };
+
     const label = PROPERTY_LABELS[key.toLowerCase()] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const helpData = getPropertyHelp(key, selectedField?.type_slug || 'text');
+    const helpText = helpData?.text || helpData; // Handle backward compat if string
+    const placeholderText = helpData?.example || (helpData?.text ? `Ej: ${helpData.text}` : `Configurar ${label}`);
 
     if (type === 'boolean') {
       return (
@@ -439,7 +522,11 @@ const FormBuilder = ({ formId, onSuccess }) => {
       const choices = Array.isArray(value) ? value : [];
       return (
         <div key={key} className="pt-2">
-          <label className="block text-xs font-bold text-gray-500 uppercase mb-3">{label}</label>
+          <div className="flex justify-between items-center mb-3">
+             <label className="block text-xs font-bold text-gray-500 uppercase">{label}</label>
+             {helpText && <span title={helpText} className="cursor-help text-xs">💡</span>}
+          </div>
+          
           <div className="space-y-3">
             {choices.map((choice, cIdx) => (
               <div key={cIdx} className="flex gap-2">
@@ -472,6 +559,11 @@ const FormBuilder = ({ formId, onSuccess }) => {
             >
               + Añadir Opción
             </button>
+            {helpText && (
+                <p className="mt-1 text-[10px] text-gray-400 font-medium leading-tight ml-1">
+                    💡 {helpText}
+                </p>
+            )}
           </div>
         </div>
       );
@@ -485,8 +577,13 @@ const FormBuilder = ({ formId, onSuccess }) => {
           value={value || ""}
           onChange={(e) => onChange(type === 'integer' || type === 'numeric' ? (e.target.value === "" ? "" : parseFloat(e.target.value)) : e.target.value)}
           className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
-          placeholder={`Ingrese ${label.toLowerCase()}`}
+          placeholder={placeholderText}
         />
+        {helpText && (
+            <p className="mt-1.5 text-[10px] text-gray-400 font-medium leading-tight">
+                💡 {helpText}
+            </p>
+        )}
       </div>
     );
   };
@@ -748,10 +845,156 @@ const FormBuilder = ({ formId, onSuccess }) => {
                   <h4 className="text-base md:text-lg font-semibold text-gray-800">{field.label || "Sin Etiqueta"}</h4>
                   {field.description && <p className="text-sm text-gray-500 mt-1">{field.description}</p>}
 
-                  <div className="mt-4 pointer-events-none opacity-50">
-                    <div className="w-full h-10 bg-gray-50 border border-gray-200 rounded-xl px-4 flex items-center text-gray-400 text-sm">
-                      {field.placeholder || "Muestra de campo..."}
-                    </div>
+                   <div className="mt-4 pointer-events-none opacity-80 overflow-x-auto">
+                    {(() => {
+                        const slug = field.type_slug || "";
+                        const options = field.options || {};
+ 
+                        if (slug === 'grid' || slug === 'checkbox_grid') {
+                            const rows = options.rows || ["Fila 1", "Fila 2"];
+                            const cols = options.columns || ["Col 1", "Col 2", "Col 3"];
+                            return (
+                                <div className="min-w-[400px]">
+                                    <table className="w-full text-xs text-gray-500">
+                                        <thead>
+                                            <tr>
+                                                <th className="p-2"></th>
+                                                {cols.map((c, i) => <th key={i} className="p-2 font-bold text-center">{typeof c === 'string' ? c : (c.label || `Col ${i+1}`)}</th>)}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {rows.map((r, ri) => (
+                                                <tr key={ri} className={ri % 2 === 0 ? 'bg-gray-50/50' : ''}>
+                                                    <td className="p-2 font-medium">{typeof r === 'string' ? r : (r.label || `Fila ${ri+1}`)}</td>
+                                                    {cols.map((c, ci) => (
+                                                        <td key={ci} className="p-2 text-center">
+                                                            <div className={`w-4 h-4 mx-auto border border-gray-300 ${slug === 'grid' ? 'rounded-full' : 'rounded'}`}></div>
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            );
+                        }
+
+                        if (slug === 'section') {
+                            return (
+                                <div className="flex items-center gap-4 py-4">
+                                    <div className="h-px bg-blue-200 flex-1 relative">
+                                        <div className="absolute right-0 -top-1.5 w-3 h-3 rotate-45 border-t border-r border-blue-200 bg-white"></div>
+                                    </div>
+                                    <span className="text-xs font-black text-blue-400 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100">Nueva Página</span>
+                                    <div className="h-px bg-blue-200 flex-1 relative">
+                                        <div className="absolute left-0 -top-1.5 w-3 h-3 -rotate-135 border-t border-r border-blue-200 bg-white"></div>
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        if (slug === 'title') {
+                            const Tag = options.tag || 'h2';
+                            return (
+                                <div className={`text-gray-800 ${options.align === 'center' ? 'text-center' : options.align === 'right' ? 'text-right' : 'text-left'}`}>
+                                    {/* Visual preview of the tag size */}
+                                    <div className={`font-bold ${Tag === 'h1' ? 'text-3xl' : Tag === 'h3' ? 'text-xl' : 'text-2xl'}`}>
+                                        {field.label || "Título de la Sección"}
+                                    </div>
+                                    {field.description && <p className="text-gray-500 mt-2">{field.description}</p>}
+                                </div>
+                            );
+                        }
+
+                        if (slug === 'image') {
+                            return (
+                                <div className="flex justify-center bg-gray-50 rounded-xl border border-dashed border-gray-300 p-4 min-h-[150px] items-center">
+                                    {options.src ? (
+                                        <img src={options.src} alt={options.alt || ""} className="max-h-[300px] object-contain rounded-lg shadow-sm" />
+                                    ) : (
+                                        <div className="text-center text-gray-400">
+                                            <Upload className="mx-auto mb-2 opacity-50" size={32} />
+                                            <p className="text-xs">Configura la URL de la imagen en propiedades</p>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        }
+
+                        if (slug === 'video') {
+                            return (
+                                <div className="flex justify-center bg-gray-900 rounded-xl overflow-hidden aspect-video items-center relative">
+                                    {options.url ? (
+                                        <iframe 
+                                            width="100%" 
+                                            height="100%" 
+                                            src={`https://www.youtube.com/embed/${options.url.includes('v=') ? options.url.split('v=')[1].split('&')[0] : options.url.split('/').pop()}`}
+                                            title="YouTube video player" 
+                                            frameBorder="0" 
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                            allowFullScreen
+                                            className="absolute inset-0 z-10"
+                                        ></iframe>
+                                    ) : (
+                                        <div className="text-center text-gray-500 z-10 relative">
+                                            <div className="w-12 h-12 rounded-full border-2 border-gray-600 flex items-center justify-center mx-auto mb-2">
+                                                <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-gray-600 border-b-[6px] border-b-transparent ml-1"></div>
+                                            </div>
+                                            <p className="text-xs">Configura la URL de YouTube</p>
+                                        </div>
+                                    )}
+                                    {/* Placeholder background only visible if no video */}
+                                    {!options.url && <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-black opacity-50"></div>}
+                                </div>
+                            );
+                        }
+
+                        if (slug === 'linear_scale') {
+                            const min = parseInt(options.min || 1);
+                            const max = parseInt(options.max || 5);
+                            return (
+                                <div className="flex items-end justify-between gap-4 pt-4 px-2">
+                                    <span className="text-xs font-bold text-gray-400 mb-2">{options.min_label || min}</span>
+                                    <div className="flex-1 flex justify-between items-center px-4">
+                                        {Array.from({ length: max - min + 1 }, (_, i) => i + min).map(val => (
+                                            <div key={val} className="flex flex-col items-center gap-2">
+                                                <span className="text-xs font-bold text-gray-500">{val}</span>
+                                                <div className="w-5 h-5 rounded-full border-2 border-gray-300"></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <span className="text-xs font-bold text-gray-400 mb-2">{options.max_label || max}</span>
+                                </div>
+                            );
+                        }
+
+                        if (['radio', 'checkbox', 'select'].includes(slug) && (options.options || options.choices)) {
+                            const items = options.options || options.choices || [];
+                            return (
+                                <div className="space-y-2">
+                                    {items.length > 0 ? items.map((opt, i) => (
+                                        <div key={i} className="flex items-center gap-3 p-2 border border-gray-100 rounded-lg">
+                                            {slug === 'checkbox' && <div className="w-4 h-4 rounded border border-gray-300"></div>}
+                                            {slug === 'radio' && <div className="w-4 h-4 rounded-full border border-gray-300"></div>}
+                                            {slug === 'select' && <div className="text-[10px] text-gray-400 font-bold border border-gray-200 px-1 rounded">1</div>}
+                                            <span className="text-sm text-gray-600">{opt.label || `Opción ${i + 1}`}</span>
+                                        </div>
+                                    )) : (
+                                        <div className="text-xs text-red-400 italic bg-red-50 p-2 rounded">
+                                            Sin opciones definidas. Añádelas en el panel de propiedades.
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        }
+
+                        // Default Text/Inputs
+                        return (
+                            <div className="w-full h-10 bg-gray-50 border border-gray-200 rounded-xl px-4 flex items-center text-gray-400 text-sm">
+                                {field.placeholder || (slug === 'date' ? 'dd/mm/aaaa' : slug === 'time' ? '--:--' : 'Respuesta...')}
+                            </div>
+                        );
+                    })()}
                   </div>
 
                   {field.is_required && (

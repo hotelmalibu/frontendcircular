@@ -28,6 +28,7 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
     const [errors, setErrors] = useState({});
     const [isNotFound, setIsNotFound] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
+    const [formSubmitted, setFormSubmitted] = useState(false);
 
     useEffect(() => {
         const fetchForm = async () => {
@@ -101,7 +102,17 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
         if (form && form.fields) {
             form.fields.forEach(field => {
                 const value = formData[field.name];
-                if (field.is_required && (!value || (typeof value === 'string' && value.trim() === ""))) {
+                
+                // Better validation for different types
+                const isEmpty = (val) => {
+                    if (val === undefined || val === null) return true;
+                    if (typeof val === 'string') return val.trim() === "";
+                    if (Array.isArray(val)) return val.length === 0;
+                    if (typeof val === 'object') return Object.keys(val).length === 0;
+                    return false;
+                };
+
+                if (field.is_required && isEmpty(value)) {
                     newErrors[field.name] = "Este campo es obligatorio";
                 }
             });
@@ -121,8 +132,8 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
         sorted.forEach((field, index) => {
             const type = (field.field_type?.slug || field.field_type?.name || field.type_name || "text").toLowerCase();
             
-            // If it's a Title and not the very first item, break to new page
-            if (type === 'title' && index > 0) {
+            // If it's a Section, break to new page
+            if (type === 'section' && index > 0) {
                 if (currentPage.length > 0) _pages.push(currentPage);
                 currentPage = [];
             }
@@ -137,12 +148,23 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
     const totalSteps = pages.length;
     const currentFields = pages[currentStep] || [];
 
-    const handleNext = () => {
+    const handleNext = (e) => {
+        if (e) e.preventDefault();
+        
         // Validate only fields in the current step
         const stepErrors = {};
         currentFields.forEach(field => {
             const value = formData[field.name];
-            if (field.is_required && (!value || (typeof value === 'string' && value.trim() === ""))) {
+            
+            const isEmpty = (val) => {
+                if (val === undefined || val === null) return true;
+                if (typeof val === 'string') return val.trim() === "";
+                if (Array.isArray(val)) return val.length === 0;
+                if (typeof val === 'object') return Object.keys(val).length === 0;
+                return false;
+            };
+
+            if (field.is_required && isEmpty(value)) {
                 stepErrors[field.name] = "Este campo es obligatorio";
             }
         });
@@ -167,7 +189,13 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
+
+        // Extra check: if we are not in the last step, don't submit if called via keyboard/form submit
+        if (currentStep < totalSteps - 1) {
+            handleNext();
+            return;
+        }
 
         if (!validateForm()) {
             toast.error("Por favor complete los campos obligatorios");
@@ -183,30 +211,22 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                 return type.includes("file") || type.includes("image");
             });
 
-            // Filter out decorative fields (titles, paragraphs, etc.)
-            const decorativeTypes = ['title', 'paragraph', 'divider', 'spacer', 'rich_text', 'section', 'header'];
+            // Filter out decorative fields (titles, paragraphs, etc.) - These should NEVE be sent to backend
+            const decorativeTypes = ['title', 'paragraph', 'divider', 'spacer', 'rich_text', 'section', 'header', 'image', 'video'];
             
             console.log("Filtering Form Data. Original keys:", Object.keys(formData));
 
             const cleanFormData = Object.keys(formData).reduce((acc, key) => {
                 const field = form.fields.find(f => f.name === key);
-                const type = (field?.field_type?.name || field?.type_name || "").toLowerCase();
-                
-                // Debug log for each field
-                // console.log(`Field: ${key}, Type: ${type}, Is Decorative: ${decorativeTypes.includes(type)}`);
-
-                // SKIP if:
-                // 1. Field not found in definition
-                // 2. Type is decorative
-                // 3. Name starts with decorative prefixes (fallback)
                 if (!field) return acc;
+
+                const type = (field.field_type?.slug || field.type_slug || field.field_type?.name || field.type_name || "").toLowerCase();
                 
+                // SKIP if type is decorative (images, videos, etc don't store values)
                 if (decorativeTypes.includes(type)) return acc;
                 
-                const lowerKey = key.toLowerCase();
-                if (lowerKey.startsWith('title') || lowerKey.startsWith('paragraph') || lowerKey.startsWith('divider')) {
-                    return acc;
-                }
+                // SKIP if name suggests decorative
+                if (key.includes('image_') || key.includes('video_')) return acc;
 
                 acc[key] = formData[key];
                 return acc;
@@ -220,10 +240,18 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                 Object.keys(cleanFormData).forEach(key => {
                     const value = cleanFormData[key];
                     if (value !== undefined && value !== null) {
-                        // Handle arrays for checkboxes
                         if (Array.isArray(value)) {
                             value.forEach((v, i) => {
                                 payload.append(`fields[${key}][${i}]`, v);
+                            });
+                        } else if (typeof value === 'object' && !(value instanceof File || value instanceof Blob)) {
+                            // Handle nested structures for Grids
+                            Object.entries(value).forEach(([subKey, subVal]) => {
+                                if (Array.isArray(subVal)) {
+                                    subVal.forEach((v, i) => payload.append(`fields[${key}][${subKey}][${i}]`, v));
+                                } else {
+                                    payload.append(`fields[${key}][${subKey}]`, subVal);
+                                }
                             });
                         } else {
                             payload.append(`fields[${key}]`, value);
@@ -244,18 +272,34 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
 
             await formsApi.submitForm(formId, payload);
             toast.success("Respuestas enviadas con éxito");
+            setFormSubmitted(true);
             if (onSuccess) onSuccess();
         } catch (error) {
-            console.error("Error submitting form FULL:", error);
             if (error.response?.data) {
-                console.error("Validation Errors:", error.response.data);
+                console.group("Validation Errors Details");
+                console.error("Status:", error.response.status);
+                console.error("Data:", error.response.data);
+                
+                if (error.response.status === 422 && error.response.data?.errors) {
+                    const apiErrors = error.response.data.errors;
+                    const newErrors = {};
+                    
+                    Object.keys(apiErrors).forEach(key => {
+                        const fieldName = key.replace('fields.', '');
+                        newErrors[fieldName] = Array.isArray(apiErrors[key]) ? apiErrors[key][0] : apiErrors[key];
+                    });
+                    
+                    setErrors(newErrors);
+                    console.table(apiErrors);
+                }
+                console.groupEnd();
             }
             
             let apiError = "Error al enviar las respuestas";
-            if (error.response?.data?.errors) {
-                 apiError = Object.values(error.response.data.errors).flat().join('\n');
-            } else if (error.response?.data?.message) {
+            if (error.response?.data?.message) {
                  apiError = error.response.data.message;
+            } else if (error.message) {
+                 apiError = error.message;
             }
             
             toast.error(apiError);
@@ -389,6 +433,17 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                                 );
                             }
 
+                            if (type === 'section') {
+                                return (
+                                    <div key={field.id} className="pt-8 pb-4 border-b-2 border-[#005380]/20 mb-4">
+                                        <h2 className="text-2xl font-black text-[#005380] uppercase tracking-tight">
+                                            {field.label || "Nueva Sección"}
+                                        </h2>
+                                        {field.description && <p className="text-gray-500 mt-2 font-medium">{field.description}</p>}
+                                    </div>
+                                );
+                            }
+
                             if (type === 'paragraph') {
                                 return (
                                     <div key={field.id} className="py-2">
@@ -402,12 +457,69 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                                 );
                             }
 
+                            if (type === 'image') {
+                                return (
+                                    <div key={field.id} className="py-4 flex flex-col items-center">
+                                        {field.options?.src ? (
+                                            <img 
+                                                src={field.options.src} 
+                                                alt={field.options.alt || ""} 
+                                                className="max-w-full rounded-2xl shadow-lg border border-gray-100 object-contain max-h-[500px]"
+                                            />
+                                        ) : (
+                                            <div className="p-10 bg-gray-50 border border-dashed border-gray-200 rounded-2xl text-gray-400 text-xs italic">
+                                                Imagen no configurada
+                                            </div>
+                                        )}
+                                        {field.label && <p className="mt-3 text-xs font-bold text-gray-500">{field.label}</p>}
+                                    </div>
+                                );
+                            }
+
+                            if (type === 'video') {
+                                const videoId = field.options?.url?.includes('v=') ? field.options.url.split('v=')[1].split('&')[0] : field.options?.url?.split('/').pop();
+                                return (
+                                    <div key={field.id} className="py-4">
+                                        {field.options?.url ? (
+                                            <div className="aspect-video rounded-2xl overflow-hidden shadow-lg border border-gray-100">
+                                                <iframe 
+                                                    width="100%" 
+                                                    height="100%" 
+                                                    src={`https://www.youtube.com/embed/${videoId}`}
+                                                    title="YouTube video player" 
+                                                    frameBorder="0" 
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                    allowFullScreen
+                                                ></iframe>
+                                            </div>
+                                        ) : (
+                                            <div className="p-10 bg-gray-50 border border-dashed border-gray-200 rounded-2xl text-gray-400 text-xs italic text-center">
+                                                URL de Video no configurada
+                                            </div>
+                                        )}
+                                        {field.label && <p className="mt-3 text-xs font-bold text-gray-500 text-center">{field.label}</p>}
+                                    </div>
+                                );
+                            }
+
                             // Standard Input Fields
                             return (
                                 <div key={field.id} className="space-y-3 group">
                                     <div className="flex justify-between items-end px-1">
                                         <label className="block text-sm font-black text-[#005380] group-hover:text-[#2C67B0] transition-colors uppercase text-[10px] tracking-[0.1em]">
-                                            {field.label} {field.is_required && <span className="text-red-500 font-black ml-0.5">*</span>}
+                                            {(() => {
+                                                const text = field.label;
+                                                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                                                const parts = text.split(urlRegex);
+                                                return parts.map((part, i) => 
+                                                    urlRegex.test(part) ? (
+                                                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-700 z-50 relative pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+                                                            {part}
+                                                        </a>
+                                                    ) : part
+                                                );
+                                            })()}
+                                            {field.is_required && <span className="text-red-500 font-black ml-0.5">*</span>}
                                         </label>
                                         {field.metadata?.info && (
                                             <div className="group/info relative cursor-help">
@@ -439,20 +551,28 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                                         ) : type === "select" || type === "dropdown" ? (
                                             <div className="relative">
                                                 <select
-                                                    value={formData[field.name] || ""}
-                                                    onChange={(e) => handleChange(field.name, e.target.value)}
-                                                    className={`w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-lg outline-none transition-all font-bold text-gray-600 appearance-none text-sm ${
+                                                    multiple={field.options?.multiple}
+                                                    value={formData[field.name] || (field.options?.multiple ? [] : "")}
+                                                    onChange={(e) => {
+                                                        if (field.options?.multiple) {
+                                                            const values = Array.from(e.target.selectedOptions, option => option.value);
+                                                            handleChange(field.name, values);
+                                                        } else {
+                                                            handleChange(field.name, e.target.value);
+                                                        }
+                                                    }}
+                                                    className={`w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-lg outline-none transition-all font-bold text-gray-600 ${field.options?.multiple ? 'custom-multiselect h-32' : 'appearance-none'} text-sm ${
                                                         hasError 
                                                         ? "border-red-200 focus:border-red-400 bg-red-50/10" 
                                                         : "focus:border-[#005380] focus:bg-white focus:ring-4 focus:ring-blue-500/5 group-hover:border-gray-200"
                                                     }`}
                                                 >
-                                                    <option value="" disabled>{field.placeholder || "Selecciona una opción"}</option>
+                                                    {!field.options?.multiple && <option value="" disabled>{field.placeholder || "Selecciona una opción"}</option>}
                                                     {(field.options?.choices || field.metadata?.options || []).map((opt, i) => (
                                                         <option key={i} value={opt.value || opt}>{opt.label || opt}</option>
                                                     ))}
                                                 </select>
-                                                <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
+                                                {!field.options?.multiple && <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />}
                                             </div>
                                         ) : type === "file" || type === "upload" || type.includes("image") ? (
                                             <div className={`relative group/file border border-dashed ${hasError ? 'border-red-200 bg-red-50/10' : 'border-gray-200 hover:border-[#005380] bg-gray-50/30 hover:bg-white'} rounded-lg p-6 transition-all text-center`}>
@@ -521,21 +641,32 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                                             <div className="space-y-3">
                                                 {(() => {
                                                      const rawOptions = field.options?.choices || field.options?.options || field.options || field.metadata?.options || [];
-                                                     const optionsList = Array.isArray(rawOptions) ? rawOptions : [];
+                                                     let optionsList = Array.isArray(rawOptions) ? rawOptions : [];
 
-                                                    if (optionsList.length === 0) {
-                                                        return (
-                                                            <div className="p-2 bg-red-50 border border-red-100 rounded text-xs text-red-600 font-mono break-all">
-                                                                Debug: {JSON.stringify(field)}
-                                                            </div>
-                                                        );
-                                                    }
+                                                     // FIX: Support for Single Boolean Checkbox (e.g. Terms & Conditions)
+                                                     // If no options list but we have a label or it's a simple checkbox
+                                                     if (optionsList.length === 0 && (field.options?.label || field.label)) {
+                                                         optionsList = [{
+                                                             label: field.options?.label || "Sí",
+                                                             value: "1"
+                                                         }];
+                                                     }
+
+                                                     if (optionsList.length === 0) {
+                                                         return (
+                                                             <div className="p-2 bg-red-50 border border-red-100 rounded text-xs text-red-600 font-mono break-all">
+                                                                 Error de configuración: Sin opciones definidas.
+                                                             </div>
+                                                         );
+                                                     }
 
                                                     return optionsList.map((opt, i) => {
                                                         const val = typeof opt === 'object' ? opt.value : opt;
                                                         const label = typeof opt === 'object' ? opt.label : opt;
+                                                        // Handle both array of values (multiple) and boolean (single) scenarios if needed
+                                                        // For singular boolean checkboxes, we might store as "true"/"false" or array ["true"]
                                                         const currentValues = Array.isArray(formData[field.name]) ? formData[field.name] : [];
-                                                        const isChecked = currentValues.includes(val);
+                                                        const isChecked = currentValues.includes(val) || formData[field.name] === val || formData[field.name] === true;
                                                         
                                                         return (
                                                             <label key={i} className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${
@@ -553,10 +684,15 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                                                                     value={val}
                                                                     checked={isChecked}
                                                                     onChange={(e) => {
-                                                                        const newValues = e.target.checked
-                                                                            ? [...currentValues, val]
-                                                                            : currentValues.filter(v => v !== val);
-                                                                        handleChange(field.name, newValues);
+                                                                        // If it's the only option (like Accept Terms), send '1' or null
+                                                                        if (optionsList.length === 1) {
+                                                                             handleChange(field.name, e.target.checked ? "1" : null);
+                                                                        } else {
+                                                                            const newValues = isChecked 
+                                                                                ? (Array.isArray(formData[field.name]) ? formData[field.name].filter(v => v !== val) : [])
+                                                                                : [...(Array.isArray(formData[field.name]) ? formData[field.name] : []), val];
+                                                                            handleChange(field.name, newValues);
+                                                                        }
                                                                     }}
                                                                     className="hidden"
                                                                 />
@@ -568,6 +704,104 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                                                     });
                                                 })()}
                                             </div>
+                                        ) : type === "grid" || type === "checkbox_grid" ? (
+                                            <div className="overflow-x-auto bg-gray-50/50 rounded-2xl border border-gray-100 p-1 md:p-6 group-hover:bg-white transition-all">
+                                                <table className="w-full text-left border-collapse min-w-[500px]">
+                                                    <thead>
+                                                        <tr className="border-b border-gray-200">
+                                                            <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest"></th>
+                                                            {(field.options?.columns || ["Col 1", "Col 2", "Col 3"]).map((col, idx) => (
+                                                                <th key={idx} className="p-4 text-center text-[10px] font-black text-[#005380] uppercase tracking-widest bg-blue-50/30 rounded-t-xl min-w-[80px]">
+                                                                    {typeof col === 'string' ? col : (col.label || `Col ${idx+1}`)}
+                                                                </th>
+                                                            ))}
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-gray-100">
+                                                        {(field.options?.rows || ["Fila 1", "Fila 2"]).map((row, rIdx) => {
+                                                            const rowName = typeof row === 'string' ? row : (row.label || `Fila ${rIdx+1}`);
+                                                            return (
+                                                                <tr key={rIdx} className="hover:bg-blue-50/10 transition-colors">
+                                                                    <td className="p-4 text-sm font-bold text-gray-700">{rowName}</td>
+                                                                    {(field.options?.columns || ["Col 1", "Col 2", "Col 3"]).map((col, cIdx) => {
+                                                                        const colVal = typeof col === 'string' ? col : (col.value || col.label || `Val ${cIdx+1}`);
+                                                                        const currentGridData = formData[field.name] || {};
+                                                                        
+                                                                        if (type === 'grid') {
+                                                                            const isSelected = currentGridData[rowName] === colVal;
+                                                                            return (
+                                                                                <td key={cIdx} className="p-4 text-center">
+                                                                                     <button 
+                                                                                        type="button"
+                                                                                        onClick={() => {
+                                                                                            const newData = { ...currentGridData, [rowName]: colVal };
+                                                                                            handleChange(field.name, newData);
+                                                                                        }}
+                                                                                        className={`w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center transition-all ${isSelected ? 'border-[#005380] bg-[#005380] shadow-md scale-110' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                                                                                     >
+                                                                                         {isSelected && <div className="w-2 h-2 bg-white rounded-full" />}
+                                                                                     </button>
+                                                                                </td>
+                                                                            );
+                                                                        } else {
+                                                                            const rowValues = Array.isArray(currentGridData[rowName]) ? currentGridData[rowName] : [];
+                                                                            const isChecked = rowValues.includes(colVal);
+                                                                            return (
+                                                                                <td key={cIdx} className="p-4 text-center">
+                                                                                     <button 
+                                                                                        type="button"
+                                                                                        onClick={() => {
+                                                                                            const newRowValues = isChecked 
+                                                                                                ? rowValues.filter(v => v !== colVal)
+                                                                                                : [...rowValues, colVal];
+                                                                                            const newData = { ...currentGridData, [rowName]: newRowValues };
+                                                                                            handleChange(field.name, newData);
+                                                                                        }}
+                                                                                        className={`w-6 h-6 rounded border-2 mx-auto flex items-center justify-center transition-all ${isChecked ? 'border-[#005380] bg-[#005380] shadow-md scale-110' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                                                                                     >
+                                                                                         {isChecked && <CheckCircle size={14} className="text-white" />}
+                                                                                     </button>
+                                                                                </td>
+                                                                            );
+                                                                        }
+                                                                    })}
+                                                                </tr>
+                                                            );
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ) : type === "linear_scale" ? (
+                                            <div className="py-2">
+                                                <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-gray-50 px-6 py-8 rounded-2xl border border-gray-100 group-hover:bg-white transition-all">
+                                                    <span className="text-xs font-bold text-gray-400 order-2 md:order-1">{field.options?.min_label || "Bajo"}</span>
+                                                    <div className="flex-1 flex justify-between items-center gap-2 md:gap-4 order-1 md:order-2 w-full md:w-auto">
+                                                        {(() => {
+                                                            const min = parseInt(field.options?.min || 1);
+                                                            const max = parseInt(field.options?.max || 5);
+                                                            const range = Array.from({ length: max - min + 1 }, (_, i) => i + min);
+                                                            return range.map(val => (
+                                                                <button
+                                                                    key={val}
+                                                                    type="button"
+                                                                    onClick={() => handleChange(field.name, val)}
+                                                                    className={`flex flex-col items-center gap-3 transition-all ${String(formData[field.name]) === String(val) ? 'scale-110' : 'opacity-60 hover:opacity-100'}`}
+                                                                >
+                                                                    <span className={`text-xs font-black ${String(formData[field.name]) === String(val) ? 'text-[#005380]' : 'text-gray-400'}`}>{val}</span>
+                                                                    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${
+                                                                        String(formData[field.name]) === String(val) 
+                                                                        ? 'border-[#005380] bg-[#005380] shadow-lg shadow-blue-500/20' 
+                                                                        : 'border-gray-300 bg-white'
+                                                                    }`}>
+                                                                        {String(formData[field.name]) === String(val) && <div className="w-2 h-2 bg-white rounded-full" />}
+                                                                    </div>
+                                                                </button>
+                                                            ));
+                                                        })()}
+                                                    </div>
+                                                    <span className="text-xs font-bold text-gray-400 order-3">{field.options?.max_label || "Alto"}</span>
+                                                </div>
+                                            </div>
                                         ) : (
                                             <div className="relative">
                                                 {/* Icon Wrapper based on Type */}
@@ -578,7 +812,7 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                                                 )}
                                                 
                                                 <input
-                                                    type={type.includes("email") ? "email" : type.includes("number") ? "number" : "text"}
+                                                    type={type.includes("email") ? "email" : type.includes("number") ? "number" : type === "date" ? "date" : type === "time" ? "time" : "text"}
                                                     value={formData[field.name] || ""}
                                                     onChange={(e) => handleChange(field.name, e.target.value)}
                                                     placeholder={field.placeholder || "Escriba aquí..."}
@@ -602,6 +836,30 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                             );
                         })}
                 </div>
+                
+                {/* SUCCESS STATE */}
+                {formSubmitted && (
+                    <div className="absolute inset-0 bg-white z-50 flex flex-col items-center justify-center p-8 animate-fadeIn">
+                        <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-6">
+                            <CheckCircle size={48} className="text-green-500" />
+                        </div>
+                        <h3 className="text-2xl font-black text-gray-800 mb-2 text-center">¡Enviado con Éxito!</h3>
+                        <p className="text-gray-500 text-center max-w-md mb-8">
+                            Tus respuestas han sido registradas correctamente. Gracias por participar.
+                        </p>
+                        <button 
+                            onClick={() => {
+                                setFormSubmitted(false);
+                                setFormData({});
+                                setCurrentStep(0);
+                                if (onCancel) onCancel();
+                            }}
+                            className="px-8 py-3 bg-[#005380] text-white font-bold rounded-xl hover:bg-[#2C67B0] transition-colors shadow-lg"
+                        >
+                            Volver / Finalizar
+                        </button>
+                    </div>
+                )}
 
                 {/* MULTI-STEP NAVIGATION ACTIONS */}
                 <div className="mt-12 pt-8 border-t border-gray-100 flex items-center justify-between gap-4">
