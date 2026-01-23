@@ -7,6 +7,25 @@ import { getAllProjects } from "../../../../../api/projectsApi.js";
 import { getProjectTypes } from "../../../../../api/projectTypesApi.js";
 import { getAllCategories } from "../../../../../api/categoriesApi.js";
 
+// Import specific category images
+import imgFortalecimiento from "../../../../../assets/home/Proyectos/Fortalecimiento.png";
+import imgInnovacion from "../../../../../assets/home/Proyectos/Innovacion.png";
+import imgConsumo from "../../../../../assets/home/Proyectos/ConsumoResponsable.png";
+import imgEstrategicos from "../../../../../assets/home/Proyectos/ProyectosEstrategicos.png";
+import imgInclusion from "../../../../../assets/home/Proyectos/Inclusion.png";
+
+const CATEGORY_IMAGES = {
+  "Fortalecimiento": imgFortalecimiento,
+  "Innovación": imgInnovacion,
+  "Innovacion": imgInnovacion,
+  "Consumo Responsable": imgConsumo,
+  "Consumo": imgConsumo,
+  "Proyectos Estratégicos": imgEstrategicos,
+  "Estratégicos": imgEstrategicos,
+  "Inclusión": imgInclusion,
+  "Inclusion": imgInclusion,
+};
+
 const FORTALECIMIENTO_CATEGORY_NAME = "Fortalecimiento";
 
 // Skeleton loader components
@@ -29,7 +48,12 @@ const SkeletonCard = () => (
 
 const ProjectCard = ({ p, i }) => {
   const plainDescription = p.description ? p.description.replace(/<[^>]*>?/gm, "") : (p.descripcion || "");
-  const imageUrl = p.cover_image?.url || p.cover_image_url || p.img || "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400";
+
+  // Lógica de fallback de imagen por categoría
+  const catName = p.category_name || p.category?.name || "";
+  const categoryFallback = CATEGORY_IMAGES[catName] || "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400";
+
+  const imageUrl = p.cover_image?.url || p.cover_image_url || p.img || categoryFallback;
 
   const fileUrl = p.upload_file?.path
     ? `https://api-ecocircular.creativostecnologicosit.com/storage/${p.upload_file.path}`
@@ -53,8 +77,8 @@ const ProjectCard = ({ p, i }) => {
           alt={p.title || p.titulo}
           className="w-full h-full object-cover"
           onError={(e) => {
-            if (e.target.src !== "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400") {
-              e.target.src = "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400";
+            if (e.target.src !== categoryFallback) {
+              e.target.src = categoryFallback;
             }
           }}
         />

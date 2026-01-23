@@ -64,7 +64,7 @@ export default function ProjectsSection() {
       try {
         setLoading(true);
         setError(null);
-        const responseData = await getAllProjects();
+        const responseData = await getAllProjects({ per_page: 100 });
 
         let projectsArray = [];
         // Since getAllProjects returns response.data, responseData is the body
@@ -253,8 +253,8 @@ export default function ProjectsSection() {
                     window.scrollTo({ top: document.getElementById('projects-section')?.offsetTop - 100, behavior: 'smooth' });
                   }}
                   className={`w-10 h-10 rounded-full font-bold transition-all ${currentPage === i + 1
-                      ? "bg-[#1E305D] text-white shadow-lg"
-                      : "text-gray-400 hover:text-[#1E305D] hover:bg-gray-100"
+                    ? "bg-[#1E305D] text-white shadow-lg"
+                    : "text-gray-400 hover:text-[#1E305D] hover:bg-gray-100"
                     }`}
                 >
                   {i + 1}
