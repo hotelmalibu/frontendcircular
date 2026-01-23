@@ -20,6 +20,8 @@ import {
   Menu,
 } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
+import { getAllProjects } from "../api/projectsApi";
+import { getAllCategories } from "../api/categoriesApi";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -57,16 +59,14 @@ function MobileMenuDropdown({
     <div className="border-b border-gray-100 last:border-0">
       <button
         onClick={() => setOpen(!open)}
-        className={`w-full text-left py-4 px-4 font-bold uppercase text-sm transition-all flex justify-between items-center ${
-          showWhiteText ? "text-white" : "text-gray-800"
-        }`}
+        className={`w-full text-left py-4 px-4 font-bold uppercase text-sm transition-all flex justify-between items-center ${showWhiteText ? "text-white" : "text-gray-800"
+          }`}
         style={{ color: !showWhiteText && open ? BRAND.blue : "" }}
       >
         <span>{title}</span>
         <ChevronDown
-          className={`w-5 h-5 transition-transform duration-300 ${
-            open ? "rotate-180" : ""
-          }`}
+          className={`w-5 h-5 transition-transform duration-300 ${open ? "rotate-180" : ""
+            }`}
         />
       </button>
 
@@ -80,15 +80,13 @@ function MobileMenuDropdown({
                   <>
                     <button
                       onClick={() => toggleSubmenu(idx)}
-                      className={`w-full text-left py-3 px-8 font-semibold text-xs uppercase tracking-wide flex justify-between items-center ${
-                        showWhiteText ? "text-gray-300" : "text-gray-600"
-                      }`}
+                      className={`w-full text-left py-3 px-8 font-semibold text-xs uppercase tracking-wide flex justify-between items-center ${showWhiteText ? "text-gray-300" : "text-gray-600"
+                        }`}
                     >
                       <span>{subsection.title}</span>
                       <ChevronDown
-                        className={`w-4 h-4 transition-transform ${
-                          openSubmenus[idx] ? "rotate-180" : ""
-                        }`}
+                        className={`w-4 h-4 transition-transform ${openSubmenus[idx] ? "rotate-180" : ""
+                          }`}
                       />
                     </button>
 
@@ -108,25 +106,58 @@ function MobileMenuDropdown({
                                 >
                                   <span>{item.label}</span>
                                   <ChevronDown
-                                    className={`w-3 h-3 transition-transform ${
-                                      openSubSubmenus[subKey]
-                                        ? "rotate-180"
-                                        : ""
-                                    }`}
+                                    className={`w-3 h-3 transition-transform ${openSubSubmenus[subKey]
+                                      ? "rotate-180"
+                                      : ""
+                                      }`}
                                   />
                                 </button>
                                 {openSubSubmenus[subKey] && (
-                                  <div className="pl-4 pb-2">
-                                    {item.subItems.map((subItem, subIdx) => (
-                                      <Link
-                                        key={subIdx}
-                                        to={subItem.path}
-                                        onClick={onClose}
-                                        className="block py-2 px-4 text-xs text-gray-500 hover:text-blue-600"
-                                      >
-                                        {subItem.label}
-                                      </Link>
-                                    ))}
+                                  <div className="pl-4 pb-2 border-l border-blue-50 ml-6">
+                                    {item.subItems.map((subItem, subIdx) => {
+                                      const hasProjects = subItem.projects && subItem.projects.length > 0;
+                                      const projectsKey = `${subKey}-${subIdx}`;
+
+                                      return (
+                                        <div key={subIdx}>
+                                          {hasProjects ? (
+                                            <>
+                                              <button
+                                                onClick={() => setOpenSubSubmenus(prev => ({ ...prev, [projectsKey]: !prev[projectsKey] }))}
+                                                className="w-full text-left py-2 px-2 text-xs flex justify-between items-center text-gray-500 hover:text-blue-600"
+                                              >
+                                                <span>{subItem.label}</span>
+                                                <ChevronDown
+                                                  className={`w-2 h-2 transition-transform ${openSubSubmenus[projectsKey] ? "rotate-180" : ""}`}
+                                                />
+                                              </button>
+                                              {openSubSubmenus[projectsKey] && (
+                                                <div className="pl-3 py-1 space-y-1 max-h-[200px] overflow-y-auto custom-scrollbar">
+                                                  {subItem.projects.map((project, pIdx) => (
+                                                    <Link
+                                                      key={pIdx}
+                                                      to={`/proyectos/${project.id}`}
+                                                      onClick={onClose}
+                                                      className="block py-1.5 px-3 text-[11px] text-gray-400 hover:text-blue-500 hover:bg-blue-50/50 rounded transition-all"
+                                                    >
+                                                      {project.title}
+                                                    </Link>
+                                                  ))}
+                                                </div>
+                                              )}
+                                            </>
+                                          ) : (
+                                            <Link
+                                              to={subItem.path}
+                                              onClick={onClose}
+                                              className="block py-2 px-2 text-xs text-gray-500 hover:text-blue-600"
+                                            >
+                                              {subItem.label}
+                                            </Link>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
                                   </div>
                                 )}
                               </div>
@@ -173,6 +204,7 @@ function MegaMenuDropdown({
   onOpenChange,
 }) {
   const [open, setOpen] = useState(false);
+  const [activeProjectsId, setActiveProjectsId] = useState(null);
   const timeoutRef = useRef(null);
 
   const handleMouseEnter = () => {
@@ -203,20 +235,18 @@ function MegaMenuDropdown({
     >
       <button
         type="button"
-        className={`text-base lg:text-base font-semibold fontfamily-montserrat transition-all menu-underline pb-1 ${
-          open ? "active" : ""
-        } ${textColorClass}`}
+        className={`text-base lg:text-base font-semibold fontfamily-montserrat transition-all menu-underline pb-1 ${open ? "active" : ""
+          } ${textColorClass}`}
         style={{ "--hover-color": BRAND.blue }}
       >
         {label}
       </button>
 
       <div
-        className={`fixed left-0 right-0 top-full bg-white shadow-xl transform transition-all duration-300 border-t border-gray-100 ${
-          open
-            ? "opacity-100 visible translate-y-0"
-            : "opacity-0 invisible -translate-y-2"
-        }`}
+        className={`fixed left-0 right-0 top-full bg-white shadow-xl transform transition-all duration-300 border-t border-gray-100 ${open
+          ? "opacity-100 visible translate-y-0"
+          : "opacity-0 invisible -translate-y-2"
+          }`}
       >
         {/* Barra de gradiente superior */}
         <div
@@ -269,18 +299,61 @@ function MegaMenuDropdown({
                                   className="text-gray-400 transition-transform duration-300 group-hover/item:-rotate-180"
                                 />
                               </button>
-                              <div className="overflow-hidden max-h-0 opacity-0 group-hover/item:max-h-[500px] group-hover/item:opacity-100 transition-all duration-500 ease-in-out">
+                              <div className="overflow-hidden max-h-0 opacity-0 group-hover/item:max-h-[800px] group-hover/item:opacity-100 transition-all duration-500 ease-in-out">
                                 <ul className="pl-3 mt-1 space-y-2 border-l-2 border-blue-100 ml-1 py-1">
-                                  {item.subItems.map((sub, subIdx) => (
-                                    <li key={subIdx}>
-                                      <Link
-                                        to={sub.path}
-                                        className="block text-xs text-gray-500 hover:text-blue-600 hover:font-semibold transition-all py-1"
-                                      >
-                                        {sub.label}
-                                      </Link>
-                                    </li>
-                                  ))}
+                                  {item.subItems.map((sub, subIdx) => {
+                                    const subKey = `${idx}-${itemIdx}-${subIdx}`;
+                                    const isOpen = activeProjectsId === subKey;
+
+                                    return (
+                                      <li key={subIdx} className="relative">
+                                        {sub.projects && sub.projects.length > 0 ? (
+                                          <div className="relative">
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                setActiveProjectsId(isOpen ? null : subKey);
+                                              }}
+                                              className={`w-full text-left flex items-center justify-between text-xs transition-all py-1.5 px-2 rounded-md ${isOpen ? "bg-blue-50 text-blue-700 font-bold" : "text-gray-500 hover:text-blue-600 hover:font-semibold"
+                                                }`}
+                                            >
+                                              <span>{sub.label}</span>
+                                              <ChevronDown size={12} className={`transition-transform duration-300 ${isOpen ? "rotate-0" : "-rotate-90"}`} />
+                                            </button>
+
+                                            {/* Sub-submenu de proyectos (Inline Accordion) */}
+                                            {isOpen && (
+                                              <div
+                                                className="mt-2 ml-2 pl-3 border-l-2 border-blue-50 animate-in fade-in slide-in-from-top-2 duration-300"
+                                                onClick={(e) => e.stopPropagation()}
+                                              >
+                                                <ul className="space-y-1 mt-1 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
+                                                  {sub.projects.map((project, pIdx) => (
+                                                    <li key={pIdx}>
+                                                      <Link
+                                                        to={`/proyectos/${project.id}`}
+                                                        className="block text-[11px] text-gray-400 hover:text-blue-600 hover:bg-blue-50/50 px-2 py-1.5 rounded-md transition-all"
+                                                        onClick={() => setOpen(false)}
+                                                      >
+                                                        {project.title}
+                                                      </Link>
+                                                    </li>
+                                                  ))}
+                                                </ul>
+                                              </div>
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <Link
+                                            to={sub.path}
+                                            className="block text-xs text-gray-500 hover:text-blue-600 hover:font-semibold transition-all py-1.5 px-2"
+                                          >
+                                            {sub.label}
+                                          </Link>
+                                        )}
+                                      </li>
+                                    );
+                                  })}
                                 </ul>
                               </div>
                             </div>
@@ -321,14 +394,14 @@ function ProfileDropdown({ user, logout, showWhiteText }) {
     }, 300);
   };
 
-// function ProfileDropdown (part of the file)
+  // function ProfileDropdown (part of the file)
 
   const userFullName = user?.name
     ? `${user.name} ${user.lastName || ""}`.trim()
     : "Usuario";
   const userRole = user?.role || "Sin rol";
   // Si no hay avatar, usamos null para luego mostrar las iniciales
-  const userAvatar = user?.avatar; 
+  const userAvatar = user?.avatar;
 
   const getInitials = (name) => {
     if (!name) return "U";
@@ -355,9 +428,8 @@ function ProfileDropdown({ user, logout, showWhiteText }) {
       >
         <div className="text-right hidden sm:block leading-tight">
           <p
-            className={`text-sm font-bold ${
-              showWhiteText ? "text-white" : "text-gray-800"
-            }`}
+            className={`text-sm font-bold ${showWhiteText ? "text-white" : "text-gray-800"
+              }`}
           >
             {userFullName}
           </p>
@@ -380,18 +452,16 @@ function ProfileDropdown({ user, logout, showWhiteText }) {
         </div>
         <ChevronDown
           size={16}
-          className={`${
-            showWhiteText ? "text-white" : "text-gray-500"
-          } transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`${showWhiteText ? "text-white" : "text-gray-500"
+            } transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       <div
-        className={`absolute right-0 mt-0 w-56 bg-white rounded-xl shadow-xl border border-gray-100 transform transition-all duration-200 origin-top-right overflow-hidden ${
-          open
-            ? "opacity-100 visible scale-100"
-            : "opacity-0 invisible scale-95"
-        }`}
+        className={`absolute right-0 mt-0 w-56 bg-white rounded-xl shadow-xl border border-gray-100 transform transition-all duration-200 origin-top-right overflow-hidden ${open
+          ? "opacity-100 visible scale-100"
+          : "opacity-0 invisible scale-95"
+          }`}
       >
         <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 sm:hidden">
           <p className="text-sm font-bold text-gray-800">{userFullName}</p>
@@ -438,6 +508,42 @@ export default function Navbar({ onMenuClick }) {
   // eslint-disable-next-line no-unused-vars
   const [scrollDirection, setScrollDirection] = useState("up");
 
+  // --- DATOS DINÁMICOS ---
+  const [projectsList, setProjectsList] = useState([]);
+  const [categoriesList, setCategoriesList] = useState([]);
+
+  useEffect(() => {
+    const fetchMenuData = async () => {
+      try {
+        const [projRes, catRes] = await Promise.all([
+          getAllProjects({ per_page: 100 }),
+          getAllCategories()
+        ]);
+        setProjectsList(projRes?.data?.items || []);
+        setCategoriesList(catRes?.data?.items || []);
+      } catch (error) {
+        console.error("Error fetching menu data:", error);
+      }
+    };
+    fetchMenuData();
+  }, []);
+
+  const getProjectsByLineSubstr = (searchStr) => {
+    if (!searchStr || !projectsList.length) return [];
+
+    const search = searchStr.toLowerCase();
+    return projectsList.filter(project => {
+      // 1. Verificar Nombre de Categoría (Prioritario en muchos casos)
+      const categoryName = (project.category_name || project.category?.name || "").toLowerCase();
+
+      // 2. Verificar Etiqueta de Clasificación (Usado para 'Innovación' por ejemplo)
+      const classificationLabel = (project.classification_type_label || "").toLowerCase();
+
+      // 3. Verificar si el término de búsqueda está en alguno
+      return categoryName.includes(search) || classificationLabel.includes(search);
+    }).slice(0, 30); // Aumentar el límite para permitir scroll
+  };
+
   // --- LÓGICA DE VISIBILIDAD ---
   const isPublicPage = location.pathname === "/";
 
@@ -478,7 +584,7 @@ export default function Navbar({ onMenuClick }) {
     scrolled || isHovered || hasOpenDropdown || mobileMenuOpen;
 
   const isDashboardView = user && isPublicPage && !isInteracted;
-  const isAuthPage = ["/login","/quines-somos","/alianzas","/resoluciones","/planes","/polticas","/register", "/forgot-password"].includes(
+  const isAuthPage = ["/login", "/quines-somos", "/alianzas", "/resoluciones", "/planes", "/polticas", "/register", "/forgot-password"].includes(
     location.pathname
   );
 
@@ -535,8 +641,8 @@ export default function Navbar({ onMenuClick }) {
           items: [
             { label: "Razón y propósito", path: "/quines-somos" },
             { label: "Ética y transparencia", path: "/valores" },
-            { label: "Líneas estratégicas", path: "/lineas-estrategicas" },
             { label: "Junta Directiva - Equipo", path: "/juntaDirecteEquipo" },
+            { label: "Líneas Estratégicas", path: "/lineas-estrategicas" },
             { label: "Informes", path: "/informes-anuales" },
             { label: "Encuestas", path: "/encuestas" },
             { label: "Alianzas", path: "/alianzas" },
@@ -559,9 +665,37 @@ export default function Navbar({ onMenuClick }) {
           title: "Proyectos y alianzas",
           items: [
             { label: "Portafolio de proyectos", path: "/proyectos-activos" },
-            { label: "Inclusión Social", path: "/inclusion-social" },
-            { label: "Casos de éxito", path: "/casos-de-exito" },
-            { label: "Convocatorias", path: "/convocatorias" },
+            {
+              label: "Líneas Estratégicas",
+              path: null,
+              subItems: [
+                {
+                  label: "Fortalecimiento",
+                  path: null,
+                  projects: getProjectsByLineSubstr("Fortalecimiento")
+                },
+                {
+                  label: "Consumo Responsable",
+                  path: null,
+                  projects: getProjectsByLineSubstr("Consumo")
+                },
+                {
+                  label: "Inclusión",
+                  path: null,
+                  projects: getProjectsByLineSubstr("Inclusión")
+                },
+                {
+                  label: "Proyectos Estratégicos",
+                  path: null,
+                  projects: getProjectsByLineSubstr("Proyectos")
+                },
+                {
+                  label: "Innovación",
+                  path: null,
+                  projects: getProjectsByLineSubstr("Innovación")
+                },
+              ],
+            },
           ],
         },
       ],
@@ -664,15 +798,13 @@ export default function Navbar({ onMenuClick }) {
 
   return (
     <div
-      className={`fixed top-0 left-0 w-full z-50 font-sans ${
-        user ? "" : "transition-all duration-500 ease-in-out"
-      } ${
-        user
+      className={`fixed top-0 left-0 w-full z-50 font-sans ${user ? "" : "transition-all duration-500 ease-in-out"
+        } ${user
           ? "translate-y-0 opacity-100"
           : visible
-          ? "translate-y-0 opacity-100"
-          : "-translate-y-full opacity-0"
-      }`}
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-full opacity-0"
+        }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -692,21 +824,18 @@ export default function Navbar({ onMenuClick }) {
           border-radius: 2px; 
         }
         /* Solo activamos el hover si la línea no está ya al 100% (modo normal) */
-        ${
-          !showWhiteText
-            ? ".menu-underline:hover::after, .menu-underline.active::after { width: 100%; }"
-            : ""
+        ${!showWhiteText
+          ? ".menu-underline:hover::after, .menu-underline.active::after { width: 100%; }"
+          : ""
         }
         
         /* Hamburger Animation */
         .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 5px; }
         .hamburger-line { width: 24px; height: 2px; transition: all 0.3s ease; border-radius: 4px; }
-        .hamburger.active .hamburger-line:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); background-color: ${
-          BRAND.blue
+        .hamburger.active .hamburger-line:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); background-color: ${BRAND.blue
         }; }
         .hamburger.active .hamburger-line:nth-child(2) { opacity: 0; }
-        .hamburger.active .hamburger-line:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); background-color: ${
-          BRAND.blue
+        .hamburger.active .hamburger-line:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); background-color: ${BRAND.blue
         }; }
         
         @media (max-width: 768px) { .nav-desktop { display: none; } }
@@ -715,22 +844,20 @@ export default function Navbar({ onMenuClick }) {
 
       {/* NAVBAR HEADER */}
       <header
-        className={`flex items-center justify-between px-4 md:px-8 lg:px-24 py-4 transition-all duration-300 ${
-          !showWhiteBg
-            ? "bg-transparent"
-            : "bg-white shadow-md border-b border-gray-100"
-        }`}
+        className={`flex items-center justify-between px-4 md:px-8 lg:px-24 py-4 transition-all duration-300 ${!showWhiteBg
+          ? "bg-transparent"
+          : "bg-white shadow-md border-b border-gray-100"
+          }`}
       >
         {/* LOGO & TOGGLE */}
         <div className="flex items-center slide-in shrink-0 relative">
           {isInternalPage && !user?.role?.toLowerCase()?.includes("afiliado") && (
             <button
               onClick={toggleSidebar}
-              className={`hidden md:flex absolute -left-1 md:-left-6 lg:-left-20 p-2 rounded-xl transition-all duration-300 transform active:scale-95 items-center justify-center ${
-                showWhiteText 
-                  ? "text-white hover:bg-white/20" 
-                  : "text-gray-600 hover:bg-gray-50 hover:text-blue-600"
-              }`}
+              className={`hidden md:flex absolute -left-1 md:-left-6 lg:-left-20 p-2 rounded-xl transition-all duration-300 transform active:scale-95 items-center justify-center ${showWhiteText
+                ? "text-white hover:bg-white/20"
+                : "text-gray-600 hover:bg-gray-50 hover:text-blue-600"
+                }`}
               title={isSidebarCollapsed ? "Mostrar menú completo" : "Contraer menú"}
             >
               <Menu size={24} />
@@ -786,11 +913,10 @@ export default function Navbar({ onMenuClick }) {
                         setShowAlertMenu(false);
                       }}
                       title="Notificaciones de Gestión"
-                      className={`relative p-2 rounded-full transition-all ${
-                        showWhiteText
-                          ? "text-white hover:bg-white/20"
-                          : "text-gray-500 hover:bg-gray-100 hover:text-blue-600"
-                      }`}
+                      className={`relative p-2 rounded-full transition-all ${showWhiteText
+                        ? "text-white hover:bg-white/20"
+                        : "text-gray-500 hover:bg-gray-100 hover:text-blue-600"
+                        }`}
                     >
                       <Bell size={20} />
                       {pendingCount > 0 && (
@@ -859,11 +985,10 @@ export default function Navbar({ onMenuClick }) {
                         setShowNotifMenu(false);
                       }}
                       title="Centro de Alertas de Seguridad"
-                      className={`relative p-2 rounded-full transition-all ${
-                        showWhiteText
-                          ? "text-white hover:bg-white/20"
-                          : "text-gray-500 hover:bg-gray-100 hover:text-orange-600"
-                      }`}
+                      className={`relative p-2 rounded-full transition-all ${showWhiteText
+                        ? "text-white hover:bg-white/20"
+                        : "text-gray-500 hover:bg-gray-100 hover:text-orange-600"
+                        }`}
                     >
                       <ShieldAlert size={20} />
                       {alertCount > 0 && (
@@ -941,9 +1066,8 @@ export default function Navbar({ onMenuClick }) {
           {/* Menú de Perfil (Solo si hay usuario) */}
           {user ? (
             <div
-              className={`pl-4 border-l ${
-                showWhiteText ? "border-white/30" : "border-gray-200"
-              }`}
+              className={`pl-4 border-l ${showWhiteText ? "border-white/30" : "border-gray-200"
+                }`}
             >
               <ProfileDropdown
                 user={user}
@@ -955,26 +1079,22 @@ export default function Navbar({ onMenuClick }) {
 
           {/* HAMBURGER (Mobile - Right) */}
           <button
-            className={`nav-mobile ml-2 hamburger ${
-              mobileMenuOpen ? "active" : ""
-            }`}
+            className={`nav-mobile ml-2 hamburger ${mobileMenuOpen ? "active" : ""
+              }`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Menú móvil"
           >
             <div
-              className={`hamburger-line ${
-                showWhiteText ? "bg-white" : "bg-gray-800"
-              }`}
+              className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-800"
+                }`}
             ></div>
             <div
-              className={`hamburger-line ${
-                showWhiteText ? "bg-white" : "bg-gray-800"
-              }`}
+              className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-800"
+                }`}
             ></div>
             <div
-              className={`hamburger-line ${
-                showWhiteText ? "bg-white" : "bg-gray-800"
-              }`}
+              className={`hamburger-line ${showWhiteText ? "bg-white" : "bg-gray-800"
+                }`}
             ></div>
           </button>
         </div>

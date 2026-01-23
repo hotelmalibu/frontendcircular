@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft,
@@ -131,6 +132,16 @@ const DATA_LINEAS = [
 export default function LineasEstrategicasPage() {
   const [selectedLineId, setSelectedLineId] = useState(DATA_LINEAS[0].id);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const location = useLocation();
+
+  useEffect(() => {
+    const hash = location.hash.replace("#", "");
+    if (hash && DATA_LINEAS.some((item) => item.id === hash)) {
+      setSelectedLineId(hash);
+      setCurrentSlide(0);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [location.hash]);
 
   const activeData = DATA_LINEAS.find((item) => item.id === selectedLineId) || DATA_LINEAS[0];
 
@@ -151,9 +162,9 @@ export default function LineasEstrategicasPage() {
       {/* HERO SECTION */}
       <div className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center bg-[#0D1B2A]">
         {/* Background Image */}
-        <div 
+        <div
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{ 
+          style={{
             backgroundImage: `url("https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2070&auto=format&fit=crop")`
           }}
         />
@@ -177,7 +188,7 @@ export default function LineasEstrategicasPage() {
 
       {/* TABS DE SELECCIÓN (Single Card) - Positioned AFTER the banner */}
       <div className="relative w-full z-40 px-4 md:px-6 py-4 md:py-8">
-        <motion.div 
+        <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -211,17 +222,17 @@ export default function LineasEstrategicasPage() {
             )
           })}
         </motion.div>
-      
+
         {/* Texto informativo */}
         <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="text-center mt-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="text-center mt-3"
         >
-            <span className="text-[10px] md:text-xs tracking-widest uppercase text-gray-500 font-bold">
-              Haz clic en cada línea estratégica para conocer más
-            </span>
+          <span className="text-[10px] md:text-xs tracking-widest uppercase text-gray-500 font-bold">
+            Haz clic en cada línea estratégica para conocer más
+          </span>
         </motion.div>
       </div>
 
