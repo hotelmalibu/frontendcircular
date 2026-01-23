@@ -57,62 +57,66 @@ export default function FeaturedSection() {
         }
 
         // Map news items
-        const mappedNews = newsArray.map(n => {
-          const rawType = n.type || n.category || "";
-          let finalType = "Noticias";
+        const mappedNews = newsArray
+          .filter(n => (n.status || "").toLowerCase() === "published")
+          .map(n => {
+            const rawType = n.type || n.category || "";
+            let finalType = "Noticias";
 
-          if (rawType.toLowerCase().includes("doc") || rawType.toLowerCase().includes("interés")) {
-            finalType = "Documentos de interés";
-          }
-          else if (rawType.toLowerCase().includes("gesti") || rawType.toLowerCase().includes("gestion")) {
-            finalType = "Gestión documental";
-          }
+            if (rawType.toLowerCase().includes("doc") || rawType.toLowerCase().includes("interés")) {
+              finalType = "Documentos de interés";
+            }
+            else if (rawType.toLowerCase().includes("gesti") || rawType.toLowerCase().includes("gestion")) {
+              finalType = "Gestión documental";
+            }
 
-          let imageUrl = "";
-          if (n.upload_file && n.upload_file.url) {
-            imageUrl = n.upload_file.url;
-          } else if (n.image) {
-            imageUrl = n.image;
-          } else if (n.thumbnail) {
-            imageUrl = n.thumbnail;
-          } else if (n.cover) {
-            imageUrl = n.cover;
-          }
+            let imageUrl = "";
+            if (n.upload_file && n.upload_file.url) {
+              imageUrl = n.upload_file.url;
+            } else if (n.image) {
+              imageUrl = n.image;
+            } else if (n.thumbnail) {
+              imageUrl = n.thumbnail;
+            } else if (n.cover) {
+              imageUrl = n.cover;
+            }
 
-          return {
-            id: n.id || n._id || n.uid || Math.random(),
-            type: finalType,
-            topic: n.category_name ||
-              (n.category && typeof n.category === 'object' ? n.category.name : n.category) ||
-              "Sin categoría asignada",
-            title: n.title || n.name || "Sin título",
-            excerpt: stripHtml(n.description || n.excerpt),
-            image: getImageProxyUrl(imageUrl, { width: 600, quality: 80 }),
-            date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
-            slug: n.slug || (`noticia-${n.id || n._id || ''}`),
-            status: n.status || "",
-            source: 'news'
-          };
-        });
+            return {
+              id: n.id || n._id || n.uid || Math.random(),
+              type: finalType,
+              topic: n.category_name ||
+                (n.category && typeof n.category === 'object' ? n.category.name : n.category) ||
+                "Sin categoría asignada",
+              title: n.title || n.name || "Sin título",
+              excerpt: stripHtml(n.description || n.excerpt),
+              image: getImageProxyUrl(imageUrl, { width: 600, quality: 80 }),
+              date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
+              slug: n.slug || (`noticia-${n.id || n._id || ''}`),
+              status: n.status || "",
+              source: 'news'
+            };
+          });
 
-        const mappedDocuments = documentsArray.map(doc => {
-          // All documents go to "Documentos de interés"
-          const category = "Documentos de interés";
+        const mappedDocuments = documentsArray
+          .filter(doc => (doc.status || "").toLowerCase() === "approved")
+          .map(doc => {
+            // All documents go to "Documentos de interés"
+            const category = "Documentos de interés";
 
-          return {
-            id: `doc-${doc.id}`,
-            type: category,
-            topic: doc.category_name || (doc.category && typeof doc.category === 'object' ? doc.category.name : doc.category) || "Documento",
-            title: doc.name,
-            excerpt: doc.description,
-            image: "", // Documents don't have images
-            date: new Date(doc.created_at).toLocaleDateString(),
-            slug: `documento-${doc.id}`,
-            status: doc.status,
-            source: 'document',
-            documentData: doc // Keep original document data for actions
-          };
-        });
+            return {
+              id: `doc-${doc.id}`,
+              type: category,
+              topic: doc.category_name || (doc.category && typeof doc.category === 'object' ? doc.category.name : doc.category) || "Documento",
+              title: doc.name,
+              excerpt: doc.description,
+              image: "", // Documents don't have images
+              date: new Date(doc.created_at).toLocaleDateString(),
+              slug: `documento-${doc.id}`,
+              status: doc.status,
+              source: 'document',
+              documentData: doc // Keep original document data for actions
+            };
+          });
 
         // Combine and set items
         const allItems = [...mappedNews, ...mappedDocuments];
@@ -277,8 +281,8 @@ export default function FeaturedSection() {
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className={`p-3 rounded-full border-2 transition-all ${currentPage === 1
-                  ? "border-gray-100 text-gray-300 cursor-not-allowed"
-                  : "border-[#00AB6D] text-[#00AB6D] hover:bg-[#00AB6D] hover:text-white"
+                ? "border-gray-100 text-gray-300 cursor-not-allowed"
+                : "border-[#00AB6D] text-[#00AB6D] hover:bg-[#00AB6D] hover:text-white"
                 }`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -293,8 +297,8 @@ export default function FeaturedSection() {
                     window.scrollTo({ top: document.getElementById('featured-section')?.offsetTop - 100, behavior: 'smooth' });
                   }}
                   className={`w-10 h-10 rounded-full font-bold transition-all ${currentPage === i + 1
-                      ? "bg-[#1E305D] text-white shadow-lg"
-                      : "text-gray-400 hover:text-[#1E305D] hover:bg-gray-100"
+                    ? "bg-[#1E305D] text-white shadow-lg"
+                    : "text-gray-400 hover:text-[#1E305D] hover:bg-gray-100"
                     }`}
                 >
                   {i + 1}
@@ -306,8 +310,8 @@ export default function FeaturedSection() {
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
               className={`p-3 rounded-full border-2 transition-all ${currentPage === totalPages
-                  ? "border-gray-100 text-gray-300 cursor-not-allowed"
-                  : "border-[#00AB6D] text-[#00AB6D] hover:bg-[#00AB6D] hover:text-white"
+                ? "border-gray-100 text-gray-300 cursor-not-allowed"
+                : "border-[#00AB6D] text-[#00AB6D] hover:bg-[#00AB6D] hover:text-white"
                 }`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
