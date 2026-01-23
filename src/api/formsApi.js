@@ -109,11 +109,12 @@ const formsApi = {
     /**
      * Get responses for a form
      * @param {string} id
+     * @param {Object} params
      * @returns {Promise}
      */
-    getFormResponses: async (id) => {
+    getFormResponses: async (id, params = {}) => {
         // Try 'responses' as 'submissions' returned 404
-        const response = await api.get(`/forms/${id}/responses`);
+        const response = await api.get(`/forms/${id}/responses`, { params });
         return response.data;
     },
 

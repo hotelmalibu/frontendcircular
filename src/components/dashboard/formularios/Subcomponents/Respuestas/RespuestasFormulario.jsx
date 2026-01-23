@@ -159,8 +159,8 @@ const SummaryTab = ({ analytics }) => {
 
         if (type === 'pie') {
             return (
-                <div className="w-full h-[150px] md:h-[180px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                <div className="w-full h-[150px] md:h-[180px] relative">
+                    <ResponsiveContainer width="100%" height="100%" minHeight={150}>
                         <PieChart>
                             <Pie 
                                 data={field.data} 
@@ -180,8 +180,8 @@ const SummaryTab = ({ analytics }) => {
             );
         } else if (type === 'bar_vertical') {
             return (
-                <div className="w-full h-[150px] md:h-[180px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                <div className="w-full h-[150px] md:h-[180px] relative">
+                    <ResponsiveContainer width="100%" height="100%" minHeight={150}>
                         <BarChart data={field.data} margin={{ top: 5, right: 10, left: -25, bottom: 20 }}>
                             <XAxis dataKey="name" tick={{ fontSize: 8 }} interval={0} angle={-30} textAnchor="end" />
                             <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 8 }} />
@@ -195,8 +195,8 @@ const SummaryTab = ({ analytics }) => {
             );
         } else if (type === 'bar_horizontal') {
             return (
-                <div className="w-full h-[150px] md:h-[180px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                <div className="w-full h-[150px] md:h-[180px] relative">
+                    <ResponsiveContainer width="100%" height="100%" minHeight={150}>
                         <BarChart data={field.data} layout="vertical" margin={{ left: -10, right: 10, top: 0, bottom: 5 }}>
                             <XAxis type="number" hide />
                             <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 8 }} />

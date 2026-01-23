@@ -155,7 +155,7 @@ export default function DashboardGraficos() {
               <h2 className="text-lg font-bold text-gray-800">Distribución por Categoría</h2>
            </div>
            
-           <div className="h-[300px] w-full">
+           <div className="h-[300px] w-full relative">
               <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                 <PieChart>
                   <Pie
@@ -189,7 +189,7 @@ export default function DashboardGraficos() {
               <h2 className="text-lg font-bold text-gray-800">Estado de los Formularios</h2>
            </div>
            
-           <div className="h-[300px] w-full">
+           <div className="h-[300px] w-full relative">
               <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                 <PieChart>
                   <Pie
@@ -233,8 +233,8 @@ export default function DashboardGraficos() {
               </span>
            </div>
 
-           <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+           <div className="h-[300px] w-full relative">
+              <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                  <BarChart data={stats?.submissions_trend || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
                     <XAxis 

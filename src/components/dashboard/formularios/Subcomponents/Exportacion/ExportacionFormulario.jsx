@@ -6,12 +6,12 @@ import {
   Calendar, 
   BarChart3, 
   ClipboardList,
-  ArrowRight,
   Loader2,
   AlertCircle
 } from "lucide-react";
 import formsApi from "../../../../../api/formsApi";
 import { toast } from "react-hot-toast";
+import * as XLSX from "xlsx";
 
 
 
@@ -46,20 +46,189 @@ export default function ExportacionFormulario() {
     fetchForms();
   }, [fetchForms]);
 
-  const handleExportExcel = (formId, formName) => {
-    // Como no podemos tocar el backend, simulamos el inicio de la descarga
-    // o apuntamos al endpoint de respuestas si el backend ya soporta algún tipo de exportación básica.
-    toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 2000)),
-      {
-        loading: `Preparando Excel para "${formName}"...`,
-        success: "Descarga iniciada correctamente (Simulado)",
-        error: "Error al generar el archivo",
-      }
-    );
+  const handleExportExcel = async (formId, formName) => {
+    const toastId = toast.loading(`Preparando exportación para "${formName}"...`);
     
-    // Aquí iría la lógica real de descarga si el endpoint existiera:
-    // window.open(`${config.apiUrl}/forms/${formId}/export/excel`, '_blank');
+    try {
+      // 1. Obtener los datos del formulario (estructura) y las respuestas
+      const [formRes, responsesRes] = await Promise.all([
+        formsApi.getForm(formId),
+        formsApi.getFormResponses(formId, { page: 1, per_page: 500 }) // Intentamos traer bastantes de una vez
+      ]);
+
+      const formBody = formRes.data || formRes;
+      const form = formBody.form || formBody.data || formBody;
+      const formFields = form.fields || [];
+      
+      const body = responsesRes.data || responsesRes;
+      let allResponses = body.data || (Array.isArray(body) ? body : []);
+      const meta = body.meta || {};
+      
+      // 2. Obtener todas las páginas restantes si existen (si hay más de 500)
+      if (meta.last_page > 1) {
+        const promises = [];
+        for (let p = 2; p <= meta.last_page; p++) {
+          promises.push(formsApi.getFormResponses(formId, { page: p, per_page: 500 }));
+        }
+        
+        const results = await Promise.all(promises);
+        results.forEach(res => {
+          const pageBody = res.data || res;
+          const pageData = pageBody.data || (Array.isArray(pageBody) ? pageBody : []);
+          allResponses = [...allResponses, ...pageData];
+        });
+      }
+
+      if (allResponses.length === 0) {
+        toast.error("No hay respuestas para exportar", { id: toastId });
+        return;
+      }
+
+      // 3. Normalizar los datos para el Excel
+      const excelData = allResponses.map(submission => {
+        const row = {
+          "ID Respuesta": submission.id,
+          "Fecha de Envío": submission.submitted_at ? new Date(submission.submitted_at).toLocaleString() : 'N/A',
+          "Usuario": submission.user?.name || 
+                     (submission.user?.first_name ? `${submission.user.first_name} ${submission.user.last_name || ''}` : null) || 
+                     submission.submitted_by_name || 
+                     submission.submitted_by || 
+                     "Anónimo"
+        };
+
+        // Mapear cada campo/pregunta usando la definición del formulario
+        formFields.forEach(field => {
+          // 1. Identificar el tipo de campo de forma robusta y filtrar inmediatamente
+          const typeSlug = String(field.field_type?.slug || field.type_slug || field.type || field.fieldType?.slug || 'text').toLowerCase();
+          
+          // FILTRO ESTRICTO: Solo preguntas reales. 
+          const excludedTypes = [
+            'title', 'paragraph', 'section', 'divider', 'spacer', 'image', 'video', 'header', 'rich_text',
+            'image-display', 'video-display', 'section-break', 'title-display'
+          ];
+          
+          if (excludedTypes.includes(typeSlug)) {
+            return;
+          }
+
+          // Buscamos la respuesta correspondiente a este campo
+          const fieldSubmission = submission.field_submissions?.find(fs => 
+            String(fs.form_field_id) === String(field.id) || 
+            String(fs.field?.id) === String(field.id) ||
+            String(fs.field_id) === String(field.id)
+          );
+
+          let rawValue = fieldSubmission?.value;
+          const questionLabel = field.label || field.name || `Pregunta ${field.id}`;
+
+          if (rawValue !== null && rawValue !== undefined && rawValue !== "") {
+            let fieldOptions = field.options || {};
+            if (typeof fieldOptions === 'string') {
+              try { fieldOptions = JSON.parse(fieldOptions); } catch(e) {}
+            }
+            const choices = (fieldOptions.choices || fieldOptions.options || []).filter(Boolean);
+
+            if (typeSlug.includes('grid')) {
+              // --- CASO ESPECIAL: GRID (FLATTENED) ---
+              try {
+                const data = (typeof rawValue === 'string') ? JSON.parse(rawValue) : rawValue;
+                const rows = fieldOptions.rows || [];
+                const columns = fieldOptions.columns || [];
+                
+                if (rows.length > 0 && columns.length > 0) {
+                  rows.forEach(r => {
+                    const rowColHeader = `${questionLabel} [${r.label}]`;
+                    const cellVal = (data && typeof data === 'object') 
+                      ? (data[r.id] ?? data[String(r.id)] ?? data[r.label] ?? data[r.name] ?? null)
+                      : null;
+
+                    if (cellVal === null || cellVal === undefined || cellVal === "") {
+                      row[rowColHeader] = "";
+                    } else {
+                      const cellArray = Array.isArray(cellVal) ? cellVal : [cellVal];
+                      const labels = cellArray.map(cv => {
+                        const col = columns.find(c => 
+                          String(c.id) === String(cv) || 
+                          String(c.value) === String(cv) || 
+                          String(c.label) === String(cv)
+                        );
+                        return col ? col.label : cv;
+                      }).filter(Boolean);
+                      
+                      row[rowColHeader] = labels.join(", ") || "";
+                    }
+                  });
+                  return; // Terminamos con este campo ya que se expandió en varias columnas
+                }
+              } catch (e) {
+                row[questionLabel] = String(rawValue);
+                return;
+              }
+            }
+
+            // --- CASO ESTÁNDAR: OTROS CAMPOS ---
+            let value = "";
+            if (choices.length > 0) {
+              // Mapeo de select/radio/checkbox simple con opciones
+              if (Array.isArray(rawValue)) {
+                value = rawValue.map(v => {
+                  const choice = choices.find(c => String(c.id) === String(v) || String(c.value) === String(v) || String(c.label) === String(v));
+                  return choice ? choice.label : v;
+                }).join(", ");
+              } else {
+                const choice = choices.find(c => String(c.id) === String(rawValue) || String(c.value) === String(rawValue) || String(c.label) === String(rawValue));
+                value = choice ? choice.label : rawValue;
+              }
+            } else if (typeSlug === 'checkbox') {
+              // Checkbox simple sin opciones (booleano)
+              value = (String(rawValue) === "1" || rawValue === true || String(rawValue) === "true") ? "Sí" : "No";
+            } else if (Array.isArray(rawValue)) {
+              value = rawValue.join(", ");
+            } else if (typeSlug === 'file') {
+              value = fieldSubmission.file_url || rawValue;
+            } else {
+              value = String(rawValue);
+            }
+            row[questionLabel] = value;
+          } else {
+            // Si no hay respuesta, dejamos la celda vacía
+            if (!typeSlug.includes('grid')) {
+              row[questionLabel] = "";
+            } else {
+              // Para grids vacíos, también creamos las columnas vacías
+              let fieldOptions = field.options || {};
+              if (typeof fieldOptions === 'string') { try { fieldOptions = JSON.parse(fieldOptions); } catch(e) {} }
+              const rows = fieldOptions.rows || [];
+              rows.forEach(r => { row[`${questionLabel} [${r.label}]`] = ""; });
+            }
+          }
+        });
+
+        return row;
+      });
+
+      // 4. Crear el libro de Excel
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      
+      // Ajustar anchos de columna automáticamente
+      const wscols = Object.keys(excelData[0] || {}).map(key => ({
+        wch: Math.max(key.length, 15)
+      }));
+      worksheet['!cols'] = wscols;
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Respuestas");
+
+      // 5. Generar el archivo y descargar
+      const cleanFormName = formName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      const fileName = `${cleanFormName}_respuestas_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+
+      toast.success("Excel generado correctamente", { id: toastId });
+    } catch (error) {
+      console.error("Error al exportar a Excel:", error);
+      toast.error("Error al generar el archivo Excel. Verifica tu conexión.", { id: toastId });
+    }
   };
 
   const categories = [
@@ -70,9 +239,9 @@ export default function ExportacionFormulario() {
   ];
 
   return (
-    <div className="p-4 sm:p-6 space-y-8 animate-fadeIn">
+    <div className="p-4 sm:p-6 space-y-6 animate-fadeIn">
       {/* Header Interactivo */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
             <div className="p-2 bg-green-50 rounded-lg">
@@ -119,12 +288,12 @@ export default function ExportacionFormulario() {
 
       {/* Grid de Formularios */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 space-y-4">
+        <div className="flex flex-col items-center justify-center py-20 space-y-4">
           <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
           <p className="text-gray-500 font-medium">Buscando formularios disponibles...</p>
         </div>
       ) : error ? (
-        <div className="flex flex-col items-center justify-center py-20 px-6 bg-red-50 rounded-3xl border border-red-100 text-center space-y-4">
+        <div className="flex flex-col items-center justify-center py-16 px-6 bg-red-50 rounded-3xl border border-red-100 text-center space-y-4">
           <div className="p-4 bg-white rounded-2xl shadow-sm text-red-500">
             <AlertCircle size={40} />
           </div>
@@ -139,7 +308,7 @@ export default function ExportacionFormulario() {
           </div>
         </div>
       ) : forms.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-dashed border-gray-200 text-center">
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-200 text-center">
           <div className="p-5 bg-gray-50 rounded-full text-gray-300 mb-6">
             <ClipboardList size={60} />
           </div>
@@ -149,7 +318,7 @@ export default function ExportacionFormulario() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {forms.map((form) => (
             <div 
               key={form.ulid || form.id} 
@@ -169,7 +338,7 @@ export default function ExportacionFormulario() {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-bold text-gray-900 leading-tight line-clamp-2 min-h-[3rem] group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-bold text-base text-gray-900 leading-snug line-clamp-3 min-h-[4rem] group-hover:text-blue-600 transition-colors">
                     {form.title}
                   </h3>
                   <p className="text-xs text-gray-500 flex items-center gap-1.5">
@@ -194,20 +363,22 @@ export default function ExportacionFormulario() {
               </div>
 
               {/* Acciones de la Card */}
-              <div className="p-4 bg-gray-50/50 flex items-center justify-between group-hover:bg-white transition-colors">
-                <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-tighter">
-                  <Download size={14} className="text-gray-300" />
-                  Formato XLS
+              <div className="p-4 bg-gray-50/50 group-hover:bg-white transition-colors">
+                <div className="flex flex-nowrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-tighter shrink-0">
+                    <Download size={14} className="text-gray-300" />
+                    XLS
+                  </div>
+                  <button 
+                    onClick={() => handleExportExcel(form.ulid || form.id, form.title)}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-white text-green-700 border border-green-200 rounded-xl shadow-sm hover:bg-green-600 hover:text-white hover:border-green-600 transition-all font-bold text-xs md:text-sm group/btn disabled:opacity-50"
+                    disabled={!form.submissions_count || form.submissions_count === 0}
+                    title={!form.submissions_count ? "Sin respuestas para exportar" : "Descargar Excel"}
+                  >
+                    <span>Exportar</span>
+                    <Download size={16} className="group-hover/btn:translate-y-0.5 transition-transform" />
+                  </button>
                 </div>
-                <button 
-                  onClick={() => handleExportExcel(form.ulid || form.id, form.title)}
-                  className="flex items-center justify-center gap-2 px-4 py-2 bg-white text-green-700 border border-green-200 rounded-xl shadow-sm hover:bg-green-600 hover:text-white hover:border-green-600 transition-all font-bold group/btn disabled:opacity-50"
-                  disabled={!form.submissions_count || form.submissions_count === 0}
-                  title={!form.submissions_count ? "Sin respuestas para exportar" : "Descargar Excel"}
-                >
-                  <span className="text-sm">Exportar</span>
-                  <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
-                </button>
               </div>
             </div>
           ))}
@@ -215,14 +386,14 @@ export default function ExportacionFormulario() {
       )}
 
       {/* Footer Info */}
-      <div className="mt-8 p-6 bg-blue-50/50 rounded-2xl border border-blue-100 flex items-start gap-4">
+      <div className="mt-6 p-5 bg-blue-50/50 rounded-2xl border border-blue-100 flex items-start gap-4">
         <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
           <AlertCircle size={20} />
         </div>
         <div className="space-y-1">
           <p className="text-sm font-bold text-blue-900">Nota de Exportación</p>
           <p className="text-sm text-blue-800/80 leading-relaxed">
-            Las exportaciones solo se generan para formularios que tengan **al menos una respuesta registrada**. 
+            Las exportaciones solo se generan para formularios que tengan <strong>al menos una respuesta registrada</strong>. 
             El archivo Excel incluirá todas las preguntas, metadatos de usuario (si aplica) y marcas de tiempo de envío.
           </p>
         </div>
