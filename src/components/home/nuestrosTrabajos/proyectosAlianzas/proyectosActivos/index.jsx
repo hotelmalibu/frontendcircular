@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Download, MapPin, Globe, Briefcase, Filter } from "lucide-react";
+import { ArrowRight, Download, MapPin, Globe, Briefcase, Filter, Search, X } from "lucide-react";
 import { getImageProxyUrl } from "../../../../../utils/imageUtils.js";
 import { getAllProjects } from "../../../../../api/projectsApi.js";
 import { getProjectTypes } from "../../../../../api/projectTypesApi.js";
@@ -129,6 +129,7 @@ export default function ProyectosYAlianzas() {
   const [categories, setCategories] = useState([]);
   const [territorialTypeId, setTerritorialTypeId] = useState(null);
   const [sectorialTypeId, setSectorialTypeId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -191,6 +192,14 @@ export default function ProyectosYAlianzas() {
     filteredProjects = filteredProjects.filter(p => p.project_type_id === typeId);
   }
 
+  // Filtrado por buscador
+  if (searchQuery.trim()) {
+    const query = searchQuery.toLowerCase();
+    filteredProjects = filteredProjects.filter(p =>
+      (p.title || p.titulo || "").toLowerCase().includes(query)
+    );
+  }
+
   const isFortalecimiento = activeCategory.name === FORTALECIMIENTO_CATEGORY_NAME;
 
   return (
@@ -215,6 +224,31 @@ export default function ProyectosYAlianzas() {
 
       {/* CONTENIDO PRINCIPAL */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-20 mt-12">
+
+        {/* BUSCADOR */}
+        <div className="max-w-2xl mx-auto mb-10">
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className={`w-5 h-5 transition-colors duration-300 ${searchQuery ? "text-[#2B65AC]" : "text-gray-400"}`} />
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar proyectos por nombre..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-12 py-4 bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl shadow-sm focus:ring-4 focus:ring-[#2B65AC]/10 focus:border-[#2B65AC] outline-none transition-all duration-300 text-gray-700 font-medium placeholder:text-gray-400"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-red-500 transition-colors"
+                title="Limpiar búsqueda"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* FILTRO DE CATEGORÍAS GLOBALES */}
         <div className="mb-12">
