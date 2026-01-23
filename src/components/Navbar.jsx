@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 import { getAllProjects } from "../api/projectsApi";
-import { getAllCategories } from "../api/categoriesApi";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -510,17 +509,14 @@ export default function Navbar({ onMenuClick }) {
 
   // --- DATOS DINÁMICOS ---
   const [projectsList, setProjectsList] = useState([]);
-  const [categoriesList, setCategoriesList] = useState([]);
 
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
-        const [projRes, catRes] = await Promise.all([
-          getAllProjects({ per_page: 100 }),
-          getAllCategories()
+        const [projRes] = await Promise.all([
+          getAllProjects({ per_page: 100 })
         ]);
         setProjectsList(projRes?.data?.items || []);
-        setCategoriesList(catRes?.data?.items || []);
       } catch (error) {
         console.error("Error fetching menu data:", error);
       }
@@ -723,6 +719,12 @@ export default function Navbar({ onMenuClick }) {
     (user.role?.toLowerCase() === "admin" ||
       user.role_slug?.toLowerCase() === "admin" ||
       user.role?.toLowerCase() === "administrador");
+
+  const isAfiliado =
+    user &&
+    (user.role_slug?.toLowerCase() === "afiliado" ||
+      user.role?.toLowerCase() === "afiliado" ||
+      user.role?.toLowerCase() === "afiliados");
 
   useEffect(() => {
     if (user && isAdmin) {
@@ -1121,8 +1123,8 @@ export default function Navbar({ onMenuClick }) {
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto py-4">
-                {isInternalPage ? (
-                  /* Menú Móvil Dashboard (Solo visible en páginas internas/dashboard) */
+                {isInternalPage && !isAfiliado ? (
+                  /* Menú Móvil Dashboard (Solo visible en páginas internas/dashboard para no afiliados) */
                   <div className="flex flex-col gap-2">
                     {[
                       {
