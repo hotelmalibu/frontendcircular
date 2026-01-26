@@ -5,8 +5,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
-  Box, GlassWater, Trash2, Recycle, Target, MapPin, Lightbulb, GraduationCap,
-  Package, ShoppingCart, Factory, Truck
+  Files, GlassWater, Trash2, Recycle, Target, MapPin, Lightbulb, GraduationCap,
+  Package, ShoppingCart, Factory, Truck, Box
 } from 'lucide-react';
 
 
@@ -228,7 +228,7 @@ export default function Index() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Box size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <Files size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
               <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Papel y cartón</h4>
             </div>
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
@@ -240,7 +240,7 @@ export default function Index() {
               <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Basuras</h4>
             </div>
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Package size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <Box size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
               <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Metal</h4>
             </div>
           </div>
