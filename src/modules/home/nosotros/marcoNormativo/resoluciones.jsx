@@ -5,8 +5,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
-  Box, GlassWater, Trash2, Recycle, Target, MapPin, Lightbulb, GraduationCap,
-  Package, ShoppingCart, Factory, Truck
+  Files, GlassWater, Trash2, Recycle, Target, MapPin, Lightbulb, GraduationCap,
+  Package, ShoppingCart, Factory, Truck, Box
 } from 'lucide-react';
 
 
@@ -15,6 +15,7 @@ import {
 import pdf1407 from "../../../../assets/marconormativo/resoluciones/resolucion-1407-de-2018.pdf";
 import pdf1342 from "../../../../assets/marconormativo/resoluciones/resolucion-1342-de-2020.pdf";
 import pdf0803 from "../../../../assets/marconormativo/resoluciones/RES.-0803-DE-24-JUN-2024-REDUCCION-GRADUAL-DE-PRODUCCION-Y-CONSUMO-CIERTOS-PRODUCTOS-PLASTICOS-4 (1).pdf";
+import decreto1381 from "../../../../assets/marconormativo/resoluciones/DECRETO_1381_DE_2024.pdf";
 
 // Colores del manual de marca
 const COLOR_AZUL_PRINCIPAL = '#1E305D';
@@ -94,6 +95,12 @@ export default function Index() {
               </div>
               <div className="flex items-baseline mt-2">
                 <span className="font-display font-bold text-7xl text-white">803</span>
+                <span className="font-display font-bold text-4xl text-white ml-2">RES.</span>
+                <span className="font-sans text-3xl text-gray-200 ml-3">de 2024</span>
+              </div>
+              <div className="flex items-baseline mt-2">
+                <span className="font-display font-bold text-7xl text-white">1381</span>
+                <span className="font-display font-bold text-4xl text-white ml-2">DEC.</span>
                 <span className="font-sans text-3xl text-gray-200 ml-3">de 2024</span>
               </div>
               <p className="text-sm text-gray-300 mt-4">Ministerio de Ambiente y Desarrollo Sostenible.</p>
@@ -219,9 +226,9 @@ export default function Index() {
           <h2 className="text-4xl font-display font-bold text-center mb-10" style={{ color: COLOR_AZUL_PRINCIPAL }}>
             3. ¿QUÉ ESTÁ REGULADO?
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Box size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <Files size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
               <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Papel y cartón</h4>
             </div>
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
@@ -230,6 +237,10 @@ export default function Index() {
             </div>
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
               <Trash2 size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Basuras</h4>
+            </div>
+            <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
+              <Box size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
               <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Metal</h4>
             </div>
           </div>
@@ -369,6 +380,12 @@ export default function Index() {
                 file: pdf0803,
                 desc:
                   'Reglamenta la Ley 2232 de 2022 para reducir gradualmente los plásticos de un solo uso. Promueve materiales alternativos y el uso de contenido reciclado para proteger el ambiente.'
+              },
+              {
+                year: 'Decreto 1381 de 2024',
+                file: decreto1381,
+                desc:
+                  'Establece medidas para la gestión integral de residuos y promueve la transición hacia modelos de economía circular, fortaleciendo la normativa ambiental vigente.'
               }
             ].map((res, index) => (
               <div
