@@ -2,9 +2,18 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import fondo1 from '../../assets/home/Carrusel/Index_imagen_1.jpg';
 import fondo2 from '../../assets/home/Carrusel/Index_imagen_2.jpeg';
+import fondo3 from '../../assets/home/Carrusel/Index_imagen_3.jpeg';
 import fondo4 from '../../assets/home/Carrusel/Index_imagen_4.png';
 
 const SLIDES = [
+  {
+    image: fondo3,
+    title: 'Impulsando el país hacia',
+    subtitle: 'la economía circular',
+    description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
+    button1: 'Sobre nosotros',
+    button2: 'Conoce nuestras estrategias'
+  },
   {
     image: fondo1,
     title: 'Impulsando el país hacia',
@@ -42,8 +51,7 @@ export default function IndexImagen() {
 
   // Duraciones personalizadas para cada slide
   const getDuration = useCallback((slideIndex) => {
-    if (slideIndex === 0) return 15; // Primera imagen: 15 segundos
-    return 8; // Otras imágenes: 8 segundos
+    return 8; // Todas las imágenes: 8 segundos
   }, []);
 
   useEffect(() => {

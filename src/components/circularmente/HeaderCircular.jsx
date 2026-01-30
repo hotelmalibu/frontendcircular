@@ -37,14 +37,14 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
 
         {/* Descripción */}
         <motion.p
-          className="text-lg md:text-xl text-[#b9e31b] mt-6 max-w-3xl mx-auto leading-relaxed"
+          className="text-lg md:text-xl text-white mt-6 max-w-3xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
         >
           Conecta con transformadores líderes en economía circular.
           <br />
-          <span className="font-semibold text-[#b9e31b]">
+          <span className="font-semibold text-white">
             La plataforma impulsa la economía circular de envases y empaques.
           </span>
         </motion.p>
@@ -60,7 +60,7 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
             <>
               <button
                 onClick={() => navigate("/login")}
-                className="group bg-gradient-to-b from-[#007f4f] to-[#00ab6d] justify-center text-white px-12 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 w-64"
+                className="group bg-white justify-center text-[#007f4f] px-12 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2 w-64"
               >
                 Iniciar Sesión
                 <ArrowRight
@@ -85,7 +85,7 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
           ) : (
             <button
               onClick={() => navigate("/dashboard")}
-              className="group bg-[#B1D357] text-[#0a2342] px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2">
+              className="group bg-white text-[#0a2342] px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2">
               Ir al Dashboard
               <ArrowRight
                 size={18}

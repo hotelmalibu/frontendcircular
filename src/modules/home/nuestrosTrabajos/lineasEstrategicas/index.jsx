@@ -13,6 +13,7 @@ import imgInnovacion from "../../../../assets/lineasestrategicas/innovacion.png"
 import imgInclusion from "../../../../assets/lineasestrategicas/inclusion.png";
 import imgConsumo from "../../../../assets/lineasestrategicas/consumoresponsable.png";
 import imgCadenas from "../../../../assets/lineasestrategicas/cadenasdevalor.png";
+import bannerImg from "../../../../assets/lineasestrategicas/Banner.png";
 import ImpactSection from "../../../../components/home/nosotros/conocenos/quienesSomos/ImpactSection.jsx";
 
 const DATA_LINEAS = [
@@ -165,7 +166,7 @@ export default function LineasEstrategicasPage() {
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url("https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2070&auto=format&fit=crop")`
+            backgroundImage: `url(${bannerImg})`
           }}
         />
 
