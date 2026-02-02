@@ -197,6 +197,7 @@ function MobileMenuDropdown({
 function MegaMenuDropdown({
   label,
   sections = [],
+  path,
   showWhiteBg,
   showHover,
   showWhiteText,
@@ -225,6 +226,18 @@ function MegaMenuDropdown({
   }, []);
 
   const textColorClass = showWhiteText ? "text-white" : "text-gray-700";
+
+  if (path) {
+    return (
+      <Link
+        to={path}
+        className={`text-base lg:text-base font-semibold fontfamily-montserrat transition-all menu-underline pb-1 ${textColorClass}`}
+        style={{ "--hover-color": BRAND.blue }}
+      >
+        {label}
+      </Link>
+    );
+  }
 
   return (
     <div
@@ -698,10 +711,8 @@ export default function Navbar({ onMenuClick }) {
     },
     {
       name: "Circularmente",
-      subsections: [
-        { title: "Micrositio", path: "/circularmente", items: [] },
-        { title: "Herramientas digitales", path: "#", items: [] },
-      ],
+      path: "/circularmente",
+      subsections: [],
     },
   ];
 
@@ -890,6 +901,7 @@ export default function Navbar({ onMenuClick }) {
                 key={section.name}
                 label={section.name}
                 sections={section.subsections}
+                path={section.path}
                 showWhiteBg={showWhiteBg}
                 showHover={isPublicPage || isTransparentNavPath}
                 showWhiteText={showWhiteText}
@@ -1186,15 +1198,26 @@ export default function Navbar({ onMenuClick }) {
                 ) : (
                   /* Menú Móvil Público */
                   menuSections.map((section) => (
-                    <MobileMenuDropdown
-                      key={section.name}
-                      title={section.name}
-                      subsections={section.subsections}
-                      showWhiteBg={true}
-                      showHover={false}
-                      showWhiteText={false}
-                      onClose={handleMobileMenuClick}
-                    />
+                    section.path ? (
+                      <Link
+                        key={section.name}
+                        to={section.path}
+                        onClick={handleMobileMenuClick}
+                        className={`block py-4 px-4 font-bold uppercase text-sm border-b border-gray-100 ${showWhiteText ? "text-white" : "text-gray-800"}`}
+                      >
+                        {section.name}
+                      </Link>
+                    ) : (
+                      <MobileMenuDropdown
+                        key={section.name}
+                        title={section.name}
+                        subsections={section.subsections}
+                        showWhiteBg={true}
+                        showHover={false}
+                        showWhiteText={false}
+                        onClose={handleMobileMenuClick}
+                      />
+                    )
                   ))
                 )}
               </div>

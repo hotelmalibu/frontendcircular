@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import fondo1 from '../../assets/home/Carrusel/Index_imagen_1.jpg';
-import fondo2 from '../../assets/home/Carrusel/Index_imagen_2.jpeg';
 import fondo3 from '../../assets/home/Carrusel/Index_imagen_3.jpeg';
 import fondo4 from '../../assets/home/Carrusel/Index_imagen_4.png';
 
@@ -23,14 +22,6 @@ const SLIDES = [
     button2: 'Conoce nuestras estrategias'
   },
   {
-    image: fondo2,
-    title: 'Impulsando el país hacia',
-    subtitle: 'la economía circular',
-    description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-    button1: 'Sobre nosotros',
-    button2: 'Conoce nuestras estrategias'
-  },
-  {
     image: fondo4,
     title: 'Impulsando el país hacia',
     subtitle: 'la economía circular',
@@ -42,6 +33,12 @@ const SLIDES = [
 
 export default function IndexImagen() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  useEffect(() => {
+    if (currentSlide >= SLIDES.length) {
+      setCurrentSlide(0);
+    }
+  }, [currentSlide]);
+
   const [isAutoplay] = useState(true);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -436,15 +433,15 @@ export default function IndexImagen() {
           {/* Títulos con animación SOLO AL CARGAR */}
           <div className="mb-6">
             <h1 className={`animate-on-load ${hasLoaded ? 'loaded' : ''} text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-2`}>
-              <span className="block whitespace-normal md:whitespace-nowrap">{SLIDES[currentSlide].title}</span>
-              <span className="block whitespace-normal md:whitespace-nowrap">{SLIDES[currentSlide].subtitle}</span>
+              <span className="block whitespace-normal md:whitespace-nowrap">{SLIDES[currentSlide]?.title}</span>
+              <span className="block whitespace-normal md:whitespace-nowrap">{SLIDES[currentSlide]?.subtitle}</span>
             </h1>
           </div>
 
 
           {/* Descripción */}
           <p className={`animate-on-load ${hasLoaded ? 'loaded' : ''} text-gray-100 text-base md:text-lg max-w-2xl leading-relaxed mb-8`}>
-            {SLIDES[currentSlide].description}
+            {SLIDES[currentSlide]?.description}
           </p>
 
 
@@ -453,7 +450,7 @@ export default function IndexImagen() {
             {/* Botón secundario - Contorno limpio */}
             <Link to="/quines-somos" className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
               <span className="relative z-10 flex items-center gap-2">
-                {SLIDES[currentSlide].button1}
+                {SLIDES[currentSlide]?.button1}
                 <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -464,7 +461,7 @@ export default function IndexImagen() {
             {/* Botón primario - */}
             <Link to="/lineas-estrategicas" className="btn-primary group relative px-8 py-3 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
               <span className="relative z-10 flex items-center gap-2">
-                {SLIDES[currentSlide].button2}
+                {SLIDES[currentSlide]?.button2}
                 <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
