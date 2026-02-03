@@ -13,6 +13,7 @@ import {
   MessageSquare,
   LayoutDashboard,
   ShieldAlert,
+  ArrowRight,
   FileText,
   ClipboardList,
   Settings,
@@ -913,6 +914,21 @@ export default function Navbar({ onMenuClick }) {
 
         {/* BOTONES Y USUARIO */}
         <div className="flex items-center gap-3 md:gap-5 ml-auto">
+          {/* ÚNASE A VISIÓN CIRCULAR (Solo para invitados) */}
+          {!user && (
+            <a
+              href="https://ecocircular.creativostecnologicosit.com/encuestas/01kf9vjyyz000n6hqzmcnr4nx0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`hidden lg:flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-[13px] uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 ${showWhiteText
+                ? "bg-white text-[#2C67B0] hover:bg-gray-100"
+                : "bg-[#B1D357] text-[#005380] hover:bg-[#9CB84D]"
+                }`}
+            >
+              Únase a Visión Circular
+              <ArrowRight size={16} />
+            </a>
+          )}
           {/* Alertas y Notificaciones */}
           {user && (
             <div className="flex items-center gap-1">
@@ -1219,6 +1235,21 @@ export default function Navbar({ onMenuClick }) {
                       />
                     )
                   ))
+                )}
+
+                {/* BOTÓN ÚNASE MÓVIL (Solo para invitados) */}
+                {!user && (
+                  <div className="px-4 py-6 mt-4 border-t border-gray-100">
+                    <a
+                      href="https://ecocircular.creativostecnologicosit.com/encuestas/01kf9vjyyz000n6hqzmcnr4nx0"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex justify-center items-center gap-2 w-full py-4 bg-[#B1D357] text-[#005380] rounded-xl font-bold shadow-lg hover:bg-[#9CB84D] transition-all active:scale-95"
+                    >
+                      Únase a Visión Circular
+                      <ArrowRight size={18} />
+                    </a>
+                  </div>
                 )}
               </div>
             </div>

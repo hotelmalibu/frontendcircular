@@ -29,7 +29,7 @@ export default function Footer() {
           </div>
 
           {/* Info & Socials - Right Side Group */}
-          <div className="flex flex-col md:flex-row gap-10 md:gap-16 text-center md:text-left">
+          <div className="flex flex-col md:flex-row gap-10 md:gap-12 lg:gap-16 text-center md:text-left">
 
             {/* Contacto */}
             <div>
@@ -77,6 +77,21 @@ export default function Footer() {
                             bg-white/10 border border-white/20 hover:bg-[#00AB6D] hover:border-[#00AB6D] transition-all duration-300"
                 >
                   <Linkedin size={20} className="text-white" />
+                </a>
+              </div>
+            </div>
+
+            {/* Soporte */}
+            <div>
+              <h4 className="font-bold text-lg mb-4 text-white">Soporte</h4>
+              <div className="text-sm text-white/90 space-y-2 flex flex-col items-center md:items-start">
+                <a
+                  href="https://ecocircular.creativostecnologicosit.com/encuestas/01kgjqgjyhg1tknmfm7jsgfrp2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#00AB6D] transition-colors font-medium border border-white/20 rounded-lg px-4 py-2 hover:bg-white/5"
+                >
+                  Soporte Técnico
                 </a>
               </div>
             </div>
