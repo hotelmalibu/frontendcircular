@@ -16,6 +16,7 @@ import pdf1407 from "../../../../assets/marconormativo/resoluciones/resolucion-1
 import pdf1342 from "../../../../assets/marconormativo/resoluciones/resolucion-1342-de-2020.pdf";
 import pdf0803 from "../../../../assets/marconormativo/resoluciones/RES.-0803-DE-24-JUN-2024-REDUCCION-GRADUAL-DE-PRODUCCION-Y-CONSUMO-CIERTOS-PRODUCTOS-PLASTICOS-4 (1).pdf";
 import decreto1381 from "../../../../assets/marconormativo/resoluciones/DECRETO_1381_DE_2024.pdf";
+import decreto0670 from "../../../../assets/marconormativo/resoluciones/decreto-0670-del-17-de-junio-de-2025-1.pdf";
 
 // Colores del manual de marca
 const COLOR_AZUL_PRINCIPAL = '#1E305D';
@@ -102,6 +103,11 @@ export default function Index() {
                 <span className="font-display font-bold text-7xl text-white">1381</span>
                 <span className="font-display font-bold text-4xl text-white ml-2">DEC.</span>
                 <span className="font-sans text-3xl text-gray-200 ml-3">de 2024</span>
+              </div>
+              <div className="flex items-baseline mt-2">
+                <span className="font-display font-bold text-7xl text-white">0670</span>
+                <span className="font-display font-bold text-4xl text-white ml-2">DEC.</span>
+                <span className="font-sans text-3xl text-gray-200 ml-3">de 2025</span>
               </div>
               <p className="text-sm text-gray-300 mt-4">Ministerio de Ambiente y Desarrollo Sostenible.</p>
             </div>
@@ -386,6 +392,12 @@ export default function Index() {
                 file: decreto1381,
                 desc:
                   'Establece medidas para la gestión integral de residuos y promueve la transición hacia modelos de economía circular, fortaleciendo la normativa ambiental vigente.'
+              },
+              {
+                year: '0670 de 2025',
+                file: decreto0670,
+                desc:
+                  'Decreto 0670 del 17 de junio de 2025. Fortalece las medidas de gestión ambiental y economía circular, estableciendo nuevos lineamientos para el cumplimiento normativo.'
               }
             ].map((res, index) => (
               <div

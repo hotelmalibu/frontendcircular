@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { login as loginRequest } from "../../api/auth";
 import { AuthContext } from "../../context/AuthContext";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
-import Logo from "../../assets/fondosYlogos/Logo.png"; 
+import Logo from "../../assets/fondosYlogos/Logo.png";
 import LogoBlanco from "../../assets/fondosYlogos/Logo_blanco.png";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -42,17 +42,17 @@ export default function Login() {
         err.response?.data?.message ||
         err.message ||
         "Credenciales incorrectas. Inténtalo nuevamente.";
-      
+
       const newAttempts = failedAttempts + 1;
       setFailedAttempts(newAttempts);
 
       if (message.toLowerCase().includes('suspen')) {
-          setError(message);
+        setError(message);
       } else {
-           if (newAttempts === 3) {
-              setShowWarningModal(true);
-          }
-          setError(message);
+        if (newAttempts === 3) {
+          setShowWarningModal(true);
+        }
+        setError(message);
       }
 
     } finally {
@@ -62,15 +62,15 @@ export default function Login() {
 
   return (
     <div className="min-h-screen w-full flex bg-white font-sans">
-      
+
       {/* SECCIÓN IZQUIERDA - BRANDING (Solo visible en desktop) */}
       <div className="hidden lg:flex w-1/2 relative overflow-hidden flex-col justify-between p-12 text-white"
-           style={{ backgroundColor: BRAND.darkBlue }}>
-        
+        style={{ backgroundColor: BRAND.darkBlue }}>
+
         {/* Elementos Decorativos de Fondo (Círculos difuminados) */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#2C67B0] rounded-full mix-blend-multiply filter blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2 animate-blob"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#B1D357] rounded-full mix-blend-multiply filter blur-3xl opacity-10 translate-y-1/2 -translate-x-1/2 animate-blob animation-delay-2000"></div>
-        
+
         {/* Contenido Izquierda */}
         <div className="relative z-10">
           <img src={LogoBlanco} alt="Visión Circular" className="h-16 w-auto mb-8" />
@@ -80,21 +80,21 @@ export default function Login() {
           <h1 className="text-5xl font-bold leading-tight mb-6">
             Impulsando el país hacia la <span style={{ color: BRAND.green }}>economía circular</span>.
           </h1>
-          <p className="text-blue-100 text-lg max-w-md leading-relaxed">
-            Gestiona proyectos, monitorea indicadores y conecta con aliados estratégicos en una sola plataforma integral.
+          <p className="text-white text-xl font-bold max-w-md leading-relaxed opacity-90 drop-shadow-sm">
+            Conecta con aliados estrategicos en una sola plataforma integral
           </p>
         </div>
 
-        
+
       </div>
 
       {/* SECCIÓN DERECHA - FORMULARIO */}
       <div className="w-full lg:w-1/2 flex mt-24 items-center justify-center p-8 bg-gray-50/50">
         <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl shadow-xl border border-gray-100">
-          
+
           {/* Header Móvil (Logo visible solo en móvil) */}
           <div className="lg:hidden flex justify-center mb-8">
-             <img src={Logo} alt="Visión Circular" className="h-12 w-auto" />
+            <img src={Logo} alt="Visión Circular" className="h-12 w-auto" />
           </div>
 
           <div className="mb-8">
@@ -103,7 +103,7 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            
+
             {/* Input Email */}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700 ml-1">Correo Electrónico</label>
@@ -195,37 +195,37 @@ export default function Login() {
         </div>
       </div>
 
-        {/* Modal Global de Advertencia de Suspensión */}
-        {showWarningModal && createPortal(
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
-                <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform transition-all scale-100 border-l-4 border-yellow-500">
-                    <div className="flex flex-col items-center text-center">
-                        <div className="w-14 h-14 rounded-full bg-yellow-100 flex items-center justify-center mb-4 text-yellow-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                            </svg>
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">
-                            Advertencia de Seguridad
-                        </h3>
-                        <p className="text-gray-600 mb-6">
-                            Has fallado <strong>3 intentos</strong> de inicio de sesión. 
-                            <br/><br/>
-                            Si alcanzas los <strong>5 intentos fallidos</strong>, tu cuenta será suspendida temporalmente por seguridad.
-                            <br/>
-                            Podrás intentar de nuevo en algunas horas.
-                        </p>
-                        <button
-                            onClick={() => setShowWarningModal(false)}
-                            className="w-full px-4 py-3 bg-[#2C67B0] text-white rounded-xl font-bold hover:bg-[#005380] transition shadow-md"
-                        >
-                            Entendido
-                        </button>
-                    </div>
-                </div>
-            </div>,
-            document.body
-        )}
+      {/* Modal Global de Advertencia de Suspensión */}
+      {showWarningModal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform transition-all scale-100 border-l-4 border-yellow-500">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-14 h-14 rounded-full bg-yellow-100 flex items-center justify-center mb-4 text-yellow-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                Advertencia de Seguridad
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Has fallado <strong>3 intentos</strong> de inicio de sesión.
+                <br /><br />
+                Si alcanzas los <strong>5 intentos fallidos</strong>, tu cuenta será suspendida temporalmente por seguridad.
+                <br />
+                Podrás intentar de nuevo en algunas horas.
+              </p>
+              <button
+                onClick={() => setShowWarningModal(false)}
+                className="w-full px-4 py-3 bg-[#2C67B0] text-white rounded-xl font-bold hover:bg-[#005380] transition shadow-md"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       <style>{`
         @keyframes blob {
