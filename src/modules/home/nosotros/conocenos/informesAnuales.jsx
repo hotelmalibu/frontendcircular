@@ -42,43 +42,45 @@ export default function InformesAnuales() {
           if (possibleArrays.length > 0) newsArray = possibleArrays[0];
         }
 
-        const mappedNews = newsArray.map(n => {
-          const rawType = n.type || n.category || "";
-          let finalType = "Noticias";
+        const mappedNews = newsArray
+          .filter(n => (n.status || "").toLowerCase() === "published")
+          .map(n => {
+            const rawType = n.type || n.category || "";
+            let finalType = "Noticias";
 
-          // Logic key: identify if it belongs to "Documentos de interés"
-          if (rawType.toLowerCase().includes("doc") || rawType.toLowerCase().includes("interés")) {
-            finalType = "Documentos de interés";
-          }
-          // We can also include "Gestión documental" if desired, as per FeaturedSection logic
-          else if (rawType.toLowerCase().includes("gesti") || rawType.toLowerCase().includes("gestion")) {
-            finalType = "Gestión documental";
-          }
+            // Logic key: identify if it belongs to "Documentos de interés"
+            if (rawType.toLowerCase().includes("doc") || rawType.toLowerCase().includes("interés")) {
+              finalType = "Documentos de interés";
+            }
+            // We can also include "Gestión documental" if desired, as per FeaturedSection logic
+            else if (rawType.toLowerCase().includes("gesti") || rawType.toLowerCase().includes("gestion")) {
+              finalType = "Gestión documental";
+            }
 
-          let imageUrl = "";
-          if (n.upload_file && n.upload_file.url) {
-            imageUrl = n.upload_file.url;
-          } else if (n.image) {
-            imageUrl = n.image;
-          } else if (n.thumbnail) {
-            imageUrl = n.thumbnail;
-          } else if (n.cover) {
-            imageUrl = n.cover;
-          }
+            let imageUrl = "";
+            if (n.upload_file && n.upload_file.url) {
+              imageUrl = n.upload_file.url;
+            } else if (n.image) {
+              imageUrl = n.image;
+            } else if (n.thumbnail) {
+              imageUrl = n.thumbnail;
+            } else if (n.cover) {
+              imageUrl = n.cover;
+            }
 
-          return {
-            id: n.id || n._id || n.uid || Math.random(),
-            type: finalType,
-            topic: n.category_name || (n.category && typeof n.category === 'object' ? n.category.name : n.category) || "General",
-            title: n.title || n.name || "Sin título",
-            excerpt: stripHtml(n.description || n.excerpt),
-            image: getImageProxyUrl(imageUrl, { width: 600, quality: 80 }),
-            date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
-            slug: n.slug || (`noticia-${n.id || n._id || ''}`),
-            status: n.status || "",
-            source: 'news'
-          };
-        });
+            return {
+              id: n.id || n._id || n.uid || Math.random(),
+              type: finalType,
+              topic: n.category_name || (n.category && typeof n.category === 'object' ? n.category.name : n.category) || "General",
+              title: n.title || n.name || "Sin título",
+              excerpt: stripHtml(n.description || n.excerpt),
+              image: getImageProxyUrl(imageUrl, { width: 600, quality: 80 }),
+              date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
+              slug: n.slug || (`noticia-${n.id || n._id || ''}`),
+              status: n.status || "",
+              source: 'news'
+            };
+          });
 
         // --- Process Documents ---
         let documentsArray = [];
@@ -90,23 +92,25 @@ export default function InformesAnuales() {
           documentsArray = documentsResponse;
         }
 
-        const mappedDocuments = documentsArray.map(doc => {
-          const category = "Documentos de interés";
+        const mappedDocuments = documentsArray
+          .filter(doc => (doc.status || "").toLowerCase() === "approved")
+          .map(doc => {
+            const category = "Documentos de interés";
 
-          return {
-            id: `doc-${doc.id}`,
-            type: category,
-            topic: doc.category_name || (doc.category && typeof doc.category === 'object' ? doc.category.name : doc.category) || "Documento",
-            title: doc.name,
-            excerpt: doc.description,
-            image: "", // Documents usually don't have covers
-            date: new Date(doc.created_at).toLocaleDateString(),
-            slug: `documento-${doc.id}`,
-            status: doc.status,
-            source: 'document',
-            documentData: doc
-          };
-        });
+            return {
+              id: `doc-${doc.id}`,
+              type: category,
+              topic: doc.category_name || (doc.category && typeof doc.category === 'object' ? doc.category.name : doc.category) || "Documento",
+              title: doc.name,
+              excerpt: doc.description,
+              image: "", // Documents usually don't have covers
+              date: new Date(doc.created_at).toLocaleDateString(),
+              slug: `documento-${doc.id}`,
+              status: doc.status,
+              source: 'document',
+              documentData: doc
+            };
+          });
 
         // --- Process Projects ---
         let projectsArray = [];
@@ -127,6 +131,7 @@ export default function InformesAnuales() {
 
         const mappedProjects = projectsArray
           .filter(p => p && (p.upload_file || p.file)) // Only projects with files
+          .filter(p => (p.status || "").toLowerCase() === "approved")
           .map(p => {
             return {
               id: `project-${p.id}`,

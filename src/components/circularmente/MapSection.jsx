@@ -116,27 +116,68 @@ export default function MapSection() {
       <div className="relative z-10 w-full min-h-screen flex flex-col">
         {/* SECCIÓN: Acceso Requerido (sin login) */}
         {!user && (
-          <div className="flex-1 flex flex-col items-center justify-center px-6 py-20">
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-center mt-20 pt-12 border-t border-white/30 max-w-2xl"
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="bg-white/60 backdrop-blur-xl p-10 md:p-14 rounded-[3rem] border border-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] text-center max-w-3xl relative overflow-hidden"
             >
-              <MapPin className="w-16 h-16 text-[#1E305D] mx-auto mb-4" />
-              <h2 className="text-3xl md:text-4xl font-bold text-[#1E305D] mb-2">
-                Directorio de Empresas
-              </h2>
-              <p className="text-base md:text-lg text-[#1E305D]">
-                Selecciona una región para ver las empresas aliadas en economía circular.
-              </p>
+              {/* Decorative Blur Elements */}
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#00AB6D]/20 blur-[80px] rounded-full" />
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#1E305D]/20 blur-[80px] rounded-full" />
+
+              <div className="relative z-10">
+                <div className="w-24 h-24 bg-white rounded-3xl shadow-xl flex items-center justify-center mx-auto mb-8 transform -rotate-3 hover:rotate-0 transition-transform duration-500">
+                  <MapPin className="w-12 h-12 text-[#00AB6D]" />
+                </div>
+
+                <span className="inline-block bg-[#00AB6D]/10 text-[#00AB6D] text-[11px] font-bold uppercase tracking-[0.25em] px-5 py-2 rounded-full mb-6 border border-[#00AB6D]/20">
+                  Acceso Especial para Aliados
+                </span>
+
+                <h2 className="text-4xl md:text-6xl font-black text-[#1E305D] mb-6 tracking-tight leading-tight">
+                  Directorio de <span className="text-[#00AB6D]">Empresas</span>
+                </h2>
+
+                <div className="w-24 h-1.5 bg-gradient-to-r from-[#00AB6D] to-[#2C67B0] mx-auto rounded-full mb-8" />
+
+                <p className="text-gray-600 text-lg font-medium max-w-lg mx-auto leading-relaxed">
+                  Conecta con las organizaciones líderes que están transformando la economía circular en Colombia.
+                </p>
+              </div>
             </motion.div>
           </div>
         )}
 
         {/* SECCIÓN: Directorio de Empresas (con login) */}
         {user && (
-          <div className="flex-1 flex flex-col py-8 px-6 md:px-12 lg:px-20">
+          <div className="flex-1 flex flex-col py-6 px-6 md:px-12 lg:px-20">
+            {/* ENCABEZADO PREMIUM */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-8"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg border border-gray-100">
+                    <MapPin size={22} className="text-[#00AB6D]" />
+                  </div>
+                  <span className="text-[#00AB6D] font-bold text-[10px] uppercase tracking-[0.2em] bg-[#00AB6D]/5 px-4 py-1.5 rounded-full border border-[#00AB6D]/10">
+                    Ecosistema Colaborativo
+                  </span>
+                </div>
+                <h1 className="text-4xl md:text-6xl font-black text-[#1E305D] tracking-tight leading-none">
+                  Directorio de <span className="text-[#00AB6D]">Empresas</span>
+                </h1>
+                <div className="w-20 h-1 bg-[#00AB6D] rounded-full" />
+                <p className="text-gray-500 font-medium max-w-xl text-lg leading-relaxed">
+                  Encuentra aliados estratégicos, servicios especializados y productos circulares para potenciar tu organización.
+                </p>
+              </div>
+            </motion.div>
             {/* BUSCADOR MEJORADO */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
@@ -265,7 +306,7 @@ export default function MapSection() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-12"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-0"
                 >
                   {empresasFiltradas.map((empresa, idx) => (
                     <motion.div
@@ -334,21 +375,7 @@ export default function MapSection() {
               )}
             </div>
 
-            {/* ENCABEZADO ABAJO */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-center py-6 border-t border-white/30 mt-12"
-            >
-              <MapPin className="w-14 h-14 text-[#1E305D] mx-auto mb-3" />
-              <h2 className="text-2xl md:text-3xl font-bold text-[#1E305D] mb-1.5">
-                Directorio de Empresas
-              </h2>
-              <p className="text-sm md:text-base text-[#1E305D] max-w-2xl mx-auto">
-                Selecciona una región para ver las empresas aliadas en economía circular.
-              </p>
-            </motion.div>
+
           </div>
         )}
 
