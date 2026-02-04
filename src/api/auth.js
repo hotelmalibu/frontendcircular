@@ -28,3 +28,6 @@ export const updateUserStatus = (userId, status) => api.post(`/auth/users/${user
 export const getSecurityLogs = () => api.get(`/auth/security-logs`);
 export const markSecurityLogAsViewed = (id) => api.patch(`/auth/security-logs/${id}/viewed`);
 export const getActiveSessions = () => api.get(`/auth/active-sessions`);
+export const forgotPassword = (email) => api.post(`/auth/forgot-password`, { email });
+
+export const resetPassword = (data) => api.post(`/auth/reset-password`, data);
