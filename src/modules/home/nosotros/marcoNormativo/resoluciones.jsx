@@ -6,7 +6,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
   Files, GlassWater, Trash2, Recycle, Target, MapPin, Lightbulb, GraduationCap,
-  Package, ShoppingCart, Factory, Truck, Box
+  Package, ShoppingCart, Factory, Truck, Box, ScrollText, Milk, Anvil, Trash
 } from 'lucide-react';
 
 
@@ -234,20 +234,20 @@ export default function Index() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Files size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <ScrollText size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
               <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Papel y cartón</h4>
             </div>
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <GlassWater size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <Milk size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
               <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Vidrio</h4>
             </div>
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Trash2 size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
-              <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Basuras</h4>
+              <Anvil size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Metal</h4>
             </div>
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Box size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
-              <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Metal</h4>
+              <Trash size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Basuras</h4>
             </div>
           </div>
         </section>

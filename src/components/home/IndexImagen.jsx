@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
+import { ArrowRight } from 'lucide-react';
 import fondo1 from '../../assets/home/Carrusel/Index_imagen_1.jpg';
 import fondo3 from '../../assets/home/Carrusel/Index_imagen_3.jpeg';
 import fondo4 from '../../assets/home/Carrusel/Index_imagen_4.png';
@@ -32,6 +34,7 @@ const SLIDES = [
 ];
 
 export default function IndexImagen() {
+  const { user } = useContext(AuthContext);
   const [currentSlide, setCurrentSlide] = useState(0);
   useEffect(() => {
     if (currentSlide >= SLIDES.length) {
@@ -446,27 +449,41 @@ export default function IndexImagen() {
 
 
           {/* Botones estilo Citeo */}
-          <div className={`animate-buttons ${hasLoaded ? 'loaded' : ''} flex flex-wrap gap-4 `}>
-            {/* Botón secundario - Contorno limpio */}
-            <Link to="/quines-somos" className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
-              <span className="relative z-10 flex items-center gap-2">
-                {SLIDES[currentSlide]?.button1}
-                <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </span>
-            </Link>
+          <div className={`animate-buttons ${hasLoaded ? 'loaded' : ''} flex flex-col gap-4 w-fit`}>
+            <div className="flex flex-wrap gap-4">
+              {/* Botón secundario - Contorno limpio */}
+              <Link to="/quines-somos" className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
+                <span className="relative z-10 flex items-center gap-2">
+                  {SLIDES[currentSlide]?.button1}
+                  <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
+              </Link>
 
+              {/* Botón primario - */}
+              <Link to="/lineas-estrategicas" className="btn-primary group relative px-8 py-3 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                <span className="relative z-10 flex items-center gap-2">
+                  {SLIDES[currentSlide]?.button2}
+                  <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
+              </Link>
+            </div>
 
-            {/* Botón primario - */}
-            <Link to="/lineas-estrategicas" className="btn-primary group relative px-8 py-3 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <span className="relative z-10 flex items-center gap-2">
-                {SLIDES[currentSlide]?.button2}
-                <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </span>
-            </Link>
+            {/* Nuevo botón: Únase a Visión Circular (Solo si no hay usuario) */}
+            {!user && (
+              <a
+                href="https://ecocircular.creativostecnologicosit.com/encuestas/01kf9vjyyz000n6hqzmcnr4nx0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full px-8 py-3 rounded-full font-bold text-sm uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 bg-white text-[#2C67B0] hover:bg-gray-100 border-2 border-[#2C67B0]/10"
+              >
+                Únase a Visión Circular
+                <ArrowRight size={18} />
+              </a>
+            )}
           </div>
         </div>
       </div>
