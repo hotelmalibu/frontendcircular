@@ -4,6 +4,8 @@ import React from "react";
 import pdfGestionResiduos from "../../../../assets/marconormativo/politicas/Política_para_la_gestión_integral_de_ residuos.pdf";
 import pdfODS from "../../../../assets/marconormativo/politicas/CONPES 3918_638235471484658132.pdf";
 import pdfCrecimientoVerde from "../../../../assets/marconormativo/politicas/CONPES 3934.pdf";
+import decreto1381 from "../../../../assets/marconormativo/resoluciones/DECRETO_1381_DE_2024.pdf";
+import decreto0670 from "../../../../assets/marconormativo/resoluciones/decreto-0670-del-17-de-junio-de-2025-1.pdf";
 
 
 // Colores del manual de marca
@@ -31,6 +33,18 @@ const politicas = [
     title: "Política de Crecimiento Verde (CONPES 3934 del 2018)",
     description: "Consejo Nacional de Política Económica y Social | 2018",
     pdf: pdfCrecimientoVerde,
+    color: COLOR_VERDE_PRINCIPAL
+  },
+  {
+    title: "Decreto 1381 de 2024",
+    description: "Establece medidas para la gestión integral de residuos y promueve la transición hacia modelos de economía circular.",
+    pdf: decreto1381,
+    color: COLOR_AZUL_SECUNDARIO
+  },
+  {
+    title: "Decreto 0670 de 2025",
+    description: "Fortalece las medidas de gestión ambiental y economía circular, estableciendo nuevos lineamientos para el cumplimiento normativo.",
+    pdf: decreto0670,
     color: COLOR_VERDE_PRINCIPAL
   }
 ];

@@ -5,8 +5,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
-  Files, GlassWater, Trash2, Recycle, Target, MapPin, Lightbulb, GraduationCap,
-  Package, ShoppingCart, Factory, Truck, Box, ScrollText, Milk, Anvil, Trash
+  Package, ShoppingCart, Factory, Truck, Box, ScrollText, Milk, Anvil, FileText, PackageOpen,
+  Target, MapPin, Lightbulb, GraduationCap, GlassWater, Recycle
 } from 'lucide-react';
 
 
@@ -15,8 +15,6 @@ import {
 import pdf1407 from "../../../../assets/marconormativo/resoluciones/resolucion-1407-de-2018.pdf";
 import pdf1342 from "../../../../assets/marconormativo/resoluciones/resolucion-1342-de-2020.pdf";
 import pdf0803 from "../../../../assets/marconormativo/resoluciones/RES.-0803-DE-24-JUN-2024-REDUCCION-GRADUAL-DE-PRODUCCION-Y-CONSUMO-CIERTOS-PRODUCTOS-PLASTICOS-4 (1).pdf";
-import decreto1381 from "../../../../assets/marconormativo/resoluciones/DECRETO_1381_DE_2024.pdf";
-import decreto0670 from "../../../../assets/marconormativo/resoluciones/decreto-0670-del-17-de-junio-de-2025-1.pdf";
 
 // Colores del manual de marca
 const COLOR_AZUL_PRINCIPAL = '#1E305D';
@@ -49,6 +47,15 @@ const metodologiaCriterios = [
   { name: "Meta cuantitativa", icon: Target }, { name: "Cobertura geográfica", icon: MapPin },
   { name: "Innovación", icon: Lightbulb }, { name: "Educación", icon: GraduationCap },
 ];
+
+// --- Icono de Lata para Metal ---
+const CanIcon = ({ size = 48, color = "#333333" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 4V20C18 21.1046 15.3137 22 12 22C8.68629 22 6 21.1046 6 20V4C6 2.89543 8.68629 2 12 2C15.3137 2 18 2.89543 18 4Z" stroke={color} strokeWidth="2" />
+    <path d="M6 4C6 5.10457 8.68629 6 12 6C15.3137 6 18 5.10457 18 4" stroke={color} strokeWidth="2" />
+    <path d="M6 16C6 17.1046 8.68629 18 12 18C15.3137 18 18 17.1046 18 16" stroke={color} strokeWidth="2" />
+  </svg>
+);
 
 // --- Icono Personalizado para Leaflet ---
 const customLeafletIcon = L.divIcon({
@@ -99,23 +106,13 @@ export default function Index() {
                 <span className="font-display font-bold text-4xl text-white ml-2">RES.</span>
                 <span className="font-sans text-3xl text-gray-200 ml-3">de 2024</span>
               </div>
-              <div className="flex items-baseline mt-2">
-                <span className="font-display font-bold text-7xl text-white">1381</span>
-                <span className="font-display font-bold text-4xl text-white ml-2">DEC.</span>
-                <span className="font-sans text-3xl text-gray-200 ml-3">de 2024</span>
-              </div>
-              <div className="flex items-baseline mt-2">
-                <span className="font-display font-bold text-7xl text-white">0670</span>
-                <span className="font-display font-bold text-4xl text-white ml-2">DEC.</span>
-                <span className="font-sans text-3xl text-gray-200 ml-3">de 2025</span>
-              </div>
               <p className="text-sm text-gray-300 mt-4">Ministerio de Ambiente y Desarrollo Sostenible.</p>
             </div>
 
             <div className="md:w-1/2 text-left md:border-l-2 border-gray-400 border-opacity-50 pl-8">
               <div className="flex flex-wrap justify-start gap-5 text-gray-200 mb-6">
                 <Package size={32} /> <ShoppingCart size={32} /> <GlassWater size={32} />
-                <Recycle size={32} /> <Trash2 size={32} /> <Box size={32} />
+                <Recycle size={32} /> <Box size={32} />
               </div>
               <p className="italic text-gray-100 text-lg leading-relaxed">
                 "Por la cual se reglamenta la gestión ambiental de los residuos de envases y empaques de papel, cartón, plástico, vidrio, metal y se toman otras determinaciones".
@@ -132,44 +129,37 @@ export default function Index() {
           <h3 className="text-2xl font-sans font-bold mb-8 text-center" style={{ color: COLOR_AZUL_PRINCIPAL }}>
             Cadena de Valor Circular
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-wrap justify-center gap-6">
 
-            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md">
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]">
               <Factory size={40} className="flex-shrink-0" style={{ color: COLOR_AZUL_SECUNDARIO }} />
               <div>
                 <h4 className="font-semibold text-lg" style={{ color: COLOR_GRIS_TEXTO }}>Fabricante de Envases y Empaques / Proveedor de Materias Primas</h4>
                 <p className="text-sm text-gray-500">Origen de los materiales.</p>
               </div>
             </div>
-            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md">
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]">
               <Package size={40} className="flex-shrink-0" style={{ color: COLOR_AZUL_SECUNDARIO }} />
               <div>
                 <h4 className="font-semibold text-lg" style={{ color: COLOR_GRIS_TEXTO }}>Regulado como Productor</h4>
                 <p className="text-sm text-gray-500">Empresas que ponen productos en el mercado.</p>
               </div>
             </div>
-            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md">
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]">
               <Truck size={40} className="flex-shrink-0" style={{ color: COLOR_AZUL_SECUNDARIO }} />
               <div>
                 <h4 className="font-semibold text-lg" style={{ color: COLOR_GRIS_TEXTO }}>Distribución y Comercializadores</h4>
                 <p className="text-sm text-gray-500">Llegan los productos al punto de venta.</p>
               </div>
             </div>
-            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md">
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]">
               <ShoppingCart size={40} className="flex-shrink-0" style={{ color: COLOR_AZUL_SECUNDARIO }} />
               <div>
                 <h4 className="font-semibold text-lg" style={{ color: COLOR_GRIS_TEXTO }}>Consumidores</h4>
                 <p className="text-sm text-gray-500">Uso y descarte inicial de los productos.</p>
               </div>
             </div>
-            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md">
-              <Trash2 size={40} className="flex-shrink-0" style={{ color: COLOR_AZUL_SECUNDARIO }} />
-              <div>
-                <h4 className="font-semibold text-lg" style={{ color: COLOR_GRIS_TEXTO }}>Gestores</h4>
-                <p className="text-sm text-gray-500">Recolección y pre-tratamiento de residuos.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md">
+            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg transition-all duration-300 hover:shadow-md w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]">
               <Recycle size={40} className="flex-shrink-0" style={{ color: COLOR_AZUL_SECUNDARIO }} />
               <div>
                 <h4 className="font-semibold text-lg" style={{ color: COLOR_GRIS_TEXTO }}>Transformadoras</h4>
@@ -234,20 +224,22 @@ export default function Index() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <ScrollText size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
-              <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Papel y cartón</h4>
+              <FileText size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Papel</h4>
             </div>
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Milk size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <PackageOpen size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Cartón</h4>
+            </div>
+            <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
+              <GlassWater size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
               <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Vidrio</h4>
             </div>
             <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Anvil size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
+              <div className="mb-3">
+                <CanIcon size={48} color={COLOR_GRIS_TEXTO} />
+              </div>
               <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Metal</h4>
-            </div>
-            <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
-              <Trash size={48} className="mb-3" style={{ color: COLOR_GRIS_TEXTO }} />
-              <h4 className="text-lg font-semibold" style={{ color: COLOR_GRIS_TEXTO }}>Basuras</h4>
             </div>
           </div>
         </section>
@@ -386,18 +378,6 @@ export default function Index() {
                 file: pdf0803,
                 desc:
                   'Reglamenta la Ley 2232 de 2022 para reducir gradualmente los plásticos de un solo uso. Promueve materiales alternativos y el uso de contenido reciclado para proteger el ambiente.'
-              },
-              {
-                year: 'Decreto 1381 de 2024',
-                file: decreto1381,
-                desc:
-                  'Establece medidas para la gestión integral de residuos y promueve la transición hacia modelos de economía circular, fortaleciendo la normativa ambiental vigente.'
-              },
-              {
-                year: '0670 de 2025',
-                file: decreto0670,
-                desc:
-                  'Decreto 0670 del 17 de junio de 2025. Fortalece las medidas de gestión ambiental y economía circular, estableciendo nuevos lineamientos para el cumplimiento normativo.'
               }
             ].map((res, index) => (
               <div

@@ -133,7 +133,7 @@ export default function MapSection() {
                 </div>
 
                 <span className="inline-block bg-[#00AB6D]/10 text-[#00AB6D] text-[11px] font-bold uppercase tracking-[0.25em] px-5 py-2 rounded-full mb-6 border border-[#00AB6D]/20">
-                  Acceso Especial para Aliados
+                  Acceso Especial para Afiliados
                 </span>
 
                 <h2 className="text-4xl md:text-6xl font-black text-[#1E305D] mb-6 tracking-tight leading-tight">
