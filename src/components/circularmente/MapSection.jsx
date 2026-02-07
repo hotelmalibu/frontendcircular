@@ -137,7 +137,7 @@ export default function MapSection() {
                 </span>
 
                 <h2 className="text-4xl md:text-6xl font-black text-[#1E305D] mb-6 tracking-tight leading-tight">
-                  Directorio de <span className="text-[#00AB6D]">Empresas</span>
+                  Directorio de <span className="text-[#00AB6D]">Empresas Transformadoras</span>
                 </h2>
 
                 <div className="w-24 h-1.5 bg-gradient-to-r from-[#00AB6D] to-[#2C67B0] mx-auto rounded-full mb-8" />
@@ -170,7 +170,7 @@ export default function MapSection() {
                   </span>
                 </div>
                 <h1 className="text-4xl md:text-6xl font-black text-[#1E305D] tracking-tight leading-none">
-                  Directorio de <span className="text-[#00AB6D]">Empresas</span>
+                  Directorio de <span className="text-[#00AB6D]">Empresas Transformadoras</span>
                 </h1>
                 <div className="w-20 h-1 bg-[#00AB6D] rounded-full" />
                 <p className="text-gray-500 font-medium max-w-xl text-lg leading-relaxed">

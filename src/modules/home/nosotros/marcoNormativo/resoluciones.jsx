@@ -103,7 +103,6 @@ export default function Index() {
               </div>
               <div className="flex items-baseline mt-2">
                 <span className="font-display font-bold text-7xl text-white">803</span>
-                <span className="font-display font-bold text-4xl text-white ml-2">RES.</span>
                 <span className="font-sans text-3xl text-gray-200 ml-3">de 2024</span>
               </div>
               <p className="text-sm text-gray-300 mt-4">Ministerio de Ambiente y Desarrollo Sostenible.</p>
