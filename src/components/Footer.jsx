@@ -1,9 +1,15 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUp, Instagram, Facebook, Linkedin } from "lucide-react";
 import Logo from "../assets/fondosYlogos/Logo_blanco.png";
 import fondoFooter from "../assets/fondosYlogos/fondo_footer.jpg";
+import HelpdeskModal from "./modals/HelpdeskModal";
+import TicketStatusModal from "./modals/TicketStatusModal";
 
 export default function Footer() {
+  const [isHelpdeskOpen, setIsHelpdeskOpen] = useState(false);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -16,6 +22,17 @@ export default function Footer() {
       className="relative text-white bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${fondoFooter})` }}
     >
+      {/* Modals */}
+      <HelpdeskModal
+        isOpen={isHelpdeskOpen}
+        onClose={() => setIsHelpdeskOpen(false)}
+      />
+
+      <TicketStatusModal
+        isOpen={isStatusModalOpen}
+        onClose={() => setIsStatusModalOpen(false)}
+      />
+
       {/* CONTENIDO PRINCIPAL */}
       <div className="relative z-10 container mx-auto px-6 py-6">
         <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-12">
@@ -83,20 +100,25 @@ export default function Footer() {
 
             {/* Soporte */}
             <div>
-              <h4 className="font-bold text-lg mb-4 text-white">Soporte</h4>
-              <div className="text-sm text-white/90 space-y-2 flex flex-col items-center md:items-start">
-                <a
-                  href="https://ecocircular.creativostecnologicosit.com/encuestas/01kgjqgjyhg1tknmfm7jsgfrp2"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-[#00AB6D] transition-colors font-medium border border-white/20 rounded-lg px-4 py-2 hover:bg-white/5"
+              <h4 className="font-bold text-lg mb-4 text-white uppercase tracking-wider">Mesa de Ayuda</h4>
+              <div className="text-sm text-white/90 space-y-3 flex flex-col items-center md:items-start min-w-[200px]">
+                <button
+                  onClick={() => setIsHelpdeskOpen(true)}
+                  className="w-full text-left hover:text-[#00AB6D] transition-all font-bold border border-white/20 rounded-xl px-5 py-3 hover:bg-white/10 flex items-center justify-center md:justify-start gap-2"
                 >
+                  <div className="w-2 h-2 rounded-full bg-green-400"></div>
                   Soporte Técnico
-                </a>
+                </button>
+                <button
+                  onClick={() => setIsStatusModalOpen(true)}
+                  className="w-full text-left hover:text-[#00AB6D] transition-all font-bold border border-white/20 rounded-xl px-5 py-3 hover:bg-white/10 flex items-center justify-center md:justify-start gap-2"
+                >
+                  <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                  Consultar Estado
+                </button>
               </div>
             </div>
           </div>
-
         </div>
 
         {/* Botón subir */}
@@ -129,6 +151,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-    </footer >
+    </footer>
   );
 }

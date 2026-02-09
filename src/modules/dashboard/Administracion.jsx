@@ -5,13 +5,15 @@ import Aprobaciones from "../../components/dashboard/administracion/Aprobaciones
 import Usuarios from "../../components/dashboard/administracion/Usuarios";
 import RolesPermisos from "../../components/dashboard/administracion/RolesPermisos";
 import SecurityLogs from "../../components/dashboard/administracion/Subcomponents/security/SecurityLogs";
+import Helpdesk from "../../components/dashboard/administracion/Helpdesk";
 import {
   Settings,
   Users,
   ShieldCheck,
   FileCheck,
   ShieldAlert,
-  UserX
+  UserX,
+  LifeBuoy
 } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -31,6 +33,7 @@ export default function Administracion() {
     { name: "Aprobaciones", label: "Aprobaciones", icon: <FileCheck size={18} />, component: <Aprobaciones /> },
     { name: "Usuarios", label: "Gestión de Usuarios", icon: <Users size={18} />, component: <Usuarios /> },
     { name: "Roles y Permisos", label: "Roles y Permisos", icon: <ShieldCheck size={18} />, component: <RolesPermisos /> },
+    { name: "Mesa de Ayuda", label: "Mesa de Ayuda", icon: <LifeBuoy size={18} />, component: <Helpdesk /> },
     { name: "Seguridad", label: "Seguridad", icon: <ShieldAlert size={18} />, component: <SecurityLogs /> },
   ];
 
