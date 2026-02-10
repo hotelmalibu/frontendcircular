@@ -10,7 +10,7 @@ export const register = (data) => api.post(`/auth/register`, data);
 // Roles CRUD
 export const getRoles = () => api.get(`/auth/roles`);
 
-export const getPublicRoles = () => api.get(`/auth/roles/public?sort_by=level&sort_order=desc&per_page=15`);
+export const getPublicRoles = () => api.get(`/auth/roles/public?sort_by=level&sort_order=desc&per_page=1000`);
 
 export const createRole = (data) => api.post(`/auth/roles`, data);
 
@@ -25,8 +25,12 @@ export const getUsers = () => api.get(`/auth/users`);
 // Approval Workflow
 export const getApprovals = () => api.get(`/auth/approvals`);
 export const updateUserStatus = (userId, status) => api.post(`/auth/users/${userId}/status`, { status });
-export const getSecurityLogs = () => api.get(`/auth/security-logs`);
+// Security Logs
+export const getSecurityLogs = (params) => api.get(`/auth/security-logs`, { params });
 export const markSecurityLogAsViewed = (id) => api.patch(`/auth/security-logs/${id}/viewed`);
+export const deleteSecurityLog = (id) => api.delete(`/auth/security-logs/${id}`);
+export const clearSecurityLogs = () => api.delete(`/auth/security-logs`);
+
 export const getActiveSessions = () => api.get(`/auth/active-sessions`);
 export const forgotPassword = (email) => api.post(`/auth/forgot-password`, { email });
 

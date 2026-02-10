@@ -19,6 +19,7 @@ import {
   Settings,
   Building,
   Menu,
+  LifeBuoy,
 } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 import { getAllProjects } from "../api/projectsApi";
@@ -565,6 +566,7 @@ export default function Navbar({ onMenuClick }) {
     "/formularios",
     "/comunicaciones",
     "/administracion",
+    "/soporte",
     "/integracion",
     "/profile",
   ];
@@ -739,7 +741,10 @@ export default function Navbar({ onMenuClick }) {
       user.role?.toLowerCase() === "afiliados");
 
   useEffect(() => {
-    if (user && isAdmin) {
+    const canSeeNotifs = isAdmin || user?.permissions?.includes("view.support");
+    const canSeeAlerts = isAdmin || user?.permissions?.includes("view.admin");
+
+    if (user && (canSeeNotifs || canSeeAlerts)) {
       const fetchCounts = async () => {
         try {
           const { getUsers, getSecurityLogs } = await import("../api/auth");
@@ -794,7 +799,7 @@ export default function Navbar({ onMenuClick }) {
         );
       };
     }
-  }, [user, isAdmin]);
+  }, [user, isAdmin, user?.permissions]);
 
   // Cerrar menús al hacer clic fuera
   useEffect(() => {
@@ -932,8 +937,8 @@ export default function Navbar({ onMenuClick }) {
           {/* Alertas y Notificaciones */}
           {user && (
             <div className="flex items-center gap-1">
-              {/* Alertas y Notificaciones solo para Admins */}
-              {isAdmin && (
+              {/* Alertas y Notificaciones solo para Admins o Soporte */}
+              {(isAdmin || user?.permissions?.includes("view.support")) && (
                 <>
                   {/* NOTIFICACIONES (Aprobaciones/Info) */}
                   <div className="relative" ref={notifRef}>
@@ -972,7 +977,7 @@ export default function Navbar({ onMenuClick }) {
                         <div className="max-h-80 overflow-y-auto">
                           {pendingCount > 0 ? (
                             <Link
-                              to="/administracion"
+                              to="/soporte"
                               onClick={() => setShowNotifMenu(false)}
                               className="p-4 flex gap-3 hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0"
                             >
@@ -1007,87 +1012,89 @@ export default function Navbar({ onMenuClick }) {
                     )}
                   </div>
 
-                  {/* ALERTAS DE SEGURIDAD (ShieldAlert) */}
-                  <div className="relative" ref={alertRef}>
-                    <button
-                      onClick={() => {
-                        setShowAlertMenu(!showAlertMenu);
-                        setShowNotifMenu(false);
-                      }}
-                      title="Centro de Alertas de Seguridad"
-                      className={`relative p-2 rounded-full transition-all ${showWhiteText
-                        ? "text-white hover:bg-white/20"
-                        : "text-gray-500 hover:bg-gray-100 hover:text-orange-600"
-                        }`}
-                    >
-                      <ShieldAlert size={20} />
-                      {alertCount > 0 && (
-                        <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
-                          {alertCount}
-                        </span>
-                      )}
-                    </button>
+                  {/* ALERTAS DE SEGURIDAD (ShieldAlert) - ADMINS O PERMISO ADMIN */}
+                  {(isAdmin || user?.permissions?.includes("view.admin")) && (
+                    <div className="relative" ref={alertRef}>
+                      <button
+                        onClick={() => {
+                          setShowAlertMenu(!showAlertMenu);
+                          setShowNotifMenu(false);
+                        }}
+                        title="Centro de Alertas de Seguridad"
+                        className={`relative p-2 rounded-full transition-all ${showWhiteText
+                          ? "text-white hover:bg-white/20"
+                          : "text-gray-500 hover:bg-gray-100 hover:text-orange-600"
+                          }`}
+                      >
+                        <ShieldAlert size={20} />
+                        {alertCount > 0 && (
+                          <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                            {alertCount}
+                          </span>
+                        )}
+                      </button>
 
-                    {/* DROPDOWN ALERTAS */}
-                    {showAlertMenu && (
-                      <div className="absolute right-0 mt-2 top-full w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[70] animate-fadeIn focus:outline-none">
-                        <div className="p-4 bg-orange-50 border-b border-orange-100 flex justify-between items-center">
-                          <h4 className="font-bold text-orange-800 flex items-center gap-2">
-                            <ShieldAlert size={16} /> Seguridad
-                          </h4>
-                          {alertCount > 0 && (
-                            <span className="bg-orange-100 text-orange-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
-                              {alertCount} Alertas
-                            </span>
-                          )}
-                        </div>
-                        <div className="max-h-80 overflow-y-auto">
-                          {recentAlerts.length > 0 ? (
-                            <>
-                              <div className="divide-y divide-gray-50">
-                                {recentAlerts.map((alerta, idx) => (
-                                  <div
-                                    key={idx}
-                                    className="p-4 hover:bg-gray-50 transition-colors"
-                                  >
-                                    <p className="text-xs font-bold text-gray-800 truncate">
-                                      {alerta.description}
-                                    </p>
-                                    <div className="flex justify-between items-center mt-1">
-                                      <span className="text-[10px] text-gray-400">
-                                        {new Date(
-                                          alerta.created_at
-                                        ).toLocaleDateString()}
-                                      </span>
-                                      <span className="text-[9px] font-bold uppercase text-orange-500 bg-orange-50 px-1.5 rounded">
-                                        {alerta.type}
-                                      </span>
+                      {/* DROPDOWN ALERTAS */}
+                      {showAlertMenu && (
+                        <div className="absolute right-0 mt-2 top-full w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[70] animate-fadeIn focus:outline-none">
+                          <div className="p-4 bg-orange-50 border-b border-orange-100 flex justify-between items-center">
+                            <h4 className="font-bold text-orange-800 flex items-center gap-2">
+                              <ShieldAlert size={16} /> Seguridad
+                            </h4>
+                            {alertCount > 0 && (
+                              <span className="bg-orange-100 text-orange-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+                                {alertCount} Alertas
+                              </span>
+                            )}
+                          </div>
+                          <div className="max-h-80 overflow-y-auto">
+                            {recentAlerts.length > 0 ? (
+                              <>
+                                <div className="divide-y divide-gray-50">
+                                  {recentAlerts.map((alerta, idx) => (
+                                    <div
+                                      key={idx}
+                                      className="p-4 hover:bg-gray-50 transition-colors"
+                                    >
+                                      <p className="text-xs font-bold text-gray-800 truncate">
+                                        {alerta.description}
+                                      </p>
+                                      <div className="flex justify-between items-center mt-1">
+                                        <span className="text-[10px] text-gray-400">
+                                          {new Date(
+                                            alerta.created_at
+                                          ).toLocaleDateString()}
+                                        </span>
+                                        <span className="text-[9px] font-bold uppercase text-orange-500 bg-orange-50 px-1.5 rounded">
+                                          {alerta.type}
+                                        </span>
+                                      </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  ))}
+                                </div>
+                                <Link
+                                  to="/administracion"
+                                  onClick={() => setShowAlertMenu(false)}
+                                  className="block p-3 text-center text-xs font-bold text-orange-600 bg-orange-50/50 hover:bg-orange-50 transition-colors border-t border-orange-100"
+                                >
+                                  Ver historial completo
+                                </Link>
+                              </>
+                            ) : (
+                              <div className="p-10 text-center">
+                                <div className="w-12 h-12 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto mb-3">
+                                  <ShieldAlert size={24} />
+                                </div>
+                                <p className="text-sm text-gray-400">
+                                  Todo se ve seguro por ahora.
+                                </p>
                               </div>
-                              <Link
-                                to="/administracion"
-                                onClick={() => setShowAlertMenu(false)}
-                                className="block p-3 text-center text-xs font-bold text-orange-600 bg-orange-50/50 hover:bg-orange-50 transition-colors border-t border-orange-100"
-                              >
-                                Ver historial completo
-                              </Link>
-                            </>
-                          ) : (
-                            <div className="p-10 text-center">
-                              <div className="w-12 h-12 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <ShieldAlert size={24} />
-                              </div>
-                              <p className="text-sm text-gray-400">
-                                Todo se ve seguro por ahora.
-                              </p>
-                            </div>
-                          )}
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -1180,6 +1187,11 @@ export default function Navbar({ onMenuClick }) {
                         name: "Administración",
                         path: "/administracion",
                         icon: Settings,
+                      },
+                      (isAdmin || user?.permissions?.includes("view.support")) && {
+                        name: "Soporte",
+                        path: "/soporte",
+                        icon: LifeBuoy,
                       },
                     ]
                       .filter(Boolean)

@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
-  Package, ShoppingCart, Factory, Truck, Box, ScrollText, Milk, Anvil, FileText, PackageOpen,
+  Package, ShoppingCart, Factory, Truck, Box, FileText, PackageOpen,
   Target, MapPin, Lightbulb, GraduationCap, GlassWater, Recycle
 } from 'lucide-react';
 

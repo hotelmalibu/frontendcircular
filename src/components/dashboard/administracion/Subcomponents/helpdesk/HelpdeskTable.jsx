@@ -4,7 +4,6 @@ import {
     Edit,
     Trash2,
     Search,
-    Filter,
     ChevronLeft,
     ChevronRight,
     Loader2,
@@ -68,6 +67,7 @@ export default function HelpdeskTable() {
 
     useEffect(() => {
         fetchTickets();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pagination.current_page]);
 
     const fetchTickets = async () => {
@@ -306,8 +306,8 @@ export default function HelpdeskTable() {
 
             {/* Details Modal (READ ONLY) */}
             {isDetailsModalOpen && createPortal(
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 text-gray-900">
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 text-gray-900 max-h-[95vh] flex flex-col my-auto">
                         <div className="px-8 py-6 flex justify-between items-center text-white" style={{ backgroundColor: BRAND.darkBlue }}>
                             <div>
                                 <h3 className="text-xl font-bold">Visualización del Ticket</h3>
@@ -390,7 +390,7 @@ export default function HelpdeskTable() {
                             )}
                         </div>
 
-                        <div className="p-8 bg-gray-50 border-t border-gray-100 flex justify-end">
+                        <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
                             <button
                                 onClick={() => setIsDetailsModalOpen(false)}
                                 className="px-8 py-3 rounded-2xl font-bold text-gray-500 hover:bg-gray-200 transition-colors"
@@ -405,8 +405,8 @@ export default function HelpdeskTable() {
 
             {/* Manage Modal (STATUS & SOLUTION) */}
             {isManageModalOpen && createPortal(
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 text-gray-900">
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 text-gray-900 max-h-[95vh] flex flex-col my-auto">
                         <div className="px-8 py-6 flex justify-between items-center text-white" style={{ backgroundColor: BRAND.blue }}>
                             <div>
                                 <h3 className="text-xl font-bold">Gestionar Reporte</h3>
@@ -420,7 +420,7 @@ export default function HelpdeskTable() {
                         <form onSubmit={handleUpdateStatus} className="p-8 space-y-6">
                             <div className="space-y-5">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1 text-gray-900">Cambiar Estado</label>
+                                    <label className="block text-sm font-bold mb-1.5 ml-1 text-gray-900">Cambiar Estado</label>
                                     <select
                                         value={currentTicket?.status}
                                         onChange={(e) => setCurrentTicket(t => ({ ...t, status: e.target.value }))}
@@ -433,7 +433,7 @@ export default function HelpdeskTable() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1 text-gray-900">Brindar Solución</label>
+                                    <label className="block text-sm font-bold mb-1.5 ml-1 text-gray-900">Brindar Solución</label>
                                     <textarea
                                         rows="5"
                                         value={currentTicket?.solution || ""}

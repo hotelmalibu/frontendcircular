@@ -31,7 +31,10 @@ export default function Roles() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentRole, setCurrentRole] = useState(null);
+  const [roleToDelete, setRoleToDelete] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -56,17 +59,19 @@ export default function Roles() {
 
       // --- PARSE ROLES ---
       let rolesArray = [];
-      if (Array.isArray(rolesRes.data)) {
-        rolesArray = rolesRes.data;
-      } else if (rolesRes.data?.data && Array.isArray(rolesRes.data.data)) {
-        rolesArray = rolesRes.data.data;
-      } else if (rolesRes.data?.data?.items && Array.isArray(rolesRes.data.data.items)) {
-        rolesArray = rolesRes.data.data.items;
-      } else if (rolesRes.data && typeof rolesRes.data === 'object') {
-        const possibleArray = Object.values(rolesRes.data).find(val => Array.isArray(val));
-        rolesArray = possibleArray || Object.values(rolesRes.data);
+      const responseData = rolesRes.data?.data || rolesRes.data;
+      
+      if (Array.isArray(responseData)) {
+        rolesArray = responseData;
+      } else if (responseData?.items && Array.isArray(responseData.items)) {
+        rolesArray = responseData.items;
+      } else if (typeof responseData === 'object' && responseData !== null) {
+        // Buscar cualquier propiedad que sea un array (útil si la estructura cambia)
+        const possibleArray = Object.values(responseData).find(val => Array.isArray(val));
+        rolesArray = possibleArray || [];
       }
-      rolesArray = rolesArray.filter(item => typeof item === 'object');
+      
+      rolesArray = rolesArray.filter(item => item && typeof item === 'object');
 
       // --- PARSE USERS FOR COUNT ---
       let usersArray = [];
@@ -166,14 +171,28 @@ export default function Roles() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("¿Estás seguro de eliminar este rol?")) return;
+  const openDeleteModal = (role) => {
+    setRoleToDelete(role);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setRoleToDelete(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!roleToDelete) return;
+    setIsSaving(true);
     try {
-      await deleteRole(id);
+      await deleteRole(roleToDelete.id);
       fetchData();
+      closeDeleteModal();
     } catch (err) {
       console.error("Error deleting role:", err);
       alert("No se pudo eliminar el rol.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -250,7 +269,7 @@ export default function Roles() {
                     <Edit size={18} />
                   </button>
                   <button
-                    onClick={() => handleDelete(rol.id)}
+                    onClick={() => openDeleteModal(rol)}
                     className="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition"
                     title="Eliminar"
                   >
@@ -270,11 +289,6 @@ export default function Roles() {
                   <Users size={12} />
                   <span>{rol.users_count || (rol.users ? rol.users.length : 0)} Usuarios</span>
                 </div>
-                {rol.level && (
-                  <span className="text-xs font-bold px-2 py-1 rounded-full bg-green-50 text-green-700 border border-green-100">
-                    Nivel {rol.level}
-                  </span>
-                )}
               </div>
             </div>
           </div>
@@ -283,104 +297,113 @@ export default function Roles() {
 
       {/* Modal */}
       {isModalOpen && ReactDOM.createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#005380] bg-opacity-60 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg my-8 animate-fadeIn transform transition-all scale-100 flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-hidden animate-fadeIn mx-2 sm:mx-4">
 
             {/* Modal Header */}
-            <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 bg-gray-50 rounded-t-2xl">
-              <div>
-                <h2 className="text-xl font-bold text-gray-800">
-                  {currentRole ? "Editar Rol" : "Nuevo Rol"}
-                </h2>
-                <p className="text-xs text-gray-500 mt-0.5">Define los detalles y permisos</p>
-              </div>
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center flex-shrink-0" style={{ backgroundColor: BRAND.darkBlue }}>
+              <h2 className="text-lg font-bold text-white uppercase tracking-wider">
+                {currentRole ? "Editar Rol" : "Nuevo Rol"}
+              </h2>
               <button
                 onClick={closeModal}
-                className="p-2 rounded-full text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition"
+                className="text-white/70 hover:text-white transition"
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Modal Form */}
-            <div className="overflow-y-auto p-6 flex-1">
-              <form id="roleForm" onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">
-                    Nombre del Rol <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm font-medium text-gray-700"
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    placeholder="Ej: Administrador, Editor..."
-                  />
+            <form id="roleForm" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                {/* COLUMNA IZQUIERDA: INFORMACIÓN BÁSICA */}
+                <div className="space-y-6">
+                  <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Detalles del Perfil</h4>
+                  
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 mb-1.5 block ml-1">
+                      Nombre del Rol <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm font-medium text-gray-700"
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                      placeholder="Ej: Administrador, Editor..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 mb-1.5 block ml-1">
+                      Descripción
+                    </label>
+                    <textarea
+                      rows="4"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm text-gray-700 resize-none"
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                      placeholder="Describe las funciones de este rol..."
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">
-                    Descripción
-                  </label>
-                  <textarea
-                    rows="2"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm text-gray-700 resize-none"
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    placeholder="Descripción del rol..."
-                  />
-                </div>
+                {/* COLUMNA DERECHA: PERMISOS */}
+                <div className="flex flex-col h-full">
+                  <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Acceso y Permisos</h4>
 
-                {/* PERMISOS SECTION */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-3 ml-1">
-                    Permisos del Sistema
-                  </label>
-
-                  {permissions.length === 0 ? (
-                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-center text-sm text-gray-500">
-                      No hay permisos definidos en el sistema.
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto p-1">
-                      {permissions.map(perm => (
-                        <div
-                          key={perm.id}
-                          onClick={() => togglePermission(perm.id)}
-                          className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${formData.permissions.includes(perm.id)
-                            ? "bg-blue-50 border-blue-200"
-                            : "bg-white border-gray-100 hover:bg-gray-50"
-                            }`}
-                        >
-                          <div className={`mt-0.5 ${formData.permissions.includes(perm.id) ? "text-blue-600" : "text-gray-300"}`}>
-                            {formData.permissions.includes(perm.id) ? <CheckSquare size={18} /> : <Square size={18} />}
+                  <div className="flex-1 min-h-[300px] lg:min-h-0 bg-gray-50/50 rounded-2xl border border-gray-100 p-4 overflow-y-auto custom-scrollbar">
+                    {permissions.length === 0 ? (
+                      <div className="text-center py-8">
+                        <p className="text-sm text-gray-400">Sin permisos definidos</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 gap-2">
+                        {permissions.map(perm => (
+                          <div
+                            key={perm.id}
+                            onClick={() => togglePermission(perm.id)}
+                            className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${formData.permissions.includes(perm.id)
+                              ? "bg-white border-blue-200 ring-1 ring-blue-50 shadow-sm"
+                              : "bg-white border-transparent hover:border-gray-200"
+                              }`}
+                          >
+                            <div className={`mt-0.5 ${formData.permissions.includes(perm.id) ? "text-blue-600" : "text-gray-300"}`}>
+                              {formData.permissions.includes(perm.id) ? <CheckSquare size={18} /> : <Square size={18} />}
+                            </div>
+                            <div className="flex flex-col overflow-hidden">
+                              <p className={`text-sm font-bold truncate ${formData.permissions.includes(perm.id) ? "text-blue-800" : "text-gray-700"}`}>
+                                {perm.name}
+                              </p>
+                              {perm.description && (
+                                <p className="text-[10px] text-gray-400 mt-0.5 line-clamp-1 italic">{perm.description}</p>
+                              )}
+                            </div>
                           </div>
-                          <div>
-                            <p className={`text-sm font-semibold ${formData.permissions.includes(perm.id) ? "text-blue-800" : "text-gray-700"}`}>
-                              {perm.name}
-                            </p>
-                            {perm.description && (
-                              <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{perm.description}</p>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-100/50">
+                    <p className="text-[10px] text-blue-700 leading-relaxed font-medium">
+                      Selecciona los permisos que definirán qué puede hacer este rol dentro del sistema.
+                    </p>
+                  </div>
                 </div>
-              </form>
-            </div>
+              </div>
+            </form>
 
             {/* Modal Footer */}
             <div className="p-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
-              <div className="flex gap-3">
+              <div className="flex gap-3 max-w-md ml-auto">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition font-medium text-sm"
+                  className="flex-1 px-4 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition font-medium text-sm"
                 >
                   Cancelar
                 </button>
@@ -395,6 +418,38 @@ export default function Roles() {
               </div>
             </div>
 
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* CONFIRM DELETE MODAL */}
+      {isDeleteModalOpen && ReactDOM.createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center animate-fadeIn">
+            <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={32} />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">¿Eliminar Rol?</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              ¿Estás seguro de que deseas eliminar el rol <strong>{roleToDelete?.name}</strong>? Esta acción no se puede deshacer.
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={isSaving}
+                className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-2"
+              >
+                {isSaving && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
+                Sí, Eliminar
+              </button>
+            </div>
           </div>
         </div>,
         document.body

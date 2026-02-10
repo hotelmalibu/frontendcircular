@@ -1,17 +1,170 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import Undexsub from "./subcomponentes/Undexsub";
 import UndexAfiliado from "./subcomponentes/UndexAfiliado";
+import { ShieldCheck, Bell, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Index() {
   const { user } = useContext(AuthContext);
+  const [pendingUsersCount, setPendingUsersCount] = useState(0);
 
-  // Determinar si es afiliado
-  const isAfiliado = user?.role_slug === 'afiliado' || user?.role?.toLowerCase() === 'afiliado' || user?.role?.toLowerCase() === 'afiliados';
+  // Definiciones de estado de usuario
+  const isAfiliado = user?.role_slug === 'afiliado' || user?.role?.toLowerCase() === 'afiliado';
+  const hasDashboardPermission = user?.permissions?.includes('view.dashboard');
+  const hasSupportPermission = user?.permissions?.includes('view.support');
+  const hasAnyPermission = user?.permissions && user.permissions.length > 0;
 
-  if (isAfiliado) {
-    return <UndexAfiliado />;
+  // Cargar datos contextuales para usuarios con permisos específicos
+  useEffect(() => {
+    if (hasSupportPermission && !hasDashboardPermission) {
+      const fetchCounts = async () => {
+        try {
+          const { getUsers } = await import("../../../api/auth");
+          const res = await getUsers();
+          const users = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+          const pending = users.filter(u => 
+            u.status?.toLowerCase() === 'pending' || 
+            u.status?.toLowerCase() === 'pendiente' ||
+            u.status?.toLowerCase() === 'suspended' ||
+            u.status?.toLowerCase() === 'suspendido'
+          ).length;
+          setPendingUsersCount(pending);
+        } catch (e) {
+          console.error("Error al cargar contadores de Dashboard:", e);
+        }
+      };
+      fetchCounts();
+    }
+  }, [hasSupportPermission, hasDashboardPermission]);
+
+  // Mapeo de traducciones y descripciones para permisos
+  const permissionMetadata = {
+    'view.support': {
+      title: 'GESTIÓN DE SOPORTE',
+      desc: 'Gestión de registros y aprobaciones de acceso.',
+      count: pendingUsersCount,
+      countLabel: 'Usuarios pendientes',
+      link: '/soporte'
+    },
+    'view.documents': {
+      title: 'CENTRO DE DOCUMENTOS',
+      desc: 'Acceso y gestión de la biblioteca de documentos.',
+      link: '/documentos'
+    },
+    'view.circularmente': {
+      title: 'CIRCULARMENTE',
+      desc: 'Visualización de empresas y encadenamientos.',
+      link: '/companies'
+    },
+    'view.forms': {
+      title: 'FORMULARIOS',
+      desc: 'Gestión de encuestas y recolección de datos.',
+      link: '/formularios'
+    },
+    'view.communications': {
+      title: 'COMUNICACIONES',
+      desc: 'Gestión de noticias y comunicados.',
+      link: '/comunicaciones'
+    },
+    'view.admin': {
+      title: 'ADMINISTRACIÓN SISTEMA',
+      desc: 'Configuración global y gestión de roles.',
+      link: '/administracion'
+    }
+  };
+
+  // 1. Si tiene el permiso explícito de Dashboard, ve la vista administrativa completa
+  if (hasDashboardPermission) {
+    return <Undexsub />;
   }
 
-  return <Undexsub />;
+  // 2. Si tiene otros permisos (pero no el de dashboard) o no es un afiliado estándar,
+  // mostramos una pantalla de bienvenida neutra para que use el menú lateral.
+  if (hasAnyPermission || !isAfiliado) {
+    return (
+      <>
+        <div className="flex flex-col lg:flex-row items-center lg:items-start lg:justify-between w-full max-w-7xl mb-8 p-6 lg:p-8 bg-white rounded-3xl border border-gray-100 shadow-sm gap-6 animate-fade-in-up">
+          <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 text-center lg:text-left">
+            <div className="bg-blue-50 p-3 rounded-2xl text-blue-500 shadow-sm flex-shrink-0">
+              <ShieldCheck size={40} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-gray-900 tracking-tight">Panel de Control</h2>
+              <p className="text-gray-500 text-sm font-medium">
+                Hola, <span className="text-blue-600 font-bold">{user?.name}</span>. Tienes acceso a los siguientes módulos y notificaciones:
+              </p>
+            </div>
+          </div>
+          
+          <div className="hidden lg:flex items-center gap-3 px-5 py-2.5 bg-gray-50 rounded-full text-[10px] text-gray-400 font-black tracking-widest uppercase border border-gray-100">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            Sesión Activa
+          </div>
+        </div>
+
+        {/* Visualización de Permisos Mejorada en Columnas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl">
+          {user?.permissions?.map((permSlug) => {
+            const meta = permissionMetadata[permSlug] || {
+              title: permSlug.replace('view.', '').replace('.', ' ').toUpperCase(),
+              desc: 'Acceso habilitado según tu perfil de usuario.'
+            };
+
+            return (
+              <div 
+                key={permSlug}
+                className="group flex flex-col p-6 bg-gray-50 rounded-2xl border border-gray-100 transition-all hover:bg-white hover:shadow-xl hover:border-blue-100 text-left relative overflow-hidden"
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-blue-500 shadow-sm border border-gray-100 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-black text-gray-800 tracking-wider group-hover:text-blue-700 transition-colors">
+                      {meta.title}
+                    </h4>
+                  </div>
+                </div>
+                
+                <p className="text-sm text-gray-500 leading-relaxed mb-4">
+                  {meta.desc}
+                </p>
+
+                {meta.count !== undefined && (
+                  <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                       <Bell size={14} className={meta.count > 0 ? "text-orange-500" : "text-gray-300"} />
+                       <span className={`text-xs font-bold ${meta.count > 0 ? "text-orange-600" : "text-gray-400"}`}>
+                         {meta.count} {meta.countLabel || 'Pendientes'}
+                       </span>
+                    </div>
+                    {meta.link && (
+                      <Link to={meta.link} className="p-2 rounded-lg bg-white text-blue-500 hover:bg-blue-600 hover:text-white shadow-sm transition-all">
+                        <ArrowRight size={16} />
+                      </Link>
+                    )}
+                  </div>
+                )}
+                
+                {meta.count === undefined && meta.link && (
+                  <Link to={meta.link} className="mt-auto flex items-center gap-1.5 text-xs font-bold text-blue-500 hover:text-blue-700 transition-colors group/link">
+                    Ir a la sección <ArrowRight size={12} className="group-hover/link:translate-x-1 transition-transform" />
+                  </Link>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-12 flex items-center gap-3 px-6 py-3 bg-gray-50 rounded-full text-xs text-gray-400 font-bold tracking-widest uppercase border border-gray-100">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+          Usa el menú lateral para navegar
+        </div>
+      </>
+    );
+  }
+
+  // 3. Por defecto (Afiliados puros) ven la vista informativa tradicional
+  return <UndexAfiliado />;
 }

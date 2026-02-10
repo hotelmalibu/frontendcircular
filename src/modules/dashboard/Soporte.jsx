@@ -1,15 +1,13 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
-import Usuarios from "../../components/dashboard/administracion/Usuarios";
-import RolesPermisos from "../../components/dashboard/administracion/RolesPermisos";
-import SecurityLogs from "../../components/dashboard/administracion/Subcomponents/security/SecurityLogs";
+import Aprobaciones from "../../components/dashboard/administracion/Aprobaciones";
+import Helpdesk from "../../components/dashboard/administracion/Helpdesk";
 import {
-  Settings,
-  Users,
-  ShieldCheck,
-  ShieldAlert,
+  LifeBuoy,
+  FileCheck,
   UserX,
+  MessageSquare
 } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -21,14 +19,13 @@ const BRAND = {
   gray: "#6B7280",
 };
 
-export default function Administracion() {
+export default function Soporte() {
   const { user } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState("Usuarios");
+  const [activeTab, setActiveTab] = useState("Mesa de Ayuda");
 
   const tabs = [
-    { name: "Usuarios", label: "Gestión de Usuarios", icon: <Users size={18} />, component: <Usuarios /> },
-    { name: "Roles y Permisos", label: "Roles y Permisos", icon: <ShieldCheck size={18} />, component: <RolesPermisos /> },
-    { name: "Seguridad", label: "Seguridad", icon: <ShieldAlert size={18} />, component: <SecurityLogs /> },
+    { name: "Mesa de Ayuda", label: "Mesa de Ayuda", icon: <LifeBuoy size={18} />, component: <Helpdesk /> },
+    { name: "Aprobaciones", label: "Aprobaciones", icon: <FileCheck size={18} />, component: <Aprobaciones /> },
   ];
 
   return (
@@ -41,11 +38,11 @@ export default function Administracion() {
           {/* Encabezado */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
-              <Settings className="text-blue-400" size={32} />
-              Panel de Administración
+              <LifeBuoy className="text-blue-400" size={32} />
+              Centro de Soporte
             </h1>
             <p className="text-gray-500 mt-2 text-lg ml-11">
-              Control de acceso, gestión de usuarios y configuración del sistema
+              Gestión de tickets, atención al usuario y aprobaciones de sistema
             </p>
           </div>
 
@@ -86,7 +83,7 @@ export default function Administracion() {
                 <UserX size={48} className="text-gray-300" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Sesión no iniciada</h3>
-              <p className="text-gray-500">Por favor, inicia sesión para acceder a las herramientas administrativas.</p>
+              <p className="text-gray-500">Por favor, inicia sesión para acceder al centro de soporte.</p>
             </div>
           )}
         </div>

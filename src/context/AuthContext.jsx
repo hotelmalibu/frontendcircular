@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
       // Extraer rol del array 'roles' si existe (Laravel Roles lo devuelve así)
       role: userData?.role || (userData?.roles && userData.roles.length > 0 ? userData.roles[0].name : "Sin rol"),
       role_slug: userData?.role_slug || (userData?.roles && userData.roles.length > 0 ? userData.roles[0].slug : null),
+      permissions: userData?.permissions || [],
     };
 
     setUser(userWithRole);

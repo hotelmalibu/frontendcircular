@@ -1,47 +1,63 @@
+import React, { Suspense, lazy } from "react";
 import { Routes, Route, Outlet } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
-import Home from "./modules/home/Home";
-import Login from "./modules/auths/Login";
-import ForgotPassword from "./modules/auths/ForgotPassword";
-import ResetPassword from "./modules/auths/ResetPassword";
-import Register from "./modules/auths/Register";
-import Dashboard from "./modules/dashboard/Dashboard";
-import Documentos from "./modules/dashboard/Documentos";
-import Empresas from "./modules/dashboard/Empresas";
-import Trazabilidad from "./modules/dashboard/Trazabilidad";
-import Formularios from "./modules/dashboard/Formularios";
-import Comunicaciones from "./modules/dashboard/Comunicaciones";
-import Administracion from "./modules/dashboard/Administracion";
-import Integracion from "./modules/dashboard/Integracion";
 import AxiosInterceptor from "./components/common/AxiosInterceptor";
-
 import PrivateRoute from "./components/PrivateRoute";
 import Footer from "./components/Footer";
-import Circularmente from "./modules/micrositio/Circularmente";
-import QuienesSomos from "./modules/home/nosotros/conocenos/quienesSomos";
-import Alianzas from "./modules/home/nosotros/conocenos/alianzas";
+import DefaultLoader from "./components/common/DefaultLoader";
 
-import Valores from "./modules/home/nosotros/conocenos/valores";
-import JuantaDirectiva from "./modules/home/nosotros/conocenos/juntaDirecteEquipo";
-import InformesAnuales from "./modules/home/nosotros/conocenos/informesAnuales";
-import Planes from "./modules/home/nosotros/marcoNormativo/planes";
-import Politicas from "./modules/home/nosotros/marcoNormativo/politicas";
-import Resoluciones from "./modules/home/nosotros/marcoNormativo/resoluciones";
-import ProyectosActivos from "./modules/home/nuestrosTrabajos/proyectosAlianzas/proyectosActivos";
-import InclusionSocial from "./modules/home/nuestrosTrabajos/proyectosAlianzas/inclusionSocial";
-import CasosExitos from "./modules/home/nuestrosTrabajos/proyectosAlianzas/casosExitos";
-import Convocatorias from "./modules/home/nuestrosTrabajos/proyectosAlianzas/convocatorias";
-import LineasEstrategicasPage from "./modules/home/nuestrosTrabajos/lineasEstrategicas/index";
-import PublicSurveysPage from "./modules/home/nosotros/conocenos/PublicSurveysPage";
-import PublicSurveyDetail from "./modules/home/nosotros/conocenos/PublicSurveyDetail";
-import Profile from "./modules/dashboard/Profile";
+// --- LAZY LOADED COMPONENTS ---
 
+// Auth
+const Login = lazy(() => import("./modules/auths/Login"));
+const ForgotPassword = lazy(() => import("./modules/auths/ForgotPassword"));
+const ResetPassword = lazy(() => import("./modules/auths/ResetPassword"));
+const Register = lazy(() => import("./modules/auths/Register"));
 
-import ExplorePage from "./components/pagesExplorar/ExplorePage";
-import ContentDetailPage from "./components/pagesExplorar/ContentDetailPage";
-import ContentDetailProject from "./components/pagesProyectos/ContentDetailProject";
-import NotFound from "./modules/home/NotFound";
+// Public Pages (Home & Microsite)
+const Home = lazy(() => import("./modules/home/Home"));
+const Circularmente = lazy(() => import("./modules/micrositio/Circularmente"));
+
+// Public - Conócenos
+const QuienesSomos = lazy(() => import("./modules/home/nosotros/conocenos/quienesSomos"));
+const Alianzas = lazy(() => import("./modules/home/nosotros/conocenos/alianzas"));
+const Valores = lazy(() => import("./modules/home/nosotros/conocenos/valores"));
+const JuantaDirectiva = lazy(() => import("./modules/home/nosotros/conocenos/juntaDirecteEquipo"));
+const InformesAnuales = lazy(() => import("./modules/home/nosotros/conocenos/informesAnuales"));
+const PublicSurveysPage = lazy(() => import("./modules/home/nosotros/conocenos/PublicSurveysPage"));
+const PublicSurveyDetail = lazy(() => import("./modules/home/nosotros/conocenos/PublicSurveyDetail"));
+
+// Public - Marco Normativo
+const Planes = lazy(() => import("./modules/home/nosotros/marcoNormativo/planes"));
+const Politicas = lazy(() => import("./modules/home/nosotros/marcoNormativo/politicas"));
+const Resoluciones = lazy(() => import("./modules/home/nosotros/marcoNormativo/resoluciones"));
+
+// Public - Nuestros Trabajos
+const ProyectosActivos = lazy(() => import("./modules/home/nuestrosTrabajos/proyectosAlianzas/proyectosActivos"));
+const InclusionSocial = lazy(() => import("./modules/home/nuestrosTrabajos/proyectosAlianzas/inclusionSocial"));
+const CasosExitos = lazy(() => import("./modules/home/nuestrosTrabajos/proyectosAlianzas/casosExitos"));
+const Convocatorias = lazy(() => import("./modules/home/nuestrosTrabajos/proyectosAlianzas/convocatorias"));
+const LineasEstrategicasPage = lazy(() => import("./modules/home/nuestrosTrabajos/lineasEstrategicas/index"));
+
+// Dashboard (Protected)
+const Dashboard = lazy(() => import("./modules/dashboard/Dashboard"));
+const Documentos = lazy(() => import("./modules/dashboard/Documentos"));
+const Empresas = lazy(() => import("./modules/dashboard/Empresas"));
+const Trazabilidad = lazy(() => import("./modules/dashboard/Trazabilidad"));
+const Formularios = lazy(() => import("./modules/dashboard/Formularios"));
+const Comunicaciones = lazy(() => import("./modules/dashboard/Comunicaciones"));
+const Administracion = lazy(() => import("./modules/dashboard/Administracion"));
+const Soporte = lazy(() => import("./modules/dashboard/Soporte"));
+const Integracion = lazy(() => import("./modules/dashboard/Integracion"));
+const Profile = lazy(() => import("./modules/dashboard/Profile"));
+
+// Explorar & Projects
+const ExplorePage = lazy(() => import("./components/pagesExplorar/ExplorePage"));
+const ContentDetailPage = lazy(() => import("./components/pagesExplorar/ContentDetailPage"));
+const ContentDetailProject = lazy(() => import("./components/pagesProyectos/ContentDetailProject"));
+
+const NotFound = lazy(() => import("./modules/home/NotFound"));
 
 // Helper component for pages with shared layout
 const MainLayout = () => (
@@ -60,7 +76,8 @@ export default function App() {
       <AxiosInterceptor />
       <Toaster position="top-center" reverseOrder={false} />
 
-      <Routes>
+      <Suspense fallback={<DefaultLoader />}>
+        <Routes>
         {/* Pages with Navbar and Footer */}
         {/* Rutas con Navbar y Footer (Públicas y Privadas generales) */}
         <Route element={<MainLayout />}>
@@ -98,15 +115,29 @@ export default function App() {
         </Route>
 
         {/* Rutas de Administrador (Protección antes del Layout para permitir 404 limpio) */}
-        <Route element={<PrivateRoute adminOnly={true}><MainLayout /></PrivateRoute>}>
+        <Route element={<PrivateRoute permission="view.documents"><MainLayout /></PrivateRoute>}>
           <Route path="/documentos" element={<Documentos />} />
+        </Route>
+        <Route element={<PrivateRoute permission="view.circularmente"><MainLayout /></PrivateRoute>}>
           <Route path="/companies" element={<Empresas />} />
+        </Route>
+        <Route element={<PrivateRoute adminOnly={true}><MainLayout /></PrivateRoute>}>
           <Route path="/trazabilidad" element={<Trazabilidad />} />
+        </Route>
+        <Route element={<PrivateRoute permission="view.forms"><MainLayout /></PrivateRoute>}>
           <Route path="/formularios" element={<Formularios />} />
+        </Route>
+        <Route element={<PrivateRoute permission="view.communications"><MainLayout /></PrivateRoute>}>
           <Route path="/comunicaciones" element={<Comunicaciones />} />
+        </Route>
+        <Route element={<PrivateRoute permission="view.admin"><MainLayout /></PrivateRoute>}>
           <Route path="/administracion" element={<Administracion />} />
+        </Route>
+        <Route element={<PrivateRoute permission="view.support"><MainLayout /></PrivateRoute>}>
+          <Route path="/soporte" element={<Soporte />} />
+        </Route>
+        <Route element={<PrivateRoute adminOnly={true}><MainLayout /></PrivateRoute>}>
           <Route path="/integracion" element={<Integracion />} />
-
         </Route>
 
         {/* Survey Detail WITHOUT MainLayout to prevent 404 flash */}
@@ -114,7 +145,8 @@ export default function App() {
 
         {/* Catch-all 404 WITHOUT Layout */}
         <Route path="*" element={<NotFound />} />
-      </Routes>
+        </Routes>
+      </Suspense>
     </div>
   );
 }

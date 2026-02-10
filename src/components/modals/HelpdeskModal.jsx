@@ -90,8 +90,8 @@ export default function HelpdeskModal({ isOpen, onClose }) {
     };
 
     return createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 text-gray-900">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 text-gray-900 overflow-y-auto">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[95vh] flex flex-col my-auto">
                 {/* Header */}
                 <div
                     className="px-8 py-6 flex justify-between items-center text-white"
@@ -110,7 +110,7 @@ export default function HelpdeskModal({ isOpen, onClose }) {
                 </div>
 
                 {/* Content */}
-                <div className="p-8">
+                <div className="p-8 overflow-y-auto custom-scrollbar">
                     {success ? (
                         <div className="py-10 flex flex-col items-center text-center">
                             <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center animate-bounce mb-6">

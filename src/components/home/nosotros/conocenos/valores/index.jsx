@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 
 import {
@@ -5,10 +6,11 @@ import {
   FileText,
   Scale,
   Building2,
-  Lock,
   CheckCircle2,
-  ChevronRight
+  ChevronRight,
+  HelpCircle // Added HelpCircle
 } from "lucide-react";
+import HelpdeskModal from "../../../../modals/HelpdeskModal";
 
 // Importar la imagen de fondo generada (Oscura y sin texto)
 import ethicsHero from "../../../../../assets/home/nosotros/conocenos/valores/ethics_hero_dark.jpg";
@@ -102,6 +104,8 @@ const TransparencyCard = ({ item, index }) => {
 };
 
 export default function TransparencyPortal() {
+  const [isHelpdeskOpen, setIsHelpdeskOpen] = useState(false);
+
   return (
     <section className="bg-white font-sans min-h-screen">
       
@@ -180,48 +184,45 @@ export default function TransparencyPortal() {
             </div>
           </div>
 
-          <div
-            className="relative"
-          >
-            <div className="bg-[#1E305D] rounded-[3rem] p-12 text-white relative overflow-hidden shadow-2xl">
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl" />
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#B1D357]/10 rounded-full -ml-32 -mb-32 blur-3xl" />
-              
-              <div className="relative z-10 space-y-8">
-                <div className="flex items-center gap-4">
-                  <div className="p-4 bg-white/10 rounded-2xl text-white backdrop-blur-sm border border-white/20">
-                    <Lock size={32} />
+            <div className="relative">
+              <div className="bg-[#005380] rounded-[3rem] p-12 text-white relative overflow-hidden shadow-2xl group">
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/10 transition-all duration-700" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#B1D357]/10 rounded-full -ml-32 -mb-32 blur-3xl group-hover:bg-[#B1D357]/20 transition-all duration-700" />
+                
+                <div className="relative z-10 space-y-8 text-center">
+                   <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm border border-white/20 group-hover:scale-110 transition-transform duration-500">
+                    <HelpCircle size={40} className="text-[#B1D357]" />
                   </div>
                   <div>
-                    <h4 className="text-2xl font-bold">Garantía de Anonimato</h4>
-                    <p className="text-slate-300 text-sm">Protección total de tu identidad</p>
+                    <h4 className="text-2xl font-bold">Soporte Técnico Especializado</h4>
+                    <p className="text-blue-100 text-sm mt-2">"Contamos con un equipo dedicado para resolver cualquier inconveniente técnico. Tu experiencia fluida es nuestra prioridad."</p>
                   </div>
-                </div>
-                
-                <p className="text-slate-300 leading-relaxed italic border-l-2 border-[#B1D357]/30 pl-6">
-                  "Nuestra línea ética es gestionada por un tercero independiente para asegurar la imparcialidad y confidencialidad absoluta en cada reporte."
-                </p>
-
-                <div className="pt-6">
-                  <button 
-                    className="w-full border-2 font-bold py-5 px-8 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 hover:scale-[1.02]"
-                    style={{ 
-                      backgroundColor: BRAND.green, 
-                      borderColor: BRAND.green,
-                      color: BRAND.darkBlue 
-                    }}
-                  >
-                    Reportar Incidente
-                    <ShieldAlert size={20} />
-                  </button>
+                  
+                  <div className="pt-2">
+                    <button 
+                      onClick={() => setIsHelpdeskOpen(true)}
+                      className="w-full border-2 font-bold py-4 px-8 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 hover:scale-[1.02] hover:bg-white hover:text-[#005380]"
+                      style={{ 
+                        backgroundColor: BRAND.green, 
+                        borderColor: BRAND.green,
+                        color: BRAND.darkBlue 
+                      }}
+                    >
+                      Solicitar Soporte
+                      <HelpCircle size={20} className="group-hover:rotate-12 transition-transform"/>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-      </div>
+      {/* Modal Reutilizable */}
+      <HelpdeskModal 
+        isOpen={isHelpdeskOpen} 
+        onClose={() => setIsHelpdeskOpen(false)} 
+      />
     </section>
   );
 }

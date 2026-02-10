@@ -164,20 +164,11 @@ export default function AprobacionesList() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans text-gray-700">
-
-      {/* ESPACIADOR SUPERIOR */}
-      <div className="w-full "></div>
-
+    <div className="animate-fade-in-up">
       {/* Encabezado */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
-            <Shield className="text-blue-400" size={32} />
-            Centro de Aprobaciones
-          </h1>
-          <p className="text-gray-500 mt-1 text-lg ml-11">Gestiona solicitudes de registro de nuevos usuarios</p>
-        </div>
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Centro de Aprobaciones</h2>
+        <p className="text-gray-500">Gestiona solicitudes de registro de nuevos usuarios</p>
       </div>
 
       {/* Filtros y Búsqueda */}

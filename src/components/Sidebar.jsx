@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import {
   LayoutDashboard,
@@ -7,16 +7,14 @@ import {
   ClipboardList,
   MessageSquare,
   Settings,
-  LogOut,
   Building,
-  ChevronRight,
+  LifeBuoy,
 } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 
 export default function Sidebar() {
-  const { user, logout } = useContext(AuthContext);
-  const { isSidebarCollapsed, toggleSidebar } = useSidebar();
-  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const { isSidebarCollapsed } = useSidebar();
 
   const isAdmin = user && (
     user.role?.toLowerCase() === 'admin' ||
@@ -35,17 +33,51 @@ export default function Sidebar() {
 
   const links = [
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
-    { name: "Documentos", path: "/documentos", icon: <FileText size={20} /> },
-    { name: "Circularmente", path: "/companies", icon: <Building size={20} /> },
-    { name: "Formularios", path: "/formularios", icon: <ClipboardList size={20} /> },
-    { name: "Comunicaciones", path: "/comunicaciones", icon: <MessageSquare size={20} /> },
-    isAdmin && { name: "Administración", path: "/administracion", icon: <Settings size={20} /> },
-  ].filter(Boolean);
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+    { 
+      name: "Documentos", 
+      path: "/documentos", 
+      icon: <FileText size={20} />,
+      permission: "view.documents" 
+    },
+    { 
+      name: "Circularmente", 
+      path: "/companies", 
+      icon: <Building size={20} />,
+      permission: "view.circularmente" 
+    },
+    { 
+      name: "Formularios", 
+      path: "/formularios", 
+      icon: <ClipboardList size={20} />,
+      permission: "view.forms" 
+    },
+    { 
+      name: "Comunicaciones", 
+      path: "/comunicaciones", 
+      icon: <MessageSquare size={20} />,
+      permission: "view.communications" 
+    },
+    { 
+      name: "Soporte", 
+      path: "/soporte", 
+      icon: <LifeBuoy size={20} />,
+      permission: "view.support" 
+    },
+    { 
+      name: "Administración", 
+      path: "/administracion", 
+      icon: <Settings size={20} />,
+      permission: "view.admin" 
+    },
+  ].filter(link => {
+    if (!link) return false;
+    // Si no requiere permiso, se muestra (ej. Dashboard)
+    if (!link.permission) return true;
+    // Si el usuario es admin, ve todo
+    if (isAdmin) return true;
+    // Verificar si el usuario tiene el permiso en su array
+    return user?.permissions?.includes(link.permission);
+  });
 
   return (
     <aside 
@@ -90,29 +122,6 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <div className={`p-3 border-t border-gray-100 flex flex-col gap-2`}>
-        <button
-          onClick={handleLogout}
-          className={`flex items-center transition-all duration-200 group cursor-pointer rounded-xl ${
-            isSidebarCollapsed ? "justify-center px-0 py-3 mx-2" : "gap-3 px-4 py-3"
-          } text-gray-500 hover:bg-red-50 hover:text-red-600`}
-          title={isSidebarCollapsed ? "Cerrar Sesión" : ""}
-        >
-          <LogOut size={20} className="text-gray-400 group-hover:text-red-500 transition-colors flex-shrink-0" />
-          {!isSidebarCollapsed && <span className="font-medium animate-fadeIn">Cerrar Sesión</span>}
-        </button>
-
-        {/* Botón flotante para expandir si se desea desde abajo (opcional) */}
-        <button
-          onClick={toggleSidebar}
-          className="hidden md:flex items-center justify-center p-2 text-gray-300 hover:text-blue-500 transition-colors"
-        >
-          <ChevronRight 
-            size={18} 
-            className={`transition-transform duration-500 ${isSidebarCollapsed ? "" : "rotate-180"}`} 
-          />
-        </button>
-      </div>
     </aside>
   );
 }
