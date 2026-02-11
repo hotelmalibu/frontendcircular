@@ -13,7 +13,9 @@ import {
   Upload,
   Image as ImageIcon,
   XCircle,
-  Type
+  Type,
+  CheckCircle,
+  Clock
 } from "lucide-react";
 import { createNews, updateNews } from "../../../../../api/newsApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
@@ -70,6 +72,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         author: newsData.author || "",
         start_date: newsData.start_date ? formatDateForInput(newsData.start_date) : "",
         end_date: newsData.end_date ? formatDateForInput(newsData.end_date) : "",
+        status: newsData.status || "published",
         upload_file: newsData.upload_file || null,
       }));
     }
@@ -333,7 +336,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                 <Tag size={16} style={{ color: BRAND.darkGreen }} /> Clasificación
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
                 {/* Category */}
                 <div>
                   <label className={labelClass}>Categoría</label>
@@ -369,6 +372,40 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Status Selection - Centered and with more space */}
+              <div className="pt-8 border-t border-gray-100 flex flex-col items-center">
+                <label className={`${labelClass} text-center mb-3 text-sm`}>Estado de Publicación</label>
+                <div className="flex bg-gray-100 p-1.5 rounded-2xl w-full max-w-md border border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, status: "draft" }))}
+                    className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-sm font-bold transition-all ${formData.status === "draft"
+                      ? "bg-white text-orange-600 shadow-md ring-1 ring-black/5 scale-[1.02]"
+                      : "text-gray-500 hover:text-gray-700"
+                      }`}
+                  >
+                    <Clock size={16} />
+                    Borrador
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, status: "published" }))}
+                    className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-sm font-bold transition-all ${formData.status === "published"
+                      ? "bg-white text-green-600 shadow-md ring-1 ring-black/5 scale-[1.02]"
+                      : "text-gray-500 hover:text-gray-700"
+                      }`}
+                  >
+                    <CheckCircle size={16} />
+                    Publicado
+                  </button>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-3 italic text-center">
+                  {formData.status === "published"
+                    ? "La noticia será visible inmediatamente para todos los usuarios."
+                    : "La noticia se guardará pero no será visible en la plataforma."}
+                </p>
               </div>
             </div>
 
