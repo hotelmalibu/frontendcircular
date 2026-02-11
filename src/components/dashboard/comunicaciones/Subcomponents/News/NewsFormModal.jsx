@@ -186,6 +186,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
   const validateForm = () => {
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = "El título es requerido";
+    if (!formData.category_id) newErrors.category_id = "La categoría es requerida";
     if (formData.end_date && formData.start_date) {
       if (new Date(formData.end_date) < new Date(formData.start_date)) {
         newErrors.end_date = "La fecha de fin debe ser posterior a la fecha de inicio";
@@ -252,10 +253,11 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         await createNews(dataToSend);
       }
       onSuccess();
+      onSuccess();
     } catch (err) {
       console.error("Error saving news:", err);
-      // ... (Manejo de errores simplificado para el ejemplo)
-      alert("Ocurrió un error al guardar la noticia.");
+      const errorMessage = err.response?.data?.message || err.message || "Ocurrió un error al guardar la noticia.";
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -355,6 +357,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                       <option key={category.id} value={category.id}>{category.name}</option>
                     ))}
                   </select>
+                  {errors.category_id && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.category_id}</p>}
                 </div>
 
                 {/* Author */}
