@@ -225,7 +225,9 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         try { return new Date(value).toISOString(); } catch (e) { return value; }
       };
 
-      const publishedAt = formData.published_at ? toIsoDateTime(formData.published_at) : null;
+      const publishedAt = formData.status === 'published' && !formData.published_at
+        ? toIsoDateTime(new Date())
+        : (formData.published_at ? toIsoDateTime(formData.published_at) : null);
 
       const dataToSend = {
         title: formData.title,
@@ -236,16 +238,32 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         end_datetime: toIsoDateTime(formData.end_datetime),
         is_all_day: formData.is_all_day,
         timezone: formData.timezone,
-        location_name: formData.location_name || "",
-        location_address: formData.location_address || "",
-        latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-        longitude: formData.longitude ? parseFloat(formData.longitude) : null,
         meeting_link: formData.meeting_link || "",
         requires_registration: formData.requires_registration,
-        max_attendees: formData.max_attendees ? parseInt(formData.max_attendees) : null,
         status: formData.status,
-        published_at: publishedAt,
       };
+
+      // Only add location fields if they have values (to avoid validation errors)
+      if (formData.location_name && formData.location_name.trim()) {
+        dataToSend.location_name = formData.location_name.trim();
+      }
+      if (formData.location_address && formData.location_address.trim()) {
+        dataToSend.location_address = formData.location_address.trim();
+      }
+      if (formData.latitude && formData.latitude.toString().trim()) {
+        dataToSend.latitude = parseFloat(formData.latitude);
+      }
+      if (formData.longitude && formData.longitude.toString().trim()) {
+        dataToSend.longitude = parseFloat(formData.longitude);
+      }
+      if (formData.max_attendees && formData.max_attendees.toString().trim()) {
+        dataToSend.max_attendees = parseInt(formData.max_attendees);
+      }
+
+      // Only add published_at if status is published or if it already has a value
+      if (formData.status === 'published' || publishedAt) {
+        dataToSend.published_at = publishedAt;
+      }
 
       if (isEditing && eventData?.id) {
         await updateSchedule(eventData.id, dataToSend);

@@ -75,6 +75,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         status: newsData.status || "published",
         upload_file: newsData.upload_file || null,
       }));
+      console.log("NewsFormModal - Status loaded:", newsData.status);
     }
   }, [newsData, isEditing]);
 
@@ -238,6 +239,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       dataToSend.append('author', formData.author || "");
       dataToSend.append('status', formData.status);
 
+      console.log("NewsFormModal - Status being sent:", formData.status);
       console.log("NewsFormModal - Submitting dataToSend (category_id):", formData.category_id);
 
       if (formData.start_date) dataToSend.append('start_date', toIsoDate(formData.start_date));
