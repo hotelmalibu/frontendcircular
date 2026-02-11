@@ -123,7 +123,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     'header', 'font', 'size',
     'bold', 'italic', 'underline', 'strike',
     'color', 'background',
-    'list', 'bullet',
+    'list',
     'align',
     'link', 'image'
   ];

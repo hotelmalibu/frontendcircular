@@ -7,6 +7,7 @@ import {
   Save,
   User,
   Tag,
+  Calendar,
   AlertCircle,
   Type,
   AlignLeft,
@@ -33,14 +34,43 @@ const BRAND = {
 };
 
 export default function ProjectFormModal({ projectData, isEditing, onClose, onSuccess }) {
+  // --- REACT-QUILL CONFIG INSIDE TO MATCH NEWS ---
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'font': [] }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'align': [] }],
+      ['link', 'image'],
+      ['clean']
+    ],
+  };
+
+  const formats = [
+    'header', 'font', 'size',
+    'bold', 'italic', 'underline', 'strike',
+    'color', 'background',
+    'list',
+    'align',
+    'link', 'image'
+  ];
+
   const [formData, setFormData] = useState({
+    type: "project",
     title: "",
     description: "",
     category_id: "",
     project_type_id: "",
     classification_type_id: "",
     author: "",
-    file: null,
+    start_date: "",
+    end_date: "",
+    published_at: "",
+    status: "published",
+    upload_file: null, // Rename from file to match News
     cover_image: null,
   });
 
@@ -142,42 +172,25 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
         rawCategory: projectData.category
       });
 
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         title: projectData.title || "",
         description: description,
         category_id: catId,
         project_type_id: projectData.project_type_id || "",
         classification_type_id: projectData.classification_type_id || "",
         author: projectData.author || "",
-        file: null, // Reset file on edit load
-        cover_image: null, // Reset image on edit load
-      });
+        start_date: projectData.start_date ? projectData.start_date.slice(0, 10) : "",
+        end_date: projectData.end_date ? projectData.end_date.slice(0, 10) : "",
+        published_at: projectData.published_at ? projectData.published_at.slice(0, 10) : "",
+        status: projectData.status || "published",
+        upload_file: projectData.upload_file || null,
+        cover_image: projectData.cover_image || null,
+      }));
     }
   }, [projectData, isEditing]);
 
 
-  const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      [{ 'font': [] }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-      [{ 'align': [] }],
-      ['link', 'image'],
-      ['clean']
-    ],
-  };
-
-  const formats = [
-    'header', 'font', 'size',
-    'bold', 'italic', 'underline', 'strike',
-    'color', 'background',
-    'list', 'bullet',
-    'align',
-    'link', 'image'
-  ];
 
   const handleEditorChange = (content) => {
     setFormData(prev => ({ ...prev, description: content }));
@@ -264,7 +277,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
           isValid = false;
           errorMessage = "La imagen de portada no puede superar los 5MB.";
         }
-      } else if (name === "file") {
+      } else if (name === "upload_file") {
         if (file.size > MAX_FILE_SIZE) {
           isValid = false;
           errorMessage = "El archivo no puede superar los 10MB.";
@@ -309,32 +322,66 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
 
     setLoading(true);
     try {
-      const submitData = new FormData();
-      submitData.append('title', formData.title);
-      submitData.append('description', formData.description || "");
-      if (formData.category_id) {
-        submitData.append('category_id', formData.category_id);
+      const toIsoDate = (value) => {
+        if (!value) return null;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return `${value}T00:00:00`;
+        try {
+          const d = new Date(value);
+          if (isNaN(d.getTime())) return value;
+          return d.toISOString();
+        } catch (e) { return value; }
+      };
+
+      const todayDate = () => {
+        const d = new Date();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}T00:00:00`;
+      };
+
+      let publishedAt = formData.published_at ? toIsoDate(formData.published_at) : todayDate();
+
+      const dataToSend = new FormData();
+
+      // Seguimos EXACTAMENTE el patrón de Noticias
+      if (formData.upload_file && formData.upload_file instanceof File && formData.upload_file.name && formData.upload_file.size > 0) {
+        dataToSend.append('file', formData.upload_file);
       }
+
+      dataToSend.append('type', formData.type || "project");
+      dataToSend.append('title', formData.title);
+
+      // --- WORKAROUND PARA LÍMITE DE 2000 CARACTERES ---
+      // El backend de proyectos tiene un límite de 2000 en 'description'.
+      // Enviamos el contenido completo a 'content' y una versión truncada a 'description'.
+      const fullContent = formData.description || "";
+      dataToSend.append('content', fullContent);
+      dataToSend.append('description', fullContent.substring(0, 1900));
+
+      dataToSend.append('category_id', formData.category_id || "");
+      dataToSend.append('author', formData.author || "");
+      dataToSend.append('status', formData.status);
+
+      if (formData.start_date) dataToSend.append('start_date', toIsoDate(formData.start_date));
+      if (formData.end_date) dataToSend.append('end_date', toIsoDate(formData.end_date));
+      if (publishedAt) dataToSend.append('published_at', publishedAt);
+
+      // Campos específicos de proyectos que no están en noticias
       if (formData.project_type_id) {
-        submitData.append('project_type_id', formData.project_type_id);
+        dataToSend.append('project_type_id', formData.project_type_id);
       }
       if (formData.classification_type_id) {
-        submitData.append('classification_type_id', formData.classification_type_id);
+        dataToSend.append('classification_type_id', formData.classification_type_id);
       }
-      submitData.append('author', formData.author || "");
-
-      if (formData.file) {
-        submitData.append('file', formData.file);
-      }
-
-      if (formData.cover_image) {
-        submitData.append('cover_image', formData.cover_image);
+      if (formData.cover_image && formData.cover_image instanceof File) {
+        dataToSend.append('cover_image', formData.cover_image);
       }
 
       if (isEditing && projectData?.id) {
-        await updateProject(projectData.id, submitData);
+        await updateProject(projectData.id, dataToSend);
       } else {
-        await createProject(submitData);
+        await createProject(dataToSend);
       }
       onSuccess();
     } catch (err) {
@@ -606,7 +653,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                     <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-blue-50 transition-colors cursor-pointer group">
                       <input
                         type="file"
-                        name="file"
+                        name="upload_file"
                         onChange={handleFileChange}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         disabled={loading}
@@ -616,12 +663,44 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                           <Upload size={20} className="text-blue-500" />
                         </div>
                         <p className="text-sm font-medium text-gray-600">
-                          {formData.file ? formData.file.name : "Seleccionar archivo para el proyecto"}
+                          {formData.upload_file ? (formData.upload_file.name || "Archivo seleccionado") : "Seleccionar archivo para el proyecto"}
                         </p>
                         <p className="text-xs text-gray-400">PDF, Imágenes o Word (Máx 10MB)</p>
                       </div>
                     </div>
-                    {errors.file && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.file}</p>}
+                    {errors.upload_file && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.upload_file}</p>}
+                  </div>
+                </div>
+
+                {/* SECCIÓN 4: Fechas (Match News) */}
+                <div className="md:col-span-2">
+                  <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                    <Calendar size={16} style={{ color: BRAND.blue }} /> Vigencia
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className={labelClass}>Fecha Inicio</label>
+                      <input
+                        type="date"
+                        name="start_date"
+                        value={formData.start_date}
+                        onChange={handleChange}
+                        className={inputClass}
+                        style={{ "--tw-ring-color": BRAND.lightBlue }}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Fecha Fin</label>
+                      <input
+                        type="date"
+                        name="end_date"
+                        value={formData.end_date}
+                        onChange={handleChange}
+                        className={inputClass}
+                        style={{ "--tw-ring-color": BRAND.lightBlue }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

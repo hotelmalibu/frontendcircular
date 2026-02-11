@@ -144,7 +144,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     'header', 'font', 'size',
     'bold', 'italic', 'underline', 'strike',
     'color', 'background',
-    'list', 'bullet',
+    'list',
     'align',
     'link', 'image'
   ];

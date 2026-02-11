@@ -15,7 +15,9 @@ import {
   User,
   Layers,
   Download,
-  FileText
+  FileText,
+  Link as LinkIcon,
+  Check
 } from "lucide-react";
 import { getProjectById } from "../../api/projectsApi";
 import { getImageProxyUrl } from "../../utils/imageUtils";
@@ -51,6 +53,13 @@ export default function ContentDetailProject() {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -81,7 +90,7 @@ export default function ContentDetailProject() {
           author: projectData.author || "Autor Desconocido",
           classification: projectData.classification_type_label || projectData.classification_type?.label,
           projectType: projectData.project_type_label || projectData.project_type?.label || projectData.project_type?.name,
-          description: projectData.description || "Sin descripción disponible",
+          description: projectData.content || projectData.description || "Sin descripción disponible",
           uploadFile: projectData.upload_file,
           stats: projectData.stats || []
         };
@@ -214,19 +223,8 @@ export default function ContentDetailProject() {
           <div className="max-w-7xl mx-auto px-6 md:px-12 py-16">
             <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
 
-              {/* COLUMNA IZQUIERDA: Social Share (Sticky) */}
-              <div className="lg:w-16 flex-shrink-0 order-2 lg:order-1">
-                <div className="sticky top-32 flex lg:flex-col gap-4 items-center">
-                  <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
-                  <SocialButton icon={X} color="#000000" url={xShareUrl} />
-                  <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
-                  <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
-                  <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
-                </div>
-              </div>
-
-              {/* COLUMNA CENTRAL: Cuerpo de la "Noticia" */}
-              <div className="flex-1 max-w-3xl order-1 lg:order-2">
+              {/* COLUMNA IZQUIERDA: Cuerpo del Proyecto (Expandido) */}
+              <div className="flex-1 order-1 lg:order-1">
                 <motion.article
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -289,40 +287,70 @@ export default function ContentDetailProject() {
                 </motion.article>
               </div>
 
-              {/* COLUMNA DERECHA: Sidebar de Metadatos */}
-              <div className="lg:w-80 flex-shrink-0 order-3">
-                <div className="sticky top-32 space-y-6">
-                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
-                    Detalles técnicos
-                  </h3>
+              {/* COLUMNA DERECHA: Metadatos y Social Share (Sticky) */}
+              <div className="lg:w-56 flex-shrink-0 order-2 lg:order-2">
+                <div className="sticky top-32 flex flex-col gap-10">
 
-                  <div className="space-y-8">
-                    <SidebarItem
-                      icon={User}
-                      label="Autor / Entidad"
-                      value={project.author}
-                    />
+                  {/* Detalles Técnicos */}
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
+                      Información del Proyecto
+                    </h3>
+                    <div className="space-y-6">
+                      <SidebarItem
+                        icon={User}
+                        label="Escrito por"
+                        value={project.author}
+                      />
+                      <SidebarItem
+                        icon={Layers}
+                        label="Tópico / Categoría"
+                        value={project.type}
+                      />
+                      <SidebarItem
+                        icon={Tag}
+                        label="Clasificación"
+                        value={project.classification}
+                      />
+                      <SidebarItem
+                        icon={Calendar}
+                        label="Publicado el"
+                        value={project.date}
+                      />
+                    </div>
+                  </div>
 
-                    <SidebarItem
-                      icon={Layers}
-                      label="Tipo de Proyecto"
-                      value={project.projectType}
-                    />
+                  {/* Social Share */}
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
+                      Compartir
+                    </h3>
+                    <div className="grid grid-cols-3 gap-3">
+                      <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
+                      <SocialButton icon={X} color="#000000" url={xShareUrl} />
+                      <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
+                      <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
+                      <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
 
-                    <SidebarItem
-                      icon={Tag}
-                      label="Clasificación"
-                      value={project.classification}
-                    />
-
-                    <SidebarItem
-                      icon={Clock}
-                      label="Fecha de publicación"
-                      value={project.date}
-                    />
+                      {/* Botón de Copiar Link */}
+                      <button
+                        onClick={copyToClipboard}
+                        className={`
+                          w-12 h-12 flex items-center justify-center
+                          rounded-xl
+                          backdrop-blur-md
+                          transition-all duration-200 hover:scale-110
+                          ${copied ? "bg-green-500 text-white border-green-400 shadow-lg shadow-green-500/20" : "bg-white/20 text-[#718096] border border-white/30 hover:bg-white/30"}
+                        `}
+                        title="Copiar enlace"
+                      >
+                        {copied ? <Check size={26} strokeWidth={2} /> : <LinkIcon size={26} strokeWidth={2} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
+
 
             </div>
           </div>

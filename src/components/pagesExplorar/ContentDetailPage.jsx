@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import DOMPurify from 'dompurify';
 import { useParams, Link } from 'react-router-dom';
-import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, Share2, MessageCircle } from 'lucide-react';
+import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, Share2, MessageCircle, Link as LinkIcon, Check } from 'lucide-react';
 import { allContentData, contentTypeConfig } from '../../data/mockContent';
 import { AuthContext } from '../../context/AuthContext';
 import { getAllNews, getNewsById } from '../../api/newsApi';
@@ -12,6 +12,13 @@ export default function ContentDetailPage() {
   const { slug } = useParams();
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Try to find content in static mock first, or fetch from API when needed
   const { isAuthenticated } = useContext(AuthContext);
@@ -234,19 +241,8 @@ export default function ContentDetailPage() {
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-16">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
 
-          {/* COLUMNA IZQUIERDA: Social Share (Sticky) */}
-          <div className="lg:w-16 flex-shrink-0 order-2 lg:order-1">
-            <div className="sticky top-32 flex lg:flex-col gap-4 items-center">
-              <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
-              <SocialButton icon={X} color="#000000" url={xShareUrl} />
-              <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
-              <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
-              <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
-            </div>
-          </div>
-
-          {/* COLUMNA CENTRAL: Cuerpo del Artículo */}
-          <div className="flex-1 max-w-3xl order-1 lg:order-2">
+          {/* COLUMNA IZQUIERDA: Cuerpo del Artículo (Expandido) */}
+          <div className="flex-1 order-1 lg:order-1">
             <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-gray-100">
               <h1 className="text-3xl md:text-5xl font-extrabold text-[#1E305D] mb-8 leading-tight">
                 {content.title}
@@ -271,42 +267,75 @@ export default function ContentDetailPage() {
             </div>
           </div>
 
-          {/* COLUMNA DERECHA: Sidebar de Metadatos */}
-          <div className="lg:w-80 flex-shrink-0 order-3">
-            <div className="sticky top-32 space-y-6">
-              <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
-                Información
-              </h3>
+          {/* COLUMNA DERECHA: Metadatos y Social Share (Sticky) */}
+          <div className="lg:w-56 flex-shrink-0 order-2 lg:order-2">
+            <div className="sticky top-32 flex flex-col gap-10">
 
-              <div className="space-y-8">
-                {content.author && (
+              {/* Información */}
+              <div className="space-y-6">
+                <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
+                  Información
+                </h3>
+                <div className="space-y-6">
+                  {content.author && (
+                    <SidebarItem
+                      icon={Mail}
+                      label="Escrito por"
+                      value={content.author}
+                    />
+                  )}
+
                   <SidebarItem
-                    icon={Mail}
-                    label="Escrito por"
-                    value={content.author}
+                    icon={ArrowLeft}
+                    label="Tópico / Categoría"
+                    value={content.topic}
                   />
-                )}
 
-                <SidebarItem
-                  icon={ArrowLeft}
-                  label="Tópico / Categoría"
-                  value={content.topic}
-                />
+                  <SidebarItem
+                    icon={Calendar}
+                    label="Publicado el"
+                    value={content.date}
+                  />
 
-                <SidebarItem
-                  icon={Calendar}
-                  label="Publicado el"
-                  value={content.date}
-                />
+                  <SidebarItem
+                    icon={Share2}
+                    label="Tipo de contenido"
+                    value={content.type}
+                  />
+                </div>
+              </div>
 
-                <SidebarItem
-                  icon={Share2}
-                  label="Tipo de contenido"
-                  value={content.type}
-                />
+              {/* Social Share */}
+              <div className="space-y-4">
+                <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
+                  Compartir
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
+                  <SocialButton icon={X} color="#000000" url={xShareUrl} />
+                  <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
+                  <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
+                  <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
+
+                  {/* Botón de Copiar Link */}
+                  <button
+                    onClick={copyToClipboard}
+                    className={`
+                      w-12 h-12 flex items-center justify-center
+                      rounded-xl
+                      backdrop-blur-md
+                      transition-all duration-200 hover:scale-110
+                      ${copied ? "bg-green-500 text-white border-green-400 shadow-lg shadow-green-500/20" : "bg-white/20 text-[#718096] border border-white/30 hover:bg-white/30"}
+                    `}
+                    title="Copiar enlace"
+                  >
+                    {copied ? <Check size={26} strokeWidth={2} /> : <LinkIcon size={26} strokeWidth={2} />}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+
 
         </div>
       </div>
