@@ -31,6 +31,14 @@ const BRAND = {
   gray: "#6B7280",
 };
 
+// Utility function to strip HTML tags and decode entities
+const stripHtml = (html) => {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = DOMPurify.sanitize(String(html));
+  return tmp.textContent || tmp.innerText || '';
+};
+
 export default function NewsList() {
   const [news, setNews] = useState([]);
   const [filteredNews, setFilteredNews] = useState([]);
@@ -335,9 +343,9 @@ export default function NewsList() {
                 </div>
 
                 {/* Descripción Corta */}
-                <p className="text-xs text-gray-500 mb-4 line-clamp-3 leading-relaxed flex-grow">
+                <p className="text-xs text-gray-500 mb-4 line-clamp-3 leading-relaxed flex-grow break-words whitespace-normal">
                   {item.description ? (
-                    DOMPurify.sanitize(String(item.description)).replace(/<[^>]+>/g, '').slice(0, 150) + (item.description.length > 150 ? '...' : '')
+                    stripHtml(item.description).slice(0, 150) + (stripHtml(item.description).length > 150 ? '...' : '')
                   ) : (
                     "Sin descripción disponible..."
                   )}

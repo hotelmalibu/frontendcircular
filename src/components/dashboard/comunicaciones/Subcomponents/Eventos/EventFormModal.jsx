@@ -135,7 +135,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'ordered' }, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['link', 'image'],
+      ['link'],
       ['clean']
     ],
   };
@@ -146,7 +146,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     'color', 'background',
     'list',
     'align',
-    'link', 'image'
+    'link'
   ];
 
   const handleEditorChange = (content) => {

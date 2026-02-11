@@ -118,7 +118,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'ordered' }, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['link', 'image'],
+      ['link'],
       ['clean']
     ],
   };
@@ -129,7 +129,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     'color', 'background',
     'list',
     'align',
-    'link', 'image'
+    'link'
   ];
 
   const handleEditorChange = (content) => {

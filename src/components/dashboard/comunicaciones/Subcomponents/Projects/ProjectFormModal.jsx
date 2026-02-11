@@ -44,7 +44,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'ordered' }, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['link', 'image'],
+      ['link'],
       ['clean']
     ],
   };
@@ -55,7 +55,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
     'color', 'background',
     'list',
     'align',
-    'link', 'image'
+    'link'
   ];
 
   const [formData, setFormData] = useState({

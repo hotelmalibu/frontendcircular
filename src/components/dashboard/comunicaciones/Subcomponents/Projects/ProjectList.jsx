@@ -28,7 +28,13 @@ const BRAND = {
   gray: "#6B7280",
 };
 
-// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+// Utility function to strip HTML tags and decode entities
+const stripHtml = (html) => {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = DOMPurify.sanitize(String(html));
+  return tmp.textContent || tmp.innerText || '';
+};
 
 export default function ProjectList() {
   const [projects, setProjects] = useState([]);
@@ -290,11 +296,9 @@ export default function ProjectList() {
                 </div>
 
                 {/* Descripción */}
-                <div className="text-xs text-gray-500 mb-5 line-clamp-3 leading-relaxed flex-grow">
+                <div className="text-xs text-gray-500 mb-5 line-clamp-3 leading-relaxed flex-grow break-words whitespace-normal">
                   {item.description ? (
-                    <div dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(String(item.description)).slice(0, 150) + (item.description.length > 150 ? '...' : '')
-                    }} />
+                    stripHtml(item.description).slice(0, 150) + (stripHtml(item.description).length > 150 ? '...' : '')
                   ) : (
                     "Sin descripción disponible..."
                   )}

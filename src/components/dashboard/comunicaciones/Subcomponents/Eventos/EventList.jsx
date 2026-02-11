@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { getAllSchedules, deleteSchedule } from "../../../../../api/scheduleApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
+import DOMPurify from 'dompurify';
 import EventFormModal from "./EventFormModal";
 import EventDetailModal from "./EventDetailModal";
 
@@ -34,6 +35,14 @@ const BRAND = {
   orange: "#E15200",     // Naranja (Alertas)
   yellow: "#E8AD00",     // Amarillo
   gray: "#6B7280",
+};
+
+// Utility function to strip HTML tags and decode entities
+const stripHtml = (html) => {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = DOMPurify.sanitize(String(html));
+  return tmp.textContent || tmp.innerText || '';
 };
 
 export default function EventList() {
@@ -402,9 +411,9 @@ export default function EventList() {
                 </div>
 
                 {/* Description */}
-                <p className="text-xs text-gray-500 mb-5 line-clamp-3 leading-relaxed">
+                <p className="text-xs text-gray-500 mb-5 line-clamp-3 leading-relaxed break-words whitespace-normal">
                   {item.description ?
-                    item.description.replace(/<[^>]+>/g, '').slice(0, 120) + (item.description.length > 120 ? '...' : '')
+                    stripHtml(item.description).slice(0, 120) + (stripHtml(item.description).length > 120 ? '...' : '')
                     : "Sin descripción disponible."
                   }
                 </p>
