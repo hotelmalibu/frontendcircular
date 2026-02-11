@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import DOMPurify from 'dompurify';
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -236,8 +237,15 @@ export default function ContentDetailProject() {
                   </h1>
                   <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed font-sans">
                     {project.description ? (
-                      /<[a-z][\s\S]*>/i.test(project.description) ? (
-                        <div dangerouslySetInnerHTML={{ __html: project.description }} className="news-content" />
+                      /[<>]/.test(project.description) ? (
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(project.description, {
+                              ADD_ATTR: ['target', 'rel', 'class']
+                            })
+                          }}
+                          className="news-content ql-editor !p-0"
+                        />
                       ) : (
                         <p className="text-xl">{project.description}</p>
                       )

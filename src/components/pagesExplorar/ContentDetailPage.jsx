@@ -102,7 +102,9 @@ export default function ContentDetailPage() {
           // Sanitize body HTML to avoid XSS
           if (mapped.body) {
             try {
-              mapped.body = DOMPurify.sanitize(String(mapped.body));
+              mapped.body = DOMPurify.sanitize(String(mapped.body), {
+                ADD_ATTR: ['target', 'rel', 'class'], // Permite atributos necesarios para Quill
+              });
             } catch (e) {
               // If sanitization fails, logic continues
             }
@@ -171,7 +173,7 @@ export default function ContentDetailPage() {
   const facebookShareUrl = `https://www.facebook.com/sharer.php?u=${encodedUrl}`;
   const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
   const linkedinShareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedTextAndUrl}`;
-const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
+  const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
   const mailShareUrl = `mailto:?subject=${encodedTitle}&body=${encodedTextAndUrl}`;
 
   return (
@@ -250,10 +252,13 @@ const whatsappShareUrl = `https://wa.me/?text=${encodedTextAndUrl}`;
                 {content.title}
               </h1>
 
-              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed font-sans">
+              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed font-sans overflow-x-auto">
                 {content.body ? (
-                  /<[a-z][\s\S]*>/i.test(content.body) ? (
-                    <div dangerouslySetInnerHTML={{ __html: content.body }} className="news-content" />
+                  /[<>]/.test(content.body) ? (
+                    <div
+                      dangerouslySetInnerHTML={{ __html: content.body }}
+                      className="news-content ql-editor !p-0"
+                    />
                   ) : (
                     content.body.split(/\n\s*\n/).map((paragraph, idx) => (
                       <p key={idx} className="mb-6">{paragraph}</p>

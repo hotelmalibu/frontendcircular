@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import {
   X,
   Save,
@@ -30,12 +31,6 @@ const BRAND = {
 };
 
 export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess }) {
-  const editorRef = useRef(null);
-  const editorInstanceRef = useRef(null);
-  const hasInitialized = useRef(false);
-  const hasSyncedDescription = useRef(false);
-  const [editorReady, setEditorReady] = useState(false);
-
   const [formData, setFormData] = useState({
     type: "news",
     title: "",
@@ -80,16 +75,6 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     }
   }, [newsData, isEditing]);
 
-  // Sync editor data once when editor is ready and data is available
-  useEffect(() => {
-    if (editorReady && isEditing && formData.description && !hasSyncedDescription.current) {
-      if (editorInstanceRef.current) {
-        console.log("NewsFormModal - Syncing initial description to editor");
-        editorInstanceRef.current.setData(formData.description);
-        hasSyncedDescription.current = true;
-      }
-    }
-  }, [editorReady, isEditing, formData.description]);
 
   const loadCategories = React.useCallback(async () => {
     try {
@@ -120,53 +105,35 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     loadCategories();
   }, [loadCategories]);
 
-  // ... (Inicialización del editor CKEditor se mantiene igual)
-  useEffect(() => {
-    const initEditor = async () => {
-      if (hasInitialized.current) return;
-      hasInitialized.current = true;
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'font': [] }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'align': [] }],
+      ['link', 'image'],
+      ['clean']
+    ],
+  };
 
-      try {
-        const container = editorRef.current || document.getElementById('news-description-editor');
-        if (!container) return;
-        if (editorInstanceRef.current) {
-          await editorInstanceRef.current.destroy();
-          editorInstanceRef.current = null;
-        }
+  const formats = [
+    'header', 'font', 'size',
+    'bold', 'italic', 'underline', 'strike',
+    'color', 'background',
+    'list', 'bullet',
+    'align',
+    'link', 'image'
+  ];
 
-        const instance = await ClassicEditor.create(container, {
-          toolbar: ['bold', 'italic', '|', 'undo', 'redo']
-        });
-
-        editorInstanceRef.current = instance;
-        setEditorReady(true);
-
-        if (formData.description) {
-          instance.setData(formData.description);
-        }
-
-        instance.model.document.on('change:data', () => {
-          const data = instance.getData();
-          setFormData(prev => ({ ...prev, description: data }));
-          if (errors.description) {
-            setErrors(prev => ({ ...prev, description: null }));
-          }
-        });
-      } catch (e) {
-        console.error('Error initializing editor:', e);
-      }
-    };
-
-    initEditor();
-    return () => {
-      if (editorInstanceRef.current) {
-        editorInstanceRef.current.destroy().catch(() => { });
-        editorInstanceRef.current = null;
-        setEditorReady(false);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const handleEditorChange = (content) => {
+    setFormData(prev => ({ ...prev, description: content }));
+    if (errors.description) {
+      setErrors(prev => ({ ...prev, description: null }));
+    }
+  };
 
 
   const formatDateForInput = (dateString) => {
@@ -263,10 +230,6 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       dataToSend.append('title', formData.title);
 
       let descriptionContent = formData.description;
-      if (editorInstanceRef.current) {
-        const editorContent = editorInstanceRef.current.getData();
-        if (editorContent !== descriptionContent) descriptionContent = editorContent;
-      }
       dataToSend.append('description', descriptionContent || "");
       dataToSend.append('category_id', formData.category_id || "");
       dataToSend.append('author', formData.author || "");
@@ -347,11 +310,19 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                 {errors.title && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.title}</p>}
               </div>
 
-              {/* Description (CKEditor) */}
+              {/* Description (ReactQuill) */}
               <div>
                 <label className={labelClass}>Descripción / Contenido</label>
-                <div className="prose max-w-none border rounded-xl overflow-hidden bg-white" style={{ borderColor: '#E5E7EB' }}>
-                  <div ref={editorRef}></div>
+                <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+                  <ReactQuill
+                    theme="snow"
+                    value={formData.description}
+                    onChange={handleEditorChange}
+                    modules={modules}
+                    formats={formats}
+                    placeholder="Escribe el contenido aquí..."
+                    className="h-64 mb-12"
+                  />
                 </div>
               </div>
             </div>
