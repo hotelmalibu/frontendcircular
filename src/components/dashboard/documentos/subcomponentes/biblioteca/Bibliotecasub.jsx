@@ -44,32 +44,24 @@ export default function Bibliotecasub() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    document_type_id: "",
     category_id: "",
     name: "",
     description: "",
     version: "",
     expires_at: "",
     status: "",
-    file: null
+    file: null,
+    currentFileName: "" // Track current file name in edit mode
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
 
   const [filters, setFilters] = useState({
     search: "",
-    document_type_id: "",
     sort_by: "created_at",
     sort_order: "desc"
   });
 
-  const documentTypes = [
-    { id: "1", name: "Normas y Políticas" },
-    { id: "2", name: "Formatos" },
-    { id: "3", name: "Actas" },
-    { id: "4", name: "Pesajes" },
-    { id: "5", name: "Contratos" }
-  ];
 
   const statusLabels = {
     draft: { text: "Borrador", color: BRAND.gray, bg: "#F3F4F6", icon: <Edit size={12} /> },
@@ -111,7 +103,6 @@ export default function Bibliotecasub() {
       setIsLoading(true);
       const params = {
         search: filters.search,
-        document_type_id: filters.document_type_id === "Todos" ? "" : filters.document_type_id,
         sort_by: filters.sort_by,
         sort_order: filters.sort_order
       };
@@ -160,15 +151,28 @@ export default function Bibliotecasub() {
   };
 
   const handleEdit = (document) => {
+    // Format date for input[type="date"] which expects YYYY-MM-DD
+    let formattedDate = "";
+    if (document.expires_at) {
+      try {
+        const date = new Date(document.expires_at);
+        if (!isNaN(date.getTime())) {
+          formattedDate = date.toISOString().split('T')[0];
+        }
+      } catch (e) {
+        console.warn("Error parsing date:", e);
+      }
+    }
+
     setFormData({
-      document_type_id: document.document_type_id,
       category_id: document.category_id || "",
       name: document.name,
       description: document.description || "",
       version: document.version,
-      expires_at: document.expires_at || "",
+      expires_at: formattedDate,
       status: document.status,
-      file: null // File is optional on update
+      file: null, // File is optional on update
+      currentFileName: document.upload_file?.original_name || document.upload_file?.filename || "" // Store current file name
     });
     setEditingId(document.id);
     setIsEditMode(true);
@@ -189,14 +193,14 @@ export default function Bibliotecasub() {
 
   const openUploadModal = () => {
     setFormData({
-      document_type_id: "",
       category_id: "",
       name: "",
       description: "",
       version: "",
       expires_at: "",
       status: "",
-      file: null
+      file: null,
+      currentFileName: ""
     });
     setEditingId(null);
     setIsEditMode(false);
@@ -234,7 +238,8 @@ export default function Bibliotecasub() {
 
     try {
       const submitData = new FormData();
-      submitData.append('document_type_id', parseInt(formData.document_type_id));
+      // Set a default document_type_id (hidden from user but required by backend)
+      submitData.append('document_type_id', 1);
       if (formData.category_id) {
         submitData.append('category_id', formData.category_id);
       }
@@ -266,14 +271,14 @@ export default function Bibliotecasub() {
       // Clear form only if creating
       if (!isEditMode) {
         setFormData({
-          document_type_id: "",
           category_id: "",
           name: "",
           description: "",
           version: "",
           expires_at: "",
           status: "",
-          file: null
+          file: null,
+          currentFileName: ""
         });
       }
 
@@ -345,7 +350,7 @@ export default function Bibliotecasub() {
       {/* Filtros y Búsqueda */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-          <div className="md:col-span-5 relative">
+          <div className="md:col-span-6 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
@@ -358,24 +363,7 @@ export default function Bibliotecasub() {
             />
           </div>
 
-          <div className="md:col-span-3">
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-              <select
-                name="document_type_id"
-                value={filters.document_type_id}
-                onChange={handleFilterChange}
-                className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm bg-white appearance-none cursor-pointer"
-              >
-                <option value="">Todos los tipos</option>
-                {documentTypes.map(type => (
-                  <option key={type.id} value={type.id}>{type.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="md:col-span-3">
+          <div className="md:col-span-5">
             <select
               name="sort_by"
               value={filters.sort_by}
@@ -411,7 +399,6 @@ export default function Bibliotecasub() {
           </div>
         ) : (
           documents.map((doc) => {
-            const documentType = documentTypes.find(type => type.id === doc.document_type_id);
             const statusConfig = statusLabels[doc.status] || { text: doc.status, color: BRAND.gray, bg: "#F3F4F6", icon: null };
             const createdDate = new Date(doc.created_at).toLocaleDateString('es-ES');
             const isPdf = doc.name.toLowerCase().includes('pdf') || (doc.upload_file?.filename || '').toLowerCase().endsWith('.pdf');
@@ -427,11 +414,6 @@ export default function Bibliotecasub() {
                     {isPdf ? <FileText size={24} /> : <ImageIcon size={24} />}
                   </div>
                   <div className="flex-1 min-w-0 pt-1">
-                    <div className="flex justify-between items-start">
-                      <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400 mb-1 block">
-                        {documentType?.name || "General"}
-                      </span>
-                    </div>
                     <h3 className="font-bold text-gray-800 text-sm truncate" title={doc.name}>
                       {doc.name}
                     </h3>
@@ -499,24 +481,8 @@ export default function Bibliotecasub() {
 
             <form onSubmit={handleSubmit} className="space-y-5 overflow-y-auto px-2 pb-2">
 
-              {/* Row 1: Type, Category, Version, Status (4 Cols) */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo *</label>
-                  <select
-                    name="document_type_id"
-                    value={formData.document_type_id}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm transition-all"
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  >
-                    <option value="">Seleccionar...</option>
-                    {documentTypes.map(type => (
-                      <option key={type.id} value={type.id}>{type.name}</option>
-                    ))}
-                  </select>
-                </div>
+              {/* Row 1: Category, Version, Status (3 Cols) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Categoría</label>
                   <select
@@ -622,9 +588,11 @@ export default function Bibliotecasub() {
                   </div>
                   <div className="text-left">
                     <span className="block text-sm font-medium text-gray-700">
-                      {formData.file ? formData.file.name : "Seleccionar archivo"}
+                      {formData.file ? formData.file.name : (isEditMode && formData.currentFileName ? `Archivo actual: ${formData.currentFileName}` : "Seleccionar archivo")}
                     </span>
-                    <span className="text-xs text-gray-400">PDF, Imágenes o Word (Máx 10MB)</span>
+                    <span className="text-xs text-gray-400">
+                      {isEditMode ? "Dejar vacío para mantener el archivo actual" : "PDF, Imágenes o Word (Máx 10MB)"}
+                    </span>
                   </div>
                 </label>
               </div>
@@ -717,8 +685,10 @@ export default function Bibliotecasub() {
                 return isPdf ? (
                   <div className="w-full h-full shadow-lg rounded-lg overflow-hidden bg-white">
                     {(() => {
+                      // Use CORS proxy that supports PDFs (not image processors)
                       const directPdfUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${uploadFile.path}`;
-                      const proxyPdfUrl = getImageProxyUrl(directPdfUrl);
+                      // Use cors-anywhere or corsproxy.io for PDFs
+                      const proxyPdfUrl = `https://corsproxy.io/?${encodeURIComponent(directPdfUrl)}`;
                       return <PDFViewer file={proxyPdfUrl} />;
                     })()}
                   </div>
