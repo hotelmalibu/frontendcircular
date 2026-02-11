@@ -54,13 +54,18 @@ export default function Register() {
                 const res = await getPublicRoles();
                 const items = res.data?.data?.items || [];
 
-                setRoles(items);
+                // Filtrar para mostrar solo roles de afiliados
+                const filteredRoles = items.filter(role =>
+                    role.name.toLowerCase().includes('afiliado')
+                );
 
-                // Seleccionar automáticamente el último rol
-                if (items.length > 0) {
+                setRoles(filteredRoles);
+
+                // Seleccionar automáticamente el primer rol de la lista filtrada
+                if (filteredRoles.length > 0) {
                     setFormData(prev => ({
                         ...prev,
-                        role_id: items[items.length - 1].id
+                        role_id: filteredRoles[0].id
                     }));
                 }
 
