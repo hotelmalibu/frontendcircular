@@ -64,7 +64,7 @@ export default function ProjectsSection() {
       try {
         setLoading(true);
         setError(null);
-        const responseData = await getAllProjects({ per_page: 100 });
+        const responseData = await getAllProjects({ per_page: 100, status: 'published' });
 
         let projectsArray = [];
         // Since getAllProjects returns response.data, responseData is the body

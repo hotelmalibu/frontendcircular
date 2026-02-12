@@ -273,6 +273,15 @@ export default function ProjectList() {
                         <span>{item.classification_type_label || item.classification_type?.label}</span>
                       </div>
                     )}
+                    {/* Status Badge */}
+                    <div className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide ${
+                      item.status === 'draft'
+                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'draft' ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+                      <span>{item.status === 'draft' ? 'Borrador' : 'Publicado'}</span>
+                    </div>
                   </div>
                 </div>
 

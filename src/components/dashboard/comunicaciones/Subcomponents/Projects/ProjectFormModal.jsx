@@ -410,7 +410,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-[9999] bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
+      <div className="bg-white w-full max-w-6xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
 
         {/* Header con Azul Profundo */}
         <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100" style={{ backgroundColor: BRAND.darkBlue }}>
@@ -431,254 +431,276 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 bg-gray-50">
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            {/* SECCIÓN 1: Detalles Principales */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <FileText size={16} style={{ color: BRAND.blue }} /> Detalles del Proyecto
-              </h3>
+            {/* Columna Izquierda (Contenido Principal) */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* SECCIÓN 1: Detalles Principales */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <FileText size={16} style={{ color: BRAND.blue }} /> Detalles del Proyecto
+                </h3>
 
-              {/* Title */}
-              <div className="mb-5">
-                <label className={labelClass}>Título del Proyecto *</label>
-                <div className="relative">
-                  <Type className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    placeholder="Ej: Estrategia de Reciclaje 2025"
-                    className={`${inputClass} pl-10`}
-                    style={{
-                      "--tw-ring-color": BRAND.lightBlue,
-                      borderColor: errors.title ? BRAND.orange : ''
-                    }}
-                    disabled={loading}
-                  />
+                {/* Title */}
+                <div className="mb-5">
+                  <label className={labelClass}>Título del Proyecto <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <Type className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                    <input
+                      type="text"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleChange}
+                      placeholder="Ej: Estrategia de Reciclaje 2025"
+                      className={`${inputClass} pl-10`}
+                      style={{
+                        "--tw-ring-color": BRAND.lightBlue,
+                        borderColor: errors.title ? BRAND.orange : ''
+                      }}
+                      disabled={loading}
+                    />
+                  </div>
+                  {errors.title && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.title}</p>}
                 </div>
-                {errors.title && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.title}</p>}
+
+                {/* Description (ReactQuill) */}
+                <div>
+                  <label className={labelClass}><AlignLeft size={12} className="inline mr-1" /> Descripción / Contenido</label>
+                  <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+                    <ReactQuill
+                      theme="snow"
+                      value={formData.description}
+                      onChange={handleEditorChange}
+                      modules={modules}
+                      formats={formats}
+                      placeholder="Escribe el contenido aquí..."
+                      className="h-64 mb-12"
+                    />
+                  </div>
+                </div>
               </div>
 
-              {/* Description (ReactQuill) */}
-              <div>
-                <label className={labelClass}><AlignLeft size={12} className="inline mr-1" /> Descripción / Contenido</label>
-                <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
-                  <ReactQuill
-                    theme="snow"
-                    value={formData.description}
-                    onChange={handleEditorChange}
-                    modules={modules}
-                    formats={formats}
-                    placeholder="Escribe el contenido aquí..."
-                    className="h-64 mb-12"
-                  />
+              {/* SECCIÓN 2: Multimedia */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <Image size={16} style={{ color: BRAND.green }} /> Multimedia y Archivos
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   {/* Cover Image Upload */}
+                  <div>
+                    <label className={labelClass}>Imagen de Portada (Opcional)</label>
+                    <div className="relative">
+                      <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-green-50 transition-colors cursor-pointer group">
+                        <input
+                          type="file"
+                          name="cover_image"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          disabled={loading}
+                        />
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                            <Image size={20} className="text-green-500" />
+                          </div>
+                          <p className="text-sm font-medium text-gray-600">
+                            {formData.cover_image ? formData.cover_image.name : "Seleccionar imagen"}
+                          </p>
+                          <p className="text-xs text-gray-400">JPG, PNG o WEBP (Máx 5MB)</p>
+                        </div>
+                      </div>
+                      {errors.cover_image && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.cover_image}</p>}
+                    </div>
+                  </div>
+
+                  {/* File Upload */}
+                  <div>
+                    <label className={labelClass}>Documento / Archivo (Opcional)</label>
+                    <div className="relative">
+                      <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-blue-50 transition-colors cursor-pointer group">
+                        <input
+                          type="file"
+                          name="upload_file"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          disabled={loading}
+                        />
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                            <Upload size={20} className="text-blue-500" />
+                          </div>
+                          <p className="text-sm font-medium text-gray-600">
+                            {formData.upload_file ? (formData.upload_file.name || "Archivo seleccionado") : "Seleccionar archivo"}
+                          </p>
+                          <p className="text-xs text-gray-400">PDF, Imágenes o Word (Máx 10MB)</p>
+                        </div>
+                      </div>
+                      {errors.upload_file && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.upload_file}</p>}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* SECCIÓN 2: Clasificación */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <Tag size={16} style={{ color: BRAND.darkGreen }} /> Clasificación
-              </h3>
+            {/* Columna Derecha (Metadata) */}
+            <div className="space-y-6">
+              {/* SECCIÓN 3: Clasificación */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <Tag size={16} style={{ color: BRAND.darkGreen }} /> Clasificación
+                </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Category */}
-                <div>
-                  <label className={labelClass}>Categoría</label>
-                  <select
-                    name="category_id"
-                    value={formData.category_id}
-                    onChange={handleChange}
-                    className={inputClass}
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    disabled={loading || categoriesLoading}
-                  >
-                    <option value="">{categoriesLoading ? "Cargando..." : "-- Seleccionar --"}</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Project Type */}
-                <div className="relative group">
-                  <label
-                    className={labelClass}
-                    style={{ opacity: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? 1 : 0.5 }}
-                  >
-                    Tipo de Proyecto
-                  </label>
-                  <div className="relative group/tooltip">
-                    <Layers className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <div className="space-y-4">
+                  {/* Category */}
+                  <div>
+                    <label className={labelClass}>Categoría</label>
                     <select
-                      name="project_type_id"
-                      value={formData.project_type_id}
+                      name="category_id"
+                      value={formData.category_id}
                       onChange={handleChange}
-                      className={`${inputClass} pl-10`}
-                      style={{
-                        "--tw-ring-color": BRAND.lightBlue,
-                        opacity: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? 1 : 0.6,
-                        cursor: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? 'pointer' : 'help',
-                        borderColor: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? BRAND.green : '#E5E7EB'
-                      }}
-                      disabled={loading || projectTypesLoading || categories.find(c => String(c.id) === String(formData.category_id))?.name !== "Fortalecimiento"}
+                      className={inputClass}
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                      disabled={loading || categoriesLoading}
                     >
-                      <option value="">
-                        {projectTypesLoading
-                          ? "Cargando..."
-                          : categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento"
-                            ? "-- Seleccionar Tipo --"
-                            : "-- No disponible --"
-                        }
-                      </option>
-                      {projectTypes.map((type) => (
-                        <option key={type.id} value={type.id}>
-                          {type.label || type.name}
+                      <option value="">{categoriesLoading ? "Cargando..." : "-- Seleccionar --"}</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
                         </option>
                       ))}
                     </select>
-
-                    {/* Hover Tooltip for disabled state */}
-                    {categories.find(c => String(c.id) === String(formData.category_id))?.name !== "Fortalecimiento" && (
-                      <div className="absolute left-1/2 -bottom-2 translate-y-full -translate-x-1/2 w-64 p-3 rounded-xl bg-gray-900 text-white text-[11px] leading-relaxed shadow-xl opacity-0 group-hover/tooltip:opacity-100 invisible group-hover/tooltip:visible transition-all duration-200 z-50 pointer-events-none">
-                        <div className="absolute -top-1 left-1/2 -translate-x-1/2 border-left-4 border-right-4 border-bottom-4 border-transparent border-bottom-gray-900" style={{ borderBottomColor: '#111827', borderWidth: '0 6px 6px 6px' }}></div>
-                        <div className="flex items-start gap-2">
-                          <AlertCircle size={14} className="text-yellow-400 flex-shrink-0 mt-0.5" />
-                          <p>
-                            <span className="font-bold text-yellow-400">Acceso Restringido:</span> Los tipos de proyecto solo están disponibles para la categoría <span className="underline decoration-yellow-400/50">Fortalecimiento</span>.
-                          </p>
-                        </div>
-                      </div>
-                    )}
                   </div>
-                </div>
 
-                {/* Classification Type (Only for Fortalecimiento) */}
-                {categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" && (
-                  <div className="md:col-span-2">
-                    <label className={labelClass}>Tipo de Clasificación</label>
-                    <div className="relative">
-                      <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                  {/* Project Type */}
+                  <div className="relative group">
+                    <label
+                      className={labelClass}
+                      style={{ opacity: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? 1 : 0.5 }}
+                    >
+                      Tipo de Proyecto
+                    </label>
+                    <div className="relative group/tooltip">
+                      <Layers className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                       <select
-                        name="classification_type_id"
-                        value={formData.classification_type_id}
+                        name="project_type_id"
+                        value={formData.project_type_id}
                         onChange={handleChange}
                         className={`${inputClass} pl-10`}
                         style={{
                           "--tw-ring-color": BRAND.lightBlue,
-                          opacity: formData.project_type_id ? 1 : 0.6,
-                          cursor: formData.project_type_id ? 'pointer' : 'help'
+                          opacity: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? 1 : 0.6,
+                          cursor: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? 'pointer' : 'help',
+                          borderColor: categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" ? BRAND.green : '#E5E7EB'
                         }}
-                        disabled={loading || classificationTypesLoading || !formData.project_type_id}
+                        disabled={loading || projectTypesLoading || categories.find(c => String(c.id) === String(formData.category_id))?.name !== "Fortalecimiento"}
                       >
                         <option value="">
-                          {classificationTypesLoading
+                          {projectTypesLoading
                             ? "Cargando..."
-                            : !formData.project_type_id
-                              ? "-- Deber seleccionar un Tipo de Proyecto --"
-                              : "-- Seleccionar Clasificación --"
+                            : categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento"
+                              ? "-- Seleccionar Tipo --"
+                              : "-- No disponible --"
                           }
                         </option>
-                        {filteredClassificationTypes.map((type) => (
+                        {projectTypes.map((type) => (
                           <option key={type.id} value={type.id}>
-                            {type.label}
+                            {type.label || type.name}
                           </option>
                         ))}
                       </select>
-
-                      {/* Tooltip for when Project Type is not selected */}
-                      {!formData.project_type_id && (
-                        <div className="absolute left-1/2 -bottom-2 translate-y-full -translate-x-1/2 w-64 p-3 rounded-xl bg-gray-900 text-white text-[11px] leading-relaxed shadow-xl opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-50 pointer-events-none">
-                          <p>Debe seleccionar primero un <span className="font-bold text-yellow-400">Tipo de Proyecto</span> para filtrar las clasificaciones.</p>
-                        </div>
-                      )}
                     </div>
                   </div>
-                )}
 
-                {/* Author */}
-                <div className="md:col-span-2">
-                  <label className={labelClass}>Autor</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                      type="text"
-                      name="author"
-                      value={formData.author}
-                      onChange={handleChange}
-                      placeholder="Nombre del autor o entidad"
-                      className={`${inputClass} pl-10`}
-                      style={{ "--tw-ring-color": BRAND.lightBlue }}
-                      disabled={loading}
-                    />
-                  </div>
-                </div>
-
-                {/* Cover Image Upload */}
-                <div className="md:col-span-2">
-                  <label className={labelClass}>Imagen de Portada (Opcional)</label>
-                  <div className="relative">
-                    <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-green-50 transition-colors cursor-pointer group">
-                      <input
-                        type="file"
-                        name="cover_image"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        disabled={loading}
-                      />
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                          <Image size={20} className="text-green-500" />
-                        </div>
-                        <p className="text-sm font-medium text-gray-600">
-                          {formData.cover_image ? formData.cover_image.name : "Seleccionar imagen de portada"}
-                        </p>
-                        <p className="text-xs text-gray-400">JPG, PNG o WEBP (Máx 5MB)</p>
+                  {/* Classification Type (Only for Fortalecimiento) */}
+                  {categories.find(c => String(c.id) === String(formData.category_id))?.name === "Fortalecimiento" && (
+                    <div>
+                      <label className={labelClass}>Tipo de Clasificación</label>
+                      <div className="relative">
+                        <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                        <select
+                          name="classification_type_id"
+                          value={formData.classification_type_id}
+                          onChange={handleChange}
+                          className={`${inputClass} pl-10`}
+                          style={{
+                            "--tw-ring-color": BRAND.lightBlue,
+                            opacity: formData.project_type_id ? 1 : 0.6,
+                            cursor: formData.project_type_id ? 'pointer' : 'help'
+                          }}
+                          disabled={loading || classificationTypesLoading || !formData.project_type_id}
+                        >
+                          <option value="">
+                            {classificationTypesLoading
+                              ? "Cargando..."
+                              : !formData.project_type_id
+                                ? "-- Seleccionar Tipo Primero --"
+                                : "-- Seleccionar Clasificación --"
+                            }
+                          </option>
+                          {filteredClassificationTypes.map((type) => (
+                            <option key={type.id} value={type.id}>
+                              {type.label}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
-                    {errors.cover_image && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.cover_image}</p>}
-                  </div>
-                </div>
+                  )}
 
-                {/* File Upload */}
-                <div className="md:col-span-2">
-                  <label className={labelClass}>Documento / Archivo (Opcional)</label>
-                  <div className="relative">
-                    <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-blue-50 transition-colors cursor-pointer group">
+                  {/* Author */}
+                  <div>
+                    <label className={labelClass}>Autor/Entidad</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                       <input
-                        type="file"
-                        name="upload_file"
-                        onChange={handleFileChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        type="text"
+                        name="author"
+                        value={formData.author}
+                        onChange={handleChange}
+                        placeholder="Nombre del autor"
+                        className={`${inputClass} pl-10`}
+                        style={{ "--tw-ring-color": BRAND.lightBlue }}
                         disabled={loading}
                       />
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                          <Upload size={20} className="text-blue-500" />
-                        </div>
-                        <p className="text-sm font-medium text-gray-600">
-                          {formData.upload_file ? (formData.upload_file.name || "Archivo seleccionado") : "Seleccionar archivo para el proyecto"}
-                        </p>
-                        <p className="text-xs text-gray-400">PDF, Imágenes o Word (Máx 10MB)</p>
-                      </div>
                     </div>
-                    {errors.upload_file && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.upload_file}</p>}
                   </div>
                 </div>
 
-                {/* SECCIÓN 4: Fechas (Match News) */}
-                <div className="md:col-span-2">
+                {/* Status Selection */}
+                <div className="pt-6 mt-4 border-t border-gray-100">
+                  <label className={`${labelClass} mb-2`}>Estado</label>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, status: "draft" }))}
+                      className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${formData.status === "draft"
+                        ? "bg-orange-50 text-orange-600 border border-orange-200"
+                        : "bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100"
+                        }`}
+                    >
+                      Borrador
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, status: "published" }))}
+                      className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${formData.status === "published"
+                        ? "bg-green-50 text-green-600 border border-green-200"
+                        : "bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100"
+                        }`}
+                    >
+                      Publicado
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECCIÓN 4: Vigencia */}
+               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                   <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                     <Calendar size={16} style={{ color: BRAND.blue }} /> Vigencia
                   </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="space-y-4">
                     <div>
                       <label className={labelClass}>Fecha Inicio</label>
                       <input
@@ -703,7 +725,6 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                     </div>
                   </div>
                 </div>
-              </div>
             </div>
 
           </div>

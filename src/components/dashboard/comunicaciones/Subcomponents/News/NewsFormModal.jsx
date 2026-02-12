@@ -290,7 +290,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-[9999] bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
+      <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
 
         {/* Header con Azul Profundo */}
         <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100" style={{ backgroundColor: BRAND.darkBlue }}>
@@ -311,218 +311,219 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 bg-gray-50">
-          <div className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            {/* SECCIÓN 1: Detalles Principales */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <FileText size={16} style={{ color: BRAND.blue }} /> Información General
-              </h3>
+            {/* Columna Izquierda (Contenido Principal) */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* SECCIÓN 1: Detalles Principales */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <FileText size={16} style={{ color: BRAND.blue }} /> Información General
+                </h3>
 
-              {/* Title */}
-              <div className="mb-5">
-                <label className={labelClass}>Título <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <Type className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    placeholder="Ingrese el título de la noticia"
-                    className={`${inputClass} pl-10`}
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    disabled={loading}
-                  />
-                </div>
-                {errors.title && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.title}</p>}
-              </div>
-
-              {/* Description (ReactQuill) */}
-              <div>
-                <label className={labelClass}>Descripción / Contenido <span className="text-red-500">*</span></label>
-                <div className={`bg-white rounded-xl overflow-hidden border transition-all ${errors.description ? "border-orange-300 ring-1 ring-orange-100" : "border-gray-200"}`}>
-                  <ReactQuill
-                    theme="snow"
-                    value={formData.description}
-                    onChange={handleEditorChange}
-                    modules={modules}
-                    formats={formats}
-                    placeholder="Escribe el contenido aquí..."
-                    className="h-64 mb-12"
-                  />
-                </div>
-                {errors.description && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.description}</p>}
-              </div>
-            </div>
-
-            {/* SECCIÓN 2: Clasificación y Autor */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <Tag size={16} style={{ color: BRAND.darkGreen }} /> Clasificación
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-                {/* Category */}
-                <div>
-                  <label className={labelClass}>Categoría <span className="text-red-500">*</span></label>
-                  <select
-                    name="category_id"
-                    value={formData.category_id}
-                    onChange={handleChange}
-                    className={inputClass}
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    disabled={loading || categoriesLoading}
-                  >
-                    <option value="">{categoriesLoading ? "Cargando..." : "-- Seleccione --"}</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>{category.name}</option>
-                    ))}
-                  </select>
-                  {errors.category_id && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.category_id}</p>}
-                </div>
-
-                {/* Author */}
-                <div>
-                  <label className={labelClass}>Autor <span className="text-red-500">*</span></label>
+                {/* Title */}
+                <div className="mb-5">
+                  <label className={labelClass}>Título <span className="text-red-500">*</span></label>
                   <div className="relative">
-                    <User className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${errors.author ? "text-orange-400" : "text-gray-400"}`} size={16} />
+                    <Type className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                     <input
                       type="text"
-                      name="author"
-                      value={formData.author}
+                      name="title"
+                      value={formData.title}
                       onChange={handleChange}
-                      placeholder="Nombre del autor"
-                      className={`${inputClass} pl-10 ${errors.author ? "border-orange-300 ring-1 ring-orange-100" : ""}`}
+                      placeholder="Ingrese el título de la noticia"
+                      className={`${inputClass} pl-10`}
                       style={{ "--tw-ring-color": BRAND.lightBlue }}
                       disabled={loading}
                     />
                   </div>
-                  {errors.author && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.author}</p>}
+                  {errors.title && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.title}</p>}
                 </div>
-              </div>
 
-              {/* Status Selection - Centered and with more space */}
-              <div className="pt-8 border-t border-gray-100 flex flex-col items-center">
-                <label className={`${labelClass} text-center mb-3 text-sm`}>Estado de Publicación</label>
-                <div className="flex bg-gray-100 p-1.5 rounded-2xl w-full max-w-md border border-gray-200">
-                  <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, status: "draft" }))}
-                    className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-sm font-bold transition-all ${formData.status === "draft"
-                      ? "bg-white text-orange-600 shadow-md ring-1 ring-black/5 scale-[1.02]"
-                      : "text-gray-500 hover:text-gray-700"
-                      }`}
-                  >
-                    <Clock size={16} />
-                    Borrador
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, status: "published" }))}
-                    className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-sm font-bold transition-all ${formData.status === "published"
-                      ? "bg-white text-green-600 shadow-md ring-1 ring-black/5 scale-[1.02]"
-                      : "text-gray-500 hover:text-gray-700"
-                      }`}
-                  >
-                    <CheckCircle size={16} />
-                    Publicado
-                  </button>
-                </div>
-                <p className="text-[10px] text-gray-400 mt-3 italic text-center">
-                  {formData.status === "published"
-                    ? "La noticia será visible inmediatamente para todos los usuarios."
-                    : "La noticia se guardará pero no será visible en la plataforma."}
-                </p>
-              </div>
-            </div>
-
-            {/* SECCIÓN 3: Multimedia */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <ImageIcon size={16} style={{ color: BRAND.orange }} /> Imagen Destacada
-              </h3>
-
-              {!formData.upload_file ? (
-                <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50/30 transition-all group">
-                  <input
-                    type="file"
-                    id="news-file-input"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
-                    disabled={loading}
-                  />
-                  <label htmlFor="news-file-input" className="cursor-pointer flex flex-col items-center gap-3">
-                    <div className="p-3 bg-blue-50 rounded-full text-blue-500 group-hover:scale-110 transition-transform">
-                      <Upload size={24} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-700">Haz clic para subir una imagen</p>
-                      <p className="text-xs text-gray-400 mt-1">PNG, JPG, WEBP (Máx. 5MB)</p>
-                    </div>
-                  </label>
-                </div>
-              ) : (
-                <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl bg-gray-50">
-                  <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 border border-gray-300">
-                    {formData.upload_file instanceof File || formData.upload_file instanceof Blob ? (
-                      <img src={URL.createObjectURL(formData.upload_file)} alt="Preview" className="w-full h-full object-cover" />
-                    ) : (
-                      <img
-                        src={typeof formData.upload_file === 'string' ? formData.upload_file : (formData.upload_file?.url || '')}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
-                      />
-                    )}
+                {/* Description (ReactQuill) */}
+                <div>
+                  <label className={labelClass}>Descripción / Contenido <span className="text-red-500">*</span></label>
+                  <div className={`bg-white rounded-xl overflow-hidden border transition-all ${errors.description ? "border-orange-300 ring-1 ring-orange-100" : "border-gray-200"}`}>
+                    <ReactQuill
+                      theme="snow"
+                      value={formData.description}
+                      onChange={handleEditorChange}
+                      modules={modules}
+                      formats={formats}
+                      placeholder="Escribe el contenido aquí..."
+                      className="h-64 mb-12"
+                    />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {formData.upload_file instanceof File ? formData.upload_file.name : (typeof formData.upload_file === 'string' ? 'Imagen actual' : (formData.upload_file?.name || "Imagen actual"))}
-                    </p>
-                    {formData.upload_file instanceof File && (
-                      <p className="text-xs text-gray-500">
-                        {(formData.upload_file.size / 1024 / 1024).toFixed(2)} MB
+                  {errors.description && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.description}</p>}
+                </div>
+              </div>
+
+               {/* SECCIÓN 3: Multimedia (Movida a la izquierda) */}
+               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <ImageIcon size={16} style={{ color: BRAND.orange }} /> Imagen Destacada
+                </h3>
+
+                {!formData.upload_file ? (
+                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50/30 transition-all group">
+                    <input
+                      type="file"
+                      id="news-file-input"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      disabled={loading}
+                    />
+                    <label htmlFor="news-file-input" className="cursor-pointer flex flex-col items-center gap-3">
+                      <div className="p-3 bg-blue-50 rounded-full text-blue-500 group-hover:scale-110 transition-transform">
+                        <Upload size={24} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700">Haz clic para subir una imagen</p>
+                        <p className="text-xs text-gray-400 mt-1">PNG, JPG, WEBP (Máx. 5MB)</p>
+                      </div>
+                    </label>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl bg-gray-50">
+                    <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 border border-gray-300">
+                      {formData.upload_file instanceof File || formData.upload_file instanceof Blob ? (
+                        <img src={URL.createObjectURL(formData.upload_file)} alt="Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <img
+                          src={typeof formData.upload_file === 'string' ? formData.upload_file : (formData.upload_file?.url || '')}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {formData.upload_file instanceof File ? formData.upload_file.name : (typeof formData.upload_file === 'string' ? 'Imagen actual' : (formData.upload_file?.name || "Imagen actual"))}
                       </p>
-                    )}
+                      {formData.upload_file instanceof File && (
+                        <p className="text-xs text-gray-500">
+                          {(formData.upload_file.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                      )}
+                    </div>
+                    <button onClick={removeFile} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition">
+                      <XCircle size={20} />
+                    </button>
                   </div>
-                  <button onClick={removeFile} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition">
-                    <XCircle size={20} />
-                  </button>
-                </div>
-              )}
-              {errors.upload_file && <p className="mt-2 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.upload_file}</p>}
+                )}
+                {errors.upload_file && <p className="mt-2 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.upload_file}</p>}
+              </div>
             </div>
 
-            {/* SECCIÓN 4: Fechas */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <Calendar size={16} style={{ color: BRAND.blue }} /> Vigencia
-              </h3>
+            {/* Columna Derecha (Metadata) */}
+            <div className="space-y-6">
+              {/* SECCIÓN 2: Clasificación y Autor */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <Tag size={16} style={{ color: BRAND.darkGreen }} /> Clasificación
+                </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label className={labelClass}>Fecha Inicio</label>
-                  <input
-                    type="date"
-                    name="start_date"
-                    value={formData.start_date}
-                    onChange={handleChange}
-                    className={inputClass}
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  />
+                <div className="space-y-4">
+                  {/* Category */}
+                  <div>
+                    <label className={labelClass}>Categoría <span className="text-red-500">*</span></label>
+                    <select
+                      name="category_id"
+                      value={formData.category_id}
+                      onChange={handleChange}
+                      className={inputClass}
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                      disabled={loading || categoriesLoading}
+                    >
+                      <option value="">{categoriesLoading ? "Cargando..." : "-- Seleccione --"}</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>{category.name}</option>
+                      ))}
+                    </select>
+                    {errors.category_id && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.category_id}</p>}
+                  </div>
+
+                  {/* Author */}
+                  <div>
+                    <label className={labelClass}>Autor <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                      <User className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${errors.author ? "text-orange-400" : "text-gray-400"}`} size={16} />
+                      <input
+                        type="text"
+                        name="author"
+                        value={formData.author}
+                        onChange={handleChange}
+                        placeholder="Nombre del autor"
+                        className={`${inputClass} pl-10 ${errors.author ? "border-orange-300 ring-1 ring-orange-100" : ""}`}
+                        style={{ "--tw-ring-color": BRAND.lightBlue }}
+                        disabled={loading}
+                      />
+                    </div>
+                    {errors.author && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.author}</p>}
+                  </div>
                 </div>
-                <div>
-                  <label className={labelClass}>Fecha Fin</label>
-                  <input
-                    type="date"
-                    name="end_date"
-                    value={formData.end_date}
-                    onChange={handleChange}
-                    className={inputClass}
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  />
-                  {errors.end_date && <p className="mt-1 text-xs font-medium text-orange-500">{errors.end_date}</p>}
+
+                {/* Status Selection */}
+                <div className="pt-6 mt-4 border-t border-gray-100">
+                  <label className={`${labelClass} mb-2`}>Estado</label>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, status: "draft" }))}
+                      className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${formData.status === "draft"
+                        ? "bg-orange-50 text-orange-600 border border-orange-200"
+                        : "bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100"
+                        }`}
+                    >
+                      <Clock size={16} />
+                      Borrador
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, status: "published" }))}
+                      className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${formData.status === "published"
+                        ? "bg-green-50 text-green-600 border border-green-200"
+                        : "bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100"
+                        }`}
+                    >
+                      <CheckCircle size={16} />
+                      Publicado
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECCIÓN 4: Fechas */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <Calendar size={16} style={{ color: BRAND.blue }} /> Vigencia
+                </h3>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className={labelClass}>Desde</label>
+                    <input
+                      type="date"
+                      name="start_date"
+                      value={formData.start_date}
+                      onChange={handleChange}
+                      className={inputClass}
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Hasta</label>
+                    <input
+                      type="date"
+                      name="end_date"
+                      value={formData.end_date}
+                      onChange={handleChange}
+                      className={inputClass}
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    />
+                    {errors.end_date && <p className="mt-1 text-xs font-medium text-orange-500">{errors.end_date}</p>}
+                  </div>
                 </div>
               </div>
             </div>

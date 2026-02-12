@@ -288,7 +288,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-[9999] bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-      <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
+      <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
 
         {/* Header con Azul Profundo */}
         <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100" style={{ backgroundColor: BRAND.darkBlue }}>
@@ -307,284 +307,304 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
           </button>
         </div>
 
-        {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 bg-gray-50">
-          <div className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            {/* SECCIÓN 1: Información General */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <Type size={16} style={{ color: BRAND.blue }} /> Información Básica
-              </h3>
+            {/* Columna Izquierda (Contenido Principal) */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* SECCIÓN 1: Información General */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <Type size={16} style={{ color: BRAND.blue }} /> Información Básica
+                </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
-                {/* Estado */}
-                <div>
-                  <label className={labelClass}>Estado *</label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    className={inputClass}
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  >
-                    <option value="published">Publicado</option>
-                    <option value="draft">Borrador</option>
-                  </select>
-                </div>
-
-                {/* Tipo de Evento */}
-                <div>
-                  <label className={labelClass}>Modalidad</label>
-                  <select
-                    name="event_type"
-                    value={formData.event_type}
-                    onChange={handleChange}
-                    className={inputClass}
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  >
-                    <option value="in_person">Presencial</option>
-                    <option value="remote">Remoto / Virtual</option>
-                  </select>
-                </div>
-
-                {/* Categoría */}
-                <div>
-                  <label className={labelClass}>Categoría</label>
-                  <select
-                    name="category_id"
-                    value={formData.category_id}
-                    onChange={handleChange}
-                    className={inputClass}
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    disabled={loading || categoriesLoading}
-                  >
-                    <option value="">{categoriesLoading ? "Cargando..." : "-- Seleccione --"}</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>{category.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Título */}
-              <div className="mb-5">
-                <label className={labelClass}>Título del Evento *</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  placeholder="Ej: Congreso de Economía Circular 2025"
-                  className={inputClass}
-                  style={{
-                    "--tw-ring-color": BRAND.lightBlue,
-                    borderColor: errors.title ? BRAND.orange : ''
-                  }}
-                />
-                {errors.title && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.title}</p>}
-              </div>
-
-              {/* Descripción (ReactQuill) */}
-              <div>
-                <label className={labelClass}><AlignLeft size={12} className="inline mr-1" /> Descripción</label>
-                <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
-                  <ReactQuill
-                    theme="snow"
-                    value={formData.description}
-                    onChange={handleEditorChange}
-                    modules={modules}
-                    formats={formats}
-                    placeholder="Escribe el contenido aquí..."
-                    className="h-64 mb-12"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* SECCIÓN 2: Fecha y Hora */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <Calendar size={16} style={{ color: BRAND.darkGreen }} /> Fecha y Hora
-              </h3>
-
-              <div className="flex items-center gap-2 mb-4">
-                <input
-                  type="checkbox"
-                  name="is_all_day"
-                  checked={formData.is_all_day}
-                  onChange={handleChange}
-                  className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
-                  style={{ color: BRAND.blue }}
-                />
-                <label className="text-sm text-gray-700 font-medium">Evento de día completo</label>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
-                <div>
-                  <label className={labelClass}>Inicio *</label>
+                {/* Título */}
+                <div className="mb-5">
+                  <label className={labelClass}>Título del Evento <span className="text-red-500">*</span></label>
                   <input
-                    type="datetime-local"
-                    name="start_datetime"
-                    value={formData.start_datetime}
+                    type="text"
+                    name="title"
+                    value={formData.title}
                     onChange={handleChange}
+                    placeholder="Ej: Congreso de Economía Circular 2025"
                     className={inputClass}
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    style={{
+                      "--tw-ring-color": BRAND.lightBlue,
+                      borderColor: errors.title ? BRAND.orange : ''
+                    }}
                   />
-                  {errors.start_datetime && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.start_datetime}</p>}
+                  {errors.title && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.title}</p>}
                 </div>
+
+                {/* Descripción (ReactQuill) */}
                 <div>
-                  <label className={labelClass}>Fin *</label>
-                  <input
-                    type="datetime-local"
-                    name="end_datetime"
-                    value={formData.end_datetime}
-                    onChange={handleChange}
-                    className={inputClass}
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  />
-                  {errors.end_datetime && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.end_datetime}</p>}
-                </div>
-              </div>
-
-              <div>
-                <label className={labelClass}><Globe size={12} className="inline mr-1" /> Zona Horaria</label>
-                <select
-                  name="timezone"
-                  value={formData.timezone}
-                  onChange={handleChange}
-                  className={inputClass}
-                  style={{ "--tw-ring-color": BRAND.lightBlue }}
-                >
-                  <option value="America/Bogota">Bogotá (GMT-5)</option>
-                  <option value="America/Mexico_City">Ciudad de México (GMT-6)</option>
-                  <option value="America/Caracas">Caracas (GMT-4)</option>
-                  <option value="America/Lima">Lima (GMT-5)</option>
-                </select>
-              </div>
-            </div>
-
-            {/* SECCIÓN 3: Ubicación */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                {formData.event_type === 'remote'
-                  ? <><Video size={16} style={{ color: BRAND.blue }} /> Conexión Remota</>
-                  : <><MapPin size={16} style={{ color: BRAND.orange }} /> Ubicación Física</>}
-              </h3>
-
-              {formData.event_type === 'remote' ? (
-                <div>
-                  <label className={labelClass}>Enlace de Reunión *</label>
-                  <div className="relative">
-                    <LinkIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                      type="url"
-                      name="meeting_link"
-                      value={formData.meeting_link}
-                      onChange={handleChange}
-                      placeholder="https://meet.google.com/..."
-                      className={`${inputClass} pl-10`}
-                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                  <label className={labelClass}><AlignLeft size={12} className="inline mr-1" /> Descripción</label>
+                  <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+                    <ReactQuill
+                      theme="snow"
+                      value={formData.description}
+                      onChange={handleEditorChange}
+                      modules={modules}
+                      formats={formats}
+                      placeholder="Escribe el contenido aquí..."
+                      className="h-64 mb-12"
                     />
                   </div>
-                  {errors.meeting_link && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.meeting_link}</p>}
                 </div>
-              ) : (
+              </div>
+
+              {/* SECCIÓN 3: Ubicación / Conexión */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  {formData.event_type === 'remote'
+                    ? <><Video size={16} style={{ color: BRAND.blue }} /> Conexión Remota</>
+                    : <><MapPin size={16} style={{ color: BRAND.orange }} /> Ubicación Física</>}
+                </h3>
+
+                {formData.event_type === 'remote' ? (
+                  <div>
+                    <label className={labelClass}>Enlace de Reunión <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                      <LinkIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                      <input
+                        type="url"
+                        name="meeting_link"
+                        value={formData.meeting_link}
+                        onChange={handleChange}
+                        placeholder="https://meet.google.com/..."
+                        className={`${inputClass} pl-10`}
+                        style={{ "--tw-ring-color": BRAND.lightBlue }}
+                      />
+                    </div>
+                    {errors.meeting_link && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.meeting_link}</p>}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className={labelClass}>Nombre del Lugar <span className="text-red-500">*</span></label>
+                        <input
+                          type="text"
+                          name="location_name"
+                          value={formData.location_name}
+                          onChange={handleChange}
+                          placeholder="Ej: Centro de Convenciones Ágora"
+                          className={inputClass}
+                          style={{ "--tw-ring-color": BRAND.lightBlue }}
+                        />
+                        {errors.location_name && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.location_name}</p>}
+                      </div>
+                      <div>
+                        <label className={labelClass}>Dirección <span className="text-red-500">*</span></label>
+                        <input
+                          type="text"
+                          name="location_address"
+                          value={formData.location_address}
+                          onChange={handleChange}
+                          placeholder="Ej: Calle 26 # 12-34"
+                          className={inputClass}
+                          style={{ "--tw-ring-color": BRAND.lightBlue }}
+                        />
+                        {errors.location_address && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.location_address}</p>}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className={labelClass}>Latitud</label>
+                        <input
+                          type="number"
+                          name="latitude"
+                          value={formData.latitude}
+                          onChange={handleChange}
+                          placeholder="4.6097100"
+                          className={inputClass}
+                          style={{ "--tw-ring-color": BRAND.lightBlue }}
+                        />
+                      </div>
+                      <div>
+                        <label className={labelClass}>Longitud</label>
+                        <input
+                          type="number"
+                          name="longitude"
+                          value={formData.longitude}
+                          onChange={handleChange}
+                          placeholder="-74.0817500"
+                          className={inputClass}
+                          style={{ "--tw-ring-color": BRAND.lightBlue }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Columna Derecha (Metadata) */}
+            <div className="space-y-6">
+              {/* Clasificación y Estado */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <Type size={16} style={{ color: BRAND.darkGreen }} /> Configuración
+                </h3>
+                <div className="space-y-4">
+                  {/* Categoría */}
+                  <div>
+                    <label className={labelClass}>Categoría</label>
+                    <select
+                      name="category_id"
+                      value={formData.category_id}
+                      onChange={handleChange}
+                      className={inputClass}
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                      disabled={loading || categoriesLoading}
+                    >
+                      <option value="">{categoriesLoading ? "Cargando..." : "-- Seleccione --"}</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>{category.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Modalidad */}
+                  <div>
+                    <label className={labelClass}>Modalidad</label>
+                    <select
+                      name="event_type"
+                      value={formData.event_type}
+                      onChange={handleChange}
+                      className={inputClass}
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    >
+                      <option value="in_person">Presencial</option>
+                      <option value="remote">Remoto / Virtual</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Estado */}
+                <div className="pt-6 mt-4 border-t border-gray-100">
+                  <label className={`${labelClass} mb-2`}>Estado</label>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, status: "draft" }))}
+                      className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${formData.status === "draft"
+                        ? "bg-orange-50 text-orange-600 border border-orange-200"
+                        : "bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100"
+                        }`}
+                    >
+                      Borrador
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, status: "published" }))}
+                      className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${formData.status === "published"
+                        ? "bg-green-50 text-green-600 border border-green-200"
+                        : "bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100"
+                        }`}
+                    >
+                      Publicado
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECCIÓN 2: Fecha y Hora */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <Calendar size={16} style={{ color: BRAND.darkGreen }} /> Fecha y Hora
+                </h3>
+
+                <div className="flex items-center gap-2 mb-4">
+                  <input
+                    type="checkbox"
+                    name="is_all_day"
+                    checked={formData.is_all_day}
+                    onChange={handleChange}
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                    style={{ color: BRAND.blue }}
+                  />
+                  <label className="text-sm text-gray-700 font-medium">Día completo</label>
+                </div>
+
                 <div className="space-y-4">
                   <div>
-                    <label className={labelClass}>Nombre del Lugar *</label>
+                    <label className={labelClass}>Inicio <span className="text-red-500">*</span></label>
                     <input
-                      type="text"
-                      name="location_name"
-                      value={formData.location_name}
+                      type="datetime-local"
+                      name="start_datetime"
+                      value={formData.start_datetime}
                       onChange={handleChange}
-                      placeholder="Ej: Centro de Convenciones Ágora"
                       className={inputClass}
                       style={{ "--tw-ring-color": BRAND.lightBlue }}
                     />
-                    {errors.location_name && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.location_name}</p>}
+                    {errors.start_datetime && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.start_datetime}</p>}
                   </div>
-
                   <div>
-                    <label className={labelClass}>Dirección *</label>
+                    <label className={labelClass}>Fin <span className="text-red-500">*</span></label>
                     <input
-                      type="text"
-                      name="location_address"
-                      value={formData.location_address}
+                      type="datetime-local"
+                      name="end_datetime"
+                      value={formData.end_datetime}
                       onChange={handleChange}
-                      placeholder="Ej: Calle 26 # 12-34"
                       className={inputClass}
                       style={{ "--tw-ring-color": BRAND.lightBlue }}
                     />
-                    {errors.location_address && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.location_address}</p>}
+                    {errors.end_datetime && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.end_datetime}</p>}
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className={labelClass}>Latitud</label>
-                      <input
-                        type="number"
-                        name="latitude"
-                        value={formData.latitude}
-                        onChange={handleChange}
-                        placeholder="4.6097100"
-                        className={inputClass}
-                        style={{ "--tw-ring-color": BRAND.lightBlue }}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Longitud</label>
-                      <input
-                        type="number"
-                        name="longitude"
-                        value={formData.longitude}
-                        onChange={handleChange}
-                        placeholder="-74.0817500"
-                        className={inputClass}
-                        style={{ "--tw-ring-color": BRAND.lightBlue }}
-                      />
-                    </div>
+                  <div>
+                    <label className={labelClass}><Globe size={12} className="inline mr-1" /> Zona Horaria</label>
+                    <select
+                      name="timezone"
+                      value={formData.timezone}
+                      onChange={handleChange}
+                      className={inputClass}
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    >
+                      <option value="America/Bogota">Bogotá (GMT-5)</option>
+                      <option value="America/Mexico_City">Ciudad de México (GMT-6)</option>
+                      <option value="America/Caracas">Caracas (GMT-4)</option>
+                      <option value="America/Lima">Lima (GMT-5)</option>
+                    </select>
                   </div>
                 </div>
-              )}
-            </div>
-
-            {/* SECCIÓN 4: Registro */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <Users size={16} style={{ color: BRAND.blue }} /> Asistentes
-              </h3>
-
-              <div className="flex items-center gap-2 mb-4">
-                <input
-                  type="checkbox"
-                  name="requires_registration"
-                  checked={formData.requires_registration}
-                  onChange={handleChange}
-                  className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
-                  style={{ color: BRAND.blue }}
-                />
-                <label className="text-sm text-gray-700 font-medium">Requiere registro previo</label>
               </div>
 
-              {formData.requires_registration && (
-                <div>
-                  <label className={labelClass}>Cupo Máximo</label>
+              {/* SECCIÓN 4: Registro */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <Users size={16} style={{ color: BRAND.blue }} /> Asistentes
+                </h3>
+
+                <div className="flex items-center gap-2 mb-4">
                   <input
-                    type="number"
-                    name="max_attendees"
-                    value={formData.max_attendees}
+                    type="checkbox"
+                    name="requires_registration"
+                    checked={formData.requires_registration}
                     onChange={handleChange}
-                    placeholder="Ej: 100"
-                    className={inputClass}
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                    style={{ color: BRAND.blue }}
                   />
-                  {errors.max_attendees && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.max_attendees}</p>}
+                  <label className="text-sm text-gray-700 font-medium">Requiere registro previo</label>
                 </div>
-              )}
+
+                {formData.requires_registration && (
+                  <div>
+                    <label className={labelClass}>Cupo Máximo</label>
+                    <input
+                      type="number"
+                      name="max_attendees"
+                      value={formData.max_attendees}
+                      onChange={handleChange}
+                      placeholder="Ej: 100"
+                      className={inputClass}
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    />
+                    {errors.max_attendees && <p className="mt-1 text-xs font-medium" style={{ color: BRAND.orange }}>{errors.max_attendees}</p>}
+                  </div>
+                )}
+              </div>
             </div>
-
-
 
           </div>
         </form>
