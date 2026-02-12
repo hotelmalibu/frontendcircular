@@ -16,6 +16,7 @@ const Login = lazy(() => import("./modules/auths/Login"));
 const ForgotPassword = lazy(() => import("./modules/auths/ForgotPassword"));
 const ResetPassword = lazy(() => import("./modules/auths/ResetPassword"));
 const Register = lazy(() => import("./modules/auths/Register"));
+const VerifyEmail = lazy(() => import("./modules/auths/VerifyEmail"));
 
 // Public Pages (Home & Microsite)
 const Home = lazy(() => import("./modules/home/Home"));
@@ -102,6 +103,7 @@ export default function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/circularmente" element={<Circularmente />} />
           <Route path="/quines-somos" element={<QuienesSomos />} />
           <Route path="/alianzas" element={<Alianzas />} />

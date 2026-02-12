@@ -250,6 +250,15 @@ export default function AprobacionesList() {
                         <div className="flex items-start gap-2">
                           <User size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />
                           <span className="break-all"><strong>Email:</strong> {s.email}</span>
+                          {s.email_verified_at ? (
+                            <span className="flex items-center gap-1 text-green-600 text-xs font-bold bg-green-50 px-2 py-0.5 rounded-full w-fit mt-1">
+                               <CheckCircle size={10} /> Email Verificado
+                            </span>
+                          ) : (
+                             <span className="flex items-center gap-1 text-orange-600 text-xs font-bold bg-orange-50 px-2 py-0.5 rounded-full w-fit mt-1">
+                               <AlertCircle size={10} /> Email No Verificado
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-start gap-2">
                           <Shield size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />

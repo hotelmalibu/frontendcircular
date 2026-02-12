@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import PasswordStrengthMeter from "../../components/auth/PasswordStrengthMeter";
 import { register, getPublicRoles } from "../../api/auth";
 import {
     User,
@@ -298,6 +299,8 @@ export default function Register() {
                                 </div>
                             </div>
                         </div>
+                        
+                        <PasswordStrengthMeter password={formData.password} />
 
                         {/* ERROR */}
                         {error && (
@@ -344,17 +347,20 @@ export default function Register() {
                         </div>
 
                         <h3 className="text-2xl font-bold text-gray-800 mb-3">¡Registro Recibido!</h3>
-
-                        <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 mb-6 text-left flex gap-3">
-                            <Info size={20} className="text-blue-500 shrink-0 mt-0.5" />
-                            <p className="text-sm text-blue-800 leading-relaxed">
-                                Tu cuenta ha sido creada exitosamente, pero requiere ser <strong>aprobada por un administrador</strong> antes de que puedas iniciar sesión.
+                        
+                        <div className="bg-green-50 p-4 rounded-2xl border border-green-100 mb-6 text-left flex gap-3">
+                            <Info size={20} className="text-green-600 shrink-0 mt-0.5" />
+                            <p className="text-sm text-green-800 leading-relaxed">
+                                Te hemos enviado un <strong>correo de verificación</strong>. Por favor, verifica tu cuenta para que un administrador pueda habilitar tu acceso.
                             </p>
                         </div>
 
-                        <p className="text-gray-500 text-sm mb-8">
-                            Recibirás un correo electrónico una vez que tu acceso sea habilitado.
-                        </p>
+                        <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 mb-6 text-left flex gap-3">
+                            <Shield size={20} className="text-blue-500 shrink-0 mt-0.5" />
+                            <p className="text-sm text-blue-800 leading-relaxed">
+                                Una vez verificado el correo, tu cuenta será revisada y aprobada por el equipo administrativo.
+                            </p>
+                        </div>
 
                         <button
                             onClick={() => navigate("/login")}

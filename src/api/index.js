@@ -1,7 +1,11 @@
 import axios from "axios";
 
 // Base URL for API requests; adjust if backend runs elsewhere
-const API_BASE = "https://api-ecocircular.creativostecnologicosit.com/api";
+// Use relative path in development to trigger the proxy in package.json
+// Use absolute path in production
+const API_BASE = process.env.NODE_ENV === 'development'
+  ? "/api"
+  : "https://api-ecocircular.creativostecnologicosit.com/api";
 
 
 const api = axios.create({

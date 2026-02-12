@@ -21,6 +21,7 @@ export const deleteRole = (id) => api.delete(`/auth/roles/${id}`);
 export const getPermissions = () => api.get(`/auth/permissions`);
 
 export const getUsers = () => api.get(`/auth/users`);
+export const getCurrentUser = () => api.get(`/auth/user`);
 
 // Approval Workflow
 export const getApprovals = () => api.get(`/auth/approvals`);
@@ -35,3 +36,6 @@ export const getActiveSessions = () => api.get(`/auth/active-sessions`);
 export const forgotPassword = (email) => api.post(`/auth/forgot-password`, { email });
 
 export const resetPassword = (data) => api.post(`/auth/reset-password`, data);
+
+export const changePassword = (data) => api.post(`/auth/change-password`, data);
+export const resendVerification = () => api.post(`/auth/email/resend`);
