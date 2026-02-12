@@ -329,8 +329,8 @@ export default function Profile() {
                             )}
                           </>
                         ) : (
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-wrap max-w-full">
-                            <p className="text-gray-800 font-medium text-base break-all">{userData.email}</p>
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-wrap">
+                            <p className="text-gray-800 font-medium text-base break-all m-0">{userData.email}</p>
                             <div className="flex items-center gap-2">
                               {user?.email_verified_at ? (
                                 <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-100 whitespace-nowrap">
@@ -346,9 +346,9 @@ export default function Profile() {
                                   <button
                                     onClick={handleResendVerification}
                                     disabled={resending}
-                                    className="text-[10px] text-blue-600 font-bold hover:underline flex items-center gap-1 disabled:opacity-50 whitespace-nowrap"
+                                    className="text-[10px] text-blue-600 font-bold hover:underline flex items-center gap-1 disabled:opacity-50 whitespace-nowrap uppercase"
                                   >
-                                    {resending ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+                                    <RefreshCw size={10} className={resending ? "animate-spin" : ""} />
                                     REENVIAR
                                   </button>
                                 </>

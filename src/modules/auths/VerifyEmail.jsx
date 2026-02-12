@@ -16,18 +16,26 @@ export default function VerifyEmail() {
 
     useEffect(() => {
         const verify = async () => {
-            if (!id || !hash) {
+            // Buscamos el id y hash tanto en los segmentos de la ruta como en el query string (?id=...)
+            const finalId = id || searchParams.get("id");
+            const finalHash = hash || searchParams.get("hash");
+
+            if (!finalId || !finalHash) {
                 setStatus("error");
                 setMessage("Enlace de verificación inválido o incompleto.");
                 return;
             }
 
             try {
-                // Obtenemos todos los parámetros de búsqueda actuales para reenviarlos a la API
-                const queryParams = searchParams.toString();
+                // Preparamos los parámetros de seguridad (signature, expires) para la API
+                const params = new URLSearchParams(searchParams);
+                // Evitamos duplicar id y hash en el query string de la petición API
+                params.delete("id");
+                params.delete("hash");
+                const queryParams = params.toString();
                 
-                // Llamamos a la API. El backend ahora es capaz de leer tanto de la ruta como del query
-                const url = `/auth/email/verify/${id}/${hash}${queryParams ? `?${queryParams}` : ''}`;
+                // Llamamos a la API con los datos correctos
+                const url = `/auth/email/verify/${finalId}/${finalHash}${queryParams ? `?${queryParams}` : ''}`;
                 
                 await axios.get(url);
                 
