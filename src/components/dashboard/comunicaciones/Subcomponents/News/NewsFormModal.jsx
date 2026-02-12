@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -41,6 +41,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     author: "",
     start_date: "",
     end_date: "",
+    published_at: "",
     status: "published",
     upload_file: null,
   });
@@ -72,6 +73,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         author: newsData.author || "",
         start_date: newsData.start_date ? formatDateForInput(newsData.start_date) : "",
         end_date: newsData.end_date ? formatDateForInput(newsData.end_date) : "",
+        published_at: newsData.published_at ? formatDateForInput(newsData.published_at) : "",
         status: newsData.status || "published",
         upload_file: newsData.upload_file || null,
       }));
@@ -187,13 +189,16 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = "El título es requerido";
     if (!formData.category_id) newErrors.category_id = "La categoría es requerida";
+    if (!formData.author.trim()) newErrors.author = "El autor es requerido";
+    
+    // Validar contenido de ReactQuill (quitando tags HTML para ver si hay texto real)
+    const strippedDescription = formData.description.replace(/<[^>]*>/g, '').trim();
+    if (!strippedDescription) newErrors.description = "El contenido de la noticia es requerido";
+
     if (formData.end_date && formData.start_date) {
       if (new Date(formData.end_date) < new Date(formData.start_date)) {
         newErrors.end_date = "La fecha de fin debe ser posterior a la fecha de inicio";
       }
-    }
-    if (formData.upload_file && typeof formData.upload_file === 'object') {
-      // ... (Validaciones de archivo)
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -208,7 +213,6 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       // ... (Lógica de envío de datos - FormData - se mantiene igual)
       const toIsoDate = (value) => {
         if (!value) return null;
-        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return `${value}T00:00:00`;
         try {
           const d = new Date(value);
           if (isNaN(d.getTime())) return value;
@@ -217,11 +221,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       };
 
       const todayDate = () => {
-        const d = new Date();
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, "0");
-        const dd = String(d.getDate()).padStart(2, "0");
-        return `${yyyy}-${mm}-${dd}T00:00:00`;
+        return new Date().toISOString();
       };
 
       let publishedAt = formData.published_at ? toIsoDate(formData.published_at) : todayDate();
@@ -234,9 +234,14 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       dataToSend.append('type', formData.type);
       dataToSend.append('title', formData.title);
 
-      let descriptionContent = formData.description;
-      dataToSend.append('description', descriptionContent || "");
-      dataToSend.append('category_id', formData.category_id || "");
+      let descriptionContent = formData.description || "";
+      dataToSend.append('content', descriptionContent);
+      dataToSend.append('description', descriptionContent.substring(0, 1900));
+      
+      if (formData.category_id) {
+        dataToSend.append('category_id', formData.category_id);
+      }
+      
       dataToSend.append('author', formData.author || "");
       dataToSend.append('status', formData.status);
 
@@ -253,10 +258,26 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         await createNews(dataToSend);
       }
       onSuccess();
-      onSuccess();
     } catch (err) {
       console.error("Error saving news:", err);
-      const errorMessage = err.response?.data?.message || err.message || "Ocurrió un error al guardar la noticia.";
+      console.log("Full error response:", err.response?.data);
+      
+      let errorMessage = "Ocurrió un error al guardar la noticia.";
+      if (err.response?.data) {
+        const data = err.response.data;
+        if (data.message) errorMessage = data.message;
+        
+        // If there are specific validation errors, show them
+        if (data.errors && typeof data.errors === 'object') {
+          const detailedErrors = Object.entries(data.errors)
+            .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+            .join('\n');
+          errorMessage += `\n\nErrores de validación:\n${detailedErrors}`;
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
       alert(errorMessage);
     } finally {
       setLoading(false);
@@ -319,8 +340,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
               {/* Description (ReactQuill) */}
               <div>
-                <label className={labelClass}>Descripción / Contenido</label>
-                <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+                <label className={labelClass}>Descripción / Contenido <span className="text-red-500">*</span></label>
+                <div className={`bg-white rounded-xl overflow-hidden border transition-all ${errors.description ? "border-orange-300 ring-1 ring-orange-100" : "border-gray-200"}`}>
                   <ReactQuill
                     theme="snow"
                     value={formData.description}
@@ -331,6 +352,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                     className="h-64 mb-12"
                   />
                 </div>
+                {errors.description && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.description}</p>}
               </div>
             </div>
 
@@ -343,7 +365,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
                 {/* Category */}
                 <div>
-                  <label className={labelClass}>Categoría</label>
+                  <label className={labelClass}>Categoría <span className="text-red-500">*</span></label>
                   <select
                     name="category_id"
                     value={formData.category_id}
@@ -362,20 +384,21 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
                 {/* Author */}
                 <div>
-                  <label className={labelClass}>Autor</label>
+                  <label className={labelClass}>Autor <span className="text-red-500">*</span></label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                    <User className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${errors.author ? "text-orange-400" : "text-gray-400"}`} size={16} />
                     <input
                       type="text"
                       name="author"
                       value={formData.author}
                       onChange={handleChange}
                       placeholder="Nombre del autor"
-                      className={`${inputClass} pl-10`}
+                      className={`${inputClass} pl-10 ${errors.author ? "border-orange-300 ring-1 ring-orange-100" : ""}`}
                       style={{ "--tw-ring-color": BRAND.lightBlue }}
                       disabled={loading}
                     />
                   </div>
+                  {errors.author && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.author}</p>}
                 </div>
               </div>
 

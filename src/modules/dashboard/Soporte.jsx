@@ -7,7 +7,6 @@ import {
   LifeBuoy,
   FileCheck,
   UserX,
-  MessageSquare
 } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---

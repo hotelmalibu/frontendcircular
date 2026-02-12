@@ -14,6 +14,7 @@ import { getAllCategories } from "../../../../../api/categoriesApi";
 import DOMPurify from 'dompurify';
 import ProjectFormModal from "./ProjectFormModal";
 import ProjectDetailModal from "./ProjectDetailModal";
+import ConfirmModal from "../../../../../components/common/ConfirmModal";
 import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -46,7 +47,15 @@ export default function ProjectList() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  // Delete Modal State
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   const loadProjects = React.useCallback(async () => {
     try {
@@ -118,6 +127,7 @@ export default function ProjectList() {
     }
 
     setFilteredProjects(filtered);
+    setCurrentPage(1); // Reset to first page
   }, [projects, searchTerm]);
 
   useEffect(() => {
@@ -146,14 +156,19 @@ export default function ProjectList() {
     setShowDetailModal(true);
   };
 
-  const handleDelete = async (projectId) => {
-    if (!window.confirm("¿Está seguro de eliminar este proyecto?")) {
-      return;
-    }
+  const handleDelete = (projectItem) => {
+    setItemToDelete(projectItem);
+    setShowDeleteModal(true);
+  };
+
+  const executeDelete = async () => {
+    if (!itemToDelete) return;
 
     try {
-      await deleteProject(projectId);
+      await deleteProject(itemToDelete.id);
       await loadProjects();
+      setShowDeleteModal(false);
+      setItemToDelete(null);
     } catch (err) {
       alert(err.response?.data?.message || "Error al eliminar el proyecto");
     }
@@ -228,8 +243,9 @@ export default function ProjectList() {
           <p className="text-gray-500 mb-8 max-w-md mx-auto">Intenta ajustar los filtros de búsqueda o crea un nuevo proyecto.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProjects.map((item) => (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredProjects.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item) => (
             <div
               key={item.id}
               className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
@@ -334,7 +350,7 @@ export default function ProjectList() {
                   <Edit size={18} />
                 </button>
                 <button
-                  onClick={() => handleDelete(item.id)}
+                  onClick={() => handleDelete(item)}
                   className="p-2 rounded-lg hover:bg-white hover:shadow-sm transition"
                   title="Eliminar"
                   style={{ color: BRAND.orange }}
@@ -344,7 +360,39 @@ export default function ProjectList() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+
+          {/* Pagination Controls */}
+          {filteredProjects.length > itemsPerPage && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm"
+                  }`}
+              >
+                Anterior
+              </button>
+              
+              <span className="text-sm font-medium text-gray-600">
+                Página {currentPage} de {Math.ceil(filteredProjects.length / itemsPerPage)}
+              </span>
+
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredProjects.length / itemsPerPage)))}
+                disabled={currentPage === Math.ceil(filteredProjects.length / itemsPerPage)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === Math.ceil(filteredProjects.length / itemsPerPage)
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm"
+                  }`}
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       <div className="mt-8 text-center text-sm text-gray-400 border-t border-gray-200 pt-6">
@@ -371,6 +419,17 @@ export default function ProjectList() {
           }}
         />
       )}
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        title="Eliminar Proyecto"
+        message={`¿Está seguro que desea eliminar el proyecto "${itemToDelete?.title}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </div>
   );
 }

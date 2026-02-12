@@ -122,10 +122,36 @@ export default function ProjectsSection() {
       <section className="relative py-20 px-6 md:px-12 text-center overflow-hidden bg-cover bg-center">
         <div className="absolute inset-0 bg-[#F4F7F6]/90 mix-blend-overlay z-0 pointer-events-none"></div>
         <div className="relative z-10 max-w-[1400px] mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+          {/* Skeleton Header */}
+          <div className="flex flex-col items-center space-y-4 mb-12">
+            <div className="h-8 w-48 bg-gray-200 rounded-full animate-pulse"></div>
+            <div className="h-12 w-3/4 md:w-1/2 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="h-6 w-full md:w-2/3 bg-gray-200 rounded-lg animate-pulse"></div>
+          </div>
+
+          {/* Skeleton Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="w-full h-[280px] bg-gray-200 rounded-[1.5rem] animate-pulse relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer" style={{ backgroundSize: '200% 100%' }}></div>
+                <div className="absolute bottom-6 left-6 right-6 space-y-3">
+                  <div className="h-4 w-20 bg-gray-300 rounded-full"></div>
+                  <div className="h-6 w-3/4 bg-gray-300 rounded"></div>
+                  <div className="h-1 w-10 bg-gray-300 rounded-full"></div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+        <style>{`
+          @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+          }
+          .animate-shimmer {
+            animation: shimmer 2s infinite linear;
+          }
+        `}</style>
       </section>
     );
   }

@@ -2,23 +2,24 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import DOMPurify from 'dompurify';
 import { motion } from "framer-motion";
+import DefaultLoader from '../../components/common/DefaultLoader';
 import {
-  ArrowLeft,
+  FileText,
   Calendar,
+  User,
+  Tag,
+  Download,
+  ArrowLeft,
   Facebook,
   X,
   Linkedin,
   Mail,
-  MessageCircle,
-  Tag,
-  Clock,
-  User,
+  Check,
   Layers,
-  Download,
-  FileText,
-  Link as LinkIcon,
-  Check
+  MessageCircle,
+  Link as LinkIcon
 } from "lucide-react";
+
 import { getProjectById } from "../../api/projectsApi";
 import { getImageProxyUrl } from "../../utils/imageUtils";
 
@@ -110,14 +111,7 @@ export default function ContentDetailProject() {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-[#F6F6F6]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00AB6D] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando proyecto...</p>
-        </div>
-      </div>
-    );
+    return <DefaultLoader />;
   }
 
   if (error) {
@@ -187,10 +181,10 @@ export default function ContentDetailProject() {
                 alt={project.title}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#1E305D]/60 via-[#1E305D]/80 to-[#1E305D]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#1E305D]/50 to-[#1E305D]" />
             </div>
 
-            <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col justify-center pt-8">
+            <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col justify-center pt-32 md:pt-40">
               <Link
                 to="/"
                 className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-8 transition-colors w-fit group"
@@ -207,7 +201,7 @@ export default function ContentDetailProject() {
                 <span className="inline-block mb-4 text-xs font-bold tracking-widest text-white uppercase drop-shadow-md">
                   {project.type}
                 </span>
-                <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4 max-w-4xl">
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 max-w-5xl drop-shadow-lg">
                   {project.title}
                 </h1>
                 <div className="flex flex-wrap gap-6 text-gray-300 text-sm md:text-base">
@@ -220,7 +214,8 @@ export default function ContentDetailProject() {
           </div>
 
           {/* --- CONTENIDO PRINCIPAL --- */}
-          <div className="max-w-7xl mx-auto px-6 md:px-12 py-16">
+          {/* --- CONTENIDO PRINCIPAL --- */}
+          <div className="max-w-[1600px] mx-auto px-6 md:px-12 py-16">
             <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
 
               {/* COLUMNA IZQUIERDA: Cuerpo del Proyecto (Expandido) */}

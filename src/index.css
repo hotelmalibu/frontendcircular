@@ -101,3 +101,50 @@
   border-radius: 0.75rem;
   margin: 1.5rem 0;
 }
+
+/* --- RICH TEXT FORMATTING (Forcing visibility) --- */
+.news-content strong,
+.news-content b {
+  font-weight: 900 !important;
+}
+
+.news-content em,
+.news-content i {
+  font-style: italic !important;
+}
+
+.news-content u {
+  text-decoration: underline !important;
+}
+
+.news-content h1,
+.news-content h2,
+.news-content h3 {
+  color: #1e305d !important;
+  font-weight: 800 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1rem !important;
+  line-height: 1.2 !important;
+}
+
+.news-content h1 {
+  font-size: 2.25rem !important;
+}
+.news-content h2 {
+  font-size: 1.875rem !important;
+}
+.news-content h3 {
+  font-size: 1.5rem !important;
+}
+
+.news-content p {
+  margin-bottom: 1.25rem !important;
+}
+
+.news-content blockquote {
+  border-left: 4px solid #00ab6d;
+  padding-left: 1.5rem;
+  font-style: italic;
+  margin: 1.5rem 0;
+  color: #4b5563;
+}

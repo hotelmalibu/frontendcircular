@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
 import Dashboard from "../../components/dashboard/comunicaciones/Dashboard";
@@ -28,6 +28,11 @@ const BRAND = {
 export default function Comunicaciones() {
   const { user } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("Dashboard");
+
+  // Scroll to top when tab changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeTab]);
 
   const tabs = [
     { name: "Dashboard", label: "Gestión de Contenidos", icon: <LayoutDashboard size={18} />, component: <Dashboard /> },

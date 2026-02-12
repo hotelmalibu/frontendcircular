@@ -18,6 +18,7 @@ import { getAllNews, deleteNews } from "../../../../../api/newsApi";
 import DOMPurify from 'dompurify';
 import NewsFormModal from "./NewsFormModal";
 import NewsDetailModal from "./NewsDetailModal";
+import ConfirmModal from "../../../../../components/common/ConfirmModal";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -50,6 +51,14 @@ export default function NewsList() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedNews, setSelectedNews] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  // Delete Modal State
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   const loadNews = React.useCallback(async () => {
     try {
@@ -132,6 +141,7 @@ export default function NewsList() {
     }
 
     setFilteredNews(filtered);
+    setCurrentPage(1); // Reset to first page on filter change
   }, [news, searchTerm, filterStatus]); // Removed filterType from dependencies
 
   useEffect(() => {
@@ -159,17 +169,21 @@ export default function NewsList() {
     setShowDetailModal(true);
   };
 
-  const handleDelete = async (newsId) => {
-    if (!window.confirm("¿Está seguro de eliminar esta noticia?")) {
-      return;
-    }
+  const handleDelete = (newsItem) => {
+    setItemToDelete(newsItem);
+    setShowDeleteModal(true);
+  };
+
+  const executeDelete = async () => {
+    if (!itemToDelete) return;
 
     try {
-      await deleteNews(newsId);
+      await deleteNews(itemToDelete.id);
       await loadNews();
-
+      setShowDeleteModal(false);
+      setItemToDelete(null);
     } catch (err) {
-      alert(err.response?.data?.message || "Error al eliminar la noticia");
+      alert(err.response?.data?.message || "Error al eliminar la noticia"); // Consider replacing this with FeedbackModal later
     }
   };
 
@@ -287,8 +301,9 @@ export default function NewsList() {
           <p className="text-gray-500 mb-8 max-w-md mx-auto">Intenta ajustar los filtros de búsqueda o crea una nueva noticia.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredNews.map((item) => (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredNews.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item) => (
             <div
               key={item.id}
               className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
@@ -383,7 +398,7 @@ export default function NewsList() {
                   <Edit size={18} />
                 </button>
                 <button
-                  onClick={() => handleDelete(item.id)}
+                  onClick={() => handleDelete(item)}
                   className="p-2 rounded-lg hover:bg-white hover:shadow-sm transition"
                   title="Eliminar"
                   style={{ color: BRAND.orange }}
@@ -393,7 +408,39 @@ export default function NewsList() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+
+          {/* Pagination Controls */}
+          {filteredNews.length > itemsPerPage && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm"
+                  }`}
+              >
+                Anterior
+              </button>
+              
+              <span className="text-sm font-medium text-gray-600">
+                Página {currentPage} de {Math.ceil(filteredNews.length / itemsPerPage)}
+              </span>
+
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredNews.length / itemsPerPage)))}
+                disabled={currentPage === Math.ceil(filteredNews.length / itemsPerPage)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === Math.ceil(filteredNews.length / itemsPerPage)
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm"
+                  }`}
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       <div className="mt-8 text-center text-sm text-gray-400 border-t border-gray-200 pt-6">
@@ -420,6 +467,17 @@ export default function NewsList() {
           }}
         />
       )}
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        title="Eliminar Noticia"
+        message={`¿Está seguro que desea eliminar la noticia "${itemToDelete?.title}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </div>
   );
 }

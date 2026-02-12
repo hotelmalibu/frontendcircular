@@ -123,15 +123,15 @@ export default function EventDetailModal({ eventData, onClose }) {
   const primaryAction = getPrimaryAction();
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col animate-fadeIn">
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl max-h-[90vh] overflow-y-auto animate-fadeIn relative custom-scrollbar">
 
         {/* Header con Gradiente */}
         <div
-          className="relative px-8 py-12 text-white overflow-hidden"
+          className="relative px-6 py-8 md:px-8 md:py-12 text-white shrink-0"
           style={{ background: typeConfig.gradient }}
         >
-          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute inset-0 bg-black/20"></div>
           <div className="relative z-10">
             <button
               onClick={onClose}
@@ -162,7 +162,7 @@ export default function EventDetailModal({ eventData, onClose }) {
             </div>
 
 
-            <h1 className="text-3xl md:text-4xl font-black leading-tight max-w-4xl">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-black leading-tight max-w-4xl mt-4 text-white drop-shadow-md break-words relative z-20">
               {eventData.title}
             </h1>
 
@@ -170,7 +170,7 @@ export default function EventDetailModal({ eventData, onClose }) {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto bg-gray-50">
+        <div className="bg-gray-50">
           <div className="p-6 md:p-10">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 

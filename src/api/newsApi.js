@@ -126,7 +126,12 @@ export const updateNews = async (newsId, newsData) => {
     if (!newsData.has('_method')) {
       newsData.append('_method', 'PUT');
     }
-    const response = await api.post(`${NEWS_ENDPOINT}/${newsId}`, newsData);
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+    const response = await api.post(`${NEWS_ENDPOINT}/${newsId}`, newsData, config);
     return response.data;
   }
 

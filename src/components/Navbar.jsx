@@ -221,6 +221,14 @@ function MegaMenuDropdown({
     }, 300);
   };
 
+  const location = useLocation();
+
+  useEffect(() => {
+    setOpen(false);
+    onOpenChange(false);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  }, [location.pathname, onOpenChange]);
+
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -402,6 +410,11 @@ function ProfileDropdown({ user, logout, showWhiteText }) {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setOpen(true);
   };
+  useEffect(() => {
+    setOpen(false);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  }, [location.pathname]);
+
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setOpen(false);
@@ -622,6 +635,11 @@ export default function Navbar({ onMenuClick }) {
   const underlineColor = showWhiteText ? BRAND.green2 : BRAND.blue;
   // Define el ancho de la línea: 100% fijo si es transparente, 0% (animado a 100% en hover) si no.
   const underlineWidth = showWhiteText ? "100%" : "0";
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setHasOpenDropdown(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {

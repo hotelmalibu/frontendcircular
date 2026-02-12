@@ -6,6 +6,7 @@ import AxiosInterceptor from "./components/common/AxiosInterceptor";
 import PrivateRoute from "./components/PrivateRoute";
 import Footer from "./components/Footer";
 import DefaultLoader from "./components/common/DefaultLoader";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 // --- LAZY LOADED COMPONENTS ---
 
@@ -73,6 +74,7 @@ const MainLayout = () => (
 export default function App() {
   return (
     <div className="flex flex-col min-h-screen">
+      <ScrollToTop />
       <AxiosInterceptor />
       <Toaster position="top-center" reverseOrder={false} />
 

@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
 import DOMPurify from 'dompurify';
 import { useParams, Link } from 'react-router-dom';
-import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, Share2, MessageCircle, Link as LinkIcon, Check } from 'lucide-react';
-import { allContentData, contentTypeConfig } from '../../data/mockContent';
+import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, MessageCircle, Link as LinkIcon, Check, User, Layers } from 'lucide-react';
+import { allContentData, contentTypeConfig as typeConfig } from '../../data/mockContent';
 import { AuthContext } from '../../context/AuthContext';
 import { getAllNews, getNewsById } from '../../api/newsApi';
 import { getImageProxyUrl } from '../../utils/imageUtils.js';
+import DefaultLoader from '../../components/common/DefaultLoader';
 
 
 export default function ContentDetailPage() {
@@ -87,43 +88,31 @@ export default function ContentDetailPage() {
           const mapped = {
             id: found.id || found._id || found.uid,
             title: found.title || found.name || "Sin título",
-            // Excerpt usa description preferiblemente
-            excerpt: found.excerpt || found.description || (found.content ? (String(found.content).slice(0, 250) + '...') : ""),
-
-            // --- CORRECCIÓN CLAVE ---
-            // Priorizamos 'content', 'body', 'html' o 'text' antes que 'description' para asegurar que se muestre el artículo completo
-            body: found.content || found.body || found.html || found.text || found.description || "",
-
-            // Image: prioritize upload_file.url from API, then fallback to other image fields
-            image: getImageProxyUrl((found.upload_file && found.upload_file.url) || found.image || found.thumbnail || found.cover || "", { width: 1200, quality: 85 }),
-            date: found.published_at || found.publishedAt || found.created_at || found.createdAt || "",
-            type: found.type ? (found.type === 'news' ? 'Noticias' : found.type) : 'Noticias',
-            topic: found.category_name ||
-              (found.category && typeof found.category === 'object' ? found.category.name : found.category) ||
-              "Sin categoría asignada",
-            author: found.author || found.by || "",
+            excerpt: found.description || found.content || "",
+            body: found.content || found.description || "",
+            image: getImageProxyUrl((found.upload_file && found.upload_file.url) || found.image || "", { width: 1200, quality: 85 }),
+            date: found.published_at || found.created_at || "",
+            type: found.type === 'news' ? 'Noticias' : (found.type || 'Noticias'),
+            topic: found.category_name || (found.category && typeof found.category === 'object' ? found.category.name : found.category) || "General",
+            author: found.author || "",
             slug: found.slug || null,
             status: found.status || "",
           };
 
-          // Sanitize body HTML to avoid XSS
-          if (mapped.body) {
+          // Sanitize body HTML
+          if (mapped.body && /[<>]/.test(mapped.body)) {
             try {
               mapped.body = DOMPurify.sanitize(String(mapped.body), {
-                ADD_ATTR: ['target', 'rel', 'class'], // Permite atributos necesarios para Quill
+                ADD_ATTR: ['target', 'rel', 'class'],
               });
-            } catch (e) {
-              // If sanitization fails, logic continues
-            }
+            } catch (e) {}
           }
 
           // Format date
           if (mapped.date) {
             try {
               mapped.date = new Date(mapped.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' });
-            } catch (e) {
-              // leave as-is if invalid
-            }
+            } catch (e) {}
           }
 
           setContent(mapped);
@@ -131,7 +120,7 @@ export default function ContentDetailPage() {
           setContent(null);
         }
       } catch (err) {
-        console.error('Error fetching news for content detail:', err);
+        console.error('Error fetching news:', err);
         if (mounted) setContent(null);
       } finally {
         if (mounted) setLoading(false);
@@ -142,22 +131,15 @@ export default function ContentDetailPage() {
     return () => { mounted = false };
   }, [slug, isAuthenticated]);
 
-  // Loading State
+// ...
+
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando contenido...</p>
-        </div>
-      </div>
-    );
+    return <DefaultLoader />;
   }
 
-  // Not Found State
   if (!content) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
+      <div className="h-screen flex flex-col items-center justify-center text-center p-4 bg-[#F6F6F6]">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Contenido no encontrado</h2>
         <Link to="/explorar" className="text-[#00AB6D] hover:underline font-semibold">
           ← Volver a explorar
@@ -166,7 +148,7 @@ export default function ContentDetailPage() {
     );
   }
 
-  const config = contentTypeConfig[content.type] || {};
+  const config = (typeConfig && content?.type) ? (typeConfig[content.type] || {}) : {};
   const Icon = config.icon || (() => null);
 
   // --- SOCIAL SHARE URLS ---
@@ -187,7 +169,7 @@ export default function ContentDetailPage() {
     <div className="min-h-screen bg-white fontfamily-montserrat">
 
       {/* --- HERO HEADER --- */}
-      <div className={`relative w-full h-[70vh] md:h-[80vh] flex items-end overflow-hidden ${config.isSolid ? config.bgColor : 'bg-gray-900'}`}>
+      <div className={`relative w-full h-[85vh] overflow-hidden ${config.isSolid ? config.bgColor : 'bg-gray-900'}`}>
 
         {/* FONDO: Imagen o Color Sólido */}
         {config.isSolid ? (
@@ -202,9 +184,9 @@ export default function ContentDetailPage() {
                 <img
                   src={content.image}
                   alt={content.title}
-                  className="absolute inset-0 w-full h-full object-cover opacity-80"
+                  className="absolute inset-0 w-full h-full object-cover object-center"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1E305D]/90 via-[#1E305D]/40 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#1E305D]/50 to-[#1E305D]" />
               </>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-[#1E305D] to-[#16324a]">
@@ -215,36 +197,34 @@ export default function ContentDetailPage() {
         )}
 
         {/* TÍTULO Y DATOS EN HERO */}
-        <div className="container mx-auto px-4 md:px-8 relative z-10 pb-16 md:pb-20">
-          <div className="max-w-4xl">
-            <Link to="/explorar" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 text-sm font-semibold transition-colors">
-              <ArrowLeft size={16} /> Volver a explorar
-            </Link>
+        <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col justify-center pt-32 md:pt-40">
+          <Link to="/explorar" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 text-sm font-semibold transition-colors group">
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Volver a explorar
+          </Link>
 
-            <div className="flex items-center gap-3 mb-4">
-              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-white/20 text-white backdrop-blur-sm border border-white/20`}>
-                {content.type}
-              </span>
-              <span className="text-white/80 text-sm font-medium flex items-center gap-1">
-                <Calendar size={14} /> {content.date}
-              </span>
-            </div>
-
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4 drop-shadow-sm">
-              {content.title}
-            </h1>
+          <div className="flex items-center gap-3 mb-6">
+            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-white/20 text-white backdrop-blur-sm border border-white/20 shadow-sm`}>
+              {content.type}
+            </span>
+            <span className="text-white/90 text-sm font-bold flex items-center gap-1.5 bg-black/20 px-3 py-1 rounded-full backdrop-blur-sm">
+              <Calendar size={14} /> {content.date}
+            </span>
           </div>
+
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 drop-shadow-lg max-w-5xl">
+            {content.title}
+          </h1>
         </div>
       </div>
 
       {/* --- CONTENIDO PRINCIPAL --- */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-16">
+      <div className="max-w-[1600px] mx-auto px-6 md:px-12 py-16">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
 
           {/* COLUMNA IZQUIERDA: Cuerpo del Artículo (Expandido) */}
           <div className="flex-1 order-1 lg:order-1">
-            <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-gray-100">
-              <h1 className="text-3xl md:text-5xl font-extrabold text-[#1E305D] mb-8 leading-tight">
+            <div className="bg-white p-6 md:p-12 rounded-[2rem] shadow-sm border border-gray-100">
+              <h1 className="text-2xl md:text-4xl font-extrabold text-[#1E305D] mb-8 leading-tight">
                 {content.title}
               </h1>
 
@@ -261,7 +241,7 @@ export default function ContentDetailPage() {
                     ))
                   )
                 ) : (
-                  <p className="text-xl italic text-gray-400">{content.excerpt || 'No hay contenido adicional disponible.'}</p>
+                  <p className="text-xl italic text-gray-400">No hay contenido adicional disponible.</p>
                 )}
               </div>
             </div>
@@ -279,14 +259,14 @@ export default function ContentDetailPage() {
                 <div className="space-y-6">
                   {content.author && (
                     <SidebarItem
-                      icon={Mail}
+                      icon={User}
                       label="Escrito por"
                       value={content.author}
                     />
                   )}
 
                   <SidebarItem
-                    icon={ArrowLeft}
+                    icon={Layers}
                     label="Tópico / Categoría"
                     value={content.topic}
                   />
@@ -298,7 +278,7 @@ export default function ContentDetailPage() {
                   />
 
                   <SidebarItem
-                    icon={Share2}
+                    icon={Check}
                     label="Tipo de contenido"
                     value={content.type}
                   />
@@ -342,7 +322,6 @@ export default function ContentDetailPage() {
     </div>
   );
 }
-
 
 // Sub-componente Botón Social (ESTÁTICO)
 function SocialButton({ icon: Icon, url, color }) {

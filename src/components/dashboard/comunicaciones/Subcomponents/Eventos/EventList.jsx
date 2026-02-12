@@ -24,6 +24,7 @@ import { getAllCategories } from "../../../../../api/categoriesApi";
 import DOMPurify from 'dompurify';
 import EventFormModal from "./EventFormModal";
 import EventDetailModal from "./EventDetailModal";
+import ConfirmModal from "../../../../../components/common/ConfirmModal";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -67,6 +68,10 @@ export default function EventList() {
     per_page: 15,
     total: 0
   });
+
+  // Delete Modal State
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   const loadEvents = React.useCallback(async () => {
     try {
@@ -177,14 +182,19 @@ export default function EventList() {
     setShowDetailModal(true);
   };
 
-  const handleDelete = async (eventId) => {
-    if (!window.confirm("¿Está seguro de eliminar este evento?")) {
-      return;
-    }
+  const handleDelete = (eventItem) => {
+    setItemToDelete(eventItem);
+    setShowDeleteModal(true);
+  };
+
+  const executeDelete = async () => {
+    if (!itemToDelete) return;
 
     try {
-      await deleteSchedule(eventId);
+      await deleteSchedule(itemToDelete.id);
       await loadEvents();
+      setShowDeleteModal(false);
+      setItemToDelete(null);
     } catch (err) {
       alert(err.response?.data?.message || "Error al eliminar el evento");
     }
@@ -484,7 +494,7 @@ export default function EventList() {
                     <Edit size={18} />
                   </button>
                   <button
-                    onClick={() => handleDelete(item.id)}
+                    onClick={() => handleDelete(item)}
                     className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
                     title="Eliminar"
                     style={{ color: BRAND.orange }}
@@ -561,6 +571,17 @@ export default function EventList() {
           }}
         />
       )}
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        title="Eliminar Evento"
+        message={`¿Está seguro que desea eliminar el evento "${itemToDelete?.title}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </div>
   );
 }

@@ -11,6 +11,7 @@ export default function FeaturedSection() {
   const [newsItems, setNewsItems] = useState([]);
   const [activeTab, setActiveTab] = useState("Todos");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const itemsPerPage = 8;
 
   const categories = [
@@ -124,6 +125,8 @@ export default function FeaturedSection() {
 
       } catch (err) {
         console.error("Error cargando contenido:", err);
+      } finally {
+        if (mounted) setLoading(false);
       }
     };
 
@@ -192,7 +195,31 @@ export default function FeaturedSection() {
         </div>
 
         {/* GRID */}
-        {currentItems.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm animate-pulse">
+                {/* Skeleton Imagen */}
+                <div className="bg-gray-200 aspect-[16/10] w-full"></div>
+                
+                {/* Skeleton Contenido */}
+                <div className="p-5 flex flex-col flex-1">
+                  {/* Categoría */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="h-3 bg-gray-200 rounded w-16"></div>
+                    <div className="h-3 bg-gray-200 rounded w-20"></div>
+                  </div>
+                  
+                  {/* Título */}
+                  <div className="space-y-2 mb-4">
+                    <div className="h-5 bg-gray-200 rounded w-full"></div>
+                    <div className="h-5 bg-gray-200 rounded w-2/3"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : currentItems.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
             {currentItems.map((item) => {
               const config = contentTypeConfig[item.type] || contentTypeConfig["Noticias"] || {};
