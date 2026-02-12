@@ -5,12 +5,12 @@ export const AuthContext = createContext();
 
 
 export const AuthProvider = ({ children }) => {
-  // Inicializa desde localStorage de forma síncrona para evitar redirecciones
-  // prematuras en rutas protegidas antes de que useEffect corra.
+  // Inicializa buscando en localStorage (persistente) o sessionStorage (temporal)
   const [user, setUser] = useState(() => {
     try {
-      const saved = localStorage.getItem("user");
-      return saved ? JSON.parse(saved) : null;
+      const savedLocal = localStorage.getItem("user");
+      const savedSession = sessionStorage.getItem("user");
+      return savedLocal ? JSON.parse(savedLocal) : (savedSession ? JSON.parse(savedSession) : null);
     } catch (e) {
       return null;
     }
@@ -18,14 +18,14 @@ export const AuthProvider = ({ children }) => {
 
   const [token, setToken] = useState(() => {
     try {
-      return localStorage.getItem("token") || null;
+      return localStorage.getItem("token") || sessionStorage.getItem("token") || null;
     } catch (e) {
       return null;
     }
   });
 
 
-  const login = useCallback((userData, tokenData) => {
+  const login = useCallback((userData, tokenData, remember = false) => {
 
     const userWithRole = {
       ...userData,
@@ -39,10 +39,19 @@ export const AuthProvider = ({ children }) => {
     setToken(tokenData);
 
     try {
-      localStorage.setItem("user", JSON.stringify(userWithRole));
-      localStorage.setItem("token", tokenData);
+      if (remember) {
+        localStorage.setItem("user", JSON.stringify(userWithRole));
+        localStorage.setItem("token", tokenData);
+        // También guardamos el email para pre-completar el form
+        localStorage.setItem("remembered_email", userWithRole.email);
+      } else {
+        sessionStorage.setItem("user", JSON.stringify(userWithRole));
+        sessionStorage.setItem("token", tokenData);
+        // Al no recordar, limpiamos el email recordado previo por privacidad
+        localStorage.removeItem("remembered_email");
+      }
     } catch (e) {
-      console.error("Error guardando en localStorage:", e);
+      console.error("Error guardando datos de sesión:", e);
     }
   }, []);
 
@@ -56,9 +65,13 @@ export const AuthProvider = ({ children }) => {
     setUser(mergedUser);
 
     try {
-      localStorage.setItem("user", JSON.stringify(mergedUser));
+      if (localStorage.getItem("user")) {
+        localStorage.setItem("user", JSON.stringify(mergedUser));
+      } else if (sessionStorage.getItem("user")) {
+        sessionStorage.setItem("user", JSON.stringify(mergedUser));
+      }
     } catch (e) {
-      console.error("Error actualizando usuario en localStorage:", e);
+      console.error("Error actualizando usuario en almacenamiento:", e);
     }
   }, [user]);
 
@@ -69,8 +82,10 @@ export const AuthProvider = ({ children }) => {
     try {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
+      sessionStorage.removeItem("user");
+      sessionStorage.removeItem("token");
     } catch (e) {
-      console.error("Error eliminando de localStorage:", e);
+      console.error("Error eliminando de almacenamiento:", e);
     }
   }, []);
 

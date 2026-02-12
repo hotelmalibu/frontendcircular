@@ -20,8 +20,15 @@ const BRAND = {
 export default function Login() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => {
+    try {
+      return localStorage.getItem("remembered_email") || "";
+    } catch (e) {
+      return "";
+    }
+  });
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(!!localStorage.getItem("remembered_email"));
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +41,7 @@ export default function Login() {
     setIsLoading(true);
     try {
       const res = await loginRequest(email.trim(), password);
-      login(res.data.data.user, res.data.data.token);
+      login(res.data.data.user, res.data.data.token, remember);
       navigate("/dashboard", { replace: true });
     } catch (err) {
       console.error("Error de inicio de sesión:", err);
@@ -112,12 +119,14 @@ export default function Login() {
                   <Mail size={20} />
                 </div>
                 <input
+                  id="email"
+                  name="email"
                   type="email"
                   placeholder="usuario@empresa.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  autoComplete="email"
+                  autoComplete="username email"
                   className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#2C67B0]/20 focus:border-[#2C67B0] transition-all duration-200"
                 />
               </div>
@@ -138,7 +147,9 @@ export default function Login() {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#2C67B0] transition-colors">
                   <Lock size={20} />
                 </div>
-                <input
+                 <input
+                  id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
@@ -155,6 +166,21 @@ export default function Login() {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
+            </div>
+
+            {/* Recordarme y Olvidé mi contraseña */}
+            <div className="flex items-center justify-between px-1">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-[#2C67B0] focus:ring-[#2C67B0]/20 transition-all cursor-pointer"
+                />
+                <span className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors">
+                  Recordarme
+                </span>
+              </label>
             </div>
 
             {/* Error Message */}

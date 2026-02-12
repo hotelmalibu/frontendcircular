@@ -21,7 +21,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     try {
-      const token = localStorage.getItem("token");
+      // Intentar obtener del persistente o del temporal
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       if (token) {
         config.headers = config.headers || {};
         // If token already prefixed with Bearer, avoid double prefix
@@ -30,7 +31,7 @@ api.interceptors.request.use(
           : `Bearer ${token}`;
       }
     } catch (e) {
-      // ignore localStorage errors
+      // ignore localStorage/sessionStorage errors
     }
     return config;
   },
