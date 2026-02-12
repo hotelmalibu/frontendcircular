@@ -355,44 +355,72 @@ export default function Roles() {
                 <div className="flex flex-col h-full">
                   <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Acceso y Permisos</h4>
 
-                  <div className="flex-1 min-h-[300px] lg:min-h-0 bg-gray-50/50 rounded-2xl border border-gray-100 p-4 overflow-y-auto custom-scrollbar">
-                    {permissions.length === 0 ? (
-                      <div className="text-center py-8">
-                        <p className="text-sm text-gray-400">Sin permisos definidos</p>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 gap-2">
-                        {permissions.map(perm => (
-                          <div
-                            key={perm.id}
-                            onClick={() => togglePermission(perm.id)}
-                            className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${formData.permissions.includes(perm.id)
-                              ? "bg-white border-blue-200 ring-1 ring-blue-50 shadow-sm"
-                              : "bg-white border-transparent hover:border-gray-200"
-                              }`}
-                          >
-                            <div className={`mt-0.5 ${formData.permissions.includes(perm.id) ? "text-blue-600" : "text-gray-300"}`}>
-                              {formData.permissions.includes(perm.id) ? <CheckSquare size={18} /> : <Square size={18} />}
-                            </div>
-                            <div className="flex flex-col overflow-hidden">
-                              <p className={`text-sm font-bold truncate ${formData.permissions.includes(perm.id) ? "text-blue-800" : "text-gray-700"}`}>
-                                {perm.name}
+                  {(() => {
+                    // Check if role is affiliate (by slug or name), handling plural 'afiliados'
+                   const isAfiliadoRole = formData.slug === 'afiliados' || 
+                                        formData.slug === 'afiliado' || 
+                                        formData.name?.toLowerCase().includes('afiliado') ||
+                                        (currentRole && (
+                                            currentRole.slug === 'afiliados' || 
+                                            currentRole.slug === 'afiliado' || 
+                                            currentRole.name?.toLowerCase().includes('afiliado')
+                                        ));
+
+                    if (isAfiliadoRole) {
+                        return (
+                           <div className="flex-1 min-h-[300px] lg:min-h-0 bg-orange-50/50 rounded-2xl border border-orange-100 p-8 flex flex-col items-center justify-center text-center">
+                              <AlertCircle size={48} className="text-orange-300 mb-4" />
+                              <h4 className="text-orange-800 font-bold mb-2">Permisos Restringidos</h4>
+                              <p className="text-sm text-orange-600 max-w-xs leading-relaxed">
+                                El rol de <strong>Afiliado</strong> tiene permisos gestionados automáticamente por el sistema. No se permite la edición manual de sus accesos.
                               </p>
-                              {perm.description && (
-                                <p className="text-[10px] text-gray-400 mt-0.5 line-clamp-1 italic">{perm.description}</p>
-                              )}
-                            </div>
+                           </div>
+                        );
+                    }
+
+                    return (
+                        <>
+                          <div className="flex-1 min-h-[300px] lg:min-h-0 bg-gray-50/50 rounded-2xl border border-gray-100 p-4 overflow-y-auto custom-scrollbar">
+                            {permissions.length === 0 ? (
+                              <div className="text-center py-8">
+                                <p className="text-sm text-gray-400">Sin permisos definidos</p>
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-1 gap-2">
+                                {permissions.map(perm => (
+                                  <div
+                                    key={perm.id}
+                                    onClick={() => togglePermission(perm.id)}
+                                    className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${formData.permissions.includes(perm.id)
+                                      ? "bg-white border-blue-200 ring-1 ring-blue-50 shadow-sm"
+                                      : "bg-white border-transparent hover:border-gray-200"
+                                      }`}
+                                  >
+                                    <div className={`mt-0.5 ${formData.permissions.includes(perm.id) ? "text-blue-600" : "text-gray-300"}`}>
+                                      {formData.permissions.includes(perm.id) ? <CheckSquare size={18} /> : <Square size={18} />}
+                                    </div>
+                                    <div className="flex flex-col overflow-hidden">
+                                      <p className={`text-sm font-bold truncate ${formData.permissions.includes(perm.id) ? "text-blue-800" : "text-gray-700"}`}>
+                                        {perm.name}
+                                      </p>
+                                      {perm.description && (
+                                        <p className="text-[10px] text-gray-400 mt-0.5 line-clamp-1 italic">{perm.description}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-100/50">
-                    <p className="text-[10px] text-blue-700 leading-relaxed font-medium">
-                      Selecciona los permisos que definirán qué puede hacer este rol dentro del sistema.
-                    </p>
-                  </div>
+                          
+                          <div className="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-100/50">
+                            <p className="text-[10px] text-blue-700 leading-relaxed font-medium">
+                              Selecciona los permisos que definirán qué puede hacer este rol dentro del sistema.
+                            </p>
+                          </div>
+                        </>
+                    );
+                  })()}
                 </div>
               </div>
             </form>

@@ -1,5 +1,6 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useContext } from "react";
 import { Routes, Route, Outlet } from "react-router-dom";
+import { AuthContext } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import AxiosInterceptor from "./components/common/AxiosInterceptor";
@@ -61,15 +62,27 @@ const ContentDetailProject = lazy(() => import("./components/pagesProyectos/Cont
 const NotFound = lazy(() => import("./modules/home/NotFound"));
 
 // Helper component for pages with shared layout
-const MainLayout = () => (
-  <>
-    <Navbar />
-    <main className="flex-1">
-      <Outlet />
-    </main>
-    <Footer />
-  </>
-);
+const MainLayout = () => {
+  const { user } = useContext(AuthContext);
+
+  // Show footer if:
+  // 1. User is not logged in
+  // 2. User is logged in AND has 'afiliado' role
+  const showFooter = !user || 
+    (user.role_slug === 'afiliado' || user.role_slug === 'afiliados') || 
+    (user.role?.toLowerCase().includes('afiliado')) ||
+    (user.roles && user.roles.some(r => r.slug === 'afiliado' || r.slug === 'afiliados' || r.name?.toLowerCase().includes('afiliado')));
+
+  return (
+    <>
+      <Navbar />
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      {showFooter && <Footer />}
+    </>
+  );
+};
 
 export default function App() {
   return (

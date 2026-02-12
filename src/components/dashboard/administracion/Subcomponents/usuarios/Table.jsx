@@ -14,7 +14,9 @@ import {
   User,
   Mail,
   Lock,
-  Shield
+  Shield,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { getUsers, createUser, updateUser, deleteUser } from "../../../../../api/users";
 import { getRoles, getPermissions } from "../../../../../api/auth";
@@ -44,6 +46,7 @@ export default function Table() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null); // For Edit/Delete
   const [saving, setSaving] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Form Data
   const [formData, setFormData] = useState({
@@ -495,14 +498,21 @@ export default function Table() {
                       <div className="relative">
                         <Lock className="absolute left-3 top-2.5 text-gray-400" size={16} />
                         <input
-                          type="password"
+                          type={showPassword ? "text" : "password"}
                           name="password"
                           value={formData.password}
                           onChange={handleInputChange}
                           required={!currentUser}
-                          className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                          className="w-full pl-9 pr-10 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
                           placeholder="••••••••"
                         />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-2.5 text-gray-400 hover:text-blue-600 transition"
+                        >
+                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
                       </div>
                     </div>
                     <div>
@@ -512,7 +522,7 @@ export default function Table() {
                       <div className="relative">
                         <Lock className="absolute left-3 top-2.5 text-gray-400" size={16} />
                         <input
-                          type="password"
+                          type={showPassword ? "text" : "password"}
                           name="password_confirmation"
                           value={formData.password_confirmation}
                           onChange={handleInputChange}
@@ -525,78 +535,98 @@ export default function Table() {
                   </div>
                 </div>
 
-                {/* COLUMNA DERECHA: PERMISOS */}
-                <div className="flex flex-col h-full">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Permisos Directos</h4>
-                    {formData.role_id && (
-                      <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold">
-                        {roles.find(r => String(r.id) === String(formData.role_id))?.name}
-                      </span>
-                    )}
-                  </div>
+                {(() => {
+                  const selectedRole = roles.find(r => String(r.id) === String(formData.role_id));
+                  // Check inclusive for 'afiliados' (plural) and 'afiliado' (singular)
+                  const isAfiliadoRole = selectedRole?.slug === 'afiliados' || 
+                                         selectedRole?.slug === 'afiliado' || 
+                                         selectedRole?.name?.toLowerCase().includes('afiliado');
                   
-                  {currentUser ? (
-                    <div className="flex-1 min-h-[300px] lg:min-h-0 bg-gray-50/50 rounded-2xl border border-gray-100 p-4 overflow-y-auto custom-scrollbar">
-                      <div className="grid grid-cols-1 gap-2">
-                        {permissions.map((perm) => {
-                          const selectedRole = roles.find(r => String(r.id) === String(formData.role_id));
-                          const isInherited = selectedRole?.permissions?.some(p => p.id === perm.id || p.slug === perm.slug);
-                          const isDirect = formData.permissions.includes(perm.id);
+                  if (isAfiliadoRole) {
+                    return (
+                       <div className="flex flex-col h-full bg-blue-50/30 rounded-2xl border border-blue-100 p-8 items-center justify-center text-center">
+                          <Shield size={48} className="text-blue-200 mb-4" />
+                          <h4 className="text-blue-800 font-bold mb-2">Rol de Afiliado</h4>
+                          <p className="text-sm text-blue-600 max-w-xs">
+                            Los usuarios con rol de <strong>Afiliado</strong> tienen un conjunto de permisos predefinidos y no requieren configuración adicional de accesos directos.
+                          </p>
+                       </div>
+                    );
+                  }
 
-                          return (
-                            <label 
-                              key={perm.id} 
-                              className={`flex items-center gap-3 p-3 rounded-xl transition-all border cursor-pointer group shadow-sm ${
-                                isInherited 
-                                  ? "bg-blue-50/30 border-blue-100 opacity-80 cursor-default" 
-                                  : isDirect
-                                    ? "bg-white border-blue-200 ring-1 ring-blue-50" 
-                                    : "bg-white border-transparent hover:border-gray-200"
-                              }`}
-                            >
-                              <div className="flex-shrink-0">
-                                <input
-                                  type="checkbox"
-                                  checked={isInherited || isDirect}
-                                  disabled={isInherited}
-                                  onChange={() => togglePermission(perm.id)}
-                                  className={`w-5 h-5 rounded-md border-gray-300 text-blue-600 focus:ring-blue-500 transition-all ${isInherited ? 'cursor-default' : 'cursor-pointer'}`}
-                                />
-                              </div>
-                              <div className="flex flex-col overflow-hidden">
-                                <div className="flex items-center gap-2">
-                                  <span className={`text-sm font-bold truncate ${isInherited ? 'text-blue-700' : 'text-gray-700 group-hover:text-blue-600'}`}>
-                                    {perm.name}
-                                  </span>
-                                  {isInherited && (
-                                    <span className="text-[9px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-md font-black uppercase">Del Rol</span>
-                                  )}
-                                </div>
-                                <span className="text-[10px] text-gray-400 font-mono uppercase">
-                                  {perm.slug}
-                                </span>
-                              </div>
-                            </label>
-                          );
-                        })}
+                  return (
+                    <div className="flex flex-col h-full">
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Permisos Directos</h4>
+                        {formData.role_id && (
+                          <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold">
+                            {selectedRole?.name}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {currentUser ? (
+                        <div className="flex-1 min-h-[300px] lg:min-h-0 bg-gray-50/50 rounded-2xl border border-gray-100 p-4 overflow-y-auto custom-scrollbar">
+                          <div className="grid grid-cols-1 gap-2">
+                            {permissions.map((perm) => {
+                              const isInherited = selectedRole?.permissions?.some(p => p.id === perm.id || p.slug === perm.slug);
+                              const isDirect = formData.permissions.includes(perm.id);
+
+                              return (
+                                <label 
+                                  key={perm.id} 
+                                  className={`flex items-center gap-3 p-3 rounded-xl transition-all border cursor-pointer group shadow-sm ${
+                                    isInherited 
+                                      ? "bg-blue-50/30 border-blue-100 opacity-80 cursor-default" 
+                                      : isDirect
+                                        ? "bg-white border-blue-200 ring-1 ring-blue-50" 
+                                        : "bg-white border-transparent hover:border-gray-200"
+                                  }`}
+                                >
+                                  <div className="flex-shrink-0">
+                                    <input
+                                      type="checkbox"
+                                      checked={isInherited || isDirect}
+                                      disabled={isInherited}
+                                      onChange={() => togglePermission(perm.id)}
+                                      className={`w-5 h-5 rounded-md border-gray-300 text-blue-600 focus:ring-blue-500 transition-all ${isInherited ? 'cursor-default' : 'cursor-pointer'}`}
+                                    />
+                                  </div>
+                                  <div className="flex flex-col overflow-hidden">
+                                    <div className="flex items-center gap-2">
+                                      <span className={`text-sm font-bold truncate ${isInherited ? 'text-blue-700' : 'text-gray-700 group-hover:text-blue-600'}`}>
+                                        {perm.name}
+                                      </span>
+                                      {isInherited && (
+                                        <span className="text-[9px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-md font-black uppercase">Del Rol</span>
+                                      )}
+                                    </div>
+                                    <span className="text-[10px] text-gray-400 font-mono uppercase">
+                                      {perm.slug}
+                                    </span>
+                                  </div>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex-1 flex flex-col items-center justify-center bg-gray-50 border border-dashed border-gray-200 rounded-2xl p-8 text-center">
+                          <Shield size={40} className="text-gray-300 mb-3" />
+                          <p className="text-sm text-gray-500 font-medium">
+                            Crea el usuario primero para asignarle permisos individuales.
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-100/50">
+                        <p className="text-[10px] text-blue-700 leading-relaxed font-medium">
+                          <strong>Herencia:</strong> Los permisos marcados como <span className="font-black">"DEL ROL"</span> ya están asignados por el perfil elegido. Los adicionales son <span className="font-black">directos</span> al usuario.
+                        </p>
                       </div>
                     </div>
-                  ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center bg-gray-50 border border-dashed border-gray-200 rounded-2xl p-8 text-center">
-                      <Shield size={40} className="text-gray-300 mb-3" />
-                      <p className="text-sm text-gray-500 font-medium">
-                        Crea el usuario primero para asignarle permisos individuales.
-                      </p>
-                    </div>
-                  )}
-                  
-                  <div className="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-100/50">
-                    <p className="text-[10px] text-blue-700 leading-relaxed font-medium">
-                      <strong>Herencia:</strong> Los permisos marcados como <span className="font-black">"DEL ROL"</span> ya están asignados por el perfil elegido. Los adicionales son <span className="font-black">directos</span> al usuario.
-                    </p>
-                  </div>
-                </div>
+                  );
+                })()}
               </div>
 
             </form>

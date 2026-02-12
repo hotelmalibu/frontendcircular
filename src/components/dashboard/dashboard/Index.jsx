@@ -10,7 +10,10 @@ export default function Index() {
   const [pendingUsersCount, setPendingUsersCount] = useState(0);
 
   // Definiciones de estado de usuario
-  const isAfiliado = user?.role_slug === 'afiliado' || user?.role?.toLowerCase() === 'afiliado';
+  // Definiciones de estado de usuario
+  const isAfiliado = user?.role_slug === 'afiliado' || 
+                     user?.role_slug === 'afiliados' ||
+                     user?.role?.toLowerCase().includes('afiliado');
   const hasDashboardPermission = user?.permissions?.includes('view.dashboard');
   const hasSupportPermission = user?.permissions?.includes('view.support');
   const hasAnyPermission = user?.permissions && user.permissions.length > 0;
@@ -74,7 +77,13 @@ export default function Index() {
     }
   };
 
-  // 1. Si tiene el permiso explícito de Dashboard, ve la vista administrativa completa
+  // 1. Si es Afiliado, SIEMPRE muestra su dashboard específico (UndexAfiliado)
+  // Esto tiene prioridad sobre cualquier otro permiso para este rol específico.
+  if (isAfiliado) {
+    return <UndexAfiliado />;
+  }
+
+  // 2. Si tiene el permiso explícito de Dashboard (Admin), ve la vista administrativa
   if (hasDashboardPermission) {
     return <Undexsub />;
   }
@@ -165,6 +174,13 @@ export default function Index() {
     );
   }
 
-  // 3. Por defecto (Afiliados puros) ven la vista informativa tradicional
-  return <UndexAfiliado />;
+  // 3. Por defecto (Roles sin dashboard específico y sin permisos especiales)
+  // (El código de arriba cubre la mayoría de casos, pero esto sirve de fallback seguro)
+  return  (
+    <div className="flex flex-col items-center justify-center p-12 text-center text-gray-400 bg-white rounded-3xl border border-gray-100 border-dashed">
+      <ShieldCheck size={48} className="mb-4 text-gray-200" />
+      <h3 className="text-lg font-bold text-gray-500">Bienvenido al Panel</h3>
+      <p className="text-sm">Selecciona una opción del menú lateral para comenzar.</p>
+    </div>
+  );
 }
