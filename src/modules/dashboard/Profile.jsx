@@ -153,9 +153,14 @@ export default function Profile() {
         });
       }
 
-      toast.success("Perfil actualizado correctamente.", {
-          duration: 4000,
-      });
+      toast.success(
+        emailChanged 
+          ? "Perfil actualizado. Se ha enviado un enlace de verificación a tu nuevo correo. Por seguridad, si los cambios no se reflejan tras verificar, por favor cierra sesión e inicia nuevamente."
+          : "Perfil actualizado correctamente.", 
+        {
+          duration: 6000,
+        }
+      );
 
       // Resetear estados
       setIsEditing(false);
@@ -351,6 +356,9 @@ export default function Profile() {
                                     <RefreshCw size={10} className={resending ? "animate-spin" : ""} />
                                     REENVIAR
                                   </button>
+                                  <p className="text-[9px] text-gray-400 w-full mt-1 italic">
+                                    Si ya verificaste y no ves el cambio, intenta cerrar e iniciar sesión.
+                                  </p>
                                 </>
                               )}
                             </div>
