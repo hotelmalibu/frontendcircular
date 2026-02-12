@@ -105,33 +105,46 @@ export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Información de Contacto</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Phone */}
-              {companyData.phone && (
-                <div className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Phone size={18} className="text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Teléfono</p>
-                    <p className="font-medium text-gray-900">{companyData.phone}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Email */}
-              {companyData.email && (
-                <div className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Mail size={18} className="text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Email</p>
-                    <a
-                      href={`mailto:${companyData.email}`}
-                      className="font-medium text-blue-600 hover:text-blue-800"
-                    >
-                      {companyData.email}
-                    </a>
+              {/* Contacts List */}
+              {companyData.contacts && companyData.contacts.length > 0 && (
+                <div className="col-span-1 md:col-span-2 space-y-4">
+                  <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b border-gray-100 pb-2">Contactos de la Empresa</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {companyData.contacts.map((contact, index) => (
+                      <div key={index} className="flex flex-col p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-300 transition-colors shadow-sm">
+                        <div className="flex items-center gap-3 mb-3">
+                           <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold shadow-sm">
+                              {contact.contact_name ? contact.contact_name.charAt(0).toUpperCase() : 'C'}
+                           </div>
+                           <div>
+                              <div className="font-bold text-gray-900 leading-tight">{contact.contact_name || 'Sin nombre'}</div>
+                              <div className="text-xs text-gray-500">Contacto {index + 1}</div>
+                           </div>
+                        </div>
+                        
+                        <div className="space-y-2 pl-1">
+                          {contact.phone && (
+                            <div className="flex items-center gap-2.5 text-sm text-gray-600 group">
+                              <div className="p-1.5 bg-green-50 rounded-md text-green-600 group-hover:bg-green-100 transition-colors">
+                                <Phone size={14} />
+                              </div>
+                              <span className="font-medium">{contact.phone}</span>
+                            </div>
+                          )}
+                          
+                          {contact.email && (
+                            <div className="flex items-center gap-2.5 text-sm text-gray-600 group">
+                              <div className="p-1.5 bg-blue-50 rounded-md text-blue-600 group-hover:bg-blue-100 transition-colors">
+                                <Mail size={14} /> 
+                              </div>
+                              <a href={`mailto:${contact.email}`} className="hover:text-blue-700 hover:underline transition-colors truncate font-medium">
+                                {contact.email}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

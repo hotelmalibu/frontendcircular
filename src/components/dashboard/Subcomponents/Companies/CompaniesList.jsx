@@ -331,18 +331,7 @@ export default function CompaniesList() {
 
                 {/* Detalles de Contacto */}
                 <div className="space-y-2 mb-4 border-t border-gray-100 pt-3">
-                  {item.email && (
-                    <div className="flex items-center gap-2 text-xs text-gray-500 truncate" title={item.email}>
-                      <Mail size={12} className="text-gray-400 flex-shrink-0" />
-                      <span className="truncate">{item.email}</span>
-                    </div>
-                  )}
-                  {item.phone && (
-                    <div className="flex items-center gap-2 text-xs text-gray-500 truncate">
-                      <Phone size={12} className="text-gray-400 flex-shrink-0" />
-                      <span>{item.phone}</span>
-                    </div>
-                  )}
+
                   {item.address && (
                     <div className="flex items-center gap-2 text-xs text-gray-500 truncate">
                       <MapPin size={12} className="text-gray-400 flex-shrink-0" />
@@ -362,10 +351,10 @@ export default function CompaniesList() {
 
               {/* Footer de Acciones */}
               <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-between items-center">
-                <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-                  <Package size={14} style={{ color: BRAND.darkGreen }} />
-                  <span>{item.products ? item.products.length : 0} Productos</span>
-                </div>
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium opacity-0 select-none">
+                    {/* Spacer */}
+                    <span>-</span>
+                  </div>
 
                 <div className="flex gap-1">
                   <button

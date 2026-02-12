@@ -95,8 +95,7 @@ export default function MapSection() {
       fuzzySearch(search, e.name) ||
       fuzzySearch(search, e.region || '') ||
       fuzzySearch(search, e.description || '') ||
-      fuzzySearch(search, e.phone || '') ||
-      fuzzySearch(search, e.email || '') ||
+      fuzzySearch(search, e.contacts ? JSON.stringify(e.contacts) : '') ||
       fuzzySearch(search, e.address || '')
     );
 
@@ -436,38 +435,48 @@ export default function MapSection() {
                   <div className="space-y-3">
                     <h4 className="text-gray-900 font-bold text-sm border-b pb-1 mb-2">Contacto</h4>
 
-                    {selectedEmpresa.phone && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
-                          <Phone size={14} />
-                        </div>
-                        <a href={`tel:${selectedEmpresa.phone}`} className="text-sm text-gray-700 hover:text-blue-600 font-medium">
-                          {selectedEmpresa.phone}
-                        </a>
+                    {/* Multiple Contacts List */}
+                    {selectedEmpresa.contacts && selectedEmpresa.contacts.length > 0 ? (
+                      <div className="space-y-3">
+                        {selectedEmpresa.contacts.map((contact, index) => (
+                           <div key={index} className="flex flex-col gap-1 p-3 bg-blue-50/50 rounded-lg border border-blue-100/50 hover:bg-blue-50 transition-colors">
+                              <div className="flex items-center gap-2 mb-1">
+                                <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                                  {contact.contact_name ? contact.contact_name.charAt(0).toUpperCase() : 'C'}
+                                </div>
+                                <span className="text-sm font-semibold text-gray-800">{contact.contact_name}</span>
+                              </div>
+                              
+                              {contact.phone && (
+                                <div className="flex items-center gap-2 text-xs text-gray-600 ml-1">
+                                  <Phone size={12} className="text-green-600" />
+                                  <span>{contact.phone}</span>
+                                </div>
+                              )}
+                              
+                              {contact.email && (
+                                <div className="flex items-center gap-2 text-xs text-gray-600 ml-1">
+                                  <Mail size={12} className="text-indigo-600" />
+                                  <a href={`mailto:${contact.email}`} className="hover:text-indigo-800 underline decoration-indigo-200">
+                                    {contact.email}
+                                  </a>
+                                </div>
+                              )}
+                           </div>
+                        ))}
                       </div>
-                    )}
-
-                    {selectedEmpresa.email && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 flex-shrink-0">
-                          <Mail size={14} />
-                        </div>
-                        <a href={`mailto:${selectedEmpresa.email}`} className="text-sm text-gray-700 hover:text-indigo-600 font-medium break-all">
-                          {selectedEmpresa.email}
-                        </a>
-                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-400 italic">No hay contactos registrados.</p>
                     )}
 
                     {selectedEmpresa.website_url && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center text-teal-600 flex-shrink-0">
-                          <Globe size={14} />
-                        </div>
+                      <div className="flex items-center gap-2 p-3 bg-teal-50/50 rounded-lg border border-teal-100/50 mt-2">
+                        <Globe size={16} className="text-teal-600" />
                         <a
                           href={selectedEmpresa.website_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-sm text-teal-600 font-medium hover:underline flex items-center gap-1"
+                          className="text-sm text-teal-700 font-medium hover:underline flex items-center gap-1"
                         >
                           Visitar Sitio Web <ExternalLink size={12} />
                         </a>
