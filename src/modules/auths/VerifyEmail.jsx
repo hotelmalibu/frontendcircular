@@ -1,10 +1,13 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle, XCircle, Loader2, ArrowRight } from "lucide-react";
 import axios from "../../api"; // Adjust import based on your project structure
+import { AuthContext } from "../../context/AuthContext";
+import { getCurrentUser } from "../../api/auth";
 
 export default function VerifyEmail() {
+    const { isAuthenticated, updateUser } = useContext(AuthContext);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     
@@ -39,6 +42,18 @@ export default function VerifyEmail() {
                 
                 await axios.get(url);
                 
+                // Si el usuario está autenticado, refrescamos sus datos para actualizar el estado de verificación
+                if (isAuthenticated) {
+                    try {
+                        const res = await getCurrentUser();
+                        if (res.data?.user) {
+                            updateUser(res.data.user);
+                        }
+                    } catch (e) {
+                        console.error("Error refreshing user data after verification:", e);
+                    }
+                }
+
                 setStatus("success");
                 setMessage("¡Tu correo ha sido verificado exitosamente!");
             } catch (error) {
@@ -49,7 +64,7 @@ export default function VerifyEmail() {
         };
 
         verify();
-    }, [id, hash, searchParams]);
+    }, [id, hash, searchParams, isAuthenticated, updateUser]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
@@ -72,10 +87,10 @@ export default function VerifyEmail() {
                         <p className="text-gray-600 mb-8">{message}</p>
                         
                         <button 
-                            onClick={() => navigate("/login")}
+                            onClick={() => navigate(isAuthenticated ? "/profile" : "/login")}
                             className="flex items-center justify-center gap-2 bg-[#2C67B0] hover:bg-[#005380] text-white px-6 py-3 rounded-xl font-bold transition-all w-full"
                         >
-                            Ir al Login <ArrowRight size={18} />
+                            {isAuthenticated ? "Ir a mi Perfil" : "Ir al Login"} <ArrowRight size={18} />
                         </button>
                     </div>
                 )}
