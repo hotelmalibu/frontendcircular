@@ -557,6 +557,9 @@ export default function Navbar({ onMenuClick }) {
 
     const search = searchStr.toLowerCase();
     return projectsList.filter(project => {
+      // 0. Filtrar borradores
+      if (project.status === 'draft') return false;
+
       // 1. Verificar Nombre de Categoría (Prioritario en muchos casos)
       const categoryName = (project.category_name || project.category?.name || "").toLowerCase();
 
@@ -589,8 +592,6 @@ export default function Navbar({ onMenuClick }) {
   const transparentPaths = [
     "/circularmente",
     "/explorar",
-    "/contenido",
-    "/proyectos/",
     "/juntaDirecteEquipo",
     "/valores",
     "/lineas-estrategicas",

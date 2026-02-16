@@ -105,14 +105,14 @@ export default function ContentDetailPage() {
               mapped.body = DOMPurify.sanitize(String(mapped.body), {
                 ADD_ATTR: ['target', 'rel', 'class'],
               });
-            } catch (e) {}
+            } catch (e) { }
           }
 
           // Format date
           if (mapped.date) {
             try {
               mapped.date = new Date(mapped.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' });
-            } catch (e) {}
+            } catch (e) { }
           }
 
           setContent(mapped);
@@ -131,7 +131,7 @@ export default function ContentDetailPage() {
     return () => { mounted = false };
   }, [slug, isAuthenticated]);
 
-// ...
+  // ...
 
   if (loading) {
     return <DefaultLoader />;
@@ -169,86 +169,104 @@ export default function ContentDetailPage() {
     <div className="min-h-screen bg-white fontfamily-montserrat">
 
       {/* --- HERO HEADER --- */}
-      <div className={`relative w-full h-[85vh] overflow-hidden ${config.isSolid ? config.bgColor : 'bg-gray-900'}`}>
+      <div className={`relative w-full min-h-[40vh] h-auto overflow-hidden ${config.isSolid ? config.bgColor : 'bg-[#0f172a]'}`}>
 
-        {/* FONDO: Imagen o Color Sólido */}
+        {/* FONDO: Color Sólido / Gradiente Sophisticado */}
         {config.isSolid ? (
           <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-            <Icon size={400} strokeWidth={0.5} className="text-white opacity-10 absolute -right-20 -bottom-20 rotate-12" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            <Icon size={400} strokeWidth={0.5} className="text-white opacity-5 absolute -right-20 -bottom-20 rotate-12" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/40 to-transparent"></div>
           </div>
         ) : (
-          <>
-            {content.image ? (
-              <>
-                <img
-                  src={content.image}
-                  alt={content.title}
-                  className="absolute inset-0 w-full h-full object-cover object-center"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#1E305D]/50 to-[#1E305D]" />
-              </>
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-[#1E305D] to-[#16324a]">
-                <Icon size={160} strokeWidth={1} className="text-white/20" />
-              </div>
-            )}
-          </>
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1E305D] via-[#16324a] to-[#0f172a]"></div>
+            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`, backgroundSize: '40px 40px' }}></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,171,109,0.15)_0%,transparent_50%)]"></div>
+          </div>
         )}
 
-        {/* TÍTULO Y DATOS EN HERO */}
-        <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col justify-center pt-32 md:pt-40">
-          <Link to="/explorar" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 text-sm font-semibold transition-colors group">
+        {/* TÍTULO EN HERO */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center text-center pt-32 md:pt-40 pb-12 md:pb-16">
+          <Link to="/explorar" className="inline-flex items-center gap-2 text-white/60 hover:text-white mb-8 text-sm font-medium transition-all group px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm">
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Volver a explorar
           </Link>
 
-          <div className="flex items-center gap-3 mb-6">
-            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-white/20 text-white backdrop-blur-sm border border-white/20 shadow-sm`}>
+          <div className="flex flex-wrap justify-center items-center gap-4 mb-8">
+            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] bg-[#00AB6D] text-white shadow-lg shadow-[#00AB6D]/20`}>
               {content.type}
-            </span>
-            <span className="text-white/90 text-sm font-bold flex items-center gap-1.5 bg-black/20 px-3 py-1 rounded-full backdrop-blur-sm">
-              <Calendar size={14} /> {content.date}
             </span>
           </div>
 
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 drop-shadow-lg max-w-5xl">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] drop-shadow-2xl max-w-5xl tracking-tight">
             {content.title}
           </h1>
+
         </div>
       </div>
 
       {/* --- CONTENIDO PRINCIPAL --- */}
-      <div className="max-w-[1600px] mx-auto px-6 md:px-12 py-16">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
+      <div className="relative z-20 max-w-[1400px] mx-auto px-6 md:px-12 pt-8 pb-16">
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
 
-          {/* COLUMNA IZQUIERDA: Cuerpo del Artículo (Expandido) */}
-          <div className="flex-1 order-1 lg:order-1">
-            <div className="bg-white p-6 md:p-12 rounded-[2rem] shadow-sm border border-gray-100">
-              <h1 className="text-2xl md:text-4xl font-extrabold text-[#1E305D] mb-8 leading-tight">
-                {content.title}
-              </h1>
+          {/* COLUMNA IZQUIERDA: Cuerpo del Artículo */}
+          <div className="flex-1">
+            <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-black/10 border border-gray-100 overflow-hidden">
 
-              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed font-sans overflow-x-auto">
-                {content.body ? (
-                  /[<>]/.test(content.body) ? (
-                    <div
-                      dangerouslySetInnerHTML={{ __html: content.body }}
-                      className="news-content ql-editor !p-0"
+              {/* Imagen del contenido (Estática) */}
+              {content.image && (
+                <div className="relative overflow-hidden bg-gray-50 border-b border-gray-100 flex justify-center">
+                  <div className="max-w-4xl w-full">
+                    <img
+                      src={content.image}
+                      alt={content.title}
+                      className="w-full h-auto object-cover"
                     />
+                  </div>
+                </div>
+              )}
+
+              <div className="p-8 md:p-12">
+                {/* Título de la noticia (Tamaño moderado dentro del card) */}
+                <h2 className="text-3xl md:text-4xl font-extrabold text-[#1E305D] mb-4 leading-tight">
+                  {content.title}
+                </h2>
+
+                {/* Sección de Autor más visible */}
+                <div className="flex items-center gap-4 mb-10 pb-8 border-b border-gray-100">
+                  <div className="w-12 h-12 rounded-full bg-[#E2E8F0] flex items-center justify-center text-[#1E305D]">
+                    <User size={24} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs font-black text-[#00AB6D] uppercase tracking-widest">Escritor</span>
+                    <span className="text-lg font-bold text-gray-900">{content.author || 'Redacción Visión Circular'}</span>
+                  </div>
+                  <div className="ml-auto flex items-center gap-2 text-gray-400 text-sm italic">
+                    <Calendar size={14} /> {content.date}
+                  </div>
+                </div>
+
+                <div className="prose prose-xl max-w-none text-gray-700 leading-relaxed font-sans news-content-styled">
+                  {content.body ? (
+                    /[<>]/.test(content.body) ? (
+                      <div
+                        dangerouslySetInnerHTML={{ __html: content.body }}
+                        className="news-content ql-editor !p-0 !font-sans !text-gray-700"
+                      />
+                    ) : (
+                      content.body.split(/\n\s*\n/).map((paragraph, idx) => (
+                        <p key={idx} className="mb-8 text-xl leading-relaxed">{paragraph}</p>
+                      ))
+                    )
                   ) : (
-                    content.body.split(/\n\s*\n/).map((paragraph, idx) => (
-                      <p key={idx} className="mb-6">{paragraph}</p>
-                    ))
-                  )
-                ) : (
-                  <p className="text-xl italic text-gray-400">No hay contenido adicional disponible.</p>
-                )}
+                    <p className="text-xl italic text-gray-400">No hay contenido adicional disponible.</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
           {/* COLUMNA DERECHA: Metadatos y Social Share (Sticky) */}
-          <div className="lg:w-56 flex-shrink-0 order-2 lg:order-2">
+          <div className="lg:w-64 flex-shrink-0 order-2 lg:order-2">
             <div className="sticky top-32 flex flex-col gap-10">
 
               {/* Información */}
@@ -257,14 +275,6 @@ export default function ContentDetailPage() {
                   Información
                 </h3>
                 <div className="space-y-6">
-                  {content.author && (
-                    <SidebarItem
-                      icon={User}
-                      label="Escrito por"
-                      value={content.author}
-                    />
-                  )}
-
                   <SidebarItem
                     icon={Layers}
                     label="Tópico / Categoría"
@@ -315,15 +325,13 @@ export default function ContentDetailPage() {
               </div>
             </div>
           </div>
-
-
         </div>
       </div>
     </div>
   );
 }
 
-// Sub-componente Botón Social (ESTÁTICO)
+// Sub-componente Botón Social (REVERTIDO)
 function SocialButton({ icon: Icon, url, color }) {
   return (
     <a
@@ -346,7 +354,7 @@ function SocialButton({ icon: Icon, url, color }) {
   );
 }
 
-// Sub-component Item de Sidebar (ESTÁTICO)
+// Sub-component Item de Sidebar (REVERTIDO)
 function SidebarItem({ icon: Icon, label, value }) {
   if (!value) return null;
   return (
