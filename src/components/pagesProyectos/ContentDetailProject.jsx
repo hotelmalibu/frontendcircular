@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import DOMPurify from 'dompurify';
-import { motion } from "framer-motion";
 import DefaultLoader from '../../components/common/DefaultLoader';
 import {
   FileText,
