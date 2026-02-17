@@ -188,6 +188,14 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = "El título es requerido";
     if (!formData.status) newErrors.status = "El estado es requerido";
+
+    // Validar descripción (ReactQuill puede devolver <p><br></p> cuando está vacío)
+    const descriptionText = formData.description.replace(/<[^>]*>/g, '').trim();
+    if (!descriptionText || descriptionText === "") {
+      newErrors.description = "La descripción es requerida";
+      alert("Por favor, ingrese una descripción para el evento.");
+    }
+
     if (!formData.start_datetime) newErrors.start_datetime = "Inicio requerido";
     if (!formData.end_datetime) newErrors.end_datetime = "Fin requerido";
 
@@ -350,6 +358,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
                       className="h-64 mb-12"
                     />
                   </div>
+                  {errors.description && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.description}</p>}
                 </div>
               </div>
 
