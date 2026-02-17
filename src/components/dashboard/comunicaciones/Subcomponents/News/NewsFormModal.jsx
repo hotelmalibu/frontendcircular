@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import { Cropper } from "react-cropper";
+import "cropperjs/dist/cropper.css";
 import {
   X,
   Save,
@@ -50,6 +52,11 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
   const [errors, setErrors] = useState({});
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  // Estados para Cropper
+  const [imageToCrop, setImageToCrop] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
+  const cropperRef = useRef(null);
 
   // ... (Efectos de carga de datos y categorías se mantienen igual)
   useEffect(() => {
@@ -167,15 +174,45 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         alert('Por favor, seleccione un archivo de imagen válido (JPEG, PNG, GIF, WebP)');
         return;
       }
-      const maxSize = 5 * 1024 * 1024;
+      const maxSize = 10 * 1024 * 1024; // Aumentamos a 10MB temporalmente para el recorte
       if (file.size > maxSize) {
-        alert('El archivo es demasiado grande. El tamaño máximo permitido es 5MB.');
+        alert('El archivo es demasiado grande. El tamaño máximo permitido para procesar es 10MB.');
         return;
       }
-      setFormData((prev) => ({ ...prev, upload_file: file }));
-      if (errors.upload_file) {
-        setErrors((prev) => ({ ...prev, upload_file: null }));
-      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImageToCrop(reader.result);
+        setShowCropper(true);
+      };
+      reader.readAsDataURL(file);
+
+      // Limpiar el input para permitir seleccionar la misma imagen
+      e.target.value = '';
+    }
+  };
+
+  const handleCrop = () => {
+    const cropper = cropperRef.current?.cropper;
+    if (cropper) {
+      cropper.getCroppedCanvas({
+        maxWidth: 2000,
+        maxHeight: 2000,
+        fillColor: '#fff',
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+      }).toBlob((blob) => {
+        if (blob) {
+          // Crear un objeto de archivo a partir del blob
+          const croppedFile = new File([blob], "cropped_image.jpg", { type: "image/jpeg" });
+          setFormData((prev) => ({ ...prev, upload_file: croppedFile }));
+          setShowCropper(false);
+          setImageToCrop(null);
+          if (errors.upload_file) {
+            setErrors((prev) => ({ ...prev, upload_file: null }));
+          }
+        }
+      }, 'image/jpeg', 0.9);
     }
   };
 
@@ -190,7 +227,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     if (!formData.title.trim()) newErrors.title = "El título es requerido";
     if (!formData.category_id) newErrors.category_id = "La categoría es requerida";
     if (!formData.author.trim()) newErrors.author = "El autor es requerido";
-    
+
     // Validar contenido de ReactQuill (quitando tags HTML para ver si hay texto real)
     const strippedDescription = formData.description.replace(/<[^>]*>/g, '').trim();
     if (!strippedDescription) newErrors.description = "El contenido de la noticia es requerido";
@@ -237,11 +274,11 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       let descriptionContent = formData.description || "";
       dataToSend.append('content', descriptionContent);
       dataToSend.append('description', descriptionContent.substring(0, 1900));
-      
+
       if (formData.category_id) {
         dataToSend.append('category_id', formData.category_id);
       }
-      
+
       dataToSend.append('author', formData.author || "");
       dataToSend.append('status', formData.status);
 
@@ -261,12 +298,12 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     } catch (err) {
       console.error("Error saving news:", err);
       console.log("Full error response:", err.response?.data);
-      
+
       let errorMessage = "Ocurrió un error al guardar la noticia.";
       if (err.response?.data) {
         const data = err.response.data;
         if (data.message) errorMessage = data.message;
-        
+
         // If there are specific validation errors, show them
         if (data.errors && typeof data.errors === 'object') {
           const detailedErrors = Object.entries(data.errors)
@@ -277,7 +314,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       alert(errorMessage);
     } finally {
       setLoading(false);
@@ -358,8 +395,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                 </div>
               </div>
 
-               {/* SECCIÓN 3: Multimedia (Movida a la izquierda) */}
-               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+              {/* SECCIÓN 3: Multimedia (Movida a la izquierda) */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                   <ImageIcon size={16} style={{ color: BRAND.orange }} /> Imagen Destacada
                 </h3>
@@ -561,6 +598,58 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
           </button>
         </div>
       </div>
+
+      {/* Modal de Cropper */}
+      {showCropper && (
+        <div className="fixed inset-0 z-[10000] bg-black bg-opacity-80 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
+              <h3 className="font-bold text-gray-800">Ajustar Imagen</h3>
+              <button
+                onClick={() => { setShowCropper(false); setImageToCrop(null); }}
+                className="text-gray-400 hover:text-gray-600 transition"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-hidden bg-gray-200">
+              <Cropper
+                src={imageToCrop}
+                style={{ height: "100%", width: "100%" }}
+                initialAspectRatio={1}
+                aspectRatio={1}
+                guides={true}
+                ref={cropperRef}
+                viewMode={1}
+                dragMode="move"
+                background={false}
+                responsive={true}
+                autoCropArea={1}
+                checkOrientation={false}
+              />
+            </div>
+
+            <div className="px-6 py-4 border-t flex justify-end gap-3 bg-gray-50">
+              <button
+                type="button"
+                onClick={() => { setShowCropper(false); setImageToCrop(null); }}
+                className="px-6 py-2 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-100 transition font-medium text-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleCrop}
+                className="px-8 py-2 rounded-xl text-white font-bold text-sm transition transform active:scale-95"
+                style={{ backgroundColor: BRAND.blue }}
+              >
+                Confirmar Recorte
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>,
     document.body
   );

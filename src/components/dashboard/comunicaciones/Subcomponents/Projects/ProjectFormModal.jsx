@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import { Cropper } from "react-cropper";
+import "cropperjs/dist/cropper.css";
 import {
   X,
   Save,
@@ -83,6 +85,11 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
   const [classificationTypesLoading, setClassificationTypesLoading] = useState(true);
   const [filteredClassificationTypes, setFilteredClassificationTypes] = useState([]);
   const [errors, setErrors] = useState({});
+
+  // Estados para Cropper
+  const [imageToCrop, setImageToCrop] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
+  const cropperRef = useRef(null);
 
   const fetchCategories = React.useCallback(async () => {
     try {
@@ -267,16 +274,35 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
 
       // Validation thresholds
       const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-      const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+      const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // Aumentamos para procesar el recorte
 
       let isValid = true;
       let errorMessage = "";
 
       if (name === "cover_image") {
-        if (file.size > MAX_IMAGE_SIZE) {
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
           isValid = false;
-          errorMessage = "La imagen de portada no puede superar los 5MB.";
+          errorMessage = "Por favor, seleccione un archivo de imagen válido.";
+        } else if (file.size > MAX_IMAGE_SIZE) {
+          isValid = false;
+          errorMessage = "La imagen es demasiado grande para procesar (Máx 10MB).";
         }
+
+        if (!isValid) {
+          setErrors((prev) => ({ ...prev, [name]: errorMessage }));
+          e.target.value = "";
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          setImageToCrop(reader.result);
+          setShowCropper(true);
+        };
+        reader.readAsDataURL(file);
+        e.target.value = ""; // Permite re-seleccionar
+        return;
       } else if (name === "upload_file") {
         if (file.size > MAX_FILE_SIZE) {
           isValid = false;
@@ -289,7 +315,6 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
           ...prev,
           [name]: errorMessage,
         }));
-        // Reset file input
         e.target.value = "";
         return;
       }
@@ -304,6 +329,29 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
         ...prev,
         [name]: file,
       }));
+    }
+  };
+
+  const handleCrop = () => {
+    const cropper = cropperRef.current?.cropper;
+    if (cropper) {
+      cropper.getCroppedCanvas({
+        maxWidth: 2000,
+        maxHeight: 2000,
+        fillColor: '#fff',
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+      }).toBlob((blob) => {
+        if (blob) {
+          const croppedFile = new File([blob], "project_cover.jpg", { type: "image/jpeg" });
+          setFormData((prev) => ({ ...prev, cover_image: croppedFile }));
+          setShowCropper(false);
+          setImageToCrop(null);
+          if (errors.cover_image) {
+            setErrors((prev) => ({ ...prev, cover_image: null }));
+          }
+        }
+      }, 'image/jpeg', 0.9);
     }
   };
 
@@ -487,7 +535,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   {/* Cover Image Upload */}
+                  {/* Cover Image Upload */}
                   <div>
                     <label className={labelClass}>Imagen de Portada (Opcional)</label>
                     <div className="relative">
@@ -696,35 +744,35 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
               </div>
 
               {/* SECCIÓN 4: Vigencia */}
-               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                  <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                    <Calendar size={16} style={{ color: BRAND.blue }} /> Vigencia
-                  </h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className={labelClass}>Fecha Inicio</label>
-                      <input
-                        type="date"
-                        name="start_date"
-                        value={formData.start_date}
-                        onChange={handleChange}
-                        className={inputClass}
-                        style={{ "--tw-ring-color": BRAND.lightBlue }}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Fecha Fin</label>
-                      <input
-                        type="date"
-                        name="end_date"
-                        value={formData.end_date}
-                        onChange={handleChange}
-                        className={inputClass}
-                        style={{ "--tw-ring-color": BRAND.lightBlue }}
-                      />
-                    </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <Calendar size={16} style={{ color: BRAND.blue }} /> Vigencia
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className={labelClass}>Fecha Inicio</label>
+                    <input
+                      type="date"
+                      name="start_date"
+                      value={formData.start_date}
+                      onChange={handleChange}
+                      className={inputClass}
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Fecha Fin</label>
+                    <input
+                      type="date"
+                      name="end_date"
+                      value={formData.end_date}
+                      onChange={handleChange}
+                      className={inputClass}
+                      style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    />
                   </div>
                 </div>
+              </div>
             </div>
 
           </div>
@@ -760,6 +808,58 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
           </button>
         </div>
       </div>
+
+      {/* Modal de Cropper */}
+      {showCropper && (
+        <div className="fixed inset-0 z-[10000] bg-black bg-opacity-80 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
+              <h3 className="font-bold text-gray-800">Ajustar Portada del Proyecto</h3>
+              <button
+                onClick={() => { setShowCropper(false); setImageToCrop(null); }}
+                className="text-gray-400 hover:text-gray-600 transition"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-hidden bg-gray-200">
+              <Cropper
+                src={imageToCrop}
+                style={{ height: "100%", width: "100%" }}
+                initialAspectRatio={1}
+                aspectRatio={1}
+                guides={true}
+                ref={cropperRef}
+                viewMode={1}
+                dragMode="move"
+                background={false}
+                responsive={true}
+                autoCropArea={1}
+                checkOrientation={false}
+              />
+            </div>
+
+            <div className="px-6 py-4 border-t flex justify-end gap-3 bg-gray-50">
+              <button
+                type="button"
+                onClick={() => { setShowCropper(false); setImageToCrop(null); }}
+                className="px-6 py-2 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-100 transition font-medium text-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleCrop}
+                className="px-8 py-2 rounded-xl text-white font-bold text-sm transition transform active:scale-95"
+                style={{ backgroundColor: BRAND.blue }}
+              >
+                Confirmar Recorte
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>,
     document.body
   );
