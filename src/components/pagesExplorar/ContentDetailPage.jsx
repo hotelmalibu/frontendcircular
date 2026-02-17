@@ -89,7 +89,7 @@ export default function ContentDetailPage() {
             id: found.id || found._id || found.uid,
             title: found.title || found.name || "Sin título",
             excerpt: found.description || found.content || "",
-            body: found.content || found.description || "",
+            body: found.content || found.description || found.body || "",
             image: getImageProxyUrl((found.upload_file && found.upload_file.url) || found.image || "", { width: 1200, quality: 85 }),
             date: found.published_at || found.created_at || "",
             type: found.type === 'news' ? 'Noticias' : (found.type || 'Noticias'),

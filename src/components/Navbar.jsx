@@ -596,7 +596,8 @@ export default function Navbar({ onMenuClick }) {
     "/valores",
     "/lineas-estrategicas",
     "/informes-anuales",
-    "/encuestas",
+    "/proyectos",
+    "/contenido",
   ];
   const isTransparentNavPath = transparentPaths.some((path) => {
     // Para encuestas, solo la raíz '/encuestas' es transparente, el detalle no.
