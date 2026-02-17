@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import DOMPurify from 'dompurify';
-import { motion } from "framer-motion";
 import DefaultLoader from '../../components/common/DefaultLoader';
 import {
   FileText,
@@ -86,12 +85,12 @@ export default function ContentDetailProject() {
           title: projectData.title,
           type: catName,
           // Correctly access cover_image.url or fallback
-          image: getImageProxyUrl(projectData.cover_image?.url || projectData.cover_image_url || projectData.cover_image, { width: 1200, quality: 85 }) || categoryImages[catName] || "/assets/home/Proyectos/proyecto1.png",
+          image: getImageProxyUrl(projectData.cover_image?.url || projectData.cover_image_url || projectData.cover_image, { width: 1200, quality: 85 }) || categoryImages[catName] || imgFortalecimiento,
           date: projectData.created_at ? new Date(projectData.created_at).toLocaleDateString() : "Fecha no disponible",
           author: projectData.author || "Autor Desconocido",
           classification: projectData.classification_type_label || projectData.classification_type?.label,
           projectType: projectData.project_type_label || projectData.project_type?.label || projectData.project_type?.name,
-          description: projectData.content || projectData.description || "Sin descripción disponible",
+          description: projectData.content || projectData.description || projectData.body || "Sin descripción disponible",
           uploadFile: projectData.upload_file,
           stats: projectData.stats || []
         };

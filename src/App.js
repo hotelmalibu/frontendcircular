@@ -38,9 +38,6 @@ const Resoluciones = lazy(() => import("./modules/home/nosotros/marcoNormativo/r
 
 // Public - Nuestros Trabajos
 const ProyectosActivos = lazy(() => import("./modules/home/nuestrosTrabajos/proyectosAlianzas/proyectosActivos"));
-const InclusionSocial = lazy(() => import("./modules/home/nuestrosTrabajos/proyectosAlianzas/inclusionSocial"));
-const CasosExitos = lazy(() => import("./modules/home/nuestrosTrabajos/proyectosAlianzas/casosExitos"));
-const Convocatorias = lazy(() => import("./modules/home/nuestrosTrabajos/proyectosAlianzas/convocatorias"));
 const LineasEstrategicasPage = lazy(() => import("./modules/home/nuestrosTrabajos/lineasEstrategicas/index"));
 
 // Dashboard (Protected)
@@ -115,9 +112,6 @@ export default function App() {
           <Route path="/polticas" element={<Politicas />} />
           <Route path="/resoluciones" element={<Resoluciones />} />
           <Route path="/proyectos-activos" element={<ProyectosActivos />} />
-          <Route path="/inclusin-social" element={<InclusionSocial />} />
-          <Route path="/casos-de-xito" element={<CasosExitos />} />
-          <Route path="/convocatorias" element={<Convocatorias />} />
           <Route path="/lineas-estrategicas" element={<LineasEstrategicasPage />} />
           <Route path="/encuestas" element={<PublicSurveysPage />} />
 

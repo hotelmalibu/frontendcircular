@@ -100,7 +100,7 @@ export default function ProjectsSection() {
             type: catName || "General",
             color: categoryColors[catName] || "#1E305D",
             customImage: getImageProxyUrl(project.cover_image?.url || project.cover_image_url || project.cover_image, { width: 600, quality: 80 }),
-            defaultImage: categoryImages[catName] || "/assets/home/Proyectos/proyecto1.png",
+            defaultImage: categoryImages[catName] || imgFortalecimiento,
             shortDescription: stripHtml(project.description) || "Sin descripción disponible",
           };
         }).filter(Boolean); // Remote potential nulls

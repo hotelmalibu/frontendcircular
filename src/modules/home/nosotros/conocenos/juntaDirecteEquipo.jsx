@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, User } from "lucide-react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
 
 // --- IMPORTS LOGOS JUNTA DIRECTIVA ---

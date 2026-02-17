@@ -3,7 +3,6 @@
  */
 
 // List of reliable CORS proxy services
-// List of reliable CORS proxy services
 const CORS_PROXIES = [
   'https://images.weserv.nl/?url=',        // Fastest + supports resizing
   'https://api.allorigins.win/raw?url=',   // Fallback 1
@@ -18,7 +17,7 @@ const CORS_PROXIES = [
  * @returns {string} - Proxy URL or original URL
  */
 export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
-  if (!imageUrl || typeof imageUrl !== 'string') return '';
+  if (!imageUrl || typeof imageUrl !== 'string') return imageUrl || '';
 
   let proxyIndex = 0;
   let options = {};
@@ -27,13 +26,43 @@ export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
     proxyIndex = optionsOrIndex;
   } else if (typeof optionsOrIndex === 'object') {
     options = optionsOrIndex;
-    // default to 0 (weserv) if object passed
   }
 
-  // If the image is from our API domain, use a CORS proxy
-  if (imageUrl.includes('api-ecocircular.creativostecnologicosit.com')) {
+  const host = window.location.hostname;
+  const isDevelopment = host === 'localhost' || host === '127.0.0.1' || host.includes('.local') || host.includes('.test');
+
+  // Base domain for API and storage
+  const API_DOMAIN = 'https://api-ecocircular.creativostecnologicosit.com';
+
+  // Determine the absolute URL
+  let absoluteImageUrl = imageUrl;
+  
+  // 1. Handle filenames without paths (NEWS... or COVER...)
+  if (imageUrl.startsWith('NEWS')) {
+    absoluteImageUrl = `${API_DOMAIN}/storage/news/${imageUrl}`;
+  } else if (imageUrl.startsWith('COVER')) {
+    absoluteImageUrl = `${API_DOMAIN}/storage/projects/covers/${imageUrl}`;
+  }
+  // 2. Handle relative paths starting with /
+  else if (imageUrl.startsWith('/')) {
+    absoluteImageUrl = `${API_DOMAIN}${imageUrl}`;
+  }
+  // 3. Handle absolute URLs already containing our domain or other domains
+  else if (!imageUrl.startsWith('http')) {
+    // Fallback for any other string that doesn't look like a URL
+    absoluteImageUrl = `${API_DOMAIN}/storage/${imageUrl}`;
+  }
+
+  // If the image is from our API domain
+  if (absoluteImageUrl.includes('api-ecocircular.creativostecnologicosit.com')) {
+    // CRITICAL: In development, direct loading is safer than CORS proxies which often 
+    // trigger SSL_PROTOCOL_ERROR due to certificate or handshake mismatches.
+    if (isDevelopment && !options.useProxyInDev) {
+      return absoluteImageUrl;
+    }
+
     const proxy = CORS_PROXIES[proxyIndex] || CORS_PROXIES[0];
-    let finalUrl = `${proxy}${encodeURIComponent(imageUrl)}`;
+    let finalUrl = `${proxy}${encodeURIComponent(absoluteImageUrl)}`;
     
     // Append Weserv specific parameters if using Weserv (index 0)
     if (proxy.includes('weserv.nl')) {
@@ -41,14 +70,13 @@ export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
       if (options.height) finalUrl += `&h=${options.height}`;
       if (options.quality) finalUrl += `&q=${options.quality}`;
       if (options.output) finalUrl += `&output=${options.output}`;
-      else finalUrl += `&output=webp`; // Default to WebP for performance
+      else finalUrl += `&output=webp`; 
     }
     
     return finalUrl;
   }
 
-  // Return original URL for other domains
-  return imageUrl;
+  return absoluteImageUrl;
 };
 
 /**
@@ -87,7 +115,6 @@ export const extractOriginalUrl = (proxyUrl) => {
         const encodedUrl = proxyUrl.substring(proxy.length);
         return decodeURIComponent(encodedUrl);
       } catch (error) {
-        console.warn('Failed to decode proxy URL:', error);
         return proxyUrl;
       }
     }
@@ -100,10 +127,6 @@ export const extractOriginalUrl = (proxyUrl) => {
  * Create an image element with error handling and fallback support
  * @param {string} src - Image source URL
  * @param {Object} options - Image options
- * @param {Function} options.onLoad - Load callback
- * @param {Function} options.onError - Error callback
- * @param {Array} options.fallbacks - Fallback URLs to try
- * @returns {HTMLImageElement} - Image element
  */
 export const createImageWithFallback = (src, options = {}) => {
   const { onLoad, onError, fallbacks = [] } = options;
@@ -127,11 +150,9 @@ export const createImageWithFallback = (src, options = {}) => {
   };
 
   img.onerror = () => {
-    console.log(`Failed to load image: ${allSrcs[currentSrcIndex - 1]}`);
     tryNextSrc();
   };
 
-  // Start loading
   tryNextSrc();
 
   return img;

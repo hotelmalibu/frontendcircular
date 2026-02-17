@@ -144,7 +144,7 @@ export default function Footer() {
       {/* Barra inferior */}
       <div className="relative z-10 bg-black/40">
         <div className="container mx-auto px-6 py-3 flex flex-col sm:flex-row justify-between items-center text-xs text-white/80 gap-2 sm:gap-0">
-          <div>© {new Date().getFullYear()} Visión Circular Colombia. Todos los derechos reservados.</div>
+          <div>© {new Date().getFullYear()} Visión Circular ANDI. Todos los derechos reservados.</div>
           <div className="flex gap-4">
             <Link to="/terms" className="hover:text-[#00AB6D] transition-colors">Términos de uso</Link>
             <Link to="/privacy" className="hover:text-[#00AB6D] transition-colors">Política de privacidad</Link>
