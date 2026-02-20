@@ -191,7 +191,7 @@ export default function ContentDetailProject() {
           <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
 
             {/* COLUMNA IZQUIERDA: Cuerpo del Proyecto (Expandido) */}
-            <div className="bg-white rounded-[2rem] shadow-2xl shadow-black/10 border border-gray-100 overflow-hidden">
+            <div className="flex-1 min-w-0 bg-white rounded-[2rem] shadow-2xl shadow-black/10 border border-gray-100 overflow-hidden">
 
               {/* Imagen del contenido (Estática) */}
               {project.image && (
@@ -226,8 +226,7 @@ export default function ContentDetailProject() {
                   </div>
                 </div>
                 <div
-                  className="prose prose-lg max-w-none text-gray-700 leading-relaxed font-sans"
-                  style={{ hyphens: 'none', overflowWrap: 'break-word', wordBreak: 'normal' }}
+                  className="max-w-none text-gray-700 leading-relaxed font-sans news-content"
                 >
                   {project.description ? (
                     /[<>]/.test(project.description) ? (
@@ -240,7 +239,17 @@ export default function ContentDetailProject() {
                         className="news-content ql-editor !p-0"
                       />
                     ) : (
-                      <p className="text-xl">{project.description}</p>
+                      <>
+                        {project.description
+                          .split(/\r?\n\r?\n|\r?\n/)
+                          .map(p => p.trim())
+                          .filter(p => p.length > 0)
+                          .map((paragraph, index) => (
+                            <p key={index} className="news-content-styled">
+                              {paragraph}
+                            </p>
+                          ))}
+                      </>
                     )
                   ) : (
                     <p className="italic text-gray-400">No hay detalles adicionales disponibles.</p>

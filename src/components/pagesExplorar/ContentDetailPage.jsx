@@ -209,7 +209,7 @@ export default function ContentDetailPage() {
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
 
           {/* COLUMNA IZQUIERDA: Cuerpo del Artículo */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-black/10 border border-gray-100 overflow-hidden">
 
               {/* Imagen del contenido (Estática) */}
@@ -245,7 +245,7 @@ export default function ContentDetailPage() {
                   </div>
                 </div>
 
-                <div className="prose prose-xl max-w-none text-gray-700 leading-relaxed font-sans news-content-styled">
+                <div className="max-w-none text-gray-700 leading-relaxed font-sans news-content">
                   {content.body ? (
                     /[<>]/.test(content.body) ? (
                       <div
@@ -253,12 +253,18 @@ export default function ContentDetailPage() {
                         className="news-content ql-editor !p-0 !font-sans !text-gray-700"
                       />
                     ) : (
-                      content.body.split(/\n\s*\n/).map((paragraph, idx) => (
-                        <p key={idx} className="mb-8 text-xl leading-relaxed">{paragraph}</p>
-                      ))
+                      <>
+                        {content.body
+                          .split(/\r?\n\r?\n|\r?\n/)
+                          .map(p => p.trim())
+                          .filter(p => p.length > 0)
+                          .map((paragraph, idx) => (
+                            <p key={idx} className="news-content-styled">{paragraph}</p>
+                          ))}
+                      </>
                     )
                   ) : (
-                    <p className="text-xl italic text-gray-400">No hay contenido adicional disponible.</p>
+                    <p className="italic text-gray-400">No hay contenido adicional disponible.</p>
                   )}
                 </div>
               </div>

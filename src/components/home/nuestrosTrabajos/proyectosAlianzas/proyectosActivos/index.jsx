@@ -147,7 +147,7 @@ export default function ProyectosYAlianzas() {
         setCategories([{ id: "all", name: "Todos los proyectos" }, ...cats]);
 
         const projects = projectsResponse?.data?.items || [];
-        setAllProjects(projects);
+        setAllProjects(projects.filter(p => p.status === 'published'));
 
         const types = typesResponse?.data?.items || [];
         const tType = types.find(t => t.label?.toLowerCase().includes("territorial"));

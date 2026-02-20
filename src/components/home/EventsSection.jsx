@@ -53,7 +53,7 @@ export default function EventsSection() {
     try {
       setLoading(true);
       setError(null);
-      const response = await getAllSchedules(1, 12);
+      const response = await getAllSchedules(1, 50);
       let eventsArray = [];
       if (response?.data?.schedules && Array.isArray(response.data.schedules)) eventsArray = response.data.schedules;
       else if (Array.isArray(response)) eventsArray = response;

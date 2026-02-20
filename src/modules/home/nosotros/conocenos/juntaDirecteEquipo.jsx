@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, } from "lucide-react";
 
 
 // --- IMPORTS LOGOS JUNTA DIRECTIVA ---
@@ -27,7 +27,7 @@ import groupPhoto from "../../../../assets/imgEquipo/group_photo.jpg";
 import esteban_h1 from "../../../../assets/imgEquipo/EquipoFotos/01. Esteban Peláez/Esteban Pelaez H1.png";
 
 // 02. Gabriel Sabogal
-import gabriel_v1 from "../../../../assets/imgEquipo/EquipoFotos/02. Gabriel Sabogal/Gabriel Sabogal 01 Vertical.png";
+import gabriel_v1 from "../../../../assets/imgEquipo/EquipoFotos/02. Gabriel Sabogal/Gabriel Sabogal H1.jpg";
 
 // 03. Mónica Turrego
 import monicaT_h1 from "../../../../assets/imgEquipo/EquipoFotos/03. Mónica Turrego/Monica Turrego H1.png";
@@ -69,7 +69,7 @@ import jhostin_1 from "../../../../assets/imgEquipo/EquipoFotos/13. Jhostin Flor
 import nubia_1 from "../../../../assets/imgEquipo/EquipoFotos/14. Nubia Rivera/1.png";
 
 // 15. Mónica Villegas
-import monicaV_1 from "../../../../assets/imgEquipo/EquipoFotos/15. Mónica Villegas/1.png";
+import monicaV_1 from "../../../../assets/imgEquipo/EquipoFotos/15. Mónica Villegas/1.jpg";
 
 // 16. Andrés Cruz
 import andres_1 from "../../../../assets/imgEquipo/EquipoFotos/16- Andrés Cruz/1.png";

@@ -180,10 +180,13 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
         rawCategory: projectData.category
       });
 
+      // Prefer full content if available (edit mode), otherwise description
+      const fullContent = projectData.content || projectData.description || "";
+
       setFormData((prev) => ({
         ...prev,
         title: projectData.title || "",
-        description: description,
+        description: fullContent,
         category_id: catId,
         project_type_id: projectData.project_type_id || "",
         classification_type_id: projectData.classification_type_id || "",
@@ -523,7 +526,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                       modules={modules}
                       formats={formats}
                       placeholder="Escribe el contenido aquí..."
-                      className="h-64 mb-12"
+                      className="h-96 mb-16"
                     />
                   </div>
                 </div>

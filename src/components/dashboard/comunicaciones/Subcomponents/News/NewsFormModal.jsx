@@ -389,7 +389,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                       modules={modules}
                       formats={formats}
                       placeholder="Escribe el contenido aquí..."
-                      className="h-64 mb-12"
+                      className="h-96 mb-16"
                     />
                   </div>
                   {errors.description && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.description}</p>}

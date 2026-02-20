@@ -295,7 +295,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
   const labelClass = "block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1";
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-[9999] bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+    <div className="fixed inset-0 z-[50] bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
       <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
 
         {/* Header con Azul Profundo */}
