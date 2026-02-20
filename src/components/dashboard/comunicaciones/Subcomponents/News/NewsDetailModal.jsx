@@ -241,7 +241,7 @@ export default function NewsDetailModal({ newsData, onClose, onEdit }) {
                   className="text-gray-700 bg-white p-4 rounded-lg border border-gray-200"
                   style={{ wordBreak: 'normal', overflowWrap: 'break-word', hyphens: 'none' }}
                 >
-                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(newsData.content || newsData.description)) }} />
+                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(newsData.content || newsData.description).replace(/\u00A0|&nbsp;/g, ' ')) }} />
                 </div>
               </div>
             ) : (

@@ -90,7 +90,7 @@ export default function ContentDetailProject() {
           author: projectData.author || "Autor Desconocido",
           classification: projectData.classification_type_label || projectData.classification_type?.label,
           projectType: projectData.project_type_label || projectData.project_type?.label || projectData.project_type?.name,
-          description: projectData.content || projectData.description || projectData.body || "Sin descripción disponible",
+          description: String(projectData.content || projectData.description || projectData.body || "Sin descripción disponible").replace(/\u00A0|&nbsp;/g, ' '),
           uploadFile: projectData.upload_file,
           stats: projectData.stats || []
         };

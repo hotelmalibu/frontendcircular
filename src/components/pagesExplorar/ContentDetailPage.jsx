@@ -99,6 +99,11 @@ export default function ContentDetailPage() {
             status: found.status || "",
           };
 
+          // Normalizar espacios de no-ruptura que vienen de la API para permitir saltos de línea correctos
+          if (mapped.body) {
+            mapped.body = String(mapped.body).replace(/\u00A0|&nbsp;/g, ' ');
+          }
+
           // Sanitize body HTML
           if (mapped.body && /[<>]/.test(mapped.body)) {
             try {

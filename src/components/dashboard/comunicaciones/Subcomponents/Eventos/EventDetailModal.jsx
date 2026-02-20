@@ -420,8 +420,8 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
             </h3>
             {eventData.description ? (
               <div className="prose max-w-none">
-                <div className="text-gray-700 whitespace-pre-wrap bg-white p-4 rounded-lg border border-gray-200">
-                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(eventData.description)) }} />
+                <div className="text-gray-700 whitespace-normal bg-white p-4 rounded-lg border border-gray-200">
+                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(eventData.description).replace(/\u00A0|&nbsp;/g, ' ')) }} />
                 </div>
               </div>
             ) : (

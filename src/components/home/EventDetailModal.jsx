@@ -186,7 +186,7 @@ export default function EventDetailModal({ eventData, onClose }) {
                   {eventData.description ? (
                     <div
                       className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(eventData.description) }}
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(eventData.description).replace(/\u00A0|&nbsp;/g, ' ')) }}
                     />
                   ) : (
                     <p className="text-gray-500 italic">No hay descripción disponible para este evento.</p>
