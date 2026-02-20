@@ -21,7 +21,7 @@ export default function Index() {
       icon: Users
     },
     {
-      author: "Carlos Herrera",
+      author: "Jeronimo Rodriguez",
       role: "Vicepresidente de Desarrollo Sostenible ANDI",
       text: "Hacer de la economía circular uno de los motores del desarrollo sostenible más allá del 2030, cuando los ODS cierren su primer ciclo, es más que una oportunidad, es un imperativo.",
       icon: Target

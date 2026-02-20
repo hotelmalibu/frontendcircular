@@ -5,14 +5,15 @@ import api from "./index";
  * Handles all CRUD operations for categories management
  */
 
-const CATEGORIES_ENDPOINT = "/categories?sort_by=created_at&sort_order=desc&per_page=15";
+const CATEGORIES_ENDPOINT = "/categories";
+const DEFAULT_PARAMS = "sort_by=created_at&sort_order=desc&per_page=15";
 
 /**
  * Get all categories
  * @returns {Promise} - List of all categories
  */
 export const getAllCategories = async () => {
-  const response = await api.get(CATEGORIES_ENDPOINT);
+  const response = await api.get(`${CATEGORIES_ENDPOINT}?${DEFAULT_PARAMS}`);
   return response.data;
 };
 
@@ -45,7 +46,7 @@ export const createCategory = async (categoryData) => {
  * @returns {Promise} - Updated category object
  */
 export const updateCategory = async (categoryId, categoryData) => {
-  const response = await api.put(`/categories/${categoryId}`, categoryData);
+  const response = await api.put(`${CATEGORIES_ENDPOINT}/${categoryId}`, categoryData);
   return response.data;
 };
 
