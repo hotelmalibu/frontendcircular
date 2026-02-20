@@ -24,7 +24,7 @@ import { getAllCategories } from "../../../../../api/categoriesApi";
 import DOMPurify from 'dompurify';
 import EventFormModal from "./EventFormModal";
 import EventDetailModal from "./EventDetailModal";
-import ConfirmModal from "../../../../../components/common/ConfirmModal";
+import ConfirmModal from "../../../../../components/common/ConfirmModal";import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -192,11 +192,12 @@ export default function EventList() {
 
     try {
       await deleteSchedule(itemToDelete.id);
+      toast.success("Evento eliminado correctamente");
       await loadEvents();
       setShowDeleteModal(false);
       setItemToDelete(null);
     } catch (err) {
-      alert(err.response?.data?.message || "Error al eliminar el evento");
+      toast.error(err.response?.data?.message || "Error al eliminar el evento");
     }
   };
 
@@ -388,7 +389,7 @@ export default function EventList() {
           {filteredEvents.map((item) => (
             <div
               key={item.id}
-              className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
+              className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative"
             >
               {/* Borde Superior de Color */}
               <div
@@ -476,10 +477,10 @@ export default function EventList() {
                   </span>
                 </div>
 
-                <div className="flex gap-1">
+                <div className="flex gap-0.5 flex-shrink-0">
                   <button
                     onClick={() => handleView(item)}
-                    className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
                     title="Ver detalle"
                     style={{ color: BRAND.blue }}
                   >
@@ -487,7 +488,7 @@ export default function EventList() {
                   </button>
                   <button
                     onClick={() => handleEdit(item)}
-                    className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
                     title="Editar"
                     style={{ color: BRAND.darkGreen }}
                   >
@@ -495,7 +496,7 @@ export default function EventList() {
                   </button>
                   <button
                     onClick={() => handleDelete(item)}
-                    className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
                     title="Eliminar"
                     style={{ color: BRAND.orange }}
                   >

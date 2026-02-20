@@ -22,6 +22,7 @@ import { createProject, updateProject } from "../../../../../api/projectsApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
 import { getProjectTypes } from "../../../../../api/projectTypesApi";
 import { getClassificationTypes } from "../../../../../api/classificationTypesApi";
+import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -446,7 +447,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
         });
         setErrors((prev) => ({ ...prev, ...mapped }));
       }
-      alert(`Error: ${errorMessage}`);
+      toast.error(`Error: ${errorMessage}`);
     } finally {
       setLoading(false);
     }

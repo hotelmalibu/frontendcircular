@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useContext } from "react";
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route, Outlet, useLocation } from "react-router-dom";
 import { AuthContext } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
@@ -62,14 +62,38 @@ const NotFound = lazy(() => import("./modules/home/NotFound"));
 // Helper component for pages with shared layout
 const MainLayout = () => {
   const { user } = useContext(AuthContext);
+  const location = useLocation();
 
-  // Show footer if:
-  // 1. User is not logged in
-  // 2. User is logged in AND has 'afiliado' role
-  const showFooter = !user || 
-    (user.role_slug === 'afiliado' || user.role_slug === 'afiliados') || 
-    (user.role?.toLowerCase().includes('afiliado')) ||
-    (user.roles && user.roles.some(r => r.slug === 'afiliado' || r.slug === 'afiliados' || r.name?.toLowerCase().includes('afiliado')));
+  // Rutas internas del dashboard donde NO se muestra el footer
+  const internalPaths = [
+    "/documentos",
+    "/companies",
+    "/seguimiento",
+    "/formularios",
+    "/comunicaciones",
+    "/administracion",
+    "/soporte",
+    "/integracion",
+    "/trazabilidad",
+  ];
+
+  const isInternalRoute = internalPaths.some((p) =>
+    location.pathname === p || location.pathname.startsWith(p + "/")
+  );
+
+  // En /dashboard y /profile: solo mostrar footer si es afiliado
+  const isDashboardOrProfile =
+    location.pathname === "/dashboard" ||
+    location.pathname === "/profile" ||
+    location.pathname.startsWith("/profile/");
+
+  const isAfiliado =
+    user &&
+    (user.role_slug?.toLowerCase().includes("afiliado") ||
+      user.role?.toLowerCase().includes("afiliado"));
+
+  const showFooter =
+    !isInternalRoute && !(isDashboardOrProfile && user && !isAfiliado);
 
   return (
     <>

@@ -225,7 +225,10 @@ export default function ContentDetailProject() {
                     <Calendar size={14} /> {project.date}
                   </div>
                 </div>
-                <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed font-sans">
+                <div
+                  className="prose prose-lg max-w-none text-gray-700 leading-relaxed font-sans"
+                  style={{ hyphens: 'none', overflowWrap: 'break-word', wordBreak: 'normal' }}
+                >
                   {project.description ? (
                     /[<>]/.test(project.description) ? (
                       <div

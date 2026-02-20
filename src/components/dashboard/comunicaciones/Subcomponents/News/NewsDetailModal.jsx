@@ -235,10 +235,13 @@ export default function NewsDetailModal({ newsData, onClose, onEdit }) {
               <FileText size={20} />
               Contenido
             </h3>
-            {newsData.description ? (
+            {(newsData.content || newsData.description) ? (
               <div className="prose max-w-none">
-                <div className="text-gray-700 whitespace-pre-wrap bg-white p-4 rounded-lg border border-gray-200 break-words overflow-hidden">
-                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(newsData.description)) }} />
+                <div
+                  className="text-gray-700 bg-white p-4 rounded-lg border border-gray-200"
+                  style={{ wordBreak: 'normal', overflowWrap: 'break-word', hyphens: 'none' }}
+                >
+                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(newsData.content || newsData.description)) }} />
                 </div>
               </div>
             ) : (

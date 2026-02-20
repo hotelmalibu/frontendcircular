@@ -598,13 +598,19 @@ export default function Navbar({ onMenuClick }) {
     "/informes-anuales",
     "/proyectos",
     "/contenido",
+    "/encuestas",
   ];
   const isTransparentNavPath = transparentPaths.some((path) => {
     // Para encuestas, solo la raíz '/encuestas' es transparente, el detalle no.
     if (path === "/encuestas") {
       return location.pathname === "/encuestas";
     }
-    return location.pathname.startsWith(path);
+    // Coincidencia exacta O sub-ruta (siguiente char debe ser '/')
+    // Evita que '/proyectos-activos' coincida con '/proyectos'
+    return (
+      location.pathname === path ||
+      location.pathname.startsWith(path + "/")
+    );
   });
 
   const isInteracted =

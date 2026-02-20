@@ -20,6 +20,8 @@ import { createDocument, getDocuments, updateDocument, deleteDocument } from "..
 import { getAllCategories } from "../../../../../api/categoriesApi";
 import PDFViewer from "../../../../PDFViewer";
 import { getImageProxyUrl } from "../../../../../utils/imageUtils";
+import { toast } from "react-hot-toast";
+import ConfirmModal from "../../../../common/ConfirmModal";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -55,6 +57,9 @@ export default function Bibliotecasub() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [filters, setFilters] = useState({
     search: "",
@@ -141,7 +146,7 @@ export default function Bibliotecasub() {
       window.open(proxyUrl, '_blank');
     } catch (error) {
       console.error("Error downloading document:", error);
-      alert("Error al descargar el documento");
+      toast.error("Error al descargar el documento");
     }
   };
 
@@ -179,15 +184,26 @@ export default function Bibliotecasub() {
     setIsUploadModalOpen(true);
   };
 
-  const handleDelete = async (document) => {
-    if (window.confirm(`¿Estás seguro de que deseas eliminar el documento "${document.name}"?`)) {
-      try {
-        await deleteDocument(document.id);
-        await fetchDocuments();
-      } catch (error) {
-        console.error("Error deleting document:", error);
-        alert("Error al eliminar el documento");
-      }
+  const handleDelete = (document) => {
+    setDocumentToDelete(document);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!documentToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await deleteDocument(documentToDelete.id);
+      toast.success("Documento eliminado correctamente");
+      await fetchDocuments();
+      setIsDeleteModalOpen(false);
+      setDocumentToDelete(null);
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      toast.error("Error al eliminar el documento");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -716,6 +732,21 @@ export default function Bibliotecasub() {
         </div>,
         document.body
       )}
+      {/* Modal de Confirmación de Eliminación */}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDocumentToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title="Eliminar Documento"
+        message={`¿Estás seguro de que deseas eliminar el documento "${documentToDelete?.name}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

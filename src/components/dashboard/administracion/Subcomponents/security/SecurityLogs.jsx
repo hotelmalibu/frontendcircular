@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getSecurityLogs, markSecurityLogAsViewed } from "../../../../../api/auth";
 import { ShieldAlert, ShieldCheck, ShieldEllipsis, Search, RefreshCw, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import SecurityAlertModal from "./SecurityAlertModal";
+import { toast } from "react-hot-toast";
 
 export default function SecurityLogs() {
     const [logs, setLogs] = useState([]);
@@ -72,7 +73,7 @@ export default function SecurityLogs() {
             window.dispatchEvent(new CustomEvent('securityLogReviewed'));
         } catch (err) {
             console.error("Error marking log as viewed:", err);
-            alert("No se pudo marcar como revisado.");
+            toast.error("No se pudo marcar como revisado.");
         }
     };
 

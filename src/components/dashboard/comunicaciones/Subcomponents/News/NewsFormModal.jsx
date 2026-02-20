@@ -20,7 +20,7 @@ import {
   Clock
 } from "lucide-react";
 import { createNews, updateNews } from "../../../../../api/newsApi";
-import { getAllCategories } from "../../../../../api/categoriesApi";
+import { getAllCategories } from "../../../../../api/categoriesApi";import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -171,12 +171,12 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     if (file) {
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
-        alert('Por favor, seleccione un archivo de imagen válido (JPEG, PNG, GIF, WebP)');
+        toast.error('Por favor, seleccione un archivo de imagen válido (JPEG, PNG, GIF, WebP)');
         return;
       }
       const maxSize = 10 * 1024 * 1024; // Aumentamos a 10MB temporalmente para el recorte
       if (file.size > maxSize) {
-        alert('El archivo es demasiado grande. El tamaño máximo permitido para procesar es 10MB.');
+        toast.error('El archivo es demasiado grande. El tamaño máximo permitido para procesar es 10MB.');
         return;
       }
 
@@ -273,7 +273,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
 
       let descriptionContent = formData.description || "";
       dataToSend.append('content', descriptionContent);
-      dataToSend.append('description', descriptionContent.substring(0, 1900));
+      // El campo description ahora acepta texto completo (sin límite max en el backend)
+      dataToSend.append('description', descriptionContent);
 
       if (formData.category_id) {
         dataToSend.append('category_id', formData.category_id);
@@ -315,7 +316,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         errorMessage = err.message;
       }
 
-      alert(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

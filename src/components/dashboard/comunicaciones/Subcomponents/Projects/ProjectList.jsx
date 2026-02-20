@@ -16,6 +16,7 @@ import ProjectFormModal from "./ProjectFormModal";
 import ProjectDetailModal from "./ProjectDetailModal";
 import ConfirmModal from "../../../../../components/common/ConfirmModal";
 import { getImageProxyUrl } from "../../../../../utils/imageUtils";
+import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -166,11 +167,12 @@ export default function ProjectList() {
 
     try {
       await deleteProject(itemToDelete.id);
+      toast.success("Proyecto eliminado correctamente");
       await loadProjects();
       setShowDeleteModal(false);
       setItemToDelete(null);
     } catch (err) {
-      alert(err.response?.data?.message || "Error al eliminar el proyecto");
+      toast.error(err.response?.data?.message || "Error al eliminar el proyecto");
     }
   };
 
@@ -341,10 +343,10 @@ export default function ProjectList() {
               </div>
 
               {/* Actions Footer */}
-              <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-end items-center gap-1">
+              <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-end items-center gap-0.5 sm:gap-1 flex-wrap">
                 <button
                   onClick={() => handleView(item)}
-                  className="p-2 rounded-lg hover:bg-white hover:shadow-sm transition"
+                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
                   title="Ver detalle"
                   style={{ color: BRAND.blue }}
                 >
@@ -352,7 +354,7 @@ export default function ProjectList() {
                 </button>
                 <button
                   onClick={() => handleEdit(item)}
-                  className="p-2 rounded-lg hover:bg-white hover:shadow-sm transition"
+                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
                   title="Editar"
                   style={{ color: BRAND.darkGreen }}
                 >
@@ -360,7 +362,7 @@ export default function ProjectList() {
                 </button>
                 <button
                   onClick={() => handleDelete(item)}
-                  className="p-2 rounded-lg hover:bg-white hover:shadow-sm transition"
+                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
                   title="Eliminar"
                   style={{ color: BRAND.orange }}
                 >

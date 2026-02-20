@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { getUsers, createUser, updateUser, deleteUser } from "../../../../../api/users";
 import { getRoles, getPermissions } from "../../../../../api/auth";
+import { toast } from "react-hot-toast";
+import ConfirmModal from "../../../../common/ConfirmModal";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -213,7 +215,7 @@ export default function Table() {
         // Only verify passwords if provided
         if (formData.password) {
           if (formData.password !== formData.password_confirmation) {
-            alert("Las contraseñas no coinciden");
+            toast.error("Las contraseñas no coinciden");
             setSaving(false);
             return;
           }
@@ -222,20 +224,22 @@ export default function Table() {
         }
 
         await updateUser(currentUser.id, dataToSend);
+        toast.success("Usuario actualizado correctamente");
       } else {
         // Create
         if (formData.password !== formData.password_confirmation) {
-          alert("Las contraseñas no coinciden");
+          toast.error("Las contraseñas no coinciden");
           setSaving(false);
           return;
         }
         await createUser(formData);
+        toast.success("Usuario creado correctamente");
       }
       setIsModalOpen(false);
       fetchUsers(); // Refresh list
     } catch (err) {
       console.error("Error saving user:", err);
-      alert("Error al guardar usuario: " + (err.response?.data?.message || err.message));
+      toast.error("Error al guardar usuario: " + (err.response?.data?.message || err.message));
     } finally {
       setSaving(false);
     }
@@ -252,11 +256,12 @@ export default function Table() {
     setSaving(true);
     try {
       await deleteUser(currentUser.id);
+      toast.success("Usuario eliminado correctamente");
       setIsDeleteModalOpen(false);
       fetchUsers();
     } catch (err) {
       console.error("Error deleting user:", err);
-      alert("Error al eliminar usuario");
+      toast.error("Error al eliminar usuario");
     } finally {
       setSaving(false);
     }
@@ -657,36 +662,17 @@ export default function Table() {
       )}
 
       {/* CONFIRM DELETE MODAL */}
-      {isDeleteModalOpen && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center animate-fadeIn">
-            <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Trash2 size={32} />
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">¿Eliminar Usuario?</h3>
-            <p className="text-sm text-gray-500 mb-6">
-              ¿Estás seguro de que deseas eliminar a <strong>{currentUser?.name}</strong>? Esta acción no se puede deshacer.
-            </p>
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmDelete}
-                disabled={saving}
-                className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-2"
-              >
-                {saving && <Loader2 className="animate-spin" size={16} />}
-                Sí, Eliminar
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="¿Eliminar Usuario?"
+        message={`¿Estás seguro de que deseas eliminar a "${currentUser?.name}"? Esta acción no se puede deshacer.`}
+        confirmText="Sí, Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+        isLoading={saving}
+      />
 
     </div>
   );

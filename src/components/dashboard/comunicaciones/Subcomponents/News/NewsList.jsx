@@ -18,7 +18,7 @@ import { getAllNews, deleteNews } from "../../../../../api/newsApi";
 import DOMPurify from 'dompurify';
 import NewsFormModal from "./NewsFormModal";
 import NewsDetailModal from "./NewsDetailModal";
-import ConfirmModal from "../../../../../components/common/ConfirmModal";
+import ConfirmModal from "../../../../../components/common/ConfirmModal";import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -179,11 +179,12 @@ export default function NewsList() {
 
     try {
       await deleteNews(itemToDelete.id);
+      toast.success("Noticia eliminada correctamente");
       await loadNews();
       setShowDeleteModal(false);
       setItemToDelete(null);
     } catch (err) {
-      alert(err.response?.data?.message || "Error al eliminar la noticia"); // Consider replacing this with FeedbackModal later
+      toast.error(err.response?.data?.message || "Error al eliminar la noticia");
     }
   };
 
@@ -380,10 +381,10 @@ export default function NewsList() {
               </div>
 
               {/* Actions Footer */}
-              <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-end items-center gap-1">
+              <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-end items-center gap-0.5 sm:gap-1 flex-wrap">
                 <button
                   onClick={() => handleView(item)}
-                  className="p-2 rounded-lg hover:bg-white hover:shadow-sm transition"
+                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
                   title="Ver detalle"
                   style={{ color: BRAND.blue }}
                 >
@@ -391,7 +392,7 @@ export default function NewsList() {
                 </button>
                 <button
                   onClick={() => handleEdit(item)}
-                  className="p-2 rounded-lg hover:bg-white hover:shadow-sm transition"
+                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
                   title="Editar"
                   style={{ color: BRAND.darkGreen }}
                 >
@@ -399,7 +400,7 @@ export default function NewsList() {
                 </button>
                 <button
                   onClick={() => handleDelete(item)}
-                  className="p-2 rounded-lg hover:bg-white hover:shadow-sm transition"
+                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
                   title="Eliminar"
                   style={{ color: BRAND.orange }}
                 >

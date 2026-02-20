@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { createSchedule, updateSchedule } from "../../../../../api/scheduleApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
-
+import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -193,7 +193,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     const descriptionText = formData.description.replace(/<[^>]*>/g, '').trim();
     if (!descriptionText || descriptionText === "") {
       newErrors.description = "La descripción es requerida";
-      alert("Por favor, ingrese una descripción para el evento.");
+      toast.error("Por favor, ingrese una descripción para el evento.");
     }
 
     if (!formData.start_datetime) newErrors.start_datetime = "Inicio requerido";
@@ -284,7 +284,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       console.error("Error saving event:", err);
       let errorMessage = "Error desconocido";
       if (err.response?.data?.message) errorMessage = err.response.data.message;
-      alert(`Error: ${errorMessage}`);
+      toast.error(`Error: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
