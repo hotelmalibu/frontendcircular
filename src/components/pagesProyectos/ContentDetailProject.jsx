@@ -191,7 +191,7 @@ export default function ContentDetailProject() {
           <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
 
             {/* COLUMNA IZQUIERDA: Cuerpo del Proyecto (Expandido) */}
-            <div className="flex-1 min-w-0 bg-white rounded-[2rem] shadow-2xl shadow-black/10 border border-gray-100 overflow-hidden">
+            <div className="flex-1 min-w-0 bg-white rounded-t-[2rem] border border-gray-100">
 
               {/* Imagen del contenido (Estática) */}
               {project.image && (
@@ -206,7 +206,7 @@ export default function ContentDetailProject() {
                 </div>
               )}
 
-              <div className="p-8 md:p-12">
+              <div className="p-8 md:p-12 overflow-visible">
                 {/* Título de la noticia (Tamaño moderado dentro del card) */}
                 <h2 className="text-3xl md:text-4xl font-extrabold text-[#1E305D] mb-4 leading-tight">
                   {project.title}

@@ -157,7 +157,7 @@ export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
             </h3>
             {(projectData.content || projectData.description) ? (
               <div className="prose max-w-none">
-                <div className="text-gray-700 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm leading-relaxed break-words overflow-hidden">
+                <div className="text-gray-700 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm leading-relaxed break-words overflow-visible">
                   <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(projectData.content || projectData.description)) }} />
                 </div>
               </div>

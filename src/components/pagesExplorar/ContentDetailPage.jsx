@@ -166,51 +166,51 @@ export default function ContentDetailPage() {
   const mailShareUrl = `mailto:?subject=${encodedTitle}&body=${encodedTextAndUrl}`;
 
   return (
-    <div className="min-h-screen bg-white fontfamily-montserrat">
+    <>
+      <div className="min-h-screen bg-white font-sans">
 
-      {/* --- HERO HEADER --- */}
-      <div className={`relative w-full min-h-[40vh] h-auto overflow-hidden ${config.isSolid ? config.bgColor : 'bg-[#0f172a]'}`}>
+        {/* --- HERO HEADER --- */}
+        <div className={`relative w-full min-h-[40vh] h-auto overflow-hidden ${config.isSolid ? config.bgColor : 'bg-[#0f172a]'}`}>
 
-        {/* FONDO: Color Sólido / Gradiente Sophisticado */}
-        {config.isSolid ? (
-          <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-            <Icon size={400} strokeWidth={0.5} className="text-white opacity-5 absolute -right-20 -bottom-20 rotate-12" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/40 to-transparent"></div>
+          {/* FONDO: Color Sólido / Gradiente Sophisticado */}
+          {config.isSolid ? (
+            <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+              <Icon size={400} strokeWidth={0.5} className="text-white opacity-5 absolute -right-20 -bottom-20 rotate-12" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/40 to-transparent"></div>
+            </div>
+          ) : (
+            <div className="absolute inset-0">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#1E305D] via-[#16324a] to-[#0f172a]"></div>
+              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`, backgroundSize: '40px 40px' }}></div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,171,109,0.15)_0%,transparent_50%)]"></div>
+            </div>
+          )}
+
+          {/* TÍTULO EN HERO */}
+          <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center text-center pt-32 md:pt-40 pb-12 md:pb-16">
+            <Link to="/explorar" className="inline-flex items-center gap-2 text-white/60 hover:text-white mb-8 text-sm font-medium transition-all group px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm">
+              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Volver a explorar
+            </Link>
+
+            <div className="flex flex-wrap justify-center items-center gap-4 mb-8">
+              <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] bg-[#00AB6D] text-white shadow-lg shadow-[#00AB6D]/20`}>
+                {content.type}
+              </span>
+            </div>
+
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] drop-shadow-2xl max-w-5xl tracking-tight">
+              {content.title}
+            </h1>
+
           </div>
-        ) : (
-          <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#1E305D] via-[#16324a] to-[#0f172a]"></div>
-            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`, backgroundSize: '40px 40px' }}></div>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,171,109,0.15)_0%,transparent_50%)]"></div>
-          </div>
-        )}
-
-        {/* TÍTULO EN HERO */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center text-center pt-32 md:pt-40 pb-12 md:pb-16">
-          <Link to="/explorar" className="inline-flex items-center gap-2 text-white/60 hover:text-white mb-8 text-sm font-medium transition-all group px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm">
-            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Volver a explorar
-          </Link>
-
-          <div className="flex flex-wrap justify-center items-center gap-4 mb-8">
-            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] bg-[#00AB6D] text-white shadow-lg shadow-[#00AB6D]/20`}>
-              {content.type}
-            </span>
-          </div>
-
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] drop-shadow-2xl max-w-5xl tracking-tight">
-            {content.title}
-          </h1>
-
         </div>
-      </div>
 
-      {/* --- CONTENIDO PRINCIPAL --- */}
-      <div className="relative z-20 max-w-[1400px] mx-auto px-6 md:px-12 pt-8 pb-16">
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
+        {/* --- CONTENIDO PRINCIPAL --- */}
+        <div className="relative z-20 max-w-[1400px] mx-auto px-6 md:px-12 pt-8 pb-16">
+          <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
 
-          {/* COLUMNA IZQUIERDA: Cuerpo del Artículo */}
-          <div className="flex-1 min-w-0">
-            <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-black/10 border border-gray-100 overflow-hidden">
+            {/* COLUMNA IZQUIERDA: Cuerpo del Artículo */}
+            <div className="flex-1 min-w-0 bg-white rounded-t-[2.5rem] border border-gray-100">
 
               {/* Imagen del contenido (Estática) */}
               {content.image && (
@@ -225,7 +225,7 @@ export default function ContentDetailPage() {
                 </div>
               )}
 
-              <div className="p-8 md:p-12">
+              <div className="p-8 md:p-12 overflow-visible">
                 {/* Título de la noticia (Tamaño moderado dentro del card) */}
                 <h2 className="text-3xl md:text-4xl font-extrabold text-[#1E305D] mb-4 leading-tight">
                   {content.title}
@@ -269,71 +269,71 @@ export default function ContentDetailPage() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* COLUMNA DERECHA: Metadatos y Social Share (Sticky) */}
-          <div className="lg:w-64 flex-shrink-0 order-2 lg:order-2">
-            <div className="sticky top-32 flex flex-col gap-10">
+            {/* COLUMNA DERECHA: Metadatos y Social Share (Sticky) */}
+            <div className="lg:w-64 flex-shrink-0 order-2 lg:order-2">
+              <div className="sticky top-32 flex flex-col gap-10">
 
-              {/* Información */}
-              <div className="space-y-6">
-                <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
-                  Información
-                </h3>
+                {/* Información */}
                 <div className="space-y-6">
-                  <SidebarItem
-                    icon={Layers}
-                    label="Tópico / Categoría"
-                    value={content.topic}
-                  />
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
+                    Información de la Noticia
+                  </h3>
+                  <div className="space-y-6">
+                    <SidebarItem
+                      icon={Layers}
+                      label="Tópico / Categoría"
+                      value={content.topic}
+                    />
 
-                  <SidebarItem
-                    icon={Calendar}
-                    label="Publicado el"
-                    value={content.date}
-                  />
+                    <SidebarItem
+                      icon={Calendar}
+                      label="Publicado el"
+                      value={content.date}
+                    />
 
-                  <SidebarItem
-                    icon={Check}
-                    label="Tipo de contenido"
-                    value={content.type}
-                  />
+                    <SidebarItem
+                      icon={Check}
+                      label="Tipo de contenido"
+                      value={content.type}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Social Share */}
-              <div className="space-y-4">
-                <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
-                  Compartir
-                </h3>
-                <div className="grid grid-cols-3 gap-3">
-                  <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
-                  <SocialButton icon={X} color="#000000" url={xShareUrl} />
-                  <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
-                  <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
-                  <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
+                {/* Social Share */}
+                <div className="space-y-4">
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 border-b border-gray-200 pb-2">
+                    Compartir
+                  </h3>
+                  <div className="grid grid-cols-3 gap-3">
+                    <SocialButton icon={Facebook} color="#1877F2" url={facebookShareUrl} />
+                    <SocialButton icon={X} color="#000000" url={xShareUrl} />
+                    <SocialButton icon={Linkedin} color="#0A66C2" url={linkedinShareUrl} />
+                    <SocialButton icon={MessageCircle} color="#25D366" url={whatsappShareUrl} />
+                    <SocialButton icon={Mail} color="#444444" url={mailShareUrl} />
 
-                  {/* Botón de Copiar Link */}
-                  <button
-                    onClick={copyToClipboard}
-                    className={`
-                      w-12 h-12 flex items-center justify-center
-                      rounded-xl
-                      backdrop-blur-md
-                      transition-all duration-200 hover:scale-110
-                      ${copied ? "bg-green-500 text-white border-green-400 shadow-lg shadow-green-500/20" : "bg-white/20 text-[#718096] border border-white/30 hover:bg-white/30"}
-                    `}
-                    title="Copiar enlace"
-                  >
-                    {copied ? <Check size={26} strokeWidth={2} /> : <LinkIcon size={26} strokeWidth={2} />}
-                  </button>
+                    {/* Botón de Copiar Link */}
+                    <button
+                      onClick={copyToClipboard}
+                      className={`
+                        w-12 h-12 flex items-center justify-center
+                        rounded-xl
+                        backdrop-blur-md
+                        transition-all duration-200 hover:scale-110
+                        ${copied ? "bg-green-500 text-white border-green-400 shadow-lg shadow-green-500/20" : "bg-white/20 text-[#718096] border border-white/30 hover:bg-white/30"}
+                      `}
+                      title="Copiar enlace"
+                    >
+                      {copied ? <Check size={26} strokeWidth={2} /> : <LinkIcon size={26} strokeWidth={2} />}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
