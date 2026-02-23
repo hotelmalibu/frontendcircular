@@ -589,15 +589,30 @@ export default function Navbar({ onMenuClick }) {
   const isInternalPage =
     user && internalPaths.some((path) => location.pathname.startsWith(path));
 
+  const isAuthPage = [
+    "/login",
+    "/quines-somos",
+    "/alianzas",
+    "/resoluciones",
+    "/planes",
+    "/polticas",
+    "/register",
+    "/forgot-password",
+    "/reset-password"
+  ].some(path => location.pathname === path || location.pathname.startsWith(path + "/"));
+
+  const isContentPage = [
+    "/explorar",
+    "/contenido",
+    "/proyectos"
+  ].some(path => location.pathname === path || location.pathname.startsWith(path + "/"));
+
   const transparentPaths = [
     "/circularmente",
-    "/explorar",
     "/juntaDirecteEquipo",
     "/valores",
     "/lineas-estrategicas",
     "/informes-anuales",
-    "/proyectos",
-    "/contenido",
     "/encuestas",
   ];
   const isTransparentNavPath = transparentPaths.some((path) => {
@@ -606,7 +621,6 @@ export default function Navbar({ onMenuClick }) {
       return location.pathname === "/encuestas";
     }
     // Coincidencia exacta O sub-ruta (siguiente char debe ser '/')
-    // Evita que '/proyectos-activos' coincida con '/proyectos'
     return (
       location.pathname === path ||
       location.pathname.startsWith(path + "/")
@@ -617,12 +631,9 @@ export default function Navbar({ onMenuClick }) {
     scrolled || isHovered || hasOpenDropdown || mobileMenuOpen;
 
   const isDashboardView = user && isPublicPage && !isInteracted;
-  const isAuthPage = ["/login", "/quines-somos", "/alianzas", "/resoluciones", "/planes", "/polticas", "/register", "/forgot-password", "/reset-password"].includes(
-    location.pathname
-  );
 
   let showWhiteBg;
-  if (isAuthPage) {
+  if (isAuthPage || isContentPage) {
     showWhiteBg = true;
   } else if (isTransparentNavPath) {
     showWhiteBg = isInteracted;
