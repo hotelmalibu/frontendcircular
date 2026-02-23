@@ -18,7 +18,7 @@ import { getAllNews, deleteNews } from "../../../../../api/newsApi";
 import DOMPurify from 'dompurify';
 import NewsFormModal from "./NewsFormModal";
 import NewsDetailModal from "./NewsDetailModal";
-import ConfirmModal from "../../../../../components/common/ConfirmModal";import { toast } from "react-hot-toast";
+import ConfirmModal from "../../../../../components/common/ConfirmModal"; import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -51,7 +51,7 @@ export default function NewsList() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedNews, setSelectedNews] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -305,110 +305,110 @@ export default function NewsList() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredNews.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item) => (
-            <div
-              key={item.id}
-              className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
-            >
-              {/* Borde Superior de Acento */}
               <div
-                className="h-1.5 w-full absolute top-0 left-0"
-                style={{ backgroundColor: item.type === 'news' ? BRAND.blue : BRAND.darkGreen }}
-              ></div>
+                key={item.id}
+                className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
+              >
+                {/* Borde Superior de Acento */}
+                <div
+                  className="h-1.5 w-full absolute top-0 left-0"
+                  style={{ backgroundColor: item.type === 'news' ? BRAND.blue : BRAND.darkGreen }}
+                ></div>
 
-              <div className="p-5 flex-1 flex flex-col">
-                {/* Header: Fecha y Estado */}
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex flex-col">
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">
-                      {item.category || "General"}
-                    </span>
-                    <h3 className="text-lg font-bold text-gray-800 leading-tight line-clamp-2 group-hover:text-blue-700 transition-colors">
-                      {item.title}
-                    </h3>
-                  </div>
-                </div>
-
-                {/* Badge de Estado (Flotante o integrado) */}
-                <div className="mb-4">
-                  {getStatusBadge(item.status)}
-                </div>
-
-                {/* Imagen Destacada */}
-                <div className="mb-4 rounded-xl overflow-hidden border border-gray-100 h-40 bg-gray-50 flex items-center justify-center relative group-hover:shadow-inner transition-all">
-                  {item.upload_file && item.upload_file.url ? (
-                    <img
-                      src={item.upload_file.url}
-                      alt={item.title}
-                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-gray-400">
-                      <ImageIcon size={32} className="mb-2 opacity-50" />
-                      <span className="text-xs">Sin imagen</span>
+                <div className="p-5 flex-1 flex flex-col">
+                  {/* Header: Fecha y Estado */}
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">
+                        {item.category || "General"}
+                      </span>
+                      <h3 className="text-lg font-bold text-gray-800 leading-tight line-clamp-2 group-hover:text-blue-700 transition-colors">
+                        {item.title}
+                      </h3>
                     </div>
-                  )}
-                  {/* Fallback div */}
-                  <div className="hidden absolute inset-0 flex-col items-center justify-center text-gray-400 bg-gray-50">
-                    <ImageIcon size={32} className="mb-2 opacity-50" />
-                    <span className="text-xs">Imagen no disponible</span>
+                  </div>
+
+                  {/* Badge de Estado (Flotante o integrado) */}
+                  <div className="mb-4">
+                    {getStatusBadge(item.status)}
+                  </div>
+
+                  {/* Imagen Destacada */}
+                  <div className="mb-4 rounded-xl overflow-hidden border border-gray-100 h-40 bg-gray-50 flex items-center justify-center relative group-hover:shadow-inner transition-all">
+                    {item.upload_file && item.upload_file.url ? (
+                      <img
+                        src={item.upload_file.url}
+                        alt={item.title}
+                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-gray-400">
+                        <ImageIcon size={32} className="mb-2 opacity-50" />
+                        <span className="text-xs">Sin imagen</span>
+                      </div>
+                    )}
+                    {/* Fallback div */}
+                    <div className="hidden absolute inset-0 flex-col items-center justify-center text-gray-400 bg-gray-50">
+                      <ImageIcon size={32} className="mb-2 opacity-50" />
+                      <span className="text-xs">Imagen no disponible</span>
+                    </div>
+                  </div>
+
+                  {/* Descripción Corta */}
+                  <p className="text-xs text-gray-500 mb-4 line-clamp-3 leading-relaxed flex-grow break-words whitespace-normal">
+                    {item.description ? (
+                      stripHtml(item.description).slice(0, 150) + (stripHtml(item.description).length > 150 ? '...' : '')
+                    ) : (
+                      "Sin descripción disponible..."
+                    )}
+                  </p>
+
+                  {/* Metadata Footer */}
+                  <div className="flex items-center justify-between text-xs text-gray-400 border-t border-gray-50 pt-3 mt-auto">
+                    <div className="flex items-center gap-1.5">
+                      <User size={12} />
+                      <span className="truncate max-w-[80px]">{item.author || "Admin"}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar size={12} />
+                      <span>{formatDate(item.published_at)}</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Descripción Corta */}
-                <p className="text-xs text-gray-500 mb-4 line-clamp-3 leading-relaxed flex-grow break-words whitespace-normal">
-                  {item.description ? (
-                    stripHtml(item.description).slice(0, 150) + (stripHtml(item.description).length > 150 ? '...' : '')
-                  ) : (
-                    "Sin descripción disponible..."
-                  )}
-                </p>
-
-                {/* Metadata Footer */}
-                <div className="flex items-center justify-between text-xs text-gray-400 border-t border-gray-50 pt-3 mt-auto">
-                  <div className="flex items-center gap-1.5">
-                    <User size={12} />
-                    <span className="truncate max-w-[80px]">{item.author || "Admin"}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Calendar size={12} />
-                    <span>{formatDate(item.published_at)}</span>
-                  </div>
+                {/* Actions Footer */}
+                <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-end items-center gap-0.5 sm:gap-1 flex-wrap">
+                  <button
+                    onClick={() => handleView(item)}
+                    className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    title="Ver detalle"
+                    style={{ color: BRAND.blue }}
+                  >
+                    <Eye size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleEdit(item)}
+                    className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    title="Editar"
+                    style={{ color: BRAND.darkGreen }}
+                  >
+                    <Edit size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item)}
+                    className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    title="Eliminar"
+                    style={{ color: BRAND.orange }}
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
               </div>
-
-              {/* Actions Footer */}
-              <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-end items-center gap-0.5 sm:gap-1 flex-wrap">
-                <button
-                  onClick={() => handleView(item)}
-                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
-                  title="Ver detalle"
-                  style={{ color: BRAND.blue }}
-                >
-                  <Eye size={18} />
-                </button>
-                <button
-                  onClick={() => handleEdit(item)}
-                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
-                  title="Editar"
-                  style={{ color: BRAND.darkGreen }}
-                >
-                  <Edit size={18} />
-                </button>
-                <button
-                  onClick={() => handleDelete(item)}
-                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
-                  title="Eliminar"
-                  style={{ color: BRAND.orange }}
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
           </div>
 
           {/* Pagination Controls */}
@@ -424,7 +424,7 @@ export default function NewsList() {
               >
                 Anterior
               </button>
-              
+
               <span className="text-sm font-medium text-gray-600">
                 Página {currentPage} de {Math.ceil(filteredNews.length / itemsPerPage)}
               </span>

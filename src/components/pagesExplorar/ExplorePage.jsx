@@ -38,19 +38,23 @@ export default function ExplorePage() {
           if (foundCat) catName = foundCat.name;
         }
 
+        const API_BASE = 'https://api-ecocircular.creativostecnologicosit.com';
+        const fixUrl = (url) => url
+          ? url.replace('https://localhost', API_BASE).replace('http://localhost', API_BASE)
+          : url;
+
         return {
           id: n.id || n._id || Math.random(),
           type: "Noticias",
           category: catName,
           title: n.title || n.name || "Sin título",
           excerpt: stripHtml(n.description || n.excerpt),
-          image: getImageProxyUrl(
+          image: fixUrl(
             (n.upload_file && n.upload_file.url) ||
             n.image ||
             n.thumbnail ||
             n.cover ||
-            "",
-            { width: 600, quality: 80 }
+            ""
           ),
           date: n.published_at
             ? new Date(n.published_at).toLocaleDateString("es-ES", {

@@ -72,14 +72,19 @@ export default function FeaturedSection() {
             }
 
             let imageUrl = "";
+            const API_BASE = 'https://api-ecocircular.creativostecnologicosit.com';
+            const fixUrl = (url) => url
+              ? url.replace('https://localhost', API_BASE).replace('http://localhost', API_BASE)
+              : url;
+
             if (n.upload_file && n.upload_file.url) {
-              imageUrl = n.upload_file.url;
+              imageUrl = fixUrl(n.upload_file.url);
             } else if (n.image) {
-              imageUrl = n.image;
+              imageUrl = fixUrl(n.image);
             } else if (n.thumbnail) {
-              imageUrl = n.thumbnail;
+              imageUrl = fixUrl(n.thumbnail);
             } else if (n.cover) {
-              imageUrl = n.cover;
+              imageUrl = fixUrl(n.cover);
             }
 
             return {
@@ -90,7 +95,7 @@ export default function FeaturedSection() {
                 "Sin categoría asignada",
               title: n.title || n.name || "Sin título",
               excerpt: stripHtml(n.description || n.excerpt),
-              image: getImageProxyUrl(imageUrl, { width: 600, quality: 80 }),
+              image: imageUrl,
               date: n.published_at || n.publishedAt ? new Date(n.published_at || n.publishedAt).toLocaleDateString() : "",
               slug: n.slug || (`noticia-${n.id || n._id || ''}`),
               status: n.status || "",
@@ -201,7 +206,7 @@ export default function FeaturedSection() {
               <div key={i} className="flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm animate-pulse">
                 {/* Skeleton Imagen */}
                 <div className="bg-gray-200 aspect-[16/10] w-full"></div>
-                
+
                 {/* Skeleton Contenido */}
                 <div className="p-5 flex flex-col flex-1">
                   {/* Categoría */}
@@ -209,7 +214,7 @@ export default function FeaturedSection() {
                     <div className="h-3 bg-gray-200 rounded w-16"></div>
                     <div className="h-3 bg-gray-200 rounded w-20"></div>
                   </div>
-                  
+
                   {/* Título */}
                   <div className="space-y-2 mb-4">
                     <div className="h-5 bg-gray-200 rounded w-full"></div>

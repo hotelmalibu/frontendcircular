@@ -20,7 +20,7 @@ import {
   Clock
 } from "lucide-react";
 import { createNews, updateNews } from "../../../../../api/newsApi";
-import { getAllCategories } from "../../../../../api/categoriesApi";import { toast } from "react-hot-toast";
+import { getAllCategories } from "../../../../../api/categoriesApi"; import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -196,8 +196,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     const cropper = cropperRef.current?.cropper;
     if (cropper) {
       cropper.getCroppedCanvas({
-        maxWidth: 2000,
-        maxHeight: 2000,
+        maxWidth: 1000,
+        maxHeight: 800,
         fillColor: '#fff',
         imageSmoothingEnabled: true,
         imageSmoothingQuality: 'high',
@@ -618,8 +618,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
               <Cropper
                 src={imageToCrop}
                 style={{ height: "100%", width: "100%" }}
-                initialAspectRatio={1}
-                aspectRatio={1}
+                initialAspectRatio={100 / 80}
+                aspectRatio={100 / 80}
                 guides={true}
                 ref={cropperRef}
                 viewMode={1}

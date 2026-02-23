@@ -48,7 +48,7 @@ export default function ProjectList() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -248,129 +248,128 @@ export default function ProjectList() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProjects.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item) => (
-            <div
-              key={item.id}
-              className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
-            >
-              {/* Borde Superior de Acento */}
               <div
-                className="h-1.5 w-full absolute top-0 left-0"
-                style={{ backgroundColor: BRAND.blue }}
-              ></div>
+                key={item.id}
+                className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
+              >
+                {/* Borde Superior de Acento */}
+                <div
+                  className="h-1.5 w-full absolute top-0 left-0"
+                  style={{ backgroundColor: BRAND.blue }}
+                ></div>
 
-              <div className="p-5 flex-1 flex flex-col">
-                {/* Header: Categoría */}
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex flex-wrap gap-2">
-                    <div className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide bg-blue-50 text-blue-700 border border-blue-100">
-                      <span>{item.category_name || item.category || "General"}</span>
-                    </div>
-                    {(item.project_type_name || item.project_type_label || (typeof item.project_type === 'object' && (item.project_type?.label || item.project_type?.name))) && (
-                      <div className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide bg-green-50 text-green-700 border border-green-100">
-                        <span>{item.project_type_name || item.project_type_label || item.project_type?.label || item.project_type?.name}</span>
+                <div className="p-5 flex-1 flex flex-col">
+                  {/* Header: Categoría */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex flex-wrap gap-2">
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide bg-blue-50 text-blue-700 border border-blue-100">
+                        <span>{item.category_name || item.category || "General"}</span>
                       </div>
-                    )}
-                    {(item.classification_type_label || (item.classification_type && typeof item.classification_type === 'object' && item.classification_type.label)) && (
-                      <div className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide bg-orange-50 text-orange-700 border border-orange-100">
-                        <span>{item.classification_type_label || item.classification_type?.label}</span>
+                      {(item.project_type_name || item.project_type_label || (typeof item.project_type === 'object' && (item.project_type?.label || item.project_type?.name))) && (
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide bg-green-50 text-green-700 border border-green-100">
+                          <span>{item.project_type_name || item.project_type_label || item.project_type?.label || item.project_type?.name}</span>
+                        </div>
+                      )}
+                      {(item.classification_type_label || (item.classification_type && typeof item.classification_type === 'object' && item.classification_type.label)) && (
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide bg-orange-50 text-orange-700 border border-orange-100">
+                          <span>{item.classification_type_label || item.classification_type?.label}</span>
+                        </div>
+                      )}
+                      {/* Status Badge */}
+                      <div className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide ${item.status === 'draft'
+                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'draft' ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+                        <span>{item.status === 'draft' ? 'Borrador' : 'Publicado'}</span>
                       </div>
-                    )}
-                    {/* Status Badge */}
-                    <div className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide ${
-                      item.status === 'draft'
-                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'draft' ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
-                      <span>{item.status === 'draft' ? 'Borrador' : 'Publicado'}</span>
                     </div>
                   </div>
-                </div>
 
-                {/* Título */}
-                <h3 className="text-lg font-bold text-gray-800 leading-tight line-clamp-2 mb-3 group-hover:text-blue-700 transition-colors">
-                  {item.title}
-                </h3>
+                  {/* Título */}
+                  <h3 className="text-lg font-bold text-gray-800 leading-tight line-clamp-2 mb-3 group-hover:text-blue-700 transition-colors">
+                    {item.title}
+                  </h3>
 
-                {/* Imagen o Placeholder */}
-                <div className="mb-4 rounded-xl border border-gray-100 h-32 bg-gray-50 flex items-center justify-center relative overflow-hidden transition-colors">
-                  {(item.cover_image?.url || item.cover_image_url || (typeof item.cover_image === 'string' && item.cover_image)) ? (
-                    <img
-                      src={getImageProxyUrl(item.cover_image?.url || item.cover_image_url || item.cover_image, { width: 300, quality: 75 })}
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = ""; // Clear src to show placeholder if image fails
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                    />
-                  ) : null}
-                  <div
-                    className={`${(item.cover_image?.url || item.cover_image_url || (typeof item.cover_image === 'string' && item.cover_image)) ? 'hidden' : 'flex'} absolute inset-0 flex-col items-center justify-center text-gray-400 group-hover:text-blue-400 transition-colors transform group-hover:scale-110 duration-500`}
-                  >
+                  {/* Imagen o Placeholder */}
+                  <div className="mb-4 rounded-xl border border-gray-100 h-32 bg-gray-50 flex items-center justify-center relative overflow-hidden transition-colors">
+                    {(item.cover_image?.url || item.cover_image_url || (typeof item.cover_image === 'string' && item.cover_image)) ? (
+                      <img
+                        src={getImageProxyUrl(item.cover_image?.url || item.cover_image_url || item.cover_image, { width: 300, quality: 75 })}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = ""; // Clear src to show placeholder if image fails
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
                     <div
-                      className="absolute inset-0 opacity-[0.03] pointer-events-none"
-                      style={{
-                        backgroundImage: `radial-gradient(circle at 2px 2px, ${BRAND.blue} 1px, transparent 0)`,
-                        backgroundSize: '24px 24px'
-                      }}
-                    ></div>
-                    <FolderOpen size={48} className="mb-2 opacity-20" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Proyecto Ecocircular</span>
+                      className={`${(item.cover_image?.url || item.cover_image_url || (typeof item.cover_image === 'string' && item.cover_image)) ? 'hidden' : 'flex'} absolute inset-0 flex-col items-center justify-center text-gray-400 group-hover:text-blue-400 transition-colors transform group-hover:scale-110 duration-500`}
+                    >
+                      <div
+                        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                        style={{
+                          backgroundImage: `radial-gradient(circle at 2px 2px, ${BRAND.blue} 1px, transparent 0)`,
+                          backgroundSize: '24px 24px'
+                        }}
+                      ></div>
+                      <FolderOpen size={48} className="mb-2 opacity-20" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Proyecto Ecocircular</span>
+                    </div>
+                  </div>
+
+                  {/* Descripción */}
+                  <div className="text-xs text-gray-500 mb-5 line-clamp-3 leading-relaxed flex-grow break-words whitespace-normal">
+                    {item.description ? (
+                      stripHtml(item.description).slice(0, 150) + (stripHtml(item.description).length > 150 ? '...' : '')
+                    ) : (
+                      "Sin descripción disponible..."
+                    )}
+                  </div>
+
+                  {/* Autor */}
+                  <div className="flex items-center gap-2 text-xs text-gray-500 border-t border-gray-50 pt-3 mt-auto">
+                    <div className="p-1.5 rounded-full bg-gray-100">
+                      <User size={14} className="text-gray-400" />
+                    </div>
+                    <span className="font-medium truncate max-w-[150px]">
+                      {item.author || "Autor Desconocido"}
+                    </span>
                   </div>
                 </div>
 
-                {/* Descripción */}
-                <div className="text-xs text-gray-500 mb-5 line-clamp-3 leading-relaxed flex-grow break-words whitespace-normal">
-                  {item.description ? (
-                    stripHtml(item.description).slice(0, 150) + (stripHtml(item.description).length > 150 ? '...' : '')
-                  ) : (
-                    "Sin descripción disponible..."
-                  )}
-                </div>
-
-                {/* Autor */}
-                <div className="flex items-center gap-2 text-xs text-gray-500 border-t border-gray-50 pt-3 mt-auto">
-                  <div className="p-1.5 rounded-full bg-gray-100">
-                    <User size={14} className="text-gray-400" />
-                  </div>
-                  <span className="font-medium truncate max-w-[150px]">
-                    {item.author || "Autor Desconocido"}
-                  </span>
+                {/* Actions Footer */}
+                <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-end items-center gap-0.5 sm:gap-1 flex-wrap">
+                  <button
+                    onClick={() => handleView(item)}
+                    className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    title="Ver detalle"
+                    style={{ color: BRAND.blue }}
+                  >
+                    <Eye size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleEdit(item)}
+                    className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    title="Editar"
+                    style={{ color: BRAND.darkGreen }}
+                  >
+                    <Edit size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item)}
+                    className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
+                    title="Eliminar"
+                    style={{ color: BRAND.orange }}
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
               </div>
-
-              {/* Actions Footer */}
-              <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 flex justify-end items-center gap-0.5 sm:gap-1 flex-wrap">
-                <button
-                  onClick={() => handleView(item)}
-                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
-                  title="Ver detalle"
-                  style={{ color: BRAND.blue }}
-                >
-                  <Eye size={18} />
-                </button>
-                <button
-                  onClick={() => handleEdit(item)}
-                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
-                  title="Editar"
-                  style={{ color: BRAND.darkGreen }}
-                >
-                  <Edit size={18} />
-                </button>
-                <button
-                  onClick={() => handleDelete(item)}
-                  className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
-                  title="Eliminar"
-                  style={{ color: BRAND.orange }}
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
           </div>
 
           {/* Pagination Controls */}
@@ -386,7 +385,7 @@ export default function ProjectList() {
               >
                 Anterior
               </button>
-              
+
               <span className="text-sm font-medium text-gray-600">
                 Página {currentPage} de {Math.ceil(filteredProjects.length / itemsPerPage)}
               </span>
