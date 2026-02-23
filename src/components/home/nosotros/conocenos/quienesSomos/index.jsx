@@ -35,7 +35,7 @@ export default function Index() {
   ];
 
   return (
-    <section className="bg-gradient-to-b from-white via-[#E8F0F8] to-[#F0F7E8] py-12 px-6 md:px-12 lg:px-20">
+    <section className="bg-gradient-to-b from-white via-[#E8F0F8] to-[#F0F7E8] py-0 px-6 md:px-12 lg:px-20">
       <div className="max-w-7xl mx-auto">
         {/* Hero Section - Más compacta */}
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 items-center mb-8">

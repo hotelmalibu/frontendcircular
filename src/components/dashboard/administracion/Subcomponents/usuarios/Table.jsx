@@ -274,10 +274,7 @@ export default function Table() {
   );
 
   return (
-    <div className="bg-gray-50 min-h-screen p-4 sm:p-8 font-sans text-gray-700">
-
-      {/* ESPACIADOR SUPERIOR */}
-      <div className="w-full "></div>
+    <div className="font-sans text-gray-700">
 
       {/* Encabezado */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -379,14 +376,14 @@ export default function Table() {
                               className="p-2 rounded-xl text-blue-600 bg-blue-50 border border-blue-100 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm"
                               title="Editar usuario"
                             >
-                              <Edit size={16} />
+                              <Edit size={18} />
                             </button>
                             <button
                               onClick={() => clickDelete(user)}
                               className="p-2 rounded-xl text-red-600 bg-red-50 border border-red-100 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shadow-sm"
                               title="Eliminar usuario"
                             >
-                              <Trash2 size={16} />
+                              <Trash2 size={18} />
                             </button>
                           </div>
                         </td>

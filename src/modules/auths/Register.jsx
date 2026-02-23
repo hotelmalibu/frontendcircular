@@ -17,9 +17,6 @@ import {
     CheckCircle
 } from "lucide-react";
 
-import Logo from "../../assets/fondosYlogos/Logo.png";
-import LogoBlanco from "../../assets/fondosYlogos/Logo_blanco.png";
-
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
     blue: "#2C67B0",
@@ -123,17 +120,16 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen w-full mt-24 flex bg-white font-sans overflow-hidden">
+        <div className="min-h-screen w-full flex bg-white font-sans overflow-hidden">
 
             {/* SECCIÓN IZQUIERDA */}
-            <div className="hidden lg:flex w-[50%] relative flex-col justify-between p-10 text-white"
+            <div className="hidden lg:flex w-[50%] relative mt-16 flex-col justify-between p-10 text-white"
                 style={{ background: `linear-gradient(135deg, ${BRAND.darkBlue} 0%, ${BRAND.blue} 100%)` }}>
 
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
 
                 <div className="relative z-10 mt-10">
-                    <img src={LogoBlanco} className="h-12 w-auto mb-8" alt="Logo" />
-
+                    
                     <h1 className="text-5xl font-bold leading-tight mb-4">
                         Economía Circular <br />
                         <span style={{ color: BRAND.green }}>en acción</span>
@@ -161,13 +157,10 @@ export default function Register() {
             </div>
 
             {/* SECCIÓN DERECHA */}
-            <div className="w-full lg:w-[60%] flex items-center justify-center p-4 bg-gray-50/50">
+            <div className="w-full lg:w-[60%] flex mt-28 items-center justify-center p-4 bg-gray-50/50">
                 <div className="w-full max-w-xl bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-100">
 
                     {/* LOGO MÓVIL */}
-                    <div className="lg:hidden flex justify-center mb-4">
-                        <img src={Logo} className="h-8 w-auto" alt="Logo" />
-                    </div>
 
                     <div className="mb-6 text-center">
                         <h2 className="text-3xl font-bold">Crear Cuenta</h2>

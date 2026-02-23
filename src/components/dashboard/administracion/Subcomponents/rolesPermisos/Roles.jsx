@@ -12,6 +12,8 @@ import {
   CheckSquare,
   Square
 } from "lucide-react";
+import { toast } from "react-hot-toast";
+import ConfirmModal from "../../../../../components/common/ConfirmModal";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -167,7 +169,7 @@ export default function Roles() {
       closeModal();
     } catch (err) {
       console.error("Error saving role:", err);
-      alert("Error al guardar el rol. Verifica los datos.");
+      toast.error("Error al guardar el rol. Verifica los datos.");
     }
   };
 
@@ -190,7 +192,7 @@ export default function Roles() {
       closeDeleteModal();
     } catch (err) {
       console.error("Error deleting role:", err);
-      alert("No se pudo eliminar el rol.");
+      toast.error("No se pudo eliminar el rol.");
     } finally {
       setIsSaving(false);
     }
@@ -451,37 +453,17 @@ export default function Roles() {
         document.body
       )}
 
-      {/* CONFIRM DELETE MODAL */}
-      {isDeleteModalOpen && ReactDOM.createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center animate-fadeIn">
-            <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Trash2 size={32} />
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">¿Eliminar Rol?</h3>
-            <p className="text-sm text-gray-500 mb-6">
-              ¿Estás seguro de que deseas eliminar el rol <strong>{roleToDelete?.name}</strong>? Esta acción no se puede deshacer.
-            </p>
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={closeDeleteModal}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmDelete}
-                disabled={isSaving}
-                className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-2"
-              >
-                {isSaving && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
-                Sí, Eliminar
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        title="Eliminar Rol"
+        message={`¿Estás seguro de que deseas eliminar el rol "${roleToDelete?.name}"? Esta acción no se puede deshacer.`}
+        confirmText="Sí, Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+        isLoading={isSaving}
+      />
     </div>
   );
 }

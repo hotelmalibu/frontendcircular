@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import DOMPurify from 'dompurify';
 import { useParams, Link } from 'react-router-dom';
-import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, MessageCircle, Link as LinkIcon, Check, User, Layers } from 'lucide-react';
+import { Facebook, X, Linkedin, Mail, Calendar, MessageCircle, Link as LinkIcon, Check, User, Layers } from 'lucide-react';
 import { allContentData } from '../../data/mockContent';
 import { AuthContext } from '../../context/AuthContext';
 import { getAllNews, getNewsById } from '../../api/newsApi';
@@ -177,7 +177,7 @@ export default function ContentDetailPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-white font-sans pt-32 pb-20"> {/* Increased pt-32 to offset high fixed navbar */}
+      <div className="min-h-screen bg-white font-sans pb-20 animate-slide-up">
 
         {/* --- HEADER INFO (Above Image) --- */}
         <div className="max-w-7xl mx-auto px-6 mb-10">

@@ -232,10 +232,7 @@ export default function NewsList() {
   }
 
   return (
-    <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
-
-      {/* ESPACIADOR SUPERIOR */}
-      <div className="w-full"></div>
+    <div className="font-sans text-gray-700">
 
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">

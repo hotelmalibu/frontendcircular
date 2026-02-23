@@ -18,6 +18,7 @@ import {
     FileText
 } from "lucide-react";
 import { getTickets, updateTicket, deleteTicket } from "../../../../../api/helpdeskApi";
+import { toast } from "react-hot-toast";
 
 const BRAND = {
     blue: "#2C67B0",
@@ -123,11 +124,12 @@ export default function HelpdeskTable() {
             formData.append("description", currentTicket.description);
 
             await updateTicket(currentTicket.id, formData);
+            toast.success("Ticket actualizado correctamente");
             setIsManageModalOpen(false);
             fetchTickets();
         } catch (err) {
             console.error("Error updating ticket:", err);
-            alert("Error al actualizar el ticket");
+            toast.error("Error al actualizar el ticket");
         } finally {
             setSaving(false);
         }
@@ -138,11 +140,12 @@ export default function HelpdeskTable() {
         setSaving(true);
         try {
             await deleteTicket(currentTicket.id);
+            toast.success("Ticket eliminado correctamente");
             setIsDeleteModalOpen(false);
             fetchTickets();
         } catch (err) {
             console.error("Error deleting ticket:", err);
-            alert("Error al eliminar el ticket");
+            toast.error("Error al eliminar el ticket");
         } finally {
             setSaving(false);
         }
@@ -159,10 +162,10 @@ export default function HelpdeskTable() {
 
     const getStatusIcon = (status) => {
         switch (status) {
-            case 'resolved': return <CheckCircle2 size={14} className="text-green-500" />;
-            case 'in_progress': return <Clock size={14} className="text-blue-500" />;
-            case 'closed': return <X size={14} className="text-gray-500" />;
-            default: return <AlertTriangle size={14} className="text-yellow-500" />;
+            case 'resolved': return <CheckCircle2 size={16} className="text-green-500" />;
+            case 'in_progress': return <Clock size={16} className="text-blue-500" />;
+            case 'closed': return <X size={16} className="text-gray-500" />;
+            default: return <AlertTriangle size={16} className="text-yellow-500" />;
         }
     };
 
@@ -249,21 +252,21 @@ export default function HelpdeskTable() {
                                                     className="p-2 rounded-xl text-blue-600 bg-blue-50 hover:bg-[#2C67B0] hover:text-white transition-all shadow-sm"
                                                     title="Visualizar detalles"
                                                 >
-                                                    <Eye size={16} />
+                                                    <Eye size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => { setCurrentTicket({ ...ticket }); setIsManageModalOpen(true); }}
                                                     className="p-2 rounded-xl text-green-600 bg-green-50 hover:bg-[#8CB200] hover:text-white transition-all shadow-sm"
                                                     title="Gestionar Ticket"
                                                 >
-                                                    <Edit size={16} />
+                                                    <Edit size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => { setCurrentTicket(ticket); setIsDeleteModalOpen(true); }}
                                                     className="p-2 rounded-xl text-red-600 bg-red-50 hover:bg-red-600 hover:text-white transition-all shadow-sm"
                                                     title="Eliminar"
                                                 >
-                                                    <Trash2 size={16} />
+                                                    <Trash2 size={18} />
                                                 </button>
                                             </div>
                                         </td>

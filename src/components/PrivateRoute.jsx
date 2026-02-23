@@ -1,17 +1,20 @@
 import { useContext, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import api from "../api";
 import NotFound from "../modules/home/NotFound";
 
 export default function PrivateRoute({ children, adminOnly = false, permission = null }) {
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
+    // Solo verificar sesión si es necesario, pero no en cada navegación interna
+    // para evitar saturar el thread principal y la red.
+    /*
     if (user) {
       api.get('/auth/active-sessions')
         .catch(() => {});
     }
+    */
   }, [user]);
 
   if (!user) {

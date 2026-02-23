@@ -140,7 +140,7 @@ export default function PublicSurveysPage() {
 
         {/* LOADING STATE */}
         {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {[1,2,3,4].map(i => (
                     <div key={i} className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 animate-pulse h-80 flex flex-col justify-between">
                         <div className="space-y-4">
@@ -154,7 +154,7 @@ export default function PublicSurveysPage() {
                 ))}
             </div>
         ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {forms.length > 0 ? forms.map((form, idx) => (
                 <div
                 key={form.id}

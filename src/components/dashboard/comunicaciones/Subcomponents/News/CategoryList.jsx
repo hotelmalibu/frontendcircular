@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { getAllCategories, deleteCategory } from "../../../../../api/categoriesApi";
 import CategoryFormModal from "./CategoryFormModal";
+import ConfirmModal from "../../../../../components/common/ConfirmModal";
+import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -32,6 +34,10 @@ export default function CategoryList() {
   const [showFormModal, setShowFormModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Delete Modal State
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   const loadCategories = React.useCallback(async () => {
     try {
@@ -61,6 +67,20 @@ export default function CategoryList() {
       setLoading(false);
     }
   }, []);
+
+  const executeDelete = async () => {
+    if (!itemToDelete) return;
+
+    try {
+      await deleteCategory(itemToDelete.id);
+      toast.success("Categoría eliminada correctamente");
+      await loadCategories();
+      setShowDeleteModal(false);
+      setItemToDelete(null);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error al eliminar la categoría");
+    }
+  };
 
   const filterCategoriesData = React.useCallback(() => {
     if (!Array.isArray(categories)) {
@@ -100,17 +120,9 @@ export default function CategoryList() {
     setShowFormModal(true);
   };
 
-  const handleDelete = async (categoryId) => {
-    if (!window.confirm("¿Está seguro de eliminar esta categoría?")) {
-      return;
-    }
-
-    try {
-      await deleteCategory(categoryId);
-      await loadCategories();
-    } catch (err) {
-      alert(err.response?.data?.message || "Error al eliminar la categoría");
-    }
+  const handleDelete = (category) => {
+    setItemToDelete(category);
+    setShowDeleteModal(true);
   };
 
   const handleFormSuccess = () => {
@@ -128,10 +140,7 @@ export default function CategoryList() {
   }
 
   return (
-    <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-gray-700">
-
-      {/* ESPACIADOR SUPERIOR */}
-      <div className="w-full"></div>
+    <div className="font-sans text-gray-700">
 
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -224,7 +233,7 @@ export default function CategoryList() {
                     <Edit size={18} />
                   </button>
                   <button
-                    onClick={() => handleDelete(category.id)}
+                    onClick={() => handleDelete(category)}
                     className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
                     title="Eliminar"
                   >
@@ -250,6 +259,17 @@ export default function CategoryList() {
           onSuccess={handleFormSuccess}
         />
       )}
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        title="Eliminar Categoría"
+        message={`¿Está seguro que desea eliminar la categoría "${itemToDelete?.name}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </div>
   );
 }

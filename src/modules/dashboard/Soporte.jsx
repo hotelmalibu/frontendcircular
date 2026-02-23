@@ -28,10 +28,10 @@ export default function Soporte() {
   ];
 
   return (
-    <div className="flex min-h-screen mt-8 bg-gray-50 font-sans text-gray-700">
+    <div className="flex min-h-screen bg-gray-50 font-sans text-gray-700">
       <Sidebar />
 
-      <main className="flex-1 p-4 sm:p-8 pt-24 lg:pt-28 transition-all duration-300">
+      <main className="flex-1 p-4 sm:p-8 transition-all duration-300">
         <div className="max-w-7xl mx-auto">
 
           {/* Encabezado */}

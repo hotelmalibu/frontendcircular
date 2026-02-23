@@ -237,13 +237,16 @@ export default function FeaturedSection() {
               };
 
               return (
-                <div
+                <Link
                   key={item.id}
-                  onClick={item.source === 'document' ? handleItemClick : undefined}
+                  to={item.source === 'document' ? "#" : `/contenido/${item.slug}`}
+                  onClick={(e) => {
+                    if (item.source === 'document' && item.documentData) {
+                      e.preventDefault();
+                      handleItemClick();
+                    }
+                  }}
                   className={`group h-full flex flex-col ${item.source === 'document' ? 'cursor-pointer' : ''}`}
-                  {...(item.source !== 'document' && {
-                    onClick: () => window.open(window.location.origin + `/contenido/${item.slug}`, '_blank')
-                  })}
                 >
                   {/* Imagen / Icono */}
                   <div className={`rounded-xl overflow-hidden mb-5 aspect-[16/10] relative shadow-sm transition-transform duration-500 group-hover:-translate-y-2 ${config.isSolid ? config.bgColor : 'bg-gray-100'}`}>
@@ -292,7 +295,7 @@ export default function FeaturedSection() {
                       {item.title}
                     </h3>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

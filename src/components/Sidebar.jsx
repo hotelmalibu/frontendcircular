@@ -89,7 +89,7 @@ export default function Sidebar() {
       />
 
       <aside 
-        className={`hidden md:flex fixed left-0 top-28 bottom-0 md:flex-col bg-white border-r border-gray-200 shadow-sm z-30 transition-all duration-300 ease-in-out ${
+        className={`hidden md:flex fixed left-0 md:top-24 lg:top-28 bottom-0 md:flex-col bg-white border-r border-gray-200 shadow-sm z-30 transition-all duration-300 ease-in-out ${
           isSidebarCollapsed ? "w-20" : "w-72"
         }`}
       >

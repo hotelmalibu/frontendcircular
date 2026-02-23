@@ -3,7 +3,7 @@ import Index from "../../../../components/home/nosotros/conocenos/alianzas/index
 
 export default function Alianzas() {
   return (
-    <div className="mt-24 text-center">
+    <div className="text-center mt-24">
       <Index />
     </div>
   );

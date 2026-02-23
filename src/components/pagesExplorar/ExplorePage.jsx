@@ -1,5 +1,6 @@
 // UBICACIÓN: src/pages/ExplorePage.jsx
 import React, { useState, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Search, ChevronDown, FilterX } from "lucide-react";
 // Asegúrate que la ruta a mockContent sea correcta según tu estructura
 import { contentTypeConfig } from "../../data/mockContent";
@@ -287,10 +288,8 @@ function MinimalistCard({ item }) {
   const Icon = config.icon;
 
   return (
-    <a
-      href={window.location.origin + `/contenido/${item.slug}`}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      to={`/contenido/${item.slug}`}
       className="group h-full flex flex-col"
     >
       <div
@@ -347,6 +346,6 @@ function MinimalistCard({ item }) {
           {item.excerpt}
         </p>
       </div>
-    </a>
+    </Link>
   );
 }

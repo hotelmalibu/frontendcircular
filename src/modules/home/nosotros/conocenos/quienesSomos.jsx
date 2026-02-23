@@ -5,7 +5,7 @@ import Index from "../../../../components/home/nosotros/conocenos/quienesSomos/i
 
 export default function QuienesSomos() {
   return (
-    <div className="mt-24  text-center">
+    <div className="text-center mt-32">
       <Index />
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Search, ArrowRight, FileText, X } from "lucide-react";
 import { contentTypeConfig } from "../../../../data/mockContent";
 import { getPublishedNewsWithImages } from "../../../../api/newsApi";
@@ -318,28 +319,15 @@ function MinimalistCard({ item, onOpenPdf }) {
     }
   };
 
-  const getHref = () => {
-    const hasFile = item.projectData?.upload_file || item.projectData?.file;
-    if (item.source === 'document' || (item.source === 'project' && hasFile)) {
-      return "#";
-    }
-    if (item.source === 'project') {
-      return window.location.origin + `/proyectos/${item.slug}`;
-    }
-    return window.location.origin + `/contenido/${item.slug}`;
-  };
-
   return (
-    <a
-      href={getHref()}
+    <Link
+      to={item.source === 'document' || (item.source === 'project' && (item.projectData?.upload_file || item.projectData?.file)) ? "#" : (item.source === 'project' ? `/proyectos/${item.slug}` : `/contenido/${item.slug}`)}
       onClick={(e) => {
         const hasFile = item.projectData?.upload_file || item.projectData?.file;
         if (item.source === 'document' || (item.source === 'project' && hasFile)) {
           handleItemClick(e);
         }
       }}
-      target="_self"
-      rel="noopener noreferrer"
       className={`group h-full flex flex-col ${(item.source === 'document' || (item.source === 'project' && (item.projectData?.upload_file || item.projectData?.file))) ? 'cursor-pointer' : ''}`}
     >
       <div
@@ -403,6 +391,6 @@ function MinimalistCard({ item, onOpenPdf }) {
           {(item.source === 'document' || (item.source === 'project' && (item.projectData?.upload_file || item.projectData?.file))) ? 'Ver Documento' : 'Leer más'} <ArrowRight size={16} className="ml-1" />
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

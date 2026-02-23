@@ -78,9 +78,9 @@ const PlanCard = ({ title, description, pdf, color }) => {
 
 export default function Index() {
   return (
-    <div className="mt-24 font-sans min-h-screen" style={{ color: '#e6e6e6ff' }}>
+    <div className="font-sans min-h-screen" style={{ color: '#e6e6e6ff' }}>
 
-      <div className="px-6 py-10 max-w-4xl mx-auto">
+      <div className="px-6 py-10 mt-24 max-w-4xl mx-auto">
         <h1
           className="text-4xl font-sans font-extrabold text-center mb-12"
           style={{ color: COLOR_AZUL_PRINCIPAL }}

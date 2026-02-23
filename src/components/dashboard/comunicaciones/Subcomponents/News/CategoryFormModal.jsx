@@ -91,7 +91,7 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
         });
         setErrors((prev) => ({ ...prev, ...mapped }));
       }
-      // alert(`Error: ${errorMessage}`); // Alert removed for cleaner UX, errors handled inline if possible or via toast in parent
+      // toast.error(`Error: ${errorMessage}`); // Handled by mapped errors or parent
     } finally {
       setLoading(false);
     }

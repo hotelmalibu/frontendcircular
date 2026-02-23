@@ -140,15 +140,15 @@ export default function AprobacionesList() {
     switch (status) {
       case "Pendiente":
       case "pending":
-        return { bg: "#FFFBEB", text: BRAND.yellow, border: BRAND.yellow, icon: <AlertCircle size={14} /> };
+        return { bg: "#FFFBEB", text: BRAND.yellow, border: BRAND.yellow, icon: <AlertCircle size={16} /> };
       case "Aprobado":
       case "active":
-        return { bg: "#F0FDF4", text: BRAND.darkGreen, border: BRAND.green, icon: <CheckCircle size={14} /> };
+        return { bg: "#F0FDF4", text: BRAND.darkGreen, border: BRAND.green, icon: <CheckCircle size={16} /> };
       case "Rechazado":
       case "rejected":
-        return { bg: "#FEF2F2", text: BRAND.orange, border: BRAND.orange, icon: <XCircle size={14} /> };
+        return { bg: "#FEF2F2", text: BRAND.orange, border: BRAND.orange, icon: <XCircle size={16} /> };
       case "suspended":
-        return { bg: "#FFF1F2", text: "#BE123C", border: "#BE123C", icon: <UserX size={14} /> };
+        return { bg: "#FFF1F2", text: "#BE123C", border: "#BE123C", icon: <UserX size={16} /> };
       default:
         return { bg: "#F3F4F6", text: BRAND.gray, border: "#D1D5DB", icon: null };
     }
@@ -290,16 +290,16 @@ export default function AprobacionesList() {
 
                       {s.status === 'pending' && (
                         <div className="flex flex-col gap-2 w-full">
-                          <div className="flex gap-2 w-full">
+                          <div className="flex flex-col sm:flex-row gap-2 w-full">
                             <button
                               onClick={() => handleAction(s.id, 'active')}
-                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-50 border border-green-100 text-green-700 rounded-xl hover:bg-green-600 hover:text-white transition shadow-sm text-sm font-bold group text-nowrap">
-                              <CheckCircle size={16} className="group-hover:text-white text-green-600 transition-colors" /> Aprobar
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-50 border border-green-100 text-green-700 rounded-xl hover:bg-green-600 hover:text-white transition shadow-sm text-sm font-bold group">
+                              <CheckCircle size={18} className="group-hover:text-white text-green-600 transition-colors" /> Aprobar
                             </button>
                             <button
                               onClick={() => handleAction(s.id, 'rejected')}
-                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 border border-red-100 text-red-700 rounded-xl hover:bg-red-600 hover:text-white transition shadow-sm text-sm font-bold group text-nowrap">
-                              <XCircle size={16} className="group-hover:text-white text-red-600 transition-colors" /> Rechazar
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 border border-red-100 text-red-700 rounded-xl hover:bg-red-600 hover:text-white transition shadow-sm text-sm font-bold group">
+                              <XCircle size={18} className="group-hover:text-white text-red-600 transition-colors" /> Rechazar
                             </button>
                           </div>
                         </div>

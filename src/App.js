@@ -95,14 +95,37 @@ const MainLayout = () => {
   const showFooter =
     !isInternalRoute && !(isDashboardOrProfile && user && !isAfiliado);
 
+  // Determinar si la página actual usa un Navbar transparente/hero que NO necesita padding superior
+  const transparentPaths = [
+    "/circularmente",
+    "/juntaDirecteEquipo",
+    "/valores",
+    "/lineas-estrategicas",
+    "/informes-anuales",
+    "/encuestas",
+    "/quines-somos",
+    "/alianzas",
+    "/resoluciones",
+    "/planes",
+    "/polticas",
+    "/proyectos-activos",
+    "/login",
+    "/register",
+    "/forgot-password",
+  ];
+
+  const isTransparentPath = transparentPaths.some((p) =>
+    location.pathname === p || location.pathname.startsWith(p + "/")
+  ) || location.pathname === "/"; // Home también es transparente
+
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-1">
+      <main className={`flex-1 ${!isTransparentPath ? "page-top-padding" : ""}`}>
         <Outlet />
       </main>
       {showFooter && <Footer />}
-    </>
+    </div>
   );
 };
 
@@ -149,30 +172,16 @@ export default function App() {
           <Route path="/proyectos/:id" element={<ContentDetailProject />} />
         </Route>
 
-        {/* Rutas de Administrador (Protección antes del Layout para permitir 404 limpio) */}
-        <Route element={<PrivateRoute permission="view.documents"><MainLayout /></PrivateRoute>}>
-          <Route path="/documentos" element={<Documentos />} />
-        </Route>
-        <Route element={<PrivateRoute permission="view.circularmente"><MainLayout /></PrivateRoute>}>
-          <Route path="/companies" element={<Empresas />} />
-        </Route>
-        <Route element={<PrivateRoute adminOnly={true}><MainLayout /></PrivateRoute>}>
-          <Route path="/trazabilidad" element={<Trazabilidad />} />
-        </Route>
-        <Route element={<PrivateRoute permission="view.forms"><MainLayout /></PrivateRoute>}>
-          <Route path="/formularios" element={<Formularios />} />
-        </Route>
-        <Route element={<PrivateRoute permission="view.communications"><MainLayout /></PrivateRoute>}>
-          <Route path="/comunicaciones" element={<Comunicaciones />} />
-        </Route>
-        <Route element={<PrivateRoute permission="view.admin"><MainLayout /></PrivateRoute>}>
-          <Route path="/administracion" element={<Administracion />} />
-        </Route>
-        <Route element={<PrivateRoute permission="view.support"><MainLayout /></PrivateRoute>}>
-          <Route path="/soporte" element={<Soporte />} />
-        </Route>
-        <Route element={<PrivateRoute adminOnly={true}><MainLayout /></PrivateRoute>}>
-          <Route path="/integracion" element={<Integracion />} />
+        {/* Dashoard Routes with shared MainLayout to prevent remounts */}
+        <Route element={<MainLayout />}>
+          <Route path="/documentos" element={<PrivateRoute permission="view.documents"><Documentos /></PrivateRoute>} />
+          <Route path="/companies" element={<PrivateRoute permission="view.circularmente"><Empresas /></PrivateRoute>} />
+          <Route path="/trazabilidad" element={<PrivateRoute adminOnly={true}><Trazabilidad /></PrivateRoute>} />
+          <Route path="/formularios" element={<PrivateRoute permission="view.forms"><Formularios /></PrivateRoute>} />
+          <Route path="/comunicaciones" element={<PrivateRoute permission="view.communications"><Comunicaciones /></PrivateRoute>} />
+          <Route path="/administracion" element={<PrivateRoute permission="view.admin"><Administracion /></PrivateRoute>} />
+          <Route path="/soporte" element={<PrivateRoute permission="view.support"><Soporte /></PrivateRoute>} />
+          <Route path="/integracion" element={<PrivateRoute adminOnly={true}><Integracion /></PrivateRoute>} />
         </Route>
 
         {/* Survey Detail WITHOUT MainLayout to prevent 404 flash */}

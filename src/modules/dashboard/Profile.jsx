@@ -210,7 +210,7 @@ export default function Profile() {
     <div className="flex min-h-screen bg-gray-50 font-sans text-gray-700">
       <Sidebar />
 
-      <main className="flex-1 p-4 sm:p-8 pt-24 md:pt-32">
+      <main className="flex-1 p-4 sm:p-8">
         <div className="max-w-4xl mx-auto">
 
 
