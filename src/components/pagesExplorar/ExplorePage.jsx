@@ -6,7 +6,6 @@ import { contentTypeConfig } from "../../data/mockContent";
 import { getAllNews } from "../../api/newsApi";
 import { getAllCategories } from "../../api/categoriesApi";
 import { stripHtml } from "../../utils/textUtils";
-import { getImageProxyUrl } from "../../utils/imageUtils.js";
 import explorarHeroImage from "../../assets/explorar-hero.jpg";
 
 export default function ExplorePage() {

@@ -2,10 +2,9 @@ import React, { useEffect, useState, useContext } from 'react';
 import DOMPurify from 'dompurify';
 import { useParams, Link } from 'react-router-dom';
 import { Facebook, X, Linkedin, Mail, Calendar, ArrowLeft, MessageCircle, Link as LinkIcon, Check, User, Layers } from 'lucide-react';
-import { allContentData, contentTypeConfig as typeConfig } from '../../data/mockContent';
+import { allContentData } from '../../data/mockContent';
 import { AuthContext } from '../../context/AuthContext';
 import { getAllNews, getNewsById } from '../../api/newsApi';
-import { getImageProxyUrl } from '../../utils/imageUtils.js';
 import DefaultLoader from '../../components/common/DefaultLoader';
 
 
@@ -163,8 +162,6 @@ export default function ContentDetailPage() {
     );
   }
 
-  const config = (typeConfig && content?.type) ? (typeConfig[content.type] || {}) : {};
-  const Icon = config.icon || (() => null);
 
   // --- SOCIAL SHARE URLS ---
   const currentUrl = window.location.href;
