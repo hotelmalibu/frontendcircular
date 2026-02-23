@@ -5,7 +5,6 @@ import { contentTypeConfig } from "../../data/mockContent";
 import { getPublishedNewsWithImages } from "../../api/newsApi";
 import { getDocuments } from "../../api/documentsApi";
 import { stripHtml } from "../../utils/textUtils";
-import { getImageProxyUrl } from "../../utils/imageUtils.js";
 
 export default function FeaturedSection() {
   const [newsItems, setNewsItems] = useState([]);
