@@ -518,7 +518,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                 {/* Description (ReactQuill) */}
                 <div>
                   <label className={labelClass}><AlignLeft size={12} className="inline mr-1" /> Descripción / Contenido</label>
-                  <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+                  <div className="bg-white rounded-xl overflow-hidden border border-gray-200 quill-fixed-toolbar">
                     <ReactQuill
                       theme="snow"
                       value={formData.description}
@@ -526,7 +526,6 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
                       modules={modules}
                       formats={formats}
                       placeholder="Escribe el contenido aquí..."
-                      className="h-96 mb-16"
                     />
                   </div>
                 </div>
