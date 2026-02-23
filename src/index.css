@@ -189,7 +189,7 @@
   color: #4b5563;
 }
 
-<<<<<<< HEAD
+
 /* --- UTILS: NAVBAR SPACING --- */
 .page-top-padding {
   padding-top: 5rem; /* Default for mobile/small screens */
@@ -243,7 +243,7 @@
 .animate-slide-up {
   animation: slideUp 0.5s ease-out forwards;
 }
-=======
+
 /* --- STICKY QUILL TOOLBAR (MODIFIED) --- */
 /* We don't use position: sticky here because it causes overlap issues in the modal layout.
    Instead, we will make the editor area scrollable while keeping the toolbar fixed at its top. */
@@ -267,4 +267,3 @@
 .quill-fixed-toolbar .ql-editor {
   min-height: 400px !important;
 }
->>>>>>> 35280ed1aaec2d9a0500523d0d5b2a622b0dd9c2
