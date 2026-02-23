@@ -381,7 +381,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                 {/* Description (ReactQuill) */}
                 <div>
                   <label className={labelClass}>Descripción / Contenido <span className="text-red-500">*</span></label>
-                  <div className={`bg-white rounded-xl overflow-hidden border transition-all ${errors.description ? "border-orange-300 ring-1 ring-orange-100" : "border-gray-200"}`}>
+                  <div className={`bg-white rounded-xl overflow-hidden border transition-all quill-fixed-toolbar ${errors.description ? "border-orange-300 ring-1 ring-orange-100" : "border-gray-200"}`}>
                     <ReactQuill
                       theme="snow"
                       value={formData.description}
@@ -389,7 +389,6 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
                       modules={modules}
                       formats={formats}
                       placeholder="Escribe el contenido aquí..."
-                      className="h-96 mb-16"
                     />
                   </div>
                   {errors.description && <p className="mt-1 text-xs font-medium text-orange-500 flex items-center gap-1"><AlertCircle size={12} /> {errors.description}</p>}

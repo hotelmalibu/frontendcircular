@@ -19,7 +19,8 @@ import {
   ResponsiveContainer,
   PieChart as RechartsPieChart,
   Pie,
-  Cell
+  Cell,
+  LabelList
 } from "recharts";
 import { getAllCategories } from "../../../../../api/categoriesApi";
 import { getAllNews } from "../../../../../api/newsApi";
@@ -207,10 +208,18 @@ export default function DashboardContenido() {
                     contentStyle={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", borderRadius: "12px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}
                   />
                   <Legend verticalAlign="top" align="right" height={40} wrapperStyle={{ paddingBottom: "30px" }} />
-                  <Bar dataKey="Noticias" fill={BRAND.blue} radius={[0, 6, 6, 0]} barSize={35} />
-                  <Bar dataKey="Eventos" fill={BRAND.darkGreen} radius={[0, 6, 6, 0]} barSize={35} />
-                  <Bar dataKey="Proyectos" fill={BRAND.orange} radius={[0, 6, 6, 0]} barSize={35} />
-                  <Bar dataKey="Documentos" fill={BRAND.yellow} radius={[0, 6, 6, 0]} barSize={35} />
+                  <Bar dataKey="Noticias" fill={BRAND.blue} radius={[0, 6, 6, 0]} barSize={35}>
+                    <LabelList dataKey="Noticias" position="right" style={{ fill: BRAND.blue, fontSize: '12px', fontWeight: 'bold' }} />
+                  </Bar>
+                  <Bar dataKey="Eventos" fill={BRAND.darkGreen} radius={[0, 6, 6, 0]} barSize={35}>
+                    <LabelList dataKey="Eventos" position="right" style={{ fill: BRAND.darkGreen, fontSize: '12px', fontWeight: 'bold' }} />
+                  </Bar>
+                  <Bar dataKey="Proyectos" fill={BRAND.orange} radius={[0, 6, 6, 0]} barSize={35}>
+                    <LabelList dataKey="Proyectos" position="right" style={{ fill: BRAND.orange, fontSize: '12px', fontWeight: 'bold' }} />
+                  </Bar>
+                  <Bar dataKey="Documentos" fill={BRAND.yellow} radius={[0, 6, 6, 0]} barSize={35}>
+                    <LabelList dataKey="Documentos" position="right" style={{ fill: BRAND.yellow, fontSize: '12px', fontWeight: 'bold' }} />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
