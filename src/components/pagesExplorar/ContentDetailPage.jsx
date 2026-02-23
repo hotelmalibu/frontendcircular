@@ -146,8 +146,6 @@ export default function ContentDetailPage() {
     return () => { mounted = false };
   }, [slug, isAuthenticated]);
 
-  // ...
-
   if (loading) {
     return <DefaultLoader />;
   }
@@ -182,32 +180,11 @@ export default function ContentDetailPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-white font-sans">
+      <div className="min-h-screen bg-white font-sans pt-32 pb-20"> {/* Increased pt-32 to offset high fixed navbar */}
 
-        {/* --- BANNER IMAGE --- */}
-        {content.image && (
-          <div className="w-full px-6 md:px-16 pt-10">
-            <div className="max-w-2xl mx-auto" style={{ aspectRatio: '100 / 80' }}>
-              <img
-                src={content.image}
-                alt={content.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* --- INFO BELOW BANNER --- */}
-        <div className="max-w-7xl mx-auto px-6 pt-10">
-
-          {/* Breadcrumb */}
-          <div className="mb-8">
-            <Link to="/explorar" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-800 text-sm font-medium transition-all group">
-              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Volver a explorar
-            </Link>
-          </div>
-
-          {/* Type badge + date */}
+        {/* --- HEADER INFO (Above Image) --- */}
+        <div className="max-w-7xl mx-auto px-6 mb-10">
+          {/* Metadata: Type badge + date */}
           <div className="flex items-center gap-3 mb-5">
             <span className="px-3 py-1 rounded-sm text-[10px] font-black uppercase tracking-[0.2em] bg-[#00AB6D] text-white">
               {content.type}
@@ -218,10 +195,26 @@ export default function ContentDetailPage() {
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#1E305D] leading-[1.1] tracking-tight mb-8">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#1E305D] leading-[1.1] tracking-tight">
             {content.title}
           </h1>
+        </div>
 
+        {/* --- BANNER IMAGE --- */}
+        {content.image && (
+          <div className="w-full px-6 md:px-12 mb-12">
+            <div className="max-w-7xl mx-auto bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center border border-gray-100 shadow-sm" style={{ minHeight: '400px', maxHeight: '700px' }}>
+              <img
+                src={content.image}
+                alt={content.title}
+                className="w-full h-auto max-h-[700px] object-contain"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* --- MAIN CONTENT AREA --- */}
+        <div className="max-w-7xl mx-auto px-6">
           {/* Author */}
           <div className="flex items-center gap-3 pb-8 mb-8 border-b border-gray-100">
             <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
@@ -345,7 +338,7 @@ function SocialButton({ icon: Icon, url, color }) {
   );
 }
 
-// Sub-component Item de Sidebar (REVERTIDO)
+// Sub-component Item de Sidebar
 function SidebarItem({ icon: Icon, label, value }) {
   if (!value) return null;
   return (

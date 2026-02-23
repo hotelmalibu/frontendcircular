@@ -196,7 +196,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     const cropper = cropperRef.current?.cropper;
     if (cropper) {
       cropper.getCroppedCanvas({
-        maxWidth: 1000,
+        maxWidth: 1200,
         maxHeight: 800,
         fillColor: '#fff',
         imageSmoothingEnabled: true,
@@ -603,7 +603,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       {/* Modal de Cropper */}
       {showCropper && (
         <div className="fixed inset-0 z-[10000] bg-black bg-opacity-80 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="bg-white w-full max-w-3xl rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
               <h3 className="font-bold text-gray-800">Ajustar Imagen</h3>
               <button
@@ -618,15 +618,15 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
               <Cropper
                 src={imageToCrop}
                 style={{ height: "100%", width: "100%" }}
-                initialAspectRatio={100 / 80}
-                aspectRatio={100 / 80}
+                initialAspectRatio={120 / 80}
+                aspectRatio={120 / 80}
                 guides={true}
                 ref={cropperRef}
                 viewMode={1}
                 dragMode="move"
                 background={false}
                 responsive={true}
-                autoCropArea={1}
+                autoCropArea={0.75}
                 checkOrientation={false}
               />
             </div>
