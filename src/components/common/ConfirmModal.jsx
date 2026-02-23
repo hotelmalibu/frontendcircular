@@ -71,6 +71,7 @@ export default function ConfirmModal({
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
+              type="button"
               onClick={onClose}
               disabled={isLoading}
               className="px-6 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors disabled:opacity-50"
@@ -78,6 +79,7 @@ export default function ConfirmModal({
               {cancelText}
             </button>
             <button
+              type="button"
               onClick={onConfirm}
               disabled={isLoading}
               className={`px-6 py-3 rounded-xl text-white font-bold shadow-lg shadow-gray-200 transform active:scale-95 transition-all flex items-center justify-center gap-2 ${colors.buttonBg} ${colors.buttonRing} disabled:opacity-70 disabled:cursor-not-allowed`}

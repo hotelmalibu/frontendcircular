@@ -102,7 +102,9 @@ export default function HelpdeskModal({ isOpen, onClose }) {
                         <p className="text-white/70 text-sm mt-1">Cuéntanos cómo podemos ayudarte</p>
                     </div>
                     <button
+                        type="button"
                         onClick={handleClose}
+                        aria-label="Cerrar"
                         className="p-2 hover:bg-white/10 rounded-full transition-colors"
                     >
                         <X size={24} />
@@ -145,6 +147,7 @@ export default function HelpdeskModal({ isOpen, onClose }) {
                             </p>
 
                             <button
+                                type="button"
                                 onClick={handleClose}
                                 className="w-full py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold hover:bg-gray-200 transition-all active:scale-[0.98]"
                             >

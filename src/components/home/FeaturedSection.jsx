@@ -173,6 +173,7 @@ export default function FeaturedSection() {
             <div className="flex flex-wrap items-center gap-6 mt-4">
               {categories.map((cat) => (
                 <button
+                  type="button"
                   key={cat}
                   onClick={() => setActiveTab(cat)}
                   className={`
@@ -302,7 +303,7 @@ export default function FeaturedSection() {
         ) : (
           <div className="py-12 text-center bg-gray-50 rounded-lg">
             <p className="text-gray-500 font-medium">No se encontró contenido en la categoría "{activeTab}".</p>
-            <button onClick={() => setActiveTab("Todos")} className="mt-2 text-sm text-[#00AB6D] underline">
+            <button type="button" onClick={() => setActiveTab("Todos")} className="mt-2 text-sm text-[#00AB6D] underline">
               Ver todo el contenido
             </button>
           </div>
@@ -312,6 +313,8 @@ export default function FeaturedSection() {
         {totalPages > 1 && (
           <div className="mt-16 flex justify-center items-center gap-3">
             <button
+              type="button"
+              aria-label="Página anterior"
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className={`p-3 rounded-full border-2 transition-all ${currentPage === 1
@@ -325,7 +328,9 @@ export default function FeaturedSection() {
             <div className="flex gap-2">
               {[...Array(totalPages)].map((_, i) => (
                 <button
+                  type="button"
                   key={i}
+                  aria-label={`Página ${i + 1}`}
                   onClick={() => {
                     setCurrentPage(i + 1);
                     window.scrollTo({ top: document.getElementById('featured-section')?.offsetTop - 100, behavior: 'smooth' });
@@ -341,6 +346,8 @@ export default function FeaturedSection() {
             </div>
 
             <button
+              type="button"
+              aria-label="Página siguiente"
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
               className={`p-3 rounded-full border-2 transition-all ${currentPage === totalPages

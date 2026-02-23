@@ -103,6 +103,8 @@ export default function Footer() {
               <h4 className="font-bold text-lg mb-4 text-white uppercase tracking-wider">Mesa de Ayuda</h4>
               <div className="text-sm text-white/90 space-y-3 flex flex-col items-center md:items-start min-w-[200px]">
                 <button
+                  type="button"
+                  aria-label="Reportar problema técnico"
                   onClick={() => setIsHelpdeskOpen(true)}
                   className="w-full text-left hover:text-[#00AB6D] transition-all font-bold border border-white/20 rounded-xl px-5 py-3 hover:bg-white/10 flex items-center justify-center md:justify-start gap-2"
                 >
@@ -110,6 +112,8 @@ export default function Footer() {
                   Soporte Técnico
                 </button>
                 <button
+                  type="button"
+                  aria-label="Consultar estado de ticket"
                   onClick={() => setIsStatusModalOpen(true)}
                   className="w-full text-left hover:text-[#00AB6D] transition-all font-bold border border-white/20 rounded-xl px-5 py-3 hover:bg-white/10 flex items-center justify-center md:justify-start gap-2"
                 >
@@ -124,6 +128,7 @@ export default function Footer() {
         {/* Botón subir */}
         <div className="flex justify-center md:justify-end mt-4">
           <button
+            type="button"
             onClick={scrollToTop}
             className="group flex flex-col items-center justify-center gap-1 text-white/60 hover:text-[#00AB6D] transition-all duration-300"
             aria-label="Volver al principio"

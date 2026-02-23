@@ -52,42 +52,42 @@ export default function Undexsub() {
 
   const loadData = React.useCallback(async () => {
     try {
-      // 1. Usuarios
-      const resUsers = await getUsers();
+      // 1. Peticiones en paralelo para mayor velocidad
+      const [resUsers, resSessions, resAlerts] = await Promise.all([
+        getUsers({ per_page: 1 }), // Solo queremos el total inicialmente
+        getActiveSessions().catch(() => ({ data: { count: 0 } })),
+        getSecurityLogs({ per_page: 5 }).catch(() => ({ data: [] }))
+      ]);
+
+      // Procesar Usuarios
       let userList = [];
-      if (Array.isArray(resUsers.data)) {
-        userList = resUsers.data;
-      } else if (resUsers.data?.data && Array.isArray(resUsers.data.data)) {
-        userList = resUsers.data.data;
-      } else if (resUsers.data && typeof resUsers.data === 'object') {
-        const possibleArray = Object.values(resUsers.data).find(val => Array.isArray(val));
-        if (possibleArray) userList = possibleArray;
-        else userList = Object.values(resUsers.data).filter(item => item && typeof item === 'object');
+      const resUsersData = resUsers.data;
+      if (Array.isArray(resUsersData)) {
+        userList = resUsersData;
+      } else if (resUsersData?.data && Array.isArray(resUsersData.data)) {
+        userList = resUsersData.data;
       }
 
+      // El total real viene de la paginación del backend
+      const totalUsersCount = resUsers.data?.total || resUsers.total || userList.length;
+
       // Filter out non-user objects if necessary
-      userList = userList.filter(u => u.id && (u.name || u.email));
-      setUsersList(userList);
+      const validUsers = userList.filter(u => u.id && (u.name || u.email));
+      setUsersList(validUsers);
 
       // 2. Sesiones
-      let sessionsCount = 0;
-      try {
-        const resSessions = await getActiveSessions();
-        sessionsCount = resSessions.data?.count || 0;
-      } catch (e) { console.log("Sessions endpoint not available."); }
+      const sessionsCount = resSessions.data?.count || 0;
 
       // 3. Alertas
-      let realAlerts = [];
-      try {
-        const resAlerts = await getSecurityLogs();
-        realAlerts = Array.isArray(resAlerts.data) ? resAlerts.data : (resAlerts.data?.data || []);
-      } catch (err) { console.log("No security logs endpoint found yet."); }
+      const realAlerts = Array.isArray(resAlerts.data) ? resAlerts.data : (resAlerts.data?.data || []);
 
+      // Si el backend no soporta conteo filtrado directamente, pedimos una muestra para los charts
+      // pero para el dashboard principal, intentamos obtener los totales reales
       setDashboardStats({
-        totalUsers: userList.length.toLocaleString(),
+        totalUsers: totalUsersCount.toLocaleString(),
         activeSessions: sessionsCount.toString(),
-        criticalAlerts: realAlerts.filter(a => a.type === 'critical').length.toString(),
-        blockedAccesses: userList.filter(u => u.status === 'rejected').length.toString()
+        criticalAlerts: (resAlerts.data?.total || resAlerts.total || realAlerts.filter(a => a.type === 'critical').length).toString(),
+        blockedAccesses: "0" // Este requiere un filtro específico en backend para ser exacto
       });
 
       setAlertas(realAlerts.map(a => ({
@@ -96,6 +96,12 @@ export default function Undexsub() {
         fecha: new Date(a.created_at).toLocaleString('es-ES'),
         tipo: a.type || "info"
       })));
+
+      // Opcional: Si necesitamos data para gráficas, cargar una muestra más grande en segundo plano
+      getUsers({ per_page: 100 }).then(res => {
+        const list = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+        setUsersList(list.filter(u => u.id && (u.name || u.email)));
+      });
 
     } catch (err) {
       console.error("Error loading dashboard data:", err);

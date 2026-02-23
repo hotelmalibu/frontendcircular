@@ -404,11 +404,12 @@ export default function IndexImagen() {
             ) : (
               // PUNTO PULSANTE - Clickeable
               <button
+                type="button"
                 onClick={() => {
                   setCurrentSlide(index);
                   setProgress(0);
                 }}
-                className="w-3 h-3 rounded-full bg-white/80 hover:bg-white transition-all duration-300 cursor-pointer hover:scale-150 translate-x-[10px"
+                className="w-3 h-3 rounded-full bg-white/80 hover:bg-white transition-all duration-300 cursor-pointer hover:scale-150 translate-x-[10px]"
                 aria-label={`Ir al slide ${index + 1}`}
               >
                 {/* Pulso */}
@@ -491,6 +492,7 @@ export default function IndexImagen() {
 
       {/* 🔽 Botón Scroll Mejorado */}
       <button
+        type="button"
         onClick={handleScrollDown}
         className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center group focus:outline-none"
         aria-label="Desplazarse hacia abajo"

@@ -20,7 +20,7 @@ export const deleteRole = (id) => api.delete(`/auth/roles/${id}`);
 
 export const getPermissions = () => api.get(`/auth/permissions`);
 
-export const getUsers = () => api.get(`/auth/users`);
+export const getUsers = (params) => api.get(`/auth/users`, { params });
 export const getCurrentUser = () => api.get(`/auth/user`);
 
 // Approval Workflow

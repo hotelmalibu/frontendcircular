@@ -125,7 +125,14 @@ export default function TicketStatusModal({ isOpen, onClose }) {
                                 style={{ backgroundColor: BRAND.darkBlue }}
                                 className="w-full py-4 rounded-2xl font-bold text-white shadow-lg shadow-blue-900/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                             >
-                                {loading ? <Loader2 className="animate-spin" size={20} /> : "Consultar Ahora"}
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="animate-spin" size={20} />
+                                        <span>Consultando...</span>
+                                    </>
+                                ) : (
+                                    "Consultar Ahora"
+                                )}
                             </button>
                         </form>
                     ) : (

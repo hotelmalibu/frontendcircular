@@ -24,15 +24,14 @@ export default function Index() {
       const fetchCounts = async () => {
         try {
           const { getUsers } = await import("../../../api/auth");
-          const res = await getUsers();
-          const users = Array.isArray(res.data) ? res.data : (res.data?.data || []);
-          const pending = users.filter(u => 
-            u.status?.toLowerCase() === 'pending' || 
-            u.status?.toLowerCase() === 'pendiente' ||
-            u.status?.toLowerCase() === 'suspended' ||
-            u.status?.toLowerCase() === 'suspendido'
-          ).length;
-          setPendingUsersCount(pending);
+          // Pedimos totales exactos para usuarios en espera de revisión o suspendidos
+          const [resPending, resSuspended] = await Promise.all([
+            getUsers({ per_page: 1, status: 'pending' }).catch(() => ({ data: { total: 0 } })),
+            getUsers({ per_page: 1, status: 'suspended' }).catch(() => ({ data: { total: 0 } }))
+          ]);
+          const total = (resPending.data?.total || resPending.total || 0) + 
+                        (resSuspended.data?.total || resSuspended.total || 0);
+          setPendingUsersCount(total);
         } catch (e) {
           console.error("Error al cargar contadores de Dashboard:", e);
         }

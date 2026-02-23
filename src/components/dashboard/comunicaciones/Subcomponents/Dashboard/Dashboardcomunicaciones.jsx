@@ -2,18 +2,13 @@ import React, { useState, useEffect } from "react";
 import {
   PenTool,
   Calendar,
-  BarChart2,
   Activity,
   Briefcase,
   FileText,
-  PieChart as PieIcon
+  PieChart as PieIcon,
+  BarChart2
 } from "lucide-react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
@@ -22,6 +17,7 @@ import {
   Cell,
   LabelList
 } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { getAllCategories } from "../../../../../api/categoriesApi";
 import { getAllNews } from "../../../../../api/newsApi";
 import { getAllSchedules } from "../../../../../api/scheduleApi";
@@ -56,28 +52,31 @@ export default function DashboardContenido() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [categoriesRes, newsRes, schedulesRes, projectsRes, documentsRes] = await Promise.all([
-          getAllCategories(),
-          getAllNews(),
-          getAllSchedules(1, 100),
-          getAllProjects(),
-          getDocuments()
+        // Realizar peticiones balanceadas: 1 para totales, y una muestra para gráficas/actividad
+        const [resCats, resNews, resScheds, resProjs, resDocs] = await Promise.all([
+          getAllCategories({ per_page: 50 }).catch(() => ({ data: [] })),
+          getAllNews({ per_page: 50 }).catch(() => ({ data: [] })),
+          getAllSchedules(1, 50).catch(() => ({ data: [] })),
+          getAllProjects({ per_page: 50 }).catch(() => ({ data: [] })),
+          getDocuments({ per_page: 50 }).catch(() => ({ data: [] }))
         ]);
 
-        let categories = Array.isArray(categoriesRes) ? categoriesRes : (categoriesRes?.data?.items || categoriesRes?.data || []);
-        let news = Array.isArray(newsRes) ? newsRes : (newsRes?.data?.news || newsRes?.data || []);
-        let schedules = Array.isArray(schedulesRes) ? schedulesRes : (schedulesRes?.data?.schedules || schedulesRes?.data?.items || schedulesRes?.data || []);
-        let projects = Array.isArray(projectsRes) ? projectsRes : (projectsRes?.data?.items || projectsRes?.data || []);
-        let documents = Array.isArray(documentsRes) ? documentsRes : (documentsRes?.data?.items || documentsRes?.data || []);
+        const categories = Array.isArray(resCats) ? resCats : (resCats?.data?.items || resCats?.data || []);
+        const news = Array.isArray(resNews?.data?.news) ? resNews.data.news : (resNews?.data || []);
+        const schedules = Array.isArray(resScheds?.data?.schedules) ? resScheds.data.schedules : (resScheds?.data?.items || resScheds?.data || []);
+        const projects = Array.isArray(resProjs?.data?.items) ? resProjs.data.items : (resProjs?.data || []);
+        const documents = Array.isArray(resDocs?.data?.items) ? resDocs.data.items : (resDocs?.data || []);
 
+        // Totales reales (pueden venir de metadatos o del length de la muestra si es pequeña)
         setMetrics({
-          news: news.length,
-          events: schedules.length,
-          projects: projects.length,
-          documents: documents.length,
+          news: resNews.data?.total || news.length,
+          events: resScheds.data?.total || resScheds.total || schedules.length,
+          projects: resProjs.data?.total || projects.length,
+          documents: resDocs.data?.total || documents.length,
           categories: categories.length
         });
-
+        
+        // Re-calcular estadísticas por categoría (Muestra de los últimos 50)
         const statsMap = {};
         categories.forEach(cat => {
           statsMap[cat.id] = { name: cat.name, Noticias: 0, Eventos: 0, Proyectos: 0, Documentos: 0 };
@@ -106,18 +105,19 @@ export default function DashboardContenido() {
         setCategoryStats(Object.values(statsMap));
 
         const pData = [
-          { name: "Noticias", value: news.length },
-          { name: "Eventos", value: schedules.length },
-          { name: "Proyectos", value: projects.length },
-          { name: "Documentos", value: documents.length },
+          { name: "Noticias", value: resNews.data?.total || resNews.total || news.length },
+          { name: "Eventos", value: resScheds.data?.total || resScheds.total || schedules.length },
+          { name: "Proyectos", value: resProjs.data?.total || resProjs.total || projects.length },
+          { name: "Documentos", value: resDocs.data?.total || resDocs.total || documents.length },
         ].filter(item => item.value > 0);
         setPieData(pData);
 
+        // Actividad Reciente combinada (Muestra)
         const allItems = [
-          ...news.map(i => ({ ...i, type: "Noticia", dataType: "news", date: i.created_at })),
-          ...schedules.map(i => ({ ...i, type: "Evento", dataType: "event", date: i.created_at })),
-          ...projects.map(i => ({ ...i, type: "Proyecto", dataType: "project", date: i.created_at })),
-          ...documents.map(i => ({ ...i, type: "Documento", dataType: "document", date: i.created_at }))
+          ...news.slice(0, 5).map(i => ({ ...i, type: "Noticia", date: i.created_at })),
+          ...schedules.slice(0, 5).map(i => ({ ...i, type: "Evento", date: i.created_at })),
+          ...projects.slice(0, 5).map(i => ({ ...i, type: "Proyecto", date: i.created_at })),
+          ...documents.slice(0, 5).map(i => ({ ...i, type: "Documento", date: i.created_at }))
         ];
         allItems.sort((a, b) => new Date(b.date) - new Date(a.date));
         setRecentActivity(allItems.slice(0, 5));
@@ -181,9 +181,9 @@ export default function DashboardContenido() {
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
         <div className="mb-8">
           <h3 className="text-xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
-            <BarChart2 size={24} className="text-gray-400" /> Estadísticas por Categoría
+            <BarChart2 size={24} className="text-gray-400" /> Estadísticas por Categoría (Reciente)
           </h3>
-          <p className="text-sm text-gray-500 mt-1">Distribución detallada de contenidos por temática</p>
+          <p className="text-sm text-gray-500 mt-1">Distribución de los últimos 50 contenidos por temática</p>
         </div>
         {categoryStats.length > 0 ? (
           <div className="overflow-y-auto pr-4 custom-scrollbar" style={{ maxHeight: "800px" }}>

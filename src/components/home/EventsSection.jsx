@@ -191,6 +191,7 @@ export default function EventsSection() {
                {/* Controls */}
                <div className="flex items-center gap-2">
                   <button 
+                    type="button"
                     onClick={prevSlide}
                     className="p-2 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={currentIndex === 0 || events.length <= visibleCards}
@@ -199,6 +200,7 @@ export default function EventsSection() {
                     <ChevronLeft size={20} />
                   </button>
                   <button 
+                    type="button"
                     onClick={nextSlide}
                     className="p-2 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={currentIndex >= events.length - visibleCards || events.length <= visibleCards}
@@ -209,7 +211,7 @@ export default function EventsSection() {
                </div>
 
                {events.length > 4 && (
-                <button onClick={() => setShowFullAgenda(true)} className="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
+                <button type="button" onClick={() => setShowFullAgenda(true)} className="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
                   Ver agenda completa <ArrowRight size={16} />
                 </button>
               )}
@@ -296,6 +298,7 @@ export default function EventsSection() {
                 <div className="flex justify-center gap-1.5 mt-6">
                   {Array.from({ length: events.length - visibleCards + 1 }).map((_, idx) => (
                     <button
+                      type="button"
                       key={idx}
                       onClick={() => setCurrentIndex(idx)}
                       className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -328,7 +331,7 @@ export default function EventsSection() {
           <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-10">
               <h3 className="text-xl font-bold text-gray-900">Agenda Completa</h3>
-              <button onClick={() => setShowFullAgenda(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+              <button type="button" aria-label="Cerrar agenda" onClick={() => setShowFullAgenda(false)} className="p-2 hover:bg-gray-100 rounded-lg">
                 <X size={24} />
               </button>
             </div>

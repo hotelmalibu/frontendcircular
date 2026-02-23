@@ -67,6 +67,14 @@ export default function Bibliotecasub() {
     sort_order: "desc"
   });
 
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    per_page: 12,
+    total: 0
+  });
+  const [globalCounts, setGlobalCounts] = useState({ approved: 0, pending: 0 });
+
 
   const statusLabels = {
     draft: { text: "Borrador", color: BRAND.gray, bg: "#F3F4F6", icon: <Edit size={12} /> },
@@ -109,10 +117,16 @@ export default function Bibliotecasub() {
       const params = {
         search: filters.search,
         sort_by: filters.sort_by,
-        sort_order: filters.sort_order
+        sort_order: filters.sort_order,
+        page: pagination.current_page,
+        per_page: pagination.per_page
       };
 
-      const docsResponse = await getDocuments(params);
+      const [docsResponse, approvedRes, pendingRes] = await Promise.all([
+        getDocuments(params),
+        getDocuments({ per_page: 1, status: 'approved', search: filters.search }).catch(() => ({ data: { total: 0 } })),
+        getDocuments({ per_page: 1, status: 'pending_review', search: filters.search }).catch(() => ({ data: { total: 0 } }))
+      ]);
 
       // Handle multiple response structures
       let docsArray = [];
@@ -129,6 +143,28 @@ export default function Bibliotecasub() {
       }
 
       setDocuments(docsArray);
+      
+      // Update global counts
+      const extractTotal = (res) => {
+        if (!res) return 0;
+        return res.data?.total || res.total || res.data?.pagination?.total || res.pagination?.total || res.meta?.total || res.data?.meta?.total || 0;
+      };
+
+      setGlobalCounts({
+        approved: extractTotal(approvedRes),
+        pending: extractTotal(pendingRes)
+      });
+
+      // Update pagination state from response
+      if (docsResponse?.data?.pagination || docsResponse?.pagination) {
+        const pag = docsResponse.data?.pagination || docsResponse.pagination;
+        setPagination(prev => ({
+          ...prev,
+          current_page: pag.current_page || 1,
+          last_page: pag.last_page || 1,
+          total: pag.total || docsArray.length
+        }));
+      }
 
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -136,7 +172,7 @@ export default function Bibliotecasub() {
     } finally {
       setIsLoading(false);
     }
-  }, [filters]);
+  }, [filters, pagination.current_page, pagination.per_page]);
 
   const handleDownload = (document) => {
     try {
@@ -317,15 +353,23 @@ export default function Bibliotecasub() {
   };
 
   const stats = [
-    { title: "Documentos Totales", value: documents.length, icon: <FolderOpen />, color: BRAND.blue },
+    { title: "Documentos Totales", value: pagination.total, icon: <FolderOpen />, color: BRAND.blue },
     { title: "Espacio Usado", value: "Calculando...", icon: <Download />, color: BRAND.darkBlue },
-    { title: "Activos", value: documents.filter(doc => doc.status === 'approved').length, icon: <CheckCircle2 />, color: BRAND.darkGreen },
-    { title: "Pendientes", value: documents.filter(doc => doc.status === 'pending_review').length, icon: <Clock />, color: BRAND.yellow },
+    { title: "Activos", value: globalCounts.approved, icon: <CheckCircle2 />, color: BRAND.darkGreen },
+    { title: "Pendientes", value: globalCounts.pending, icon: <Clock />, color: BRAND.yellow },
   ];
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
+    setPagination(prev => ({ ...prev, current_page: 1 })); // Reset to first page on filter change
+  };
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= pagination.last_page) {
+      setPagination(prev => ({ ...prev, current_page: page }));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (
@@ -393,7 +437,11 @@ export default function Bibliotecasub() {
           </div>
 
           <div className="md:col-span-1 flex justify-end">
-            <button className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-blue-600 transition">
+            <button 
+              type="button"
+              aria-label="Filtrar"
+              className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-blue-600 transition"
+            >
               <Filter size={20} />
             </button>
           </div>
@@ -459,16 +507,16 @@ export default function Bibliotecasub() {
                     {createdDate}
                   </span>
                   <div className="flex gap-1">
-                    <button onClick={() => handleView(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-blue-600 hover:shadow-sm transition" title="Ver">
+                    <button type="button" onClick={() => handleView(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-blue-600 hover:shadow-sm transition" title="Ver" aria-label="Ver documento">
                       <Eye size={16} />
                     </button>
-                    <button onClick={() => handleEdit(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-blue-600 hover:shadow-sm transition" title="Editar">
+                    <button type="button" onClick={() => handleEdit(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-blue-600 hover:shadow-sm transition" title="Editar" aria-label="Editar documento">
                       <Edit size={16} />
                     </button>
-                    <button onClick={() => handleDelete(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-red-600 hover:shadow-sm transition" title="Eliminar">
+                    <button type="button" onClick={() => handleDelete(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-red-600 hover:shadow-sm transition" title="Eliminar" aria-label="Eliminar documento">
                       <Trash2 size={16} />
                     </button>
-                    <button onClick={() => handleDownload(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-green-600 hover:shadow-sm transition" title="Descargar">
+                    <button type="button" onClick={() => handleDownload(doc)} className="p-1.5 rounded-lg text-gray-500 hover:bg-white hover:text-green-600 hover:shadow-sm transition" title="Descargar" aria-label="Descargar documento">
                       <Download size={16} />
                     </button>
                   </div>
@@ -479,6 +527,57 @@ export default function Bibliotecasub() {
         )}
       </div>
 
+      {/* Pagination Controls */}
+      {!isLoading && documents.length > 0 && pagination.last_page > 1 && (
+        <div className="mt-12 flex justify-center items-center gap-2">
+          <button
+            onClick={() => goToPage(pagination.current_page - 1)}
+            disabled={pagination.current_page === 1}
+            className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition"
+          >
+            Anterior
+          </button>
+          
+          <div className="flex items-center gap-1">
+            {[...Array(pagination.last_page)].map((_, i) => {
+              const pageNum = i + 1;
+              // Show limited page numbers for better UX
+              if (
+                pageNum === 1 || 
+                pageNum === pagination.last_page || 
+                (pageNum >= pagination.current_page - 1 && pageNum <= pagination.current_page + 1)
+              ) {
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => goToPage(pageNum)}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition ${
+                      pagination.current_page === pageNum
+                        ? "text-white shadow-md"
+                        : "text-gray-500 hover:bg-gray-100"
+                    }`}
+                    style={{ backgroundColor: pagination.current_page === pageNum ? BRAND.blue : "" }}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              } else if (pageNum === pagination.current_page - 2 || pageNum === pagination.current_page + 2) {
+                return <span key={pageNum} className="text-gray-400 px-1">...</span>;
+              }
+              return null;
+            })}
+          </div>
+
+          <button
+            onClick={() => goToPage(pagination.current_page + 1)}
+            disabled={pagination.current_page === pagination.last_page}
+            className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition"
+          >
+            Siguiente
+          </button>
+        </div>
+      )}
+
       {isUploadModalOpen && ReactDOM.createPortal(
         <div className="fixed inset-0 bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 transition-opacity animate-fadeIn">
           <div className="bg-white rounded-3xl p-6 w-full max-w-3xl shadow-2xl transform transition-all scale-100 flex flex-col max-h-[90vh]">
@@ -488,7 +587,9 @@ export default function Bibliotecasub() {
                 <p className="text-sm text-gray-500">{isEditMode ? "Modifica la información del documento" : "Completa la información para archivar"}</p>
               </div>
               <button
+                type="button"
                 onClick={() => setIsUploadModalOpen(false)}
+                aria-label="Cerrar modal"
                 className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition"
               >
                 <X size={24} />
@@ -633,18 +734,19 @@ export default function Bibliotecasub() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 px-4 py-2.5 text-white rounded-xl hover:shadow-lg disabled:opacity-70 transition font-medium text-sm flex justify-center items-center gap-2"
+                  className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-[0.98] disabled:opacity-50"
                   style={{ backgroundColor: BRAND.blue }}
+                  disabled={isSubmitting}
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Subiendo...
                     </>
                   ) : (
                     <>
-                      <Upload size={18} /> {isEditMode ? "Actualizar Documento" : "Subir Documento"}
+                      <Upload size={20} />
+                      {isEditMode ? "Actualizar Documento" : "Publicar Documento"}
                     </>
                   )}
                 </button>
@@ -679,7 +781,9 @@ export default function Bibliotecasub() {
                   <Download size={18} /> Descargar
                 </button>
                 <button
+                  type="button"
                   onClick={() => setIsViewModalOpen(false)}
+                  aria-label="Cerrar vista"
                   className="p-2 hover:bg-gray-200 rounded-full transition text-gray-500"
                 >
                   <X size={20} />

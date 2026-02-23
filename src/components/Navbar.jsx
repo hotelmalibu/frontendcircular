@@ -542,7 +542,7 @@ export default function Navbar({ onMenuClick }) {
     const fetchMenuData = async () => {
       try {
         const [projRes] = await Promise.all([
-          getAllProjects({ per_page: 100 })
+          getAllProjects({ per_page: 20 }) // Reducido de 100 a 20 para mejorar carga inicial
         ]);
         setProjectsList(projRes?.data?.items || []);
       } catch (error) {
@@ -786,32 +786,36 @@ export default function Navbar({ onMenuClick }) {
         try {
           const { getUsers, getSecurityLogs } = await import("../api/auth");
 
-          // Notificaciones de Gestión (Usuarios pendientes y suspendidos)
-          const resUsers = await getUsers();
-          const users = Array.isArray(resUsers.data)
-            ? resUsers.data
-            : resUsers.data?.data || [];
-          const pending = users.filter(
-            (u) =>
-              u.status?.toLowerCase() === "pending" ||
-              u.status?.toLowerCase() === "pendiente" ||
-              u.status?.toLowerCase() === "suspended" ||
-              u.status?.toLowerCase() === "suspendido"
-          ).length;
-          setPendingCount(pending);
+          // 1. Notificaciones de Gestión (Usuarios pendientes y suspendidos)
+          // Realizamos dos peticiones ligeras para obtener totales exactos por estado
+          const [resPending, resSuspended] = await Promise.all([
+            getUsers({ per_page: 1, status: 'pending' }).catch(() => ({ data: { total: 0 } })),
+            getUsers({ per_page: 1, status: 'suspended' }).catch(() => ({ data: { total: 0 } }))
+          ]);
 
-          // Alertas de Seguridad
+          const pending = (resPending.data?.total || resPending.total || 0);
+          const suspended = (resSuspended.data?.total || resSuspended.total || 0);
+          
+          setPendingCount(pending + suspended);
+
+          // 2. Alertas de Seguridad
           try {
-            const resAlerts = await getSecurityLogs();
-            const alerts = Array.isArray(resAlerts.data)
+            // Obtenemos las alertas recientes (sin filtros agresivos para evitar que desaparezcan datos)
+            const resAlerts = await getSecurityLogs({ per_page: 10 }).catch(() => ({ data: [] }));
+            
+            const alertsData = Array.isArray(resAlerts.data)
               ? resAlerts.data
-              : resAlerts.data?.data || [];
-            // Solo contar y mostrar las que no han sido vistas/revisadas
-            const activeAlerts = alerts.filter((a) => !a.is_viewed);
-            setRecentAlerts(activeAlerts.slice(0, 5));
-            setAlertCount(activeAlerts.length);
+              : resAlerts.data?.data || resAlerts.data?.items || [];
+            
+            // Filtramos localmente para el contador de "no leídas" o "críticas" si es necesario,
+            // pero mantenemos la lógica robusta.
+            const unviewedAlerts = alertsData.filter(a => !a.is_viewed || a.is_viewed === 0);
+            
+            setRecentAlerts(alertsData.slice(0, 5));
+            // Si el backend provee un total de no leídas lo usamos, si no, el conteo local
+            setAlertCount(resAlerts.data?.total_unviewed || resAlerts.total_unviewed || unviewedAlerts.length);
           } catch (e) {
-            console.log("Security logs endpoint not available yet.");
+            console.log("Error in alerts fetching:", e);
           }
         } catch (err) {
           console.error("Error fetching notif counts:", err);

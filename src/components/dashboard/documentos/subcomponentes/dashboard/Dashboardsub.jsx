@@ -76,39 +76,50 @@ export default function Dashboardsub() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await getDocuments();
+        // Realizar peticiones ligeras (per_page: 1) solo para obtener totales de los metadatos
+        // Esto evita descargar todos los documentos innecesariamente
+        const [resTotal, resPending, resApproved, resDefault, resStats] = await Promise.all([
+          getDocuments({ per_page: 1 }).catch(() => ({ data: { total: 0 } })),
+          getDocuments({ per_page: 1, status: 'pending_review' }).catch(() => ({ data: { total: 0 } })),
+          getDocuments({ per_page: 1, status: 'approved' }).catch(() => ({ data: { total: 0 } })),
+          getDocuments({ per_page: 5 }).catch(() => ({ data: [] })), // Solo los 5 más recientes para la tabla
+          getDocuments({ per_page: 200 }).catch(() => ({ data: [] })) // Muestra ampliada para gráficas
+        ]);
 
-        let docsArray = [];
-        if (response?.data?.items && Array.isArray(response.data.items)) {
-          docsArray = response.data.items;
-        } else if (Array.isArray(response?.data)) {
-          docsArray = response.data;
-        } else if (Array.isArray(response)) {
-          docsArray = response;
-        }
+        const extractTotal = (res) => {
+          if (!res) return 0;
+          return res.data?.total || res.total || res.data?.pagination?.total || res.pagination?.total || res.meta?.total || res.data?.meta?.total || 0;
+        };
 
-        // Calculate statistics
-        const total = docsArray.length;
+        const total = extractTotal(resTotal);
+        const pendingReview = extractTotal(resPending);
+        const approved = extractTotal(resApproved);
+        
+        // Calcular "esta semana" de forma real basada en la muestra ampliada
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        
+        const docsForStats = Array.isArray(resStats.data)
+          ? resStats.data
+          : resStats.data?.data || resStats.data?.items || [];
 
-        const thisWeek = docsArray.filter(doc =>
+        const thisWeek = docsForStats.filter(doc =>
           new Date(doc.created_at) >= oneWeekAgo
-        ).length;
-
-        const pendingReview = docsArray.filter(doc =>
-          doc.status === 'pending_review'
-        ).length;
-
-        const approved = docsArray.filter(doc =>
-          doc.status === 'approved'
         ).length;
 
         setStats({ total, thisWeek, pendingReview, approved });
 
+        // Procesar Recent Docs
+        const recent = Array.isArray(resDefault.data) 
+          ? resDefault.data 
+          : resDefault.data?.data || resDefault.data?.items || [];
+        setRecentDocs(recent.slice(0, 5));
+
+        // Procesar Stats (Gráficas) - ya definidos arriba
+
         // Calculate status distribution
         const statusCounts = {};
-        docsArray.forEach(doc => {
+        docsForStats.forEach(doc => {
           const status = doc.status || 'unknown';
           statusCounts[status] = (statusCounts[status] || 0) + 1;
         });
@@ -130,7 +141,7 @@ export default function Dashboardsub() {
 
         // Calculate type distribution
         const typeCounts = {};
-        docsArray.forEach(doc => {
+        docsForStats.forEach(doc => {
           const typeId = doc.document_type_id;
           const typeName = documentTypes.find(t => t.id === typeId)?.name || `Tipo ${typeId}`;
           typeCounts[typeName] = (typeCounts[typeName] || 0) + 1;
@@ -149,7 +160,7 @@ export default function Dashboardsub() {
         }
 
         // Count documents by month
-        docsArray.forEach(doc => {
+        docsForStats.forEach(doc => {
           const docDate = new Date(doc.created_at);
           const key = `${monthNames[docDate.getMonth()]} ${docDate.getFullYear()}`;
           if (monthlyUploads.hasOwnProperty(key)) {
@@ -164,11 +175,7 @@ export default function Dashboardsub() {
 
         setMonthlyData(monthlyChartData);
 
-        // Get recent documents (last 5)
-        const sorted = [...docsArray].sort((a, b) =>
-          new Date(b.created_at) - new Date(a.created_at)
-        );
-        setRecentDocs(sorted.slice(0, 5));
+        // Los documentos recientes ya se cargaron en resDefault (línea 85)
 
       } catch (error) {
         console.error('Error fetching documents:', error);
@@ -225,9 +232,9 @@ export default function Dashboardsub() {
 
       {/* Título de la sección */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: BRAND.darkBlue }}>
+        <h2 className="text-2xl font-bold" style={{ color: BRAND.darkBlue }}>
           Gestión Documental
-        </h1>
+        </h2>
         <p className="text-gray-500 text-sm">Resumen de archivos y actividad reciente</p>
       </div>
 
@@ -404,7 +411,11 @@ export default function Dashboardsub() {
                         {statusStyle.icon}
                         {statusStyle.label}
                       </span>
-                      <button className="text-gray-400 hover:text-gray-600">
+                      <button 
+                        type="button"
+                        aria-label="Más opciones"
+                        className="text-gray-400 hover:text-gray-600"
+                      >
                         <MoreVertical size={18} />
                       </button>
                     </div>
