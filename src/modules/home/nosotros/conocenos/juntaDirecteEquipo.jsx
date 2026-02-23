@@ -127,10 +127,10 @@ const rawTeamMembers = [
   { name: "Gabriel Sabogal", role: "Coord. Regional", image: gabriel_v1, styles: STYLE_CIRCULARIDAD },
   { name: "Jhostin Florez", role: "Analista administrativo y financiero", image: jhostin_1, styles: STYLE_ADMINISTRATIVA },
   { name: "Juliana Ospina", role: "Coord. Regional", image: juliana_1, styles: STYLE_CIRCULARIDAD },
-  { name: "Karen Salazar", role: "Reg. Suroccidente", image: karen_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Laura Mojica", role: "Reg. Oriente", image: laura_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Luisa Montalvo", role: "Reg. Nororiente", image: luisa_1, styles: STYLE_CIRCULARIDAD },
-  { name: "María Fernanda", role: "Reg. Centro Oriente", image: mariaF_h1, styles: STYLE_CIRCULARIDAD },
+  { name: "Karen Salazar", role: "Prof. Circularidad suoriente", image: karen_h1, styles: STYLE_CIRCULARIDAD },
+  { name: "Laura Mojica", role: "Prof. Circularidad suoriente", image: laura_h1, styles: STYLE_CIRCULARIDAD },
+  { name: "Luisa Montalvo", role: "Prof. Circularidad suoriente", image: luisa_1, styles: STYLE_CIRCULARIDAD },
+  { name: "María Quitales", role: "Prof. Circularidad suoriente", image: mariaF_h1, styles: STYLE_CIRCULARIDAD },
   { name: "Mónica Turriago", role: "Prof. de Innovación", image: monicaT_h1, styles: STYLE_INNOVACION },
   { name: "Mónica Villegas", role: "Director Ejecutivo", image: monicaV_1, styles: STYLE_PROYECTOS, featured: true },
   { name: "Nubia Rivera", role: "Jefe Administrativa", image: nubia_1, styles: STYLE_ADMINISTRATIVA },
@@ -240,12 +240,6 @@ const TeamCarouselModal = ({ members, currentIndex, onClose, onNext, onPrev }) =
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <span
-                className="inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-6 text-white shadow-md"
-                style={{ backgroundColor: member.styles.color }}
-              >
-                {member.styles.title}
-              </span>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#1E305D] uppercase tracking-tighter leading-[0.9] mb-4">
                 {member.name.split(' ').map((part, i) => (
                   <span key={i} className="block">{part}</span>
@@ -257,7 +251,7 @@ const TeamCarouselModal = ({ members, currentIndex, onClose, onNext, onPrev }) =
 
               <div className="flex items-center justify-center md:justify-start gap-5">
                 <div className="w-16 h-2 rounded-full shadow-sm" style={{ backgroundColor: member.styles.color }} />
-                <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em]">Visión Circular Team</p>
+                <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em]">Visión Circular ANDI</p>
               </div>
             </motion.div>
           </motion.div>

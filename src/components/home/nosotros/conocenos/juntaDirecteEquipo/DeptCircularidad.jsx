@@ -25,28 +25,28 @@ export default function DeptCircularidad() {
     { role: "Coord. de Circularidad", name: "Diana García", image: dianaImg },
     { role: "Coord. Regional", name: "Gabriel Sabogal", image: gabrielImg },
     { role: "Coord. Regional", name: "Juliana Ospina", image: julianaImg },
-    { role: "Reg. Centro Oriente", name: "María Fernanda", image: mariaFImg },
-    { role: "Reg. Suroccidente", name: "Karen Salazar", image: karenImg },
-    { role: "Reg. Nororiente", name: "Luisa Montalvo", image: luisaImg },
-    { role: "Reg. Oriente", name: "Laura Mojica", image: lauraimg }
+    { role: "Prof. Circularidad suoriente", name: "María Quitales", image: mariaFImg },
+    { role: "Prof. Circularidad suoriente", name: "Karen Salazar", image: karenImg },
+    { role: "Prof. Circularidad suoriente", name: "Luisa Montalvo", image: luisaImg },
+    { role: "Prof. Circularidad suoriente", name: "Laura Mojica", image: lauraimg }
   ];
 
   return (
     <div className="w-full flex justify-center">
-      
-      
+
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-12 max-w-7xl">
-        
+
         {members.map((member, idx) => (
-          <div 
-            key={idx} 
+          <div
+            key={idx}
             className="flex justify-center w-full"
           >
-            <DepartmentBanner 
-              name={member.name} 
-              role={member.role} 
-              image={member.image} 
-              styles={styles} 
+            <DepartmentBanner
+              name={member.name}
+              role={member.role}
+              image={member.image}
+              styles={styles}
             />
           </div>
         ))}
