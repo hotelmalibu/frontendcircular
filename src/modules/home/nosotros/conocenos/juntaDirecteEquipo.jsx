@@ -99,6 +99,12 @@ const STYLE_PROYECTOS = {
   bgGradient: "bg-gradient-to-t from-[#2C65AC]/90 to-[#2C65AC]/40",
 };
 
+const STYLE_RED = {
+  title: "Coordinador de Proyectos",
+  color: "#DF0024",
+  bgGradient: "bg-gradient-to-t from-[#DF0024]/90 to-[#DF0024]/40",
+};
+
 // --- DATOS JUNTA DIRECTIVA ---
 const boardMembers = [
   { name: "Ajover Darnell", logo: logoDarnel },
@@ -122,7 +128,7 @@ const rawTeamMembers = [
   { name: "Anderson Gallego", role: "Prof. Sistemas Info.", image: anderson_h1, styles: STYLE_PROYECTOS },
   { name: "Andrés Cruz", role: "Prof. Sostenibilidad", image: andres_1, styles: STYLE_PROYECTOS },
   { name: "Diana García", role: "Coord. de Circularidad", image: diana_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Esteban Pelaez", role: "Coord. de Proyectos", image: esteban_h1, styles: STYLE_PROYECTOS },
+  { name: "Esteban Pelaez", role: "Coord. de Proyectos", image: esteban_h1, styles: STYLE_RED },
   { name: "Felipe Belalcazar", role: "Subgerente Innovación", image: felipe_1, styles: STYLE_INNOVACION },
   { name: "Gabriel Sabogal", role: "Coord. Regional", image: gabriel_v1, styles: STYLE_CIRCULARIDAD },
   { name: "Jhostin Florez", role: "Analista administrativo y financiero", image: jhostin_1, styles: STYLE_ADMINISTRATIVA },
