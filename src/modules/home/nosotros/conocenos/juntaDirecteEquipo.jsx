@@ -1,6 +1,5 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useCallback } from "react";
-import { X, } from "lucide-react";
+import { motion } from "framer-motion";
+import { useState, useCallback } from "react";
 
 
 // --- IMPORTS LOGOS JUNTA DIRECTIVA ---
@@ -35,8 +34,6 @@ import monicaT_h1 from "../../../../assets/imgEquipo/EquipoFotos/03. Mónica Tur
 // 04. Anderson Gallego
 import anderson_h1 from "../../../../assets/imgEquipo/EquipoFotos/04. Anderson Gallego/Anderson Gallego H1.png";
 
-// Organigrama
-import organigrama from "../../../../assets/imgEquipo/organigrama.png";
 
 // 05. María Fernanda Ruge
 import mariaF_h1 from "../../../../assets/imgEquipo/EquipoFotos/05. María Fernanda Ruge/María Fernanda Romero H1.png";
@@ -78,31 +75,31 @@ import andres_1 from "../../../../assets/imgEquipo/EquipoFotos/16- Andrés Cruz/
 const STYLE_INNOVACION = {
   title: "Innovación",
   color: "#9E1981",
-  bgGradient: "bg-gradient-to-t from-[#9E1981]/90 to-[#9E1981]/40",
+  bgGradient: "bg-gradient-to-t from-[#9E1981] via-[#9E1981]/80 to-transparent",
 };
 
 const STYLE_ADMINISTRATIVA = {
   title: "Administrativa y Financiera",
   color: "#E15200",
-  bgGradient: "bg-gradient-to-t from-[#E15200]/90 to-[#E15200]/40",
+  bgGradient: "bg-gradient-to-t from-[#E15200] via-[#E15200]/80 to-transparent",
 };
 
 const STYLE_CIRCULARIDAD = {
   title: "Circularidad y Regionales",
   color: "#8CB200",
-  bgGradient: "bg-gradient-to-t from-[#8CB200]/90 to-[#8CB200]/40",
+  bgGradient: "bg-gradient-to-t from-[#8CB200] via-[#8CB200]/80 to-transparent",
 };
 
 const STYLE_PROYECTOS = {
   title: "Proyectos y Sostenibilidad",
   color: "#2C65AC",
-  bgGradient: "bg-gradient-to-t from-[#2C65AC]/90 to-[#2C65AC]/40",
+  bgGradient: "bg-gradient-to-t from-[#2C65AC] via-[#2C65AC]/80 to-transparent",
 };
 
 const STYLE_RED = {
   title: "Coordinador de Proyectos",
   color: "#DF0024",
-  bgGradient: "bg-gradient-to-t from-[#DF0024]/90 to-[#DF0024]/40",
+  bgGradient: "bg-gradient-to-t from-[#DF0024] via-[#DF0024]/80 to-transparent",
 };
 
 // --- DATOS JUNTA DIRECTIVA ---
@@ -125,22 +122,22 @@ const boardMembers = [
 
 // --- DATOS EQUIPO ---
 const rawTeamMembers = [
-  { name: "Anderson Gallego", role: "Prof. Sistemas Info.", image: anderson_h1, styles: STYLE_PROYECTOS },
-  { name: "Andrés Cruz", role: "Prof. Sostenibilidad", image: andres_1, styles: STYLE_PROYECTOS },
-  { name: "Diana García", role: "Coord. de Circularidad", image: diana_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Esteban Pelaez", role: "Coord. de Proyectos", image: esteban_h1, styles: STYLE_RED },
+  { name: "Anderson Gallego", role: "Profesional de Sistemas de Información", image: anderson_h1, styles: STYLE_PROYECTOS },
+  { name: "Andrés Cruz", role: "Profesional de Sostenibilidad", image: andres_1, styles: STYLE_PROYECTOS },
+  { name: "Diana García", role: "Coordinador de Circularidad", image: diana_h1, styles: STYLE_CIRCULARIDAD },
+  { name: "Esteban Pelaez", role: "Coordinador de Proyectos", image: esteban_h1, styles: STYLE_RED },
   { name: "Felipe Belalcazar", role: "Subgerente Innovación", image: felipe_1, styles: STYLE_INNOVACION },
-  { name: "Gabriel Sabogal", role: "Coord. Regional", image: gabriel_v1, styles: STYLE_CIRCULARIDAD },
+  { name: "Gabriel Sabogal", role: "Coordinador Regional", image: gabriel_v1, styles: STYLE_CIRCULARIDAD },
   { name: "Jhostin Florez", role: "Analista administrativo y financiero", image: jhostin_1, styles: STYLE_ADMINISTRATIVA },
-  { name: "Juliana Ospina", role: "Coord. Regional", image: juliana_1, styles: STYLE_CIRCULARIDAD },
-  { name: "Karen Salazar", role: "Prof. Circularidad suoriente", image: karen_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Laura Mojica", role: "Prof. Circularidad suoriente", image: laura_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Luisa Montalvo", role: "Prof. Circularidad suoriente", image: luisa_1, styles: STYLE_CIRCULARIDAD },
-  { name: "María Quitales", role: "Prof. Circularidad suoriente", image: mariaF_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Mónica Turriago", role: "Prof. de Innovación", image: monicaT_h1, styles: STYLE_INNOVACION },
+  { name: "Juliana Ospina", role: "Coordinador Regional", image: juliana_1, styles: STYLE_CIRCULARIDAD },
+  { name: "Karen Salazar", role: "Profesional de Circularidad Suroriente", image: karen_h1, styles: STYLE_CIRCULARIDAD },
+  { name: "Laura Mojica", role: "Profesional de Circularidad Suroriente", image: laura_h1, styles: STYLE_CIRCULARIDAD },
+  { name: "Luisa Montalvo", role: "Profesional de Circularidad Suroriente", image: luisa_1, styles: STYLE_CIRCULARIDAD },
+  { name: "María Quitales", role: "Profesional de Circularidad Suroriente", image: mariaF_h1, styles: STYLE_CIRCULARIDAD },
+  { name: "Mónica Turriago", role: "Profesional de Innovación", image: monicaT_h1, styles: STYLE_INNOVACION },
   { name: "Mónica Villegas", role: "Director Ejecutivo", image: monicaV_1, styles: STYLE_PROYECTOS, featured: true },
   { name: "Nubia Rivera", role: "Jefe Administrativa", image: nubia_1, styles: STYLE_ADMINISTRATIVA },
-  { name: "Sebastián Gómez", role: "Prof. Contable", image: sebastian_1, styles: STYLE_ADMINISTRATIVA },
+  { name: "Sebastián Gómez", role: "Profesional Contable", image: sebastian_1, styles: STYLE_ADMINISTRATIVA },
 ];
 
 const sortedTeamMembers = [
@@ -150,24 +147,23 @@ const sortedTeamMembers = [
 
 // --- COMPONENTES UI ---
 
-const CoronaTeamCard = ({ name, role, image, styles, onClick }) => {
+const CoronaTeamCard = ({ name, role, image, styles }) => {
   return (
     <div
-      className="relative aspect-[4/3] overflow-hidden bg-gray-200 group flex flex-col justify-end cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 rounded-[2rem] border border-slate-100"
-      onClick={onClick}
+      className="relative aspect-[4/3] overflow-hidden bg-gray-200 group flex flex-col justify-end transition-all duration-500 rounded-none border border-slate-100/20"
     >
       <img
         src={image}
         alt={name}
-        className="absolute inset-0 w-full h-full object-cover object-top filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+        className="absolute inset-0 w-full h-full object-cover object-top transition-all duration-700 scale-105 group-hover:scale-100"
       />
 
-      <div className={`relative z-10 w-full p-4 ${styles.bgGradient} backdrop-blur-[2px] transition-all duration-500 transform translate-y-2 group-hover:translate-y-0`}>
-        <div className="border-l-4 pl-3" style={{ borderColor: 'white' }}>
-          <h3 className="text-white text-base md:text-lg font-bold leading-tight uppercase tracking-tight">
+      <div className="absolute bottom-0 left-0 right-0 p-4 pt-12 bg-gradient-to-t from-black/90 via-black/60 to-transparent transition-all duration-500">
+        <div className="border-l-4 pl-3" style={{ borderColor: styles.color }}>
+          <h3 className="text-white text-base md:text-lg font-bold leading-tight uppercase tracking-tight drop-shadow-md">
             {name}
           </h3>
-          <p className="text-white/90 text-[10px] md:text-xs font-medium uppercase tracking-widest mt-1">
+          <p className="text-white/80 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mt-0.5 drop-shadow-sm">
             {role}
           </p>
         </div>
@@ -178,94 +174,6 @@ const CoronaTeamCard = ({ name, role, image, styles, onClick }) => {
   );
 };
 
-// --- MODAL DE CARRUSEL CON GALERÍA INTERNA ---
-
-const TeamCarouselModal = ({ members, currentIndex, onClose, onNext, onPrev }) => {
-  const member = members[currentIndex];
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "PageDown") onNext();
-      if (e.key === "PageUp") onPrev();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, onNext, onPrev]);
-
-  if (!member) return null;
-
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-white/70 backdrop-blur-2xl p-4 md:p-8 cursor-zoom-out"
-        onClick={onClose}
-      >
-        {/* Botón de Cerrar Rojo Sólido y Muy Visible */}
-        <button
-          className="absolute top-6 right-6 text-white hover:scale-110 active:scale-95 transition-all z-[120] p-4 bg-[#DF0024] shadow-[0_4px_20px_rgba(223,0,36,0.4)] rounded-full flex items-center justify-center group"
-          onClick={onClose}
-          title="Cerrar (Esc)"
-        >
-          <X size={28} className="group-hover:rotate-90 transition-transform duration-300" strokeWidth={3} />
-        </button>
-
-        <div
-          className="relative max-w-5xl w-full h-auto max-h-[90vh] flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 cursor-default bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 md:p-10 border border-slate-200 shadow-[0_20px_60px_rgba(0,0,0,0.1)]"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Contenedor de Imagen */}
-          <div className="relative w-full md:w-1/2 flex flex-col gap-6">
-            <motion.div
-              key={member.name}
-              initial={{ opacity: 0, scale: 1.02 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.4 }}
-              className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border border-slate-100 group/img"
-            >
-              <img
-                src={member.image}
-                alt={member.name}
-                className="w-full h-full object-cover object-top"
-              />
-            </motion.div>
-          </div>
-
-          <motion.div
-            key={member.name + "_info"}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="w-full md:w-1/2 text-center md:text-left flex flex-col justify-center"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#1E305D] uppercase tracking-tighter leading-[0.9] mb-4">
-                {member.name.split(' ').map((part, i) => (
-                  <span key={i} className="block">{part}</span>
-                ))}
-              </h2>
-              <p className="text-lg md:text-xl text-slate-500 font-medium uppercase tracking-[0.1em] mb-10 max-w-md">
-                {member.role}
-              </p>
-
-              <div className="flex items-center justify-center md:justify-start gap-5">
-                <div className="w-16 h-2 rounded-full shadow-sm" style={{ backgroundColor: member.styles.color }} />
-                <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em]">Visión Circular ANDI</p>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </motion.div>
-    </AnimatePresence>
-  );
-};
 
 // Componente para logos de la junta, más compacto y sin fondos grises
 const CompactBoardCard = ({ name, logo, isWhite }) => (
@@ -282,18 +190,7 @@ const CompactBoardCard = ({ name, logo, isWhite }) => (
 );
 
 export default function TeamOrgChart() {
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleNext = useCallback(() => {
-    setSelectedIndex((prev) => (prev === sortedTeamMembers.length - 1 ? 0 : prev + 1));
-  }, []);
-
-  const handlePrev = useCallback(() => {
-    setSelectedIndex((prev) => (prev === 0 ? sortedTeamMembers.length - 1 : prev - 1));
-  }, []);
-
-  const teamMembers = sortedTeamMembers; // Alias for clarity with the provided edit
+  const teamMembers = sortedTeamMembers;
 
   return (
     <section className="bg-white pb-20 font-sans min-h-screen">
@@ -366,63 +263,16 @@ export default function TeamOrgChart() {
 
         {/* --- GRID DEL EQUIPO (Estilo Corona) --- */}
         {/* Personas Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 mb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-0 mb-24 items-stretch">
           {teamMembers.map((member, index) => (
             <CoronaTeamCard
               key={index}
               {...member}
-              onClick={() => {
-                setSelectedIndex(index);
-                setIsModalOpen(true);
-              }}
             />
           ))}
         </div>
-
-        {/* --- NUEVA SECCIÓN: ORGANIGRAMA --- */}
-        <div className="mt-12 mb-32">
-          <div className="flex flex-col items-center mb-16 text-center">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-4 px-6 py-2 border border-slate-100 rounded-full">
-              Estructura Corporativa
-            </span>
-            <h2 className="text-4xl md:text-5xl font-black text-[#1E305D] uppercase tracking-tighter leading-none mb-6">
-              Organigrama <span className="text-slate-300">Institucional</span>
-            </h2>
-            <div className="w-24 h-1.5 bg-[#1E305D] rounded-full opacity-20" />
-          </div>
-
-          <div className="bg-white rounded-[3rem] p-8 md:p-12 lg:p-16 shadow-2xl border border-slate-100 overflow-hidden relative group">
-            <div className="absolute inset-0 bg-slate-50 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-            <div className="relative z-10">
-              <img
-                src={organigrama}
-                alt="Organigrama Institucional"
-                className="w-full h-auto object-contain mx-auto transition-transform duration-700 group-hover:scale-[1.01]"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-center mt-12 gap-8 opacity-20">
-            <div className="w-16 h-1 rounded-full bg-[#1E305D]" />
-            <div className="w-16 h-1 rounded-full bg-[#1E305D]" />
-            <div className="w-16 h-1 rounded-full bg-[#1E305D]" />
-          </div>
-        </div>
       </div>
 
-      {/* Modal de Carrusel */}
-      {isModalOpen && selectedIndex !== null && (
-        <TeamCarouselModal
-          members={teamMembers}
-          currentIndex={selectedIndex}
-          onClose={() => {
-            setIsModalOpen(false);
-            setSelectedIndex(null);
-          }}
-          onNext={handleNext}
-          onPrev={handlePrev}
-        />
-      )}
     </section>
   );
 }
