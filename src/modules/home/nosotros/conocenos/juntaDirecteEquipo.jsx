@@ -1,6 +1,4 @@
 import { motion } from "framer-motion";
-import { useState, useCallback } from "react";
-
 
 // --- IMPORTS LOGOS JUNTA DIRECTIVA ---
 import logoDarnel from "../../../../assets/LogosJuntaDirectiva/logo-darnel.png";
