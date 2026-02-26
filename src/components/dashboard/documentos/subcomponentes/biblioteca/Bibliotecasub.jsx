@@ -143,7 +143,7 @@ export default function Bibliotecasub() {
       }
 
       setDocuments(docsArray);
-      
+
       // Update global counts
       const extractTotal = (res) => {
         if (!res) return 0;
@@ -187,8 +187,10 @@ export default function Bibliotecasub() {
   };
 
   const handleView = (document) => {
-    setSelectedDocument(document);
-    setIsViewModalOpen(true);
+    // Open document in a new browser tab using the proxy URL
+    const directUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${document.upload_file.path}`;
+    const proxyUrl = getImageProxyUrl(directUrl);
+    window.open(proxyUrl, '_blank');
   };
 
   const handleEdit = (document) => {
@@ -227,7 +229,7 @@ export default function Bibliotecasub() {
 
   const confirmDelete = async () => {
     if (!documentToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       await deleteDocument(documentToDelete.id);
@@ -437,7 +439,7 @@ export default function Bibliotecasub() {
           </div>
 
           <div className="md:col-span-1 flex justify-end">
-            <button 
+            <button
               type="button"
               aria-label="Filtrar"
               className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-blue-600 transition"
@@ -537,25 +539,24 @@ export default function Bibliotecasub() {
           >
             Anterior
           </button>
-          
+
           <div className="flex items-center gap-1">
             {[...Array(pagination.last_page)].map((_, i) => {
               const pageNum = i + 1;
               // Show limited page numbers for better UX
               if (
-                pageNum === 1 || 
-                pageNum === pagination.last_page || 
+                pageNum === 1 ||
+                pageNum === pagination.last_page ||
                 (pageNum >= pagination.current_page - 1 && pageNum <= pagination.current_page + 1)
               ) {
                 return (
                   <button
                     key={pageNum}
                     onClick={() => goToPage(pageNum)}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition ${
-                      pagination.current_page === pageNum
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition ${pagination.current_page === pageNum
                         ? "text-white shadow-md"
                         : "text-gray-500 hover:bg-gray-100"
-                    }`}
+                      }`}
                     style={{ backgroundColor: pagination.current_page === pageNum ? BRAND.blue : "" }}
                   >
                     {pageNum}
