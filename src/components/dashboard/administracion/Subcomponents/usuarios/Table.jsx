@@ -233,7 +233,9 @@ export default function Table() {
           return;
         }
         await createUser(formData);
-        toast.success("Usuario creado correctamente");
+        toast.success("Usuario creado correctamente. Se ha enviado un correo de verificación.", {
+          duration: 5000,
+        });
       }
       setIsModalOpen(false);
       fetchUsers(); // Refresh list

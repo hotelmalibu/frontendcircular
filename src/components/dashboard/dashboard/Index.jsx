@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 export default function Index() {
   const { user } = useContext(AuthContext);
   const [pendingUsersCount, setPendingUsersCount] = useState(0);
+  const [suspendedUsersCount, setSuspendedUsersCount] = useState(0);
 
   // Definiciones de estado de usuario
   // Definiciones de estado de usuario
@@ -24,18 +25,28 @@ export default function Index() {
       const fetchCounts = async () => {
         try {
           const { getUsers } = await import("../../../api/auth");
-          // Pedimos totales exactos para usuarios en espera de revisión o suspendidos
-          const [resPending, resSuspended] = await Promise.all([
-            getUsers({ per_page: 1, status: 'pending' }).catch(() => ({ data: { total: 0 } })),
-            getUsers({ per_page: 1, status: 'suspended' }).catch(() => ({ data: { total: 0 } }))
-          ]);
-          const total = (resPending.data?.total || resPending.total || 0) + 
-                        (resSuspended.data?.total || resSuspended.total || 0);
-          setPendingUsersCount(total);
+          // Obtenemos una lista para filtrar localmente de forma inclusiva
+          const res = await getUsers({ per_page: 100 }).catch(() => ({ data: [] }));
+          const items = Array.isArray(res.data) ? res.data : (res.data?.data || res.data?.items || []);
+
+          const pending = items.filter(u => 
+            u.status?.toLowerCase() === 'pending' || 
+            u.status?.toLowerCase() === 'pendiente'
+          ).length;
+
+          const suspended = items.filter(u => 
+            u.status?.toLowerCase() === 'suspended' || 
+            u.status?.toLowerCase() === 'suspendido' ||
+            u.status?.toLowerCase() === 'suspendida'
+          ).length;
+
+          setPendingUsersCount(pending);
+          setSuspendedUsersCount(suspended);
         } catch (e) {
           console.error("Error al cargar contadores de Dashboard:", e);
         }
       };
+
       fetchCounts();
     }
   }, [hasSupportPermission, hasDashboardPermission]);
@@ -45,8 +56,10 @@ export default function Index() {
     'view.support': {
       title: 'GESTIÓN DE SOPORTE',
       desc: 'Gestión de registros y aprobaciones de acceso.',
-      count: pendingUsersCount,
-      countLabel: 'Usuarios pendientes',
+      notifs: [
+        { label: 'Pendientes de revisión', count: pendingUsersCount, color: 'text-orange-600' },
+        { label: 'Usuarios suspendidos', count: suspendedUsersCount, color: 'text-red-600' }
+      ],
       link: '/soporte'
     },
     'view.documents': {
@@ -139,26 +152,30 @@ export default function Index() {
                   {meta.desc}
                 </p>
 
-                {meta.count !== undefined && (
-                  <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                       <Bell size={14} className={meta.count > 0 ? "text-orange-500" : "text-gray-300"} />
-                       <span className={`text-xs font-bold ${meta.count > 0 ? "text-orange-600" : "text-gray-400"}`}>
-                         {meta.count} {meta.countLabel || 'Pendientes'}
-                       </span>
-                    </div>
+                {meta.notifs ? (
+                  <div className="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-2">
+                    {meta.notifs.map((n, idx) => n.count > 0 && (
+                      <div key={idx} className="flex items-center justify-between">
+                         <div className="flex items-center gap-2">
+                            <Bell size={14} className={n.color} />
+                            <span className={`text-xs font-bold ${n.color}`}>
+                              {n.count} {n.label}
+                            </span>
+                         </div>
+                      </div>
+                    ))}
                     {meta.link && (
-                      <Link to={meta.link} className="p-2 rounded-lg bg-white text-blue-500 hover:bg-blue-600 hover:text-white shadow-sm transition-all">
+                      <Link to={meta.link} className="self-end mt-2 p-2 rounded-lg bg-white text-blue-500 hover:bg-blue-600 hover:text-white shadow-sm transition-all">
                         <ArrowRight size={16} />
                       </Link>
                     )}
                   </div>
-                )}
-                
-                {meta.count === undefined && meta.link && (
-                  <Link to={meta.link} className="mt-auto flex items-center gap-1.5 text-xs font-bold text-blue-500 hover:text-blue-700 transition-colors group/link">
-                    Ir a la sección <ArrowRight size={12} className="group-hover/link:translate-x-1 transition-transform" />
-                  </Link>
+                ) : (
+                  meta.link && (
+                    <Link to={meta.link} className="mt-auto flex items-center gap-1.5 text-xs font-bold text-blue-500 hover:text-blue-700 transition-colors group/link">
+                      Ir a la sección <ArrowRight size={12} className="group-hover/link:translate-x-1 transition-transform" />
+                    </Link>
+                  )
                 )}
               </div>
             );

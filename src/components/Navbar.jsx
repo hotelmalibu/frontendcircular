@@ -758,6 +758,7 @@ export default function Navbar({ onMenuClick }) {
 
   // --- NOTIFICACIONES ---
   const [pendingCount, setPendingCount] = useState(0);
+  const [suspendedCount, setSuspendedCount] = useState(0);
   const [alertCount, setAlertCount] = useState(0);
   const [recentAlerts, setRecentAlerts] = useState([]);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
@@ -787,16 +788,24 @@ export default function Navbar({ onMenuClick }) {
           const { getUsers, getSecurityLogs } = await import("../api/auth");
 
           // 1. Notificaciones de Gestión (Usuarios pendientes y suspendidos)
-          // Realizamos dos peticiones ligeras para obtener totales exactos por estado
-          const [resPending, resSuspended] = await Promise.all([
-            getUsers({ per_page: 1, status: 'pending' }).catch(() => ({ data: { total: 0 } })),
-            getUsers({ per_page: 1, status: 'suspended' }).catch(() => ({ data: { total: 0 } }))
-          ]);
+          // Obtenemos una lista más amplia para filtrar localmente de forma inclusiva (Pendiente/pending, etc.)
+          const res = await getUsers({ per_page: 100 }).catch(() => ({ data: [] }));
+          const items = Array.isArray(res.data) ? res.data : (res.data?.data || res.data?.items || []);
 
-          const pending = (resPending.data?.total || resPending.total || 0);
-          const suspended = (resSuspended.data?.total || resSuspended.total || 0);
+          const pending = items.filter(u => 
+            u.status?.toLowerCase() === 'pending' || 
+            u.status?.toLowerCase() === 'pendiente'
+          ).length;
+
+          const suspended = items.filter(u => 
+            u.status?.toLowerCase() === 'suspended' || 
+            u.status?.toLowerCase() === 'suspendido' ||
+            u.status?.toLowerCase() === 'suspendida'
+          ).length;
           
-          setPendingCount(pending + suspended);
+          setPendingCount(pending);
+          setSuspendedCount(suspended);
+
 
           // 2. Alertas de Seguridad
           try {
@@ -995,9 +1004,9 @@ export default function Navbar({ onMenuClick }) {
                         }`}
                     >
                       <Bell size={20} />
-                      {pendingCount > 0 && (
+                      {(pendingCount + suspendedCount) > 0 && (
                         <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
-                          {pendingCount}
+                          {pendingCount + suspendedCount}
                         </span>
                       )}
                     </button>
@@ -1009,14 +1018,14 @@ export default function Navbar({ onMenuClick }) {
                           <h4 className="font-bold text-gray-800">
                             Notificaciones
                           </h4>
-                          {pendingCount > 0 && (
+                          {(pendingCount + suspendedCount) > 0 && (
                             <span className="bg-red-100 text-red-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
-                              {pendingCount} Pendientes
+                              {pendingCount + suspendedCount} Pendientes
                             </span>
                           )}
                         </div>
                         <div className="max-h-80 overflow-y-auto">
-                          {pendingCount > 0 ? (
+                          {(pendingCount + suspendedCount) > 0 ? (
                             <Link
                               to="/soporte"
                               onClick={() => setShowNotifMenu(false)}
@@ -1029,11 +1038,19 @@ export default function Navbar({ onMenuClick }) {
                                 <p className="text-sm font-semibold text-gray-800">
                                   Atención Requerida
                                 </p>
-                                <p className="text-xs text-gray-500 mt-0.5">
-                                  Tienes {pendingCount} usuarios esperando
-                                  revisión o suspendidos.
-                                </p>
-                                <p className="text-[10px] text-blue-600 font-bold mt-1">
+                                <div className="space-y-1 mt-1">
+                                  {pendingCount > 0 && (
+                                    <p className="text-xs text-gray-500">
+                                      {pendingCount} usuarios esperando revisión.
+                                    </p>
+                                  )}
+                                  {suspendedCount > 0 && (
+                                    <p className="text-xs text-gray-500">
+                                      {suspendedCount} usuarios suspendidos.
+                                    </p>
+                                  )}
+                                </div>
+                                <p className="text-[10px] text-blue-600 font-bold mt-2">
                                   Ir a Centro de Aprobaciones →
                                 </p>
                               </div>
