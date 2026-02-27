@@ -153,7 +153,7 @@ export default function Index() {
             </div>
             <div className="bg-white/10 backdrop-blur rounded-lg p-4 text-center">
               <Zap className="w-8 h-8 mb-2 mx-auto text-[#B1D357]" />
-              <p className="text-xl font-bold">15</p>
+              <p className="text-xl font-bold">28</p>
               <p className="text-xs opacity-80">Proyectos innovación</p>
             </div>
             <div className="bg-white/10 backdrop-blur rounded-lg p-4 text-center">
