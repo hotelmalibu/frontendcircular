@@ -44,7 +44,6 @@ const LineasEstrategicasPage = lazy(() => import("./modules/home/nuestrosTrabajo
 const Dashboard = lazy(() => import("./modules/dashboard/Dashboard"));
 const Documentos = lazy(() => import("./modules/dashboard/Documentos"));
 const Empresas = lazy(() => import("./modules/dashboard/Empresas"));
-const Trazabilidad = lazy(() => import("./modules/dashboard/Trazabilidad"));
 const Formularios = lazy(() => import("./modules/dashboard/Formularios"));
 const Comunicaciones = lazy(() => import("./modules/dashboard/Comunicaciones"));
 const Administracion = lazy(() => import("./modules/dashboard/Administracion"));
@@ -74,7 +73,6 @@ const MainLayout = () => {
     "/administracion",
     "/soporte",
     "/integracion",
-    "/trazabilidad",
   ];
 
   const isInternalRoute = internalPaths.some((p) =>
@@ -138,57 +136,56 @@ export default function App() {
 
       <Suspense fallback={<DefaultLoader />}>
         <Routes>
-        {/* Pages with Navbar and Footer */}
-        {/* Rutas con Navbar y Footer (Públicas y Privadas generales) */}
-        <Route element={<MainLayout />}>
-          {/* Rutas públicas */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/circularmente" element={<Circularmente />} />
-          <Route path="/quines-somos" element={<QuienesSomos />} />
-          <Route path="/alianzas" element={<Alianzas />} />
+          {/* Pages with Navbar and Footer */}
+          {/* Rutas con Navbar y Footer (Públicas y Privadas generales) */}
+          <Route element={<MainLayout />}>
+            {/* Rutas públicas */}
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/circularmente" element={<Circularmente />} />
+            <Route path="/quines-somos" element={<QuienesSomos />} />
+            <Route path="/alianzas" element={<Alianzas />} />
 
-          <Route path="/valores" element={<Valores />} />
-          <Route path="/juntaDirecteEquipo" element={<JuantaDirectiva />} />
-          <Route path="/informes-anuales" element={<InformesAnuales />} />
-          <Route path="/planes" element={<Planes />} />
-          <Route path="/polticas" element={<Politicas />} />
-          <Route path="/resoluciones" element={<Resoluciones />} />
-          <Route path="/proyectos-activos" element={<ProyectosActivos />} />
-          <Route path="/lineas-estrategicas" element={<LineasEstrategicasPage />} />
-          <Route path="/encuestas" element={<PublicSurveysPage />} />
+            <Route path="/valores" element={<Valores />} />
+            <Route path="/juntaDirecteEquipo" element={<JuantaDirectiva />} />
+            <Route path="/informes-anuales" element={<InformesAnuales />} />
+            <Route path="/planes" element={<Planes />} />
+            <Route path="/polticas" element={<Politicas />} />
+            <Route path="/resoluciones" element={<Resoluciones />} />
+            <Route path="/proyectos-activos" element={<ProyectosActivos />} />
+            <Route path="/lineas-estrategicas" element={<LineasEstrategicasPage />} />
+            <Route path="/encuestas" element={<PublicSurveysPage />} />
 
-          {/* Rutas privadas generales */}
-          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            {/* Rutas privadas generales */}
+            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
 
-          {/* Rutas para explorar contenido */}
-          <Route path="/explorar" element={<ExplorePage />} />
-          <Route path="/contenido/:slug" element={<ContentDetailPage />} />
-          <Route path="/proyectos/:id" element={<ContentDetailProject />} />
-        </Route>
+            {/* Rutas para explorar contenido */}
+            <Route path="/explorar" element={<ExplorePage />} />
+            <Route path="/contenido/:slug" element={<ContentDetailPage />} />
+            <Route path="/proyectos/:id" element={<ContentDetailProject />} />
+          </Route>
 
-        {/* Dashoard Routes with shared MainLayout to prevent remounts */}
-        <Route element={<MainLayout />}>
-          <Route path="/documentos" element={<PrivateRoute permission="view.documents"><Documentos /></PrivateRoute>} />
-          <Route path="/companies" element={<PrivateRoute permission="view.circularmente"><Empresas /></PrivateRoute>} />
-          <Route path="/trazabilidad" element={<PrivateRoute adminOnly={true}><Trazabilidad /></PrivateRoute>} />
-          <Route path="/formularios" element={<PrivateRoute permission="view.forms"><Formularios /></PrivateRoute>} />
-          <Route path="/comunicaciones" element={<PrivateRoute permission="view.communications"><Comunicaciones /></PrivateRoute>} />
-          <Route path="/administracion" element={<PrivateRoute permission="view.admin"><Administracion /></PrivateRoute>} />
-          <Route path="/soporte" element={<PrivateRoute permission="view.support"><Soporte /></PrivateRoute>} />
-          <Route path="/integracion" element={<PrivateRoute adminOnly={true}><Integracion /></PrivateRoute>} />
-        </Route>
+          {/* Dashoard Routes with shared MainLayout to prevent remounts */}
+          <Route element={<MainLayout />}>
+            <Route path="/documentos" element={<PrivateRoute permission="view.documents"><Documentos /></PrivateRoute>} />
+            <Route path="/companies" element={<PrivateRoute permission="view.circularmente"><Empresas /></PrivateRoute>} />
+            <Route path="/formularios" element={<PrivateRoute permission="view.forms"><Formularios /></PrivateRoute>} />
+            <Route path="/comunicaciones" element={<PrivateRoute permission="view.communications"><Comunicaciones /></PrivateRoute>} />
+            <Route path="/administracion" element={<PrivateRoute permission="view.admin"><Administracion /></PrivateRoute>} />
+            <Route path="/soporte" element={<PrivateRoute permission="view.support"><Soporte /></PrivateRoute>} />
+            <Route path="/integracion" element={<PrivateRoute adminOnly={true}><Integracion /></PrivateRoute>} />
+          </Route>
 
-        {/* Survey Detail WITHOUT MainLayout to prevent 404 flash */}
-        <Route path="/encuestas/:id" element={<PublicSurveyDetail />} />
+          {/* Survey Detail WITHOUT MainLayout to prevent 404 flash */}
+          <Route path="/encuestas/:id" element={<PublicSurveyDetail />} />
 
-        {/* Catch-all 404 WITHOUT Layout */}
-        <Route path="*" element={<NotFound />} />
+          {/* Catch-all 404 WITHOUT Layout */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </div>
