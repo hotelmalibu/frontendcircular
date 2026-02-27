@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 
+
 // --- IMPORTS LOGOS JUNTA DIRECTIVA ---
 import logoDarnel from "../../../../assets/LogosJuntaDirectiva/logo-darnel.png";
 import logoAlimentosPolar from "../../../../assets/LogosJuntaDirectiva/Alimentos_polar_logo.jpg";
@@ -122,19 +123,19 @@ const boardMembers = [
 const rawTeamMembers = [
   { name: "Anderson Gallego", role: "Profesional de Sistemas de Información", image: anderson_h1, styles: STYLE_PROYECTOS },
   { name: "Andrés Cruz", role: "Profesional de Sostenibilidad y relacionamiento", image: andres_1, styles: STYLE_PROYECTOS },
-  { name: "Diana García", role: "Coordinador de Circularidad", image: diana_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Esteban Pelaez", role: "Coordinador de Proyectos", image: esteban_h1, styles: STYLE_RED },
-  { name: "Felipe Belalcazar", role: "Subgerente Innovación", image: felipe_1, styles: STYLE_INNOVACION },
+  { name: "Diana García", role: "Coordinadora de Relacionamiento y Circularidad", image: diana_h1, styles: STYLE_CIRCULARIDAD },
+  { name: "Esteban Pelaez", role: "Coordinador de Proyectos Estratégicos", image: esteban_h1, styles: STYLE_RED },
+  { name: "Felipe Belalcazar", role: "Subgerente de Innovación y Estrategia", image: felipe_1, styles: STYLE_INNOVACION },
   { name: "Gabriel Sabogal", role: "Coordinador Regional", image: gabriel_v1, styles: STYLE_CIRCULARIDAD },
   { name: "Jhostin Florez", role: "Analista administrativo y financiero", image: jhostin_1, styles: STYLE_ADMINISTRATIVA },
-  { name: "Juliana Ospina", role: "Coordinador Regional", image: juliana_1, styles: STYLE_CIRCULARIDAD },
+  { name: "Juliana Ospina", role: "Coordinadora Regional", image: juliana_1, styles: STYLE_CIRCULARIDAD },
   { name: "Karen Salazar", role: "Profesional de Circularidad Suroccidente", image: karen_h1, styles: STYLE_CIRCULARIDAD },
   { name: "Laura Mojica", role: "Profesional de Circularidad Oriente", image: laura_h1, styles: STYLE_CIRCULARIDAD },
   { name: "Luisa Montalvo", role: "Profesional de Circularidad Nororiente", image: luisa_1, styles: STYLE_CIRCULARIDAD },
   { name: "María Ruge", role: "Profesional de Circularidad Suroccidente", image: mariaF_h1, styles: STYLE_CIRCULARIDAD },
   { name: "Mónica Turriago", role: "Profesional de Innovación", image: monicaT_h1, styles: STYLE_INNOVACION },
-  { name: "Mónica Villegas", role: "Director Ejecutivo", image: monicaV_1, styles: STYLE_PROYECTOS, featured: true },
-  { name: "Nubia Rivera", role: "Jefe Administrativa", image: nubia_1, styles: STYLE_ADMINISTRATIVA },
+  { name: "Mónica Villegas", role: "Directora Ejecutiva", image: monicaV_1, styles: STYLE_PROYECTOS, featured: true },
+  { name: "Nubia Rivera", role: "Jefe Administrativa y Financiera", image: nubia_1, styles: STYLE_ADMINISTRATIVA },
   { name: "Sebastián Gómez", role: "Profesional Contable", image: sebastian_1, styles: STYLE_ADMINISTRATIVA },
 ];
 

@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { createDocument, getDocuments, updateDocument, deleteDocument } from "../../../../../api/documentsApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
-import PDFViewer from "../../../../PDFViewer";
 import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 import { toast } from "react-hot-toast";
 import ConfirmModal from "../../../../common/ConfirmModal";
@@ -37,8 +36,6 @@ const BRAND = {
 
 export default function Bibliotecasub() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
@@ -143,7 +140,7 @@ export default function Bibliotecasub() {
       }
 
       setDocuments(docsArray);
-      
+
       // Update global counts
       const extractTotal = (res) => {
         if (!res) return 0;
@@ -187,8 +184,10 @@ export default function Bibliotecasub() {
   };
 
   const handleView = (document) => {
-    setSelectedDocument(document);
-    setIsViewModalOpen(true);
+    // Open document in a new browser tab using the proxy URL
+    const directUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${document.upload_file.path}`;
+    const proxyUrl = getImageProxyUrl(directUrl);
+    window.open(proxyUrl, '_blank');
   };
 
   const handleEdit = (document) => {
@@ -227,7 +226,7 @@ export default function Bibliotecasub() {
 
   const confirmDelete = async () => {
     if (!documentToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       await deleteDocument(documentToDelete.id);
@@ -437,7 +436,7 @@ export default function Bibliotecasub() {
           </div>
 
           <div className="md:col-span-1 flex justify-end">
-            <button 
+            <button
               type="button"
               aria-label="Filtrar"
               className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-blue-600 transition"
@@ -537,25 +536,24 @@ export default function Bibliotecasub() {
           >
             Anterior
           </button>
-          
+
           <div className="flex items-center gap-1">
             {[...Array(pagination.last_page)].map((_, i) => {
               const pageNum = i + 1;
               // Show limited page numbers for better UX
               if (
-                pageNum === 1 || 
-                pageNum === pagination.last_page || 
+                pageNum === 1 ||
+                pageNum === pagination.last_page ||
                 (pageNum >= pagination.current_page - 1 && pageNum <= pagination.current_page + 1)
               ) {
                 return (
                   <button
                     key={pageNum}
                     onClick={() => goToPage(pageNum)}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition ${
-                      pagination.current_page === pageNum
-                        ? "text-white shadow-md"
-                        : "text-gray-500 hover:bg-gray-100"
-                    }`}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition ${pagination.current_page === pageNum
+                      ? "text-white shadow-md"
+                      : "text-gray-500 hover:bg-gray-100"
+                      }`}
                     style={{ backgroundColor: pagination.current_page === pageNum ? BRAND.blue : "" }}
                   >
                     {pageNum}
@@ -757,85 +755,6 @@ export default function Bibliotecasub() {
         document.body
       )}
 
-      {/* --- MODAL VIEW --- */}
-      {isViewModalOpen && selectedDocument && ReactDOM.createPortal(
-        <div className="fixed inset-0 bg-[#005380] bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-
-            {/* Modal Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-gray-50">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-                  <FileText size={20} />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-gray-800 leading-none">{selectedDocument.name}</h2>
-                  <p className="text-xs text-gray-500 mt-1">{selectedDocument.upload_file.original_name}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleDownload(selectedDocument)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium hover:bg-white hover:shadow-sm transition text-gray-600 border border-transparent hover:border-gray-200"
-                >
-                  <Download size={18} /> Descargar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsViewModalOpen(false)}
-                  aria-label="Cerrar vista"
-                  className="p-2 hover:bg-gray-200 rounded-full transition text-gray-500"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Content */}
-            <div className="flex-1 bg-gray-100 overflow-auto flex items-center justify-center p-4">
-              {(() => {
-                // Check if file is PDF by examining multiple properties
-                const uploadFile = selectedDocument.upload_file;
-                const isPdf =
-                  uploadFile?.filename?.toLowerCase().endsWith('.pdf') ||
-                  uploadFile?.original_name?.toLowerCase().endsWith('.pdf') ||
-                  uploadFile?.path?.toLowerCase().endsWith('.pdf') ||
-                  uploadFile?.url?.toLowerCase().includes('.pdf');
-
-                return isPdf ? (
-                  <div className="w-full h-full shadow-lg rounded-lg overflow-hidden bg-white">
-                    {(() => {
-                      // Use CORS proxy that supports PDFs (not image processors)
-                      const directPdfUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${uploadFile.path}`;
-                      // Use cors-anywhere or corsproxy.io for PDFs
-                      const proxyPdfUrl = `https://corsproxy.io/?${encodeURIComponent(directPdfUrl)}`;
-                      return <PDFViewer file={proxyPdfUrl} />;
-                    })()}
-                  </div>
-                ) : (
-                  <div className="text-center p-10 bg-white rounded-2xl shadow-sm border border-gray-200 max-w-md">
-                    <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <ImageIcon size={32} className="text-gray-400" />
-                    </div>
-                    <h3 className="text-gray-900 font-semibold mb-2">Vista previa no disponible</h3>
-                    <p className="text-gray-500 text-sm mb-6">
-                      Este tipo de archivo no se puede visualizar directamente en el navegador. Por favor, descárgalo para verlo.
-                    </p>
-                    <button
-                      onClick={() => handleDownload(selectedDocument)}
-                      className="w-full py-2.5 rounded-xl text-white font-medium shadow-sm hover:shadow-md transition"
-                      style={{ backgroundColor: BRAND.blue }}
-                    >
-                      Descargar Archivo
-                    </button>
-                  </div>
-                );
-              })()}
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
       {/* Modal de Confirmación de Eliminación */}
       <ConfirmModal
         isOpen={isDeleteModalOpen}
