@@ -21,7 +21,7 @@ export default function Index() {
       icon: Users
     },
     {
-      author: "Jeronimo Rodriguez",
+      author: "Jerónimo Rodríguez",
       role: "Vicepresidente de Desarrollo Sostenible ANDI",
       text: "Hacer de la economía circular uno de los motores del desarrollo sostenible más allá del 2030, cuando los ODS cierren su primer ciclo, es más que una oportunidad, es un imperativo.",
       icon: Target
@@ -35,7 +35,7 @@ export default function Index() {
   ];
 
   return (
-    <section className="bg-gradient-to-b from-white via-[#E8F0F8] to-[#F0F7E8] py-0 px-6 md:px-12 lg:px-20">
+    <section className="bg-gradient-to-b from-white via-[#E8F0F8] to-[#F0F7E8] py-0 px-6 md:px-12 lg:px-20 pb-20">
       <div className="max-w-7xl mx-auto">
         {/* Hero Section - Más compacta */}
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 items-center mb-8">
@@ -75,32 +75,19 @@ export default function Index() {
               <div className="h-1 w-28 bg-[#00AB6D] mt-2 rounded-full"></div>
             </div>
 
-            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed text-justify">
               Visión Circular ANDI es el colectivo empresarial líder en economía circular en Colombia, impulsado por la ANDI, que articula empresas, gestores, recicladores, transformadores, Estado, academia y ciudadanía para liderar la transición del país hacia una economía circular en envases y empaques, de manera innovadora, inclusiva y sostenible.
             </p>
 
-            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed text-justify">
               Nacimos como Visión 30/30 con la meta del 30% de aprovechamiento al 2030. Tras casi cinco años de implementación, nos consolidamos como el colectivo más importante del país y un referente en Latinoamérica.
             </p>
 
-            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed text-justify">
               Actualmente acompañamos a <span className="font-bold text-[#00AB6D]">más de 380 empresas de 27 sectores</span>, articuladas con <span className="font-bold text-[#00AB6D]">148 gestores (incluyendo 57 organizaciones de recicladores)</span>, <span className="font-bold text-[#00AB6D]">más de 52 transformadoras</span> y beneficiando a <span className="font-bold text-[#00AB6D]">7.600 recicladores de oficio</span>, con presencia en <span className="font-bold text-[#00AB6D]">228 municipios de 30 departamentos</span>.
             </p>
 
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1.5 bg-[#B1D357]/20 text-[#2C67B0] text-xs font-medium rounded-full border border-[#B1D357]/50">
-                +380 Empresas
-              </span>
-              <span className="px-3 py-1.5 bg-[#7FB8D9]/20 text-[#2C67B0] text-xs font-medium rounded-full border border-[#7FB8D9]/50">
-                7.600 Recicladores
-              </span>
-              <span className="px-3 py-1.5 bg-[#00AB6D]/20 text-[#006F63] text-xs font-medium rounded-full border border-[#00AB6D]/50">
-                228 Municipios
-              </span>
-              <span className="px-3 py-1.5 bg-[#B1D357]/20 text-[#2C67B0] text-xs font-medium rounded-full border border-[#B1D357]/50">
-                30 Departamentos
-              </span>
-            </div>
+
           </motion.div>
         </div>
 

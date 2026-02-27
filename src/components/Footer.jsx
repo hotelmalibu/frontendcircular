@@ -87,7 +87,7 @@ export default function Footer() {
                 </a>
 
                 <a
-                  href="https://www.linkedin.com/in/andivision3030/"
+                  href="https://www.linkedin.com/company/visioncircularandi/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 flex items-center justify-center rounded-full 

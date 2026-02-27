@@ -194,18 +194,19 @@ export default function TeamOrgChart() {
   return (
     <section className="bg-white pb-20 font-sans min-h-screen">
 
-      {/* HERO BANNER - Textos y transparencia */}
+      {/* HERO BANNER */}
       <div className="relative h-[450px] md:h-[650px] w-full overflow-hidden mb-12">
         <img
           src={groupPhoto}
           alt="Equipo Visión Circular"
           className="w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1E305D]/60 via-transparent to-[#1E305D]/90 flex flex-col justify-center items-center text-center px-4">
+        {/* Degradado y Textos al pie de la imagen */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1E305D] via-transparent to-transparent flex flex-col justify-end items-center text-center pb-24 px-6">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-white text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 drop-shadow-lg"
+            className="text-white text-4xl md:text-5xl lg:text-5xl font-extrabold leading-tight mb-3 drop-shadow-xl"
           >
             Nuestra Gente, Nuestra Visión
           </motion.h1>
@@ -213,7 +214,7 @@ export default function TeamOrgChart() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-gray-100 text-base md:text-lg max-w-2xl leading-relaxed drop-shadow-md px-6 md:px-0"
+            className="text-white/90 text-base md:text-lg max-w-3xl mx-auto leading-relaxed font-medium drop-shadow-lg"
           >
             Un equipo impulsado por la pasión y el compromiso para liderar la transformación hacia un país plenamente circular y sostenible.
           </motion.p>
