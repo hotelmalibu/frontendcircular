@@ -23,6 +23,8 @@ import {
 import React, { useState, useEffect, useMemo } from "react";
 import { getUsers, getSecurityLogs, getActiveSessions } from "../../../../api/auth";
 
+import QuienesSomos from "../../comunicaciones/QuienesSomos";
+
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
   blue: "#2C67B0",       // Azul Principal
@@ -39,6 +41,7 @@ const BRAND = {
 const COLORS = [BRAND.blue, BRAND.green, BRAND.purple, BRAND.orange, BRAND.lightBlue, BRAND.darkGreen];
 
 export default function Undexsub() {
+
   const [alertas, setAlertas] = useState([]);
   const [usersList, setUsersList] = useState([]);
 
@@ -365,6 +368,19 @@ export default function Undexsub() {
             </div>
           )}
         </div>
+      </div>
+      {/* Sección: Gestión de Quiénes Somos */}
+      <div className="mt-12 pt-12 border-t border-gray-200">
+        <div className="mb-8">
+          <h2 className="text-2xl font-black flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
+            <Activity className="text-green-500" size={28} />
+            Gestión de Contenido: Quiénes Somos
+          </h2>
+          <p className="text-gray-500 mt-2">
+            Administra el texto principal y las frases de los líderes que aparecen en la página pública.
+          </p>
+        </div>
+        <QuienesSomos />
       </div>
     </div>
   );

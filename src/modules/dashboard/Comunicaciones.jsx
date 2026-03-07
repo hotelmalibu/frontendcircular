@@ -6,6 +6,7 @@ import Eventos from "../../components/dashboard/comunicaciones/Eventos";
 import News from "../../components/dashboard/comunicaciones/News";
 import Categories from "../../components/dashboard/comunicaciones/Categories";
 import Projects from "../../components/dashboard/comunicaciones/Projects";
+import QuienesSomos from "../../components/dashboard/comunicaciones/QuienesSomos";
 import {
   Megaphone,
   LayoutDashboard,
@@ -13,7 +14,8 @@ import {
   Calendar,
   Briefcase,
   Tag,
-  UserX
+  UserX,
+  Info
 } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -36,11 +38,13 @@ export default function Comunicaciones() {
 
   const tabs = [
     { name: "Dashboard", label: "Gestión de Contenidos", icon: <LayoutDashboard size={18} />, component: <Dashboard /> },
+    { name: "QuienesSomos", label: "Quiénes Somos", icon: <Info size={18} />, component: <QuienesSomos /> },
     { name: "Noticias", label: "Noticias", icon: <Newspaper size={18} />, component: <News /> },
     { name: "Eventos", label: "Eventos", icon: <Calendar size={18} />, component: <Eventos /> },
     { name: "Proyectos", label: "Proyectos", icon: <Briefcase size={18} />, component: <Projects /> },
     { name: "Categorias", label: "Categorías", icon: <Tag size={18} />, component: <Categories /> },
   ];
+
 
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans text-gray-700">
