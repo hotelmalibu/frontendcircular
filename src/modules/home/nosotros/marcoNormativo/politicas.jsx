@@ -19,19 +19,19 @@ const COLOR_AZUL_SECUNDARIO = '#2C67B0';
 const politicas = [
   {
     title: "Política nacional para la gestión integral de residuos sólidos (CONPES 3874 del 2016)",
-    description: "Consejo Nacional de Política Económica y Social | 2016 - 2030",
+    description: "Consejo Nacional de Política Económica y Social.",
     pdf: pdfGestionResiduos,
     color: COLOR_VERDE_PRINCIPAL
   },
   {
     title: "Estrategia para la implementación de los Objetivos de Desarrollo Sostenible (ODS) en Colombia (CONPES 3918 de 2018)",
-    description: "Consejo Nacional de Política Económica y Social | 2017 - 2030",
+    description: "Consejo Nacional de Política Económica y Social.",
     pdf: pdfODS,
     color: COLOR_AZUL_SECUNDARIO
   },
   {
     title: "Política de Crecimiento Verde (CONPES 3934 del 2018)",
-    description: "Consejo Nacional de Política Económica y Social | 2018",
+    description: "Consejo Nacional de Política Económica y Social.",
     pdf: pdfCrecimientoVerde,
     color: COLOR_VERDE_PRINCIPAL
   },

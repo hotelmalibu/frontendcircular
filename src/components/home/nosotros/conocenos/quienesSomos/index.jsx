@@ -72,7 +72,7 @@ export default function Index() {
               />
             </div>
             <div className="absolute -bottom-2 -right-2 bg-[#00AB6D] text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
-              Casi 5 años impulsando la circularidad
+              5 años impulsando la circularidad
             </div>
           </motion.div>
 
