@@ -72,7 +72,7 @@ export default function Index() {
               />
             </div>
             <div className="absolute -bottom-2 -right-2 bg-[#00AB6D] text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
-              5 años impulsando la circularidad
+              Más de 5 años impulsando la circularidad
             </div>
           </motion.div>
 
@@ -149,7 +149,7 @@ export default function Index() {
           </div>
 
           <p className="text-base md:text-lg leading-relaxed text-white/90 mb-6 max-w-4xl text-left">
-            Hemos reincorporado <span className="font-bold">más de {data.toneladas.toLocaleString('es-ES')} toneladas</span> de envases y empaques al ciclo productivo en los últimos años, ejecutado <span className="font-bold">{data.proyectos} proyectos de innovación</span> durante 2023-2024, y fortalecido la cadena de valor para un futuro más circular.
+            Hemos reincorporado <span className="font-bold">más de {data.toneladas.toLocaleString('es-ES')} toneladas</span> de envases y empaques al ciclo productivo en los últimos años, ejecutado <span className="font-bold">{data.proyectos} proyectos de innovación</span> durante 2023-2027, y fortalecido la cadena de valor para un futuro más circular.
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -103,6 +103,8 @@ const STYLE_RED = {
 
 // --- DATOS JUNTA DIRECTIVA ---
 const boardMembers = [
+  { name: "Grupo Essitty", logo: logoEssity },
+  { name: "Grupo Nutresa", logo: logoNutresa },
   { name: "Ajover Darnell", logo: logoDarnel },
   { name: "Alimentos Polar", logo: logoAlimentosPolar },
   { name: "Arcos Dorados", logo: logoArcosDorados },
@@ -111,8 +113,6 @@ const boardMembers = [
   { name: "Corona", logo: logoCorona },
   { name: "Diana Corporación", logo: logoDiana },
   { name: "Eterna", logo: logoEterna },
-  { name: "Grupo Essitty", logo: logoEssity },
-  { name: "Grupo Nutresa", logo: logoNutresa },
   { name: "Makro", logo: logoMakro, isWhite: true },
   { name: "Natura", logo: logoNatura },
   { name: "Nestlé", logo: logoNestle },
