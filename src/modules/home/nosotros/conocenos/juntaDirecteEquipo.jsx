@@ -244,6 +244,9 @@ export default function TeamOrgChart() {
               <h2 className="text-[#1E305D] font-black text-2xl md:text-3xl uppercase tracking-tighter leading-none mb-1">
                 Asamblea de Productores
               </h2>
+              <p className="text-gray-700 text-base md:text-lg lg:text-xl font-semibold leading-relaxed max-w-3xl">
+                Más de 380 empresas hacen parte de un colectivo líder que impulsa la economía circular en el país.
+              </p>
             </div>
           </div>
 
