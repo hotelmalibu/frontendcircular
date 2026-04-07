@@ -226,7 +226,7 @@ export default function ContentDetailProject() {
                   </div>
                 </div>
                 <div
-                  className="max-w-none text-gray-700 leading-relaxed font-sans news-content"
+                  className="max-w-none text-gray-700 leading-relaxed font-sans news-content text-justify [&_*]:!text-justify"
                 >
                   {project.description ? (
                     /[<>]/.test(project.description) ? (
@@ -236,7 +236,7 @@ export default function ContentDetailProject() {
                             ADD_ATTR: ['target', 'rel', 'class']
                           })
                         }}
-                        className="news-content ql-editor !p-0"
+                        className="news-content ql-editor !p-0 !text-justify [&_*]:!text-justify"
                       />
                     ) : (
                       <>
@@ -245,7 +245,7 @@ export default function ContentDetailProject() {
                           .map(p => p.trim())
                           .filter(p => p.length > 0)
                           .map((paragraph, index) => (
-                            <p key={index} className="news-content-styled">
+                            <p key={index} className="news-content-styled text-justify !text-justify w-full">
                               {paragraph}
                             </p>
                           ))}

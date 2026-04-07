@@ -42,21 +42,27 @@
 
 /* --- QUILL RICH TEXT CLASSES --- */
 .ql-align-center {
-  text-align: left !important;
+  text-align: center !important;
 }
 
 .ql-align-right {
-  text-align: left !important;
+  text-align: right !important;
 }
 
 .ql-align-justify {
-  text-align: left !important;
+  text-align: justify !important;
 }
 
-.news-content .ql-align-center,
-.news-content .ql-align-right,
+.news-content .ql-align-center {
+  text-align: center !important;
+}
+
+.news-content .ql-align-right {
+  text-align: right !important;
+}
+
 .news-content .ql-align-justify {
-  text-align: left !important;
+  text-align: justify !important;
 }
 
 .ql-size-small {
@@ -87,7 +93,7 @@
 /* --- NEWS CONTENT BASE --- */
 .news-content {
   max-width: 100%;
-  text-align: left !important;
+  text-align: justify !important;
   /* Forzamos el wrapping correcto sin romper palabras innecesariamente */
   overflow-wrap: break-word !important;
   word-wrap: break-word !important;
@@ -100,7 +106,7 @@
 /* --- PARAGRAPH STYLES --- */
 .news-content p,
 .news-content-styled {
-  text-align: left !important;
+  text-align: justify !important;
   line-height: 1.6;
   white-space: normal !important;
   margin-bottom: 1rem;
@@ -113,7 +119,7 @@
   hyphens: none !important;
   -webkit-hyphens: none !important;
   -ms-hyphens: none !important;
-  text-align: left !important;
+  text-align: justify !important;
 }
 
 /* --- LIST FIXES (Bullets & Numbering) --- */

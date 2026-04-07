@@ -228,12 +228,12 @@ export default function ContentDetailPage() {
 
             {/* ===== LEFT: Article ===== */}
             <div className="flex-1 min-w-0">
-              <div className="news-content text-gray-700 leading-relaxed font-sans">
+              <div className="news-content text-gray-700 leading-relaxed font-sans text-justify [&_*]:!text-justify">
                 {content.body ? (
                   /[<>]/.test(content.body) ? (
                     <div
                       dangerouslySetInnerHTML={{ __html: content.body }}
-                      className="news-content ql-editor !p-0 !font-sans !text-gray-700 !text-lg"
+                      className="news-content ql-editor !p-0 !font-sans !text-gray-700 !text-lg !text-justify [&_*]:!text-justify"
                     />
                   ) : (
                     <div className="space-y-6">
@@ -242,7 +242,7 @@ export default function ContentDetailPage() {
                         .map(p => p.trim())
                         .filter(p => p.length > 0)
                         .map((paragraph, idx) => (
-                          <p key={idx} className="text-lg">{paragraph}</p>
+                          <p key={idx} className="text-lg text-justify !text-justify w-full">{paragraph}</p>
                         ))}
                     </div>
                   )

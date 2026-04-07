@@ -103,8 +103,8 @@ const STYLE_RED = {
 
 // --- DATOS JUNTA DIRECTIVA ---
 const boardMembers = [
-  { name: "Grupo Essitty", logo: logoEssity },
-  { name: "Grupo Nutresa", logo: logoNutresa },
+  { name: "Grupo Essitty", logo: logoEssity, position: "Presidencia" },
+  { name: "Grupo Nutresa", logo: logoNutresa, position: "Vicepresidencia" },
   { name: "Ajover Darnell", logo: logoDarnel },
   { name: "Alimentos Polar", logo: logoAlimentosPolar },
   { name: "Arcos Dorados", logo: logoArcosDorados },
@@ -175,16 +175,25 @@ const CoronaTeamCard = ({ name, role, image, styles }) => {
 
 
 // Componente para logos de la junta, más compacto y sin fondos grises
-const CompactBoardCard = ({ name, logo, isWhite }) => (
-  <div
-    className={`p-1 flex items-center justify-center h-24 w-full transition-all duration-300 ${isWhite ? 'bg-[#DF0024] rounded-md' : 'bg-transparent'}`}
-    title={name}
-  >
-    <img
-      src={logo}
-      alt={name}
-      className={`max-h-full max-w-full object-contain transition-transform duration-300 hover:scale-110 ${isWhite ? 'brightness-200 contrast-200' : ''}`}
-    />
+const CompactBoardCard = ({ name, logo, isWhite, position }) => (
+  <div className="flex flex-col items-center justify-end w-full group">
+    <div className="h-6 flex items-end justify-center mb-1">
+      {position && (
+        <span className="text-[9px] md:text-[10px] font-black text-[#1E305D] uppercase tracking-widest text-center">
+          {position}
+        </span>
+      )}
+    </div>
+    <div
+      className={`p-1 flex items-center justify-center h-24 w-full transition-all duration-300 ${isWhite ? 'bg-[#DF0024] rounded-md' : 'bg-transparent'}`}
+      title={name}
+    >
+      <img
+        src={logo}
+        alt={name}
+        className={`max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-110 ${isWhite ? 'brightness-200 contrast-200' : ''}`}
+      />
+    </div>
   </div>
 );
 
@@ -246,7 +255,7 @@ export default function TeamOrgChart() {
           </div>
 
           {/* Logos de la Junta Directiva (Compacts & Cleans) */}
-          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-7 gap-6 px-2 align-middle justify-items-center">
+          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-7 gap-6 px-2 align-middle justify-items-center items-end">
             {boardMembers.map((member, idx) => (
               <CompactBoardCard key={idx} {...member} />
             ))}
