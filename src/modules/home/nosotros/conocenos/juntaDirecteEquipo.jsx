@@ -1,4 +1,6 @@
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import teamApi from "../../../../api/teamApi";
 
 
 // --- IMPORTS LOGOS JUNTA DIRECTIVA ---
@@ -101,6 +103,14 @@ const STYLE_RED = {
   bgGradient: "bg-gradient-to-t from-[#DF0024] via-[#DF0024]/80 to-transparent",
 };
 
+const STYLES_MAP = {
+  INNOVACION: STYLE_INNOVACION,
+  ADMINISTRATIVA: STYLE_ADMINISTRATIVA,
+  CIRCULARIDAD: STYLE_CIRCULARIDAD,
+  PROYECTOS: STYLE_PROYECTOS,
+  RED: STYLE_RED,
+};
+
 // --- DATOS JUNTA DIRECTIVA ---
 const boardMembers = [
   { name: "Grupo Essitty", logo: logoEssity, position: "Presidencia" },
@@ -198,7 +208,33 @@ const CompactBoardCard = ({ name, logo, isWhite, position }) => (
 );
 
 export default function TeamOrgChart() {
-  const teamMembers = sortedTeamMembers;
+  const [teamMembers, setTeamMembers] = useState(sortedTeamMembers);
+
+  useEffect(() => {
+    // Attempt to fetch team members from the API
+    const fetchTeam = async () => {
+      try {
+        const data = await teamApi.getAllMembers();
+        if (data && data.length > 0) {
+          // Map DB response to expected UI format
+          const mappedMembers = data.map(m => ({
+            name: m.name,
+            role: m.role,
+            image: m.photo_url || m.image,
+            styles: STYLES_MAP[m.style_type] || STYLE_CIRCULARIDAD,
+            featured: m.featured === 1 || m.featured === true
+          }));
+          
+          // Re-apply sort/featured logic if not already sorted by backend
+          // Assuming backend sorts them, or we can just render the mappedMembers directly since backend handles 'sort_order'.
+          setTeamMembers(mappedMembers);
+        }
+      } catch (error) {
+        console.log("Using static local team members as fallback.");
+      }
+    };
+    fetchTeam();
+  }, []);
 
   return (
     <section className="bg-white pb-20 font-sans min-h-screen">
