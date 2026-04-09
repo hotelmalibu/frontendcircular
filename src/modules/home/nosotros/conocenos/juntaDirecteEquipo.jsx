@@ -23,54 +23,13 @@ import logoWhirlpool from "../../../../assets/LogosJuntaDirectiva/Logo_Whirpool.
 import andiLogo from "../../../../assets/imgEquipo/andi.png";
 import groupPhoto from "../../../../assets/imgEquipo/group_photo.jpg";
 
-// 01. Esteban Peláez
-import esteban_h1 from "../../../../assets/imgEquipo/EquipoFotos/01. Esteban Peláez/Esteban Pelaez H1.png";
-
-// 02. Gabriel Sabogal
-import gabriel_v1 from "../../../../assets/imgEquipo/EquipoFotos/02. Gabriel Sabogal/Gabriel Sabogal H1.jpg";
-
-// 03. Mónica Turrego
-import monicaT_h1 from "../../../../assets/imgEquipo/EquipoFotos/03. Mónica Turrego/Monica Turrego H1.png";
-
-// 04. Anderson Gallego
-import anderson_h1 from "../../../../assets/imgEquipo/EquipoFotos/04. Anderson Gallego/Anderson Gallego H1.png";
-
-
-// 05. María Fernanda Ruge
-import mariaF_h1 from "../../../../assets/imgEquipo/EquipoFotos/05. María Fernanda Ruge/María Fernanda Romero H1.png";
-
-// 06. Diana García
-import diana_h1 from "../../../../assets/imgEquipo/EquipoFotos/06. Diana García/Diana García H1.png";
-
-// 07. Karen Salazar
-import karen_h1 from "../../../../assets/imgEquipo/EquipoFotos/07. Karen Salazar/Karen Salazar H1.png";
-
-// 08. Laura Mojica
-import laura_h1 from "../../../../assets/imgEquipo/EquipoFotos/08. Laura Mojica/Laura Mojica H1.png";
-
-// 09. Luisa Montalvo
-import luisa_1 from "../../../../assets/imgEquipo/EquipoFotos/09. Luisa Montalvo/1.png";
-
-// 10. Juliana Ospina
-import juliana_1 from "../../../../assets/imgEquipo/EquipoFotos/10. Juliana Ospina/1.png";
-
-// 11. Felipe Belalcazar
-import felipe_1 from "../../../../assets/imgEquipo/EquipoFotos/11. Felipe Belalcazar/1.png";
-
-// 12. Sebastian Gómez
-import sebastian_1 from "../../../../assets/imgEquipo/EquipoFotos/12. Sebastian Gómez/1.png";
-
-// 13. Jhostin Florez
-import jhostin_1 from "../../../../assets/imgEquipo/EquipoFotos/13. Jhostin Florez/1.png";
-
-// 14. Nubia Rivera
-import nubia_1 from "../../../../assets/imgEquipo/EquipoFotos/14. Nubia Rivera/1.png";
-
-// 15. Mónica Villegas
-import monicaV_1 from "../../../../assets/imgEquipo/EquipoFotos/15. Mónica Villegas/1.jpg";
-
-// 16. Andrés Cruz
-import andres_1 from "../../../../assets/imgEquipo/EquipoFotos/16- Andrés Cruz/1.png";
+// --- HERRAMIENTA DE RUTAS DE IMAGEN ---
+const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http') && !path.includes('localhost')) return path;
+    const cleanPath = path.replace(/^(https?:\/\/localhost(:\d+)?\/)?(storage\/)?/, '');
+    return `https://api-ecocircular.creativostecnologicosit.com/storage/${cleanPath}`;
+};
 
 // --- CONSTANTES DE ESTILO ---
 const STYLE_INNOVACION = {
@@ -129,31 +88,6 @@ const boardMembers = [
   { name: "Whirlpool", logo: logoWhirlpool },
 ];
 
-// --- DATOS EQUIPO ---
-const rawTeamMembers = [
-  { name: "Anderson Gallego", role: "Profesional de Sistemas de Información", image: anderson_h1, styles: STYLE_PROYECTOS },
-  { name: "Andrés Cruz", role: "Profesional de Sostenibilidad y relacionamiento", image: andres_1, styles: STYLE_PROYECTOS },
-  { name: "Diana García", role: "Coordinadora de Relacionamiento y Circularidad", image: diana_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Esteban Pelaez", role: "Coordinador de Proyectos Estratégicos", image: esteban_h1, styles: STYLE_RED },
-  { name: "Felipe Belalcazar", role: "Subgerente de Innovación y Estrategia", image: felipe_1, styles: STYLE_INNOVACION },
-  { name: "Gabriel Sabogal", role: "Coordinador Regional", image: gabriel_v1, styles: STYLE_CIRCULARIDAD },
-  { name: "Jhostin Florez", role: "Analista administrativo y financiero", image: jhostin_1, styles: STYLE_ADMINISTRATIVA },
-  { name: "Juliana Ospina", role: "Coordinadora Regional", image: juliana_1, styles: STYLE_CIRCULARIDAD },
-  { name: "Karen Salazar", role: "Profesional de Circularidad Suroccidente", image: karen_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Laura Mojica", role: "Profesional de Circularidad Oriente", image: laura_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Luisa Montalvo", role: "Profesional de Circularidad Nororiente", image: luisa_1, styles: STYLE_CIRCULARIDAD },
-  { name: "María Ruge", role: "Profesional de Circularidad Suroccidente", image: mariaF_h1, styles: STYLE_CIRCULARIDAD },
-  { name: "Mónica Turriago", role: "Profesional de Innovación", image: monicaT_h1, styles: STYLE_INNOVACION },
-  { name: "Mónica Villegas", role: "Directora Ejecutiva", image: monicaV_1, styles: STYLE_PROYECTOS, featured: true },
-  { name: "Nubia Rivera", role: "Jefe Administrativa y Financiera", image: nubia_1, styles: STYLE_ADMINISTRATIVA },
-  { name: "Sebastián Gómez", role: "Profesional Contable", image: sebastian_1, styles: STYLE_ADMINISTRATIVA },
-];
-
-const sortedTeamMembers = [
-  ...rawTeamMembers.filter(m => m.featured),
-  ...rawTeamMembers.filter(m => !m.featured).sort((a, b) => a.name.localeCompare(b.name))
-];
-
 // --- COMPONENTES UI ---
 
 const CoronaTeamCard = ({ name, role, image, styles }) => {
@@ -208,29 +142,24 @@ const CompactBoardCard = ({ name, logo, isWhite, position }) => (
 );
 
 export default function TeamOrgChart() {
-  const [teamMembers, setTeamMembers] = useState(sortedTeamMembers);
+  const [teamMembers, setTeamMembers] = useState([]);
 
   useEffect(() => {
-    // Attempt to fetch team members from the API
     const fetchTeam = async () => {
       try {
         const data = await teamApi.getAllMembers();
         if (data && data.length > 0) {
-          // Map DB response to expected UI format
           const mappedMembers = data.map(m => ({
             name: m.name,
             role: m.role,
-            image: m.photo_url || m.image,
+            image: getImageUrl(m.photo_url || m.image),
             styles: STYLES_MAP[m.style_type] || STYLE_CIRCULARIDAD,
             featured: m.featured === 1 || m.featured === true
           }));
-          
-          // Re-apply sort/featured logic if not already sorted by backend
-          // Assuming backend sorts them, or we can just render the mappedMembers directly since backend handles 'sort_order'.
           setTeamMembers(mappedMembers);
         }
       } catch (error) {
-        console.log("Using static local team members as fallback.");
+        console.error("Error fetching team members:", error);
       }
     };
     fetchTeam();
@@ -311,14 +240,20 @@ export default function TeamOrgChart() {
 
         {/* --- GRID DEL EQUIPO (Estilo Corona) --- */}
         {/* Personas Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-0 mb-24 items-stretch">
-          {teamMembers.map((member, index) => (
-            <CoronaTeamCard
-              key={index}
-              {...member}
-            />
-          ))}
-        </div>
+        {teamMembers.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-0 mb-24 items-stretch">
+            {teamMembers.map((member, index) => (
+              <CoronaTeamCard
+                key={index}
+                {...member}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16 mb-24 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+            <p className="text-gray-500 font-medium">Actualmente no hay miembros del equipo registrados o están cargando.</p>
+          </div>
+        )}
       </div>
 
     </section>
