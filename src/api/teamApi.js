@@ -9,11 +9,7 @@ export const getAllMembers = async () => {
 
 export const createMember = async (formData) => {
     // using formData to support file upload
-    const response = await api.post(TEAM_ENDPOINT, formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+    const response = await api.post(TEAM_ENDPOINT, formData);
     return response.data;
 };
 
@@ -21,11 +17,7 @@ export const updateMember = async (id, formData) => {
     // Laravel usually accepts POST with _method=PUT or PUT if not multipart.
     // For FormData, often we post to /endpoint/{id} with _method=PUT
     formData.append("_method", "PUT");
-    const response = await api.post(`${TEAM_ENDPOINT}/${id}`, formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+    const response = await api.post(`${TEAM_ENDPOINT}/${id}`, formData);
     return response.data;
 };
 
