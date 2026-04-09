@@ -6,13 +6,13 @@ import {
     Edit2,
     Save,
     X,
-    AlertCircle,
     ArrowUp,
     ArrowDown,
     Image as ImageIcon
 } from "lucide-react";
 import teamApi from "../../../api/teamApi";
 import { toast } from "react-hot-toast";
+import ConfirmModal from "../../common/ConfirmModal";
 
 const ActionButton = ({ onClick, icon: Icon, color, label, disabled }) => (
     <button
@@ -47,6 +47,8 @@ export default function Equipo() {
     // States for Editing
     const [isEditingMember, setIsEditingMember] = useState(null);
     const [showAddMember, setShowAddMember] = useState(false);
+    const [memberToDelete, setMemberToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     
     // Form state
     const [formData, setFormData] = useState({
@@ -67,8 +69,18 @@ export default function Equipo() {
         setLoading(true);
         try {
             const res = await teamApi.getAllMembers();
-            // Expected to return array of members sorted by sort_order
-            setMembers(res || []);
+            
+            const API_BASE = 'https://api-ecocircular.creativostecnologicosit.com';
+            const fixUrl = (url) => url
+                ? url.replace('https://localhost', API_BASE).replace('http://localhost', API_BASE)
+                : url;
+            
+            const processedMembers = (res || []).map(m => ({
+                ...m,
+                photo_url: fixUrl(m.photo_url)
+            }));
+            
+            setMembers(processedMembers);
         } catch (error) {
             toast.error("Aún no hay conexión con el servidor (Equipo)");
             console.error(error);
@@ -174,7 +186,7 @@ export default function Equipo() {
     };
 
     const handleDeleteMember = async (id) => {
-        if (!window.confirm("¿Estás seguro de eliminar este miembro?")) return;
+        setIsDeleting(true);
         try {
             await teamApi.deleteMember(id);
             setMembers(members.filter(m => m.id !== id));
@@ -183,6 +195,9 @@ export default function Equipo() {
              // Mock locally
             setMembers(members.filter(m => m.id !== id));
             toast.success("Miembro eliminado (Local)");
+        } finally {
+            setIsDeleting(false);
+            setMemberToDelete(null);
         }
     };
 
@@ -427,7 +442,7 @@ export default function Equipo() {
                                         <Edit2 size={18} />
                                     </button>
                                     <button
-                                        onClick={() => handleDeleteMember(member.id)}
+                                        onClick={() => setMemberToDelete(member)}
                                         className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
                                         title="Eliminar"
                                     >
@@ -442,6 +457,19 @@ export default function Equipo() {
                     Mueve a las personas arriba o abajo usando las flechas de la izquierda para cambiar el orden en la página principal.
                 </p>
             </section>
+            {/* Modal de Confirmación de Eliminación Global */}
+            <ConfirmModal
+                isOpen={!!memberToDelete}
+                onClose={() => setMemberToDelete(null)}
+                onConfirm={() => memberToDelete && handleDeleteMember(memberToDelete.id)}
+                title="¿Eliminar miembro?"
+                message={
+                    <>Estás a punto de eliminar a <strong>{memberToDelete?.name}</strong>. Esta acción no se puede deshacer.</>
+                }
+                confirmText="Sí, eliminar"
+                isLoading={isDeleting}
+                type="danger"
+            />
         </div>
     );
 }
