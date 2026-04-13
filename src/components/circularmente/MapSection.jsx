@@ -4,7 +4,8 @@ import { AuthContext } from '../../context/AuthContext';
 import {
   Search, MapPin, Mail, Phone, Globe, X,
   AlertCircle, CheckCircle2, Sparkles,
-  Tag, ExternalLink, ChevronRight
+  Tag, ExternalLink, ChevronRight,
+  Download, Package, FileText
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import fondoMapa from '../../assets/fondosYlogos/fondo_mapaC.jpg';
@@ -346,11 +347,17 @@ export default function MapSection() {
                         </h4>
 
                         {/* Ubicación */}
-                        <div className="text-xs text-gray-600 mb-3 bg-gray-50 p-2 rounded-lg">
+                        <div className="text-xs text-gray-600 mb-3 bg-gray-50 p-2 rounded-lg flex flex-col gap-2">
                           <p className="flex items-start gap-1.5">
                             <MapPin size={14} className="text-[#00AB6D] flex-shrink-0 mt-0.5" />
                             <span className="line-clamp-2">{empresa.address || empresa.region || "Ubicación no disponible"}</span>
                           </p>
+                          {empresa.brochure_url && (
+                            <div className="flex items-center gap-1.5 text-blue-600 w-max bg-white/60 p-1 rounded">
+                              <FileText size={12} className="text-blue-500 flex-shrink-0" />
+                              <span className="truncate font-medium text-[11px]">Brochure disponible</span>
+                            </div>
+                          )}
                         </div>
 
                         <p className="text-xs text-gray-600 line-clamp-3 mb-4 flex-grow leading-relaxed">
@@ -428,6 +435,30 @@ export default function MapSection() {
                   <p className="text-gray-600 text-sm leading-relaxed p-4 bg-gray-50 rounded-xl border border-gray-100">
                     {selectedEmpresa.description || "Sin descripción detallada."}
                   </p>
+                  
+                  {/* Brochure / Portafolio */}
+                  {selectedEmpresa.brochure_url && (
+                    <div className="mt-4 flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100/50 rounded-lg">
+                          <Package size={20} className="text-blue-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-blue-900 text-sm">Brochure Corporativo</h4>
+                          <p className="text-xs text-blue-700">Portafolio disponible de la empresa</p>
+                        </div>
+                      </div>
+                      <a
+                        href={selectedEmpresa.brochure_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+                      >
+                        <Download size={16} />
+                        Ver / Descargar
+                      </a>
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

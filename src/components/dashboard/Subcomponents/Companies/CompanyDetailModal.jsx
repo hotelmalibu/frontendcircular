@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { X, Edit, Phone, Mail, Globe, MapPin, Package, Clock, ExternalLink, Building } from "lucide-react";
+import { X, Edit, Phone, Mail, Globe, MapPin, Package, Clock, ExternalLink, Building, Download } from "lucide-react";
 
 export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
   if (!companyData) return null;
@@ -99,6 +99,30 @@ export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
                 {companyData.description || "Sin descripción disponible"}
               </p>
             </div>
+            
+            {/* Brochure / Portafolio */}
+            {companyData.brochure_url && (
+              <div className="mt-4 flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100/50 rounded-lg">
+                    <Package size={20} className="text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-blue-900 text-sm">Brochure Corporativo</h4>
+                    <p className="text-xs text-blue-700">Portafolio disponible de la empresa</p>
+                  </div>
+                </div>
+                <a
+                  href={companyData.brochure_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+                >
+                  <Download size={16} />
+                  Ver / Descargar
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Contact Information */}

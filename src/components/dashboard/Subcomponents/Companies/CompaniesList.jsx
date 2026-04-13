@@ -12,7 +12,8 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
-  Filter
+  Filter,
+  FileText
 } from "lucide-react";
 import { getAllCompanies, deleteCompany } from "../../../../api/companiesApi";
 import toast from "react-hot-toast";
@@ -341,6 +342,12 @@ export default function CompaniesList() {
                       <a href={item.website_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate">
                         Web Oficial
                       </a>
+                    </div>
+                  )}
+                  {item.brochure_url && (
+                    <div className="flex items-center gap-2 text-xs text-blue-600 truncate bg-blue-50/50 p-1 rounded-md">
+                      <FileText size={12} className="text-blue-500 flex-shrink-0" />
+                      <span className="truncate font-medium">Brochure/Portafolio</span>
                     </div>
                   )}
                 </div>

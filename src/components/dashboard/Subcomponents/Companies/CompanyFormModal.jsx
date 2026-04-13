@@ -38,10 +38,12 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
     description: "",
     address: "",
     website_url: "",
-    logo: null
+    logo: null,
+    brochure_file: null
   });
   const [contacts, setContacts] = useState([{ ...EMPTY_CONTACT }]);
   const [logoPreview, setLogoPreview] = useState(null);
+  const [brochureFileName, setBrochureFileName] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -52,8 +54,16 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
         description: companyData.description || "",
         address: companyData.address || "",
         website_url: companyData.website_url || "",
-        logo: null
+        logo: null,
+        brochure_file: null
       });
+
+      // Show existing brochure filename if we have the url
+      if (companyData.brochure_url) {
+        setBrochureFileName("Brochure actual (click para reemplazar)");
+      } else {
+        setBrochureFileName(null);
+      }
 
       // Load contacts from JSON or fallback to legacy fields
       if (companyData.contacts && Array.isArray(companyData.contacts) && companyData.contacts.length > 0) {
@@ -133,6 +143,32 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
     setErrors(prev => ({ ...prev, logo: "" }));
   };
 
+  const handleBrochureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.pdf')) {
+        setErrors(prev => ({ ...prev, brochure_file: "Solo se permiten PDF o imágenes" }));
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setErrors(prev => ({ ...prev, brochure_file: "El archivo debe ser menor a 10MB" }));
+        return;
+      }
+      setFormData(prev => ({ ...prev, brochure_file: file }));
+      setBrochureFileName(file.name);
+      if (errors.brochure_file) {
+        setErrors(prev => ({ ...prev, brochure_file: "" }));
+      }
+    }
+  };
+
+  const removeBrochure = () => {
+    setFormData(prev => ({ ...prev, brochure_file: null }));
+    setBrochureFileName(companyData?.brochure_url ? "Brochure actual eliminado. Guarde para confirmar." : null);
+    setErrors(prev => ({ ...prev, brochure_file: "" }));
+  };
+
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "El nombre es requerido";
@@ -162,6 +198,7 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
       if (formData.address) submitData.append('address', formData.address);
       if (formData.website_url) submitData.append('website_url', formData.website_url);
       if (formData.logo) submitData.append('logo', formData.logo);
+      if (formData.brochure_file) submitData.append('brochure_file', formData.brochure_file);
 
       // Send contacts as JSON string
       const validContacts = contacts.filter(c => c.contact_name || c.email || c.phone);
@@ -268,7 +305,7 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
                     {errors.logo && <p className="mt-1 text-xs text-orange-500 font-medium">{errors.logo}</p>}
                   </div>
 
-                  {/* Name & Description */}
+                  {/* Name, Description & Brochure */}
                   <div className="md:col-span-2 space-y-4">
                     <div>
                       <label className={labelClass}>Nombre Comercial <span className="text-red-500">*</span></label>
@@ -299,6 +336,42 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
                         placeholder="Breve descripción de la actividad económica..."
                       />
                       {errors.description && <p className="mt-1 text-xs text-orange-500 font-medium">{errors.description}</p>}
+                    </div>
+
+                    <div>
+                      <label className={labelClass}>Portafolio / Brochure</label>
+                      <div className="relative">
+                        {brochureFileName ? (
+                          <div className="flex items-center justify-between p-3 border border-gray-200 rounded-xl bg-gray-50">
+                            <div className="flex items-center gap-2 truncate">
+                              <FileText className="text-gray-400 flex-shrink-0" size={16} />
+                              <span className="text-sm text-gray-700 truncate font-medium">{brochureFileName}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={removeBrochure}
+                              className="p-1 hover:bg-gray-200 rounded-md text-red-500 transition-colors"
+                              title="Remover Brochure"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="border border-dashed border-gray-300 rounded-xl p-3 flex items-center justify-center bg-gray-50 hover:bg-blue-50 hover:border-blue-300 transition-all cursor-pointer relative group">
+                            <input
+                              type="file"
+                              accept="application/pdf,image/*"
+                              onChange={handleBrochureChange}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            />
+                            <div className="flex items-center gap-2 text-gray-500 group-hover:text-blue-600 transition-colors">
+                              <Upload size={16} />
+                              <span className="text-sm font-medium">Subir PDF o Imagen (Máx 10MB)</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      {errors.brochure_file && <p className="mt-1 text-xs text-orange-500 font-medium">{errors.brochure_file}</p>}
                     </div>
                   </div>
                 </div>
