@@ -6,13 +6,13 @@ import {
     Edit2,
     Save,
     X,
-    AlertCircle,
     ArrowUp,
     ArrowDown,
     Image as ImageIcon
 } from "lucide-react";
 import teamApi from "../../../api/teamApi";
 import { toast } from "react-hot-toast";
+import ConfirmModal from "../../modals/ConfirmModal";
 
 const ActionButton = ({ onClick, icon: Icon, color, label, disabled }) => (
     <button
@@ -30,7 +30,6 @@ const ActionButton = ({ onClick, icon: Icon, color, label, disabled }) => (
     </button>
 );
 
-// Constants for categories/styles if needed in backend, otherwise just save them.
 const STYLE_OPTIONS = [
     { value: "INNOVACION", label: "Innovación" },
     { value: "ADMINISTRATIVA", label: "Administrativa y Financiera" },
@@ -39,15 +38,25 @@ const STYLE_OPTIONS = [
     { value: "RED", label: "Coordinador de Proyectos" },
 ];
 
+const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http') && !path.includes('localhost')) return path;
+
+    // Extraer solo la parte final si por error viene con localhost
+    const cleanPath = path.replace(/^(https?:\/\/localhost(:\d+)?\/)?(storage\/)?/, '');
+    return `https://api-ecocircular.creativostecnologicosit.com/storage/${cleanPath}`;
+};
+
 export default function Equipo() {
     const [loading, setLoading] = useState(true);
     const [savings, setSavings] = useState(false);
     const [members, setMembers] = useState([]);
-    
-    // States for Editing
+
+    // States for Editing & Modals
     const [isEditingMember, setIsEditingMember] = useState(null);
     const [showAddMember, setShowAddMember] = useState(false);
-    
+    const [memberToDelete, setMemberToDelete] = useState(null);
+
     // Form state
     const [formData, setFormData] = useState({
         name: "",
@@ -56,7 +65,7 @@ export default function Equipo() {
         featured: false,
         photoDetails: null
     });
-    
+
     const [photoPreview, setPhotoPreview] = useState(null);
 
     useEffect(() => {
@@ -122,19 +131,14 @@ export default function Equipo() {
             toast.success("Miembro de equipo agregado");
             resetForm();
         } catch (error) {
-            // Mock locally if backend is not ready
-            const newMember = {
-                id: Date.now(),
-                name: formData.name,
-                role: formData.role,
-                style_type: formData.style_type,
-                featured: formData.featured,
-                photo_url: photoPreview || "",
-                sort_order: members.length
-            };
-            setMembers([...members, newMember]);
-            toast.success("Miembro agregado (Local)");
-            resetForm();
+            console.error(error);
+            const backendError = error.response?.data?.errors;
+            if (backendError) {
+                const firstErrorMessage = Object.values(backendError)[0][0];
+                toast.error(`Validación: ${firstErrorMessage}`);
+            } else {
+                toast.error(error.response?.data?.message || "Error al agregar el miembro en la base de datos");
+            }
         } finally {
             setSavings(false);
         }
@@ -157,32 +161,27 @@ export default function Equipo() {
             toast.success("Miembro actualizado");
             resetForm();
         } catch (error) {
-             // Mock locally
-            setMembers(members.map(m => m.id === id ? {
-                ...m,
-                name: formData.name,
-                role: formData.role,
-                style_type: formData.style_type,
-                featured: formData.featured,
-                photo_url: photoPreview || m.photo_url
-            } : m));
-            toast.success("Miembro actualizado (Local)");
-            resetForm();
+            console.error(error);
+            const backendError = error.response?.data?.errors;
+            if (backendError) {
+                const firstErrorMessage = Object.values(backendError)[0][0];
+                toast.error(`Validación: ${firstErrorMessage}`);
+            } else {
+                toast.error(error.response?.data?.message || "Error al actualizar el miembro en la base de datos");
+            }
         } finally {
             setSavings(false);
         }
     };
 
     const handleDeleteMember = async (id) => {
-        if (!window.confirm("¿Estás seguro de eliminar este miembro?")) return;
         try {
             await teamApi.deleteMember(id);
             setMembers(members.filter(m => m.id !== id));
             toast.success("Miembro eliminado");
         } catch (error) {
-             // Mock locally
-            setMembers(members.filter(m => m.id !== id));
-            toast.success("Miembro eliminado (Local)");
+            console.error(error);
+            toast.error("Error al eliminar el miembro de la base de datos");
         }
     };
 
@@ -194,7 +193,7 @@ export default function Equipo() {
             featured: member.featured === 1 || member.featured === true,
             photoDetails: null
         });
-        setPhotoPreview(member.photo_url);
+        setPhotoPreview(getImageUrl(member.photo_url));
         setIsEditingMember(member.id);
         window.scrollTo({ top: 300, behavior: 'smooth' });
     };
@@ -208,17 +207,18 @@ export default function Equipo() {
         } else {
             return; // No movement
         }
-        
+
         // Update sort_order locally
         const reordered = newMembers.map((m, i) => ({ ...m, sort_order: i }));
         setMembers(reordered);
-        
+
         // Push update to server
         try {
             await teamApi.updateMembersOrder(reordered.map(m => m.id));
             toast.success("Orden actualizado");
         } catch (error) {
-            console.log("No backend connection, order updated locally.");
+            console.error(error);
+            toast.error("Error al actualizar el orden en la base de datos");
         }
     };
 
@@ -267,7 +267,7 @@ export default function Equipo() {
                                 <X size={20} />
                             </button>
                         </div>
-                        
+
                         <div className="grid md:grid-cols-12 gap-6 mb-4">
                             {/* Photo Upload */}
                             <div className="md:col-span-4 lg:col-span-3 flex flex-col items-center">
@@ -285,11 +285,11 @@ export default function Equipo() {
                                             <Edit2 size={16} /> Cambiar
                                         </span>
                                     </div>
-                                    <input 
-                                        type="file" 
-                                        accept="image/*" 
-                                        className="hidden" 
-                                        onChange={handlePhotoChange} 
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handlePhotoChange}
                                     />
                                 </label>
                                 <p className="text-xs text-center text-gray-400 mt-2">Recomendado: 4:5 vertical</p>
@@ -319,7 +319,7 @@ export default function Equipo() {
                                 <div className="grid md:grid-cols-2 gap-4 items-center">
                                     <div className="space-y-1">
                                         <label className="text-sm font-bold text-gray-700">Estilo Visual (Departamento)</label>
-                                        <select 
+                                        <select
                                             value={formData.style_type}
                                             onChange={(e) => setFormData({ ...formData, style_type: e.target.value })}
                                             className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -330,11 +330,11 @@ export default function Equipo() {
                                         </select>
                                     </div>
                                     <div className="flex items-center gap-3 pt-6">
-                                        <input 
-                                            type="checkbox" 
+                                        <input
+                                            type="checkbox"
                                             id="featured"
                                             checked={formData.featured}
-                                            onChange={(e) => setFormData({...formData, featured: e.target.checked})}
+                                            onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
                                             className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                         />
                                         <label htmlFor="featured" className="text-sm font-bold text-gray-700 cursor-pointer">
@@ -344,7 +344,7 @@ export default function Equipo() {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="flex justify-end gap-3 mt-4 border-t border-gray-200 pt-4">
                             <ActionButton icon={X} color="#6B7280" label="Cancelar" onClick={resetForm} />
                             {isEditingMember ? (
@@ -373,7 +373,7 @@ export default function Equipo() {
                                 <div className="flex items-center gap-4">
                                     {/* Controles de orden */}
                                     <div className="flex flex-col gap-1 items-center justify-center mr-2">
-                                        <button 
+                                        <button
                                             onClick={() => moveMember(index, 'up')}
                                             disabled={index === 0}
                                             className="p-1 text-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded disabled:opacity-30 transition-colors"
@@ -381,7 +381,7 @@ export default function Equipo() {
                                         >
                                             <ArrowUp size={16} strokeWidth={3} />
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={() => moveMember(index, 'down')}
                                             disabled={index === members.length - 1}
                                             className="p-1 text-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded disabled:opacity-30 transition-colors"
@@ -390,33 +390,33 @@ export default function Equipo() {
                                             <ArrowDown size={16} strokeWidth={3} />
                                         </button>
                                     </div>
-                                    
+
                                     {/* Foto Thumbnail */}
                                     <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
                                         {member.photo_url ? (
-                                            <img src={member.photo_url} alt={member.name} className="w-full h-full object-cover object-top" />
+                                            <img src={getImageUrl(member.photo_url)} alt={member.name} className="w-full h-full object-cover object-top" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-400">
                                                 <ImageIcon size={20} />
                                             </div>
                                         )}
                                     </div>
-                                    
+
                                     {/* Info */}
                                     <div>
                                         <h4 className="font-bold text-[#1E305D] text-lg flex items-center gap-2">
                                             {member.name}
                                             {member.featured && (
-                                                 <span className="text-[10px] bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                                                     Destacado
-                                                 </span>
+                                                <span className="text-[10px] bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                                                    Destacado
+                                                </span>
                                             )}
                                         </h4>
                                         <p className="text-gray-600 font-medium text-sm">{member.role}</p>
                                         <span className="text-xs text-gray-400 mt-1 inline-block">ID Estilo: {member.style_type || 'N/A'}</span>
                                     </div>
                                 </div>
-                                
+
                                 {/* Acciones */}
                                 <div className="flex gap-2">
                                     <button
@@ -427,7 +427,7 @@ export default function Equipo() {
                                         <Edit2 size={18} />
                                     </button>
                                     <button
-                                        onClick={() => handleDeleteMember(member.id)}
+                                        onClick={() => setMemberToDelete(member)}
                                         className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
                                         title="Eliminar"
                                     >
@@ -442,6 +442,17 @@ export default function Equipo() {
                     Mueve a las personas arriba o abajo usando las flechas de la izquierda para cambiar el orden en la página principal.
                 </p>
             </section>
+
+            {/* Modal Global de Confirmación */}
+            <ConfirmModal
+                isOpen={!!memberToDelete}
+                onClose={() => setMemberToDelete(null)}
+                onConfirm={() => memberToDelete && handleDeleteMember(memberToDelete.id)}
+                title="Eliminar Miembro"
+                message={`¿Estás seguro de que deseas eliminar permanentemente a ${memberToDelete?.name}? Esta acción no se puede deshacer.`}
+                confirmText="Sí, eliminar"
+                isDanger={true}
+            />
         </div>
     );
 }
