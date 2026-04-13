@@ -404,12 +404,8 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
       dataToSend.append('type', formData.type || "project");
       dataToSend.append('title', formData.title);
 
-      // --- WORKAROUND PARA LÍMITE DE 2000 CARACTERES ---
-      // El backend de proyectos tiene un límite de 2000 en 'description'.
-      // Enviamos el contenido completo a 'content' y una versión truncada a 'description'.
       const fullContent = formData.description || "";
-      dataToSend.append('content', fullContent);
-      dataToSend.append('description', fullContent.substring(0, 1900));
+      dataToSend.append('description', fullContent);
 
       dataToSend.append('category_id', formData.category_id || "");
       dataToSend.append('author', formData.author || "");
