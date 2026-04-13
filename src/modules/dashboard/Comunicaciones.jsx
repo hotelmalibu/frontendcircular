@@ -8,6 +8,7 @@ import Categories from "../../components/dashboard/comunicaciones/Categories";
 import Projects from "../../components/dashboard/comunicaciones/Projects";
 import QuienesSomos from "../../components/dashboard/comunicaciones/QuienesSomos";
 import Equipo from "../../components/dashboard/comunicaciones/Equipo";
+import VisionCircularFormsModule from "../../components/dashboard/comunicaciones/VisionCircularFormsModule";
 import {
   Megaphone,
   LayoutDashboard,
@@ -17,7 +18,8 @@ import {
   Tag,
   UserX,
   Info,
-  Users
+  Users,
+  FileText
 } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -46,6 +48,7 @@ export default function Comunicaciones() {
     { name: "Eventos", label: "Eventos", icon: <Calendar size={18} />, component: <Eventos /> },
     { name: "Proyectos", label: "Proyectos", icon: <Briefcase size={18} />, component: <Projects /> },
     { name: "Categorias", label: "Categorías", icon: <Tag size={18} />, component: <Categories /> },
+    { name: "Unirse", label: "Registros de Unión", icon: <FileText size={18} />, component: <VisionCircularFormsModule /> },
   ];
 
 
