@@ -39,6 +39,7 @@ const Resoluciones = lazy(() => import("./modules/home/nosotros/marcoNormativo/r
 // Public - Nuestros Trabajos
 const ProyectosActivos = lazy(() => import("./modules/home/nuestrosTrabajos/proyectosAlianzas/proyectosActivos"));
 const LineasEstrategicasPage = lazy(() => import("./modules/home/nuestrosTrabajos/lineasEstrategicas/index"));
+const VisionCircularFormPage = lazy(() => import("./components/pagesProyectos/VisionCircularFormPage"));
 
 // Dashboard (Protected)
 const Dashboard = lazy(() => import("./modules/dashboard/Dashboard"));
@@ -110,6 +111,7 @@ const MainLayout = () => {
     "/login",
     "/register",
     "/forgot-password",
+    "/unirse",
   ];
 
   const isTransparentPath = transparentPaths.some((p) =>
@@ -159,6 +161,7 @@ export default function App() {
             <Route path="/proyectos-activos" element={<ProyectosActivos />} />
             <Route path="/lineas-estrategicas" element={<LineasEstrategicasPage />} />
             <Route path="/encuestas" element={<PublicSurveysPage />} />
+            <Route path="/unirse" element={<VisionCircularFormPage />} />
 
             {/* Rutas privadas generales */}
             <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
