@@ -6,7 +6,7 @@ import api from "./index";
  */
 
 const CATEGORIES_ENDPOINT = "/categories";
-const DEFAULT_PARAMS = "sort_by=created_at&sort_order=desc&per_page=15";
+const DEFAULT_PARAMS = "sort_by=created_at&sort_order=desc&per_page=1000"; // Traer todas las categorías; no limitar resultados
 
 /**
  * Get all categories
