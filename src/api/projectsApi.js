@@ -16,7 +16,7 @@ export const getAllProjects = async (params = {}) => {
   const defaultParams = {
     sort_by: 'created_at',
     sort_order: 'desc',
-    per_page: 15,
+    per_page: 1000,   // Traer todos los proyectos; la paginación la maneja el frontend
     ...params
   };
 

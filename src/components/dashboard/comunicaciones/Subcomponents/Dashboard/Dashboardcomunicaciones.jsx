@@ -54,11 +54,11 @@ export default function DashboardContenido() {
         setLoading(true);
         // Realizar peticiones balanceadas: 1 para totales, y una muestra para gráficas/actividad
         const [resCats, resNews, resScheds, resProjs, resDocs] = await Promise.all([
-          getAllCategories({ per_page: 50 }).catch(() => ({ data: [] })),
-          getAllNews({ per_page: 50 }).catch(() => ({ data: [] })),
-          getAllSchedules(1, 50).catch(() => ({ data: [] })),
-          getAllProjects({ per_page: 50 }).catch(() => ({ data: [] })),
-          getDocuments({ per_page: 50 }).catch(() => ({ data: [] }))
+          getAllCategories({ per_page: 1000 }).catch(() => ({ data: [] })),
+          getAllNews({ per_page: 1000 }).catch(() => ({ data: [] })),
+          getAllSchedules(1, 1000).catch(() => ({ data: [] })),
+          getAllProjects({ per_page: 1000 }).catch(() => ({ data: [] })),
+          getDocuments({ per_page: 1000 }).catch(() => ({ data: [] }))
         ]);
 
         const categories = Array.isArray(resCats) ? resCats : (resCats?.data?.items || resCats?.data || []);
@@ -67,12 +67,12 @@ export default function DashboardContenido() {
         const projects = Array.isArray(resProjs?.data?.items) ? resProjs.data.items : (resProjs?.data || []);
         const documents = Array.isArray(resDocs?.data?.items) ? resDocs.data.items : (resDocs?.data || []);
 
-        // Totales reales (pueden venir de metadatos o del length de la muestra si es pequeña)
+        // Contar SOLO los publicados (excluir borradores)
         setMetrics({
-          news: resNews.data?.total || news.length,
-          events: resScheds.data?.total || resScheds.total || schedules.length,
-          projects: resProjs.data?.total || projects.length,
-          documents: resDocs.data?.total || documents.length,
+          news: news.filter(i => i.status === 'published').length,
+          events: schedules.filter(i => i.status === 'published' || i.status === 'active' || i.status === 'scheduled').length,
+          projects: projects.filter(i => i.status === 'published').length,
+          documents: documents.filter(i => i.status === 'published').length,
           categories: categories.length
         });
         
