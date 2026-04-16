@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
 import fondoCircularmente from "../../assets/fondosYlogos/fondo_circularmente.jpg";
 import { useNavigate } from "react-router-dom";
 
@@ -95,6 +95,15 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
               />
             </button>
           )}
+
+          {/* 🔹 Botón de Contacto */}
+          <a
+            href="mailto:gsabogal@andi.com.co"
+            className="group bg-[#00AB6D] text-white px-12 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 w-64"
+          >
+            Contactar
+            <Mail size={18} className="group-hover:rotate-12 transition-transform" />
+          </a>
         </motion.div>
       </motion.div>
     </header>
