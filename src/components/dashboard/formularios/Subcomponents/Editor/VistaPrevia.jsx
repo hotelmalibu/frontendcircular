@@ -701,17 +701,10 @@ const FormBuilder = ({ formId, onSuccess }) => {
         {/* Loading Overlay */}
         {loading && (
           <div className="absolute inset-0 z-[100] bg-white/60 backdrop-blur-sm flex items-center justify-center">
-<<<<<<< HEAD
-            <div className="flex flex-col items-center gap-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004b72]"></div>
-              <p className="text-gray-500 font-medium animate-pulse">Cargando formulario...</p>
-            </div>
-=======
              <div className="flex flex-col items-center gap-4">
                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2C67B0]"></div>
                <p className="text-gray-500 font-medium animate-pulse">Cargando formulario...</p>
              </div>
->>>>>>> e49a5b4694fc58138336aa1f9a87eff1139aa0d9
           </div>
         )}
 
