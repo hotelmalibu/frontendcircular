@@ -19,6 +19,14 @@ export const getDocuments = async (params = {}) => {
   const response = await api.get(url);
   return response.data;
 };
+/**
+ * Get a single document by ID
+ * @returns {Promise} - Document object
+ */
+export const getDocumentTypes = async () => {
+  const response = await api.get(`${DOCUMENTS_ENDPOINT}/types`);
+  return response.data;
+};
 
 /**
  * Get a single document by ID
