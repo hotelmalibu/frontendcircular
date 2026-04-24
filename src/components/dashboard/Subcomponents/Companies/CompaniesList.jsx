@@ -16,6 +16,7 @@ import {
   FileText
 } from "lucide-react";
 import { getAllCompanies, deleteCompany } from "../../../../api/companiesApi";
+import { stripHtml } from "../../../../utils/textUtils";
 import toast from "react-hot-toast";
 import CompanyFormModal from "./CompanyFormModal";
 import CompanyDetailModal from "./CompanyDetailModal";
@@ -317,10 +318,7 @@ export default function CompaniesList() {
                 </h3>
 
                 <p className="text-xs text-gray-500 mb-4 line-clamp-3 leading-relaxed flex-grow">
-                  {item.description ?
-                    item.description.replace(/<[^>]+>/g, '').slice(0, 100) + (item.description.length > 100 ? '...' : '')
-                    : "Sin descripción registrada."
-                  }
+                  {stripHtml(item.description) || "Sin descripción registrada."}
                 </p>
 
                 {/* Detalles de Contacto */}

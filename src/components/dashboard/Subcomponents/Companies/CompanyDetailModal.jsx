@@ -95,9 +95,9 @@ export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Descripción</h3>
             <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                {companyData.description || "Sin descripción disponible"}
-              </p>
+              <div className="text-gray-700 leading-relaxed">
+                <div dangerouslySetInnerHTML={{ __html: companyData.description }} />
+              </div>
             </div>
             
             {/* Brochure / Portafolio */}

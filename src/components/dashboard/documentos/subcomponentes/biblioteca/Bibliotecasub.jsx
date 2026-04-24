@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import ReactDOM from "react-dom";
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import {
   Upload,
   Image as ImageIcon,
@@ -19,6 +21,7 @@ import {
 import { createDocument, getDocuments, updateDocument, deleteDocument, getDocumentTypes } from "../../../../../api/documentsApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
 import { getImageProxyUrl } from "../../../../../utils/imageUtils";
+import { stripHtml } from "../../../../../utils/textUtils";
 import { toast } from "react-hot-toast";
 import ConfirmModal from "../../../../common/ConfirmModal";
 
@@ -75,6 +78,21 @@ export default function Bibliotecasub() {
   });
   const [globalCounts, setGlobalCounts] = useState({ approved: 0, pending: 0 });
 
+
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'color': [] }, { 'background': [] }],
+      ['link', 'clean'],
+    ],
+  };
+
+  const quillFormats = [
+    'header', 'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'color', 'background', 'link'
+  ];
 
   const statusLabels = {
     draft: { text: "Borrador", color: BRAND.gray, bg: "#F3F4F6", icon: <Edit size={12} /> },
@@ -531,7 +549,7 @@ export default function Bibliotecasub() {
                 {/* Body Card */}
                 <div className="p-4 flex-1">
                   <p className="text-xs text-gray-500 line-clamp-2 mb-4 h-8 leading-relaxed">
-                    {doc.description || "Sin descripción disponible."}
+                    {stripHtml(doc.description) || "Sin descripción disponible."}
                   </p>
 
                   <div className="flex items-center justify-between text-xs mt-auto">
@@ -742,16 +760,16 @@ export default function Bibliotecasub() {
               {/* Row 4: Description */}
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Descripción</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  required
-                  rows={2}
-                  className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm resize-none"
-                  style={{ "--tw-ring-color": BRAND.lightBlue }}
-                  placeholder="Breve descripción del contenido..."
-                />
+                <div className="bg-white rounded-xl overflow-hidden border border-gray-300">
+                  <ReactQuill
+                    theme="snow"
+                    value={formData.description}
+                    onChange={(content) => setFormData(prev => ({ ...prev, description: content }))}
+                    modules={quillModules}
+                    formats={quillFormats}
+                    placeholder="Breve descripción del contenido..."
+                  />
+                </div>
               </div>
 
               {/* Row 4: File Upload (Compact) */}
@@ -836,6 +854,16 @@ export default function Bibliotecasub() {
         type="danger"
         isLoading={isDeleting}
       />
+      <style>{`
+        .ql-container {
+          min-height: 100px;
+          font-family: inherit;
+        }
+        .ql-editor {
+          min-height: 100px;
+          font-size: 0.875rem;
+        }
+      `}</style>
     </div>
   );
 }

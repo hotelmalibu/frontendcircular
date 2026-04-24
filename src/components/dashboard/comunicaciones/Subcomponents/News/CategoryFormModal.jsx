@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { X, Save, Tag, AlertCircle, FileText } from "lucide-react";
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
+import { X, Save, Tag, AlertCircle } from "lucide-react";
 import { createCategory, updateCategory } from "../../../../../api/categoriesApi";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -23,6 +25,18 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const quillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      ['clean'],
+    ],
+  };
+
+  const quillFormats = [
+    'bold', 'italic', 'underline', 'list', 'bullet'
+  ];
 
   useEffect(() => {
     if (isEditing && categoryData) {
@@ -157,21 +171,15 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
             {/* Description Input */}
             <div>
               <label className={labelClass}>Descripción <span className="text-red-500">*</span></label>
-              <div className="relative">
-                <textarea
-                  name="description"
+              <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+                <ReactQuill
+                  theme="snow"
                   value={formData.description}
-                  onChange={handleChange}
+                  onChange={(content) => setFormData(prev => ({ ...prev, description: content }))}
+                  modules={quillModules}
+                  formats={quillFormats}
                   placeholder="Breve descripción del propósito de esta categoría..."
-                  rows={4}
-                  className={`${inputClass} resize-none`}
-                  style={{
-                    "--tw-ring-color": BRAND.lightBlue,
-                    borderColor: errors.description ? BRAND.orange : ''
-                  }}
-                  disabled={loading}
                 />
-                <FileText className="absolute right-3 top-3 text-gray-400" size={16} />
               </div>
               {errors.description && (
                 <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}>
@@ -213,6 +221,16 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
           </button>
         </div>
       </div>
+      <style>{`
+        .ql-container {
+          min-height: 100px;
+          font-family: inherit;
+        }
+        .ql-editor {
+          min-height: 100px;
+          font-size: 0.875rem;
+        }
+      `}</style>
     </div>,
     document.body
   );

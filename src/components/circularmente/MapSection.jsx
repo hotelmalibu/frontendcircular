@@ -10,6 +10,7 @@ import {
 import { motion } from 'framer-motion';
 import fondoMapa from '../../assets/fondosYlogos/fondo_mapaC.jpg';
 import { getAllCompanies } from "../../api/companiesApi";
+import { stripHtml } from "../../utils/textUtils";
 
 // --- FUZZY SEARCH ---
 const fuzzySearch = (searchTerm, text) => {
@@ -361,7 +362,7 @@ export default function MapSection() {
                         </div>
 
                         <p className="text-xs text-gray-600 line-clamp-3 mb-4 flex-grow leading-relaxed">
-                          {empresa.description || "Sin descripción disponible."}
+                          {stripHtml(empresa.description) || "Sin descripción disponible."}
                         </p>
 
                         <button className="w-full bg-gradient-to-r from-[#00AB6D] to-[#008A5C] hover:from-[#009B5F] hover:to-[#007A4E] text-white font-bold py-2.5 rounded-lg text-xs transition-all duration-300 hover:shadow-lg mt-auto flex items-center justify-center gap-2">
@@ -432,9 +433,9 @@ export default function MapSection() {
                     <Tag size={16} className="text-[#00AB6D]" />
                     Descripción
                   </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    {selectedEmpresa.description || "Sin descripción detallada."}
-                  </p>
+                  <div className="text-gray-600 text-sm leading-relaxed p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <div dangerouslySetInnerHTML={{ __html: selectedEmpresa.description }} />
+                  </div>
                   
                   {/* Brochure / Portafolio */}
                   {selectedEmpresa.brochure_url && (

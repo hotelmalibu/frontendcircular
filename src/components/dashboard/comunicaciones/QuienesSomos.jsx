@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import {
     Users,
     Recycle,
@@ -58,6 +60,21 @@ export default function QuienesSomos() {
     const [isEditingQuote, setIsEditingQuote] = useState(null); // ID of quote being edited
     const [newQuote, setNewQuote] = useState({ nombre: "", cargo: "", frase: "" });
     const [showAddQuote, setShowAddQuote] = useState(false);
+
+    const quillModules = {
+        toolbar: [
+            [{ 'header': [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            [{ 'color': [] }, { 'background': [] }],
+            ['link', 'clean'],
+        ],
+    };
+
+    const quillFormats = [
+        'header', 'bold', 'italic', 'underline', 'strike',
+        'list', 'bullet', 'color', 'background', 'link'
+    ];
 
     useEffect(() => {
         fetchData();
@@ -134,6 +151,7 @@ export default function QuienesSomos() {
         }
     };
 
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64 bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
@@ -160,14 +178,16 @@ export default function QuienesSomos() {
                 <form onSubmit={handleUpdateAboutUs} className="space-y-6">
                     <div className="space-y-2">
                         <label className="block text-sm font-bold text-gray-700">Texto Principal "¿Qué es Visión Circular ANDI?"</label>
-                        <textarea
-                            value={aboutUs.texto_index}
-                            onChange={(e) => setAboutUs({ ...aboutUs, texto_index: e.target.value })}
-                            className="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 outline-none transition-all duration-200 min-h-[150px] text-gray-700"
-                            style={{ "--tw-ring-color": BRAND.blue }}
-                            placeholder="Escribe el texto descriptivo aquí..."
-                            required
-                        />
+                        <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+                            <ReactQuill
+                                theme="snow"
+                                value={aboutUs.texto_index}
+                                onChange={(content) => setAboutUs({ ...aboutUs, texto_index: content })}
+                                modules={quillModules}
+                                formats={quillFormats}
+                                placeholder="Escribe el texto descriptivo aquí..."
+                            />
+                        </div>
                         <p className="text-xs text-gray-400">Este texto aparecerá en la sección superior de la vista de Quiénes Somos.</p>
                     </div>
 
@@ -278,12 +298,16 @@ export default function QuienesSomos() {
                                 className="w-full p-3 rounded-xl border border-gray-200"
                             />
                         </div>
-                        <textarea
-                            placeholder="Escribe la frase aquí..."
-                            value={newQuote.frase}
-                            onChange={(e) => setNewQuote({ ...newQuote, frase: e.target.value })}
-                            className="w-full p-3 rounded-xl border border-gray-200 mb-4 min-h-[100px]"
-                        />
+                        <div className="bg-white rounded-xl overflow-hidden border border-gray-200 mb-4">
+                            <ReactQuill
+                                theme="snow"
+                                value={newQuote.frase}
+                                onChange={(content) => setNewQuote({ ...newQuote, frase: content })}
+                                modules={quillModules}
+                                formats={quillFormats}
+                                placeholder="Escribe la frase aquí..."
+                            />
+                        </div>
                         <div className="flex justify-end gap-2">
                             <ActionButton icon={Save} color="#2C67B0" label="Crear Frase" onClick={handleCreateQuote} disabled={savings} />
                         </div>
@@ -316,11 +340,15 @@ export default function QuienesSomos() {
                                                 className="p-2 rounded-lg border border-gray-200 text-sm"
                                             />
                                         </div>
-                                        <textarea
-                                            value={quote.frase}
-                                            onChange={(e) => setQuotes(quotes.map(q => q.id === quote.id ? { ...q, frase: e.target.value } : q))}
-                                            className="w-full p-2 rounded-lg border border-gray-200 text-sm"
-                                        />
+                                        <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+                                            <ReactQuill
+                                                theme="snow"
+                                                value={quote.frase}
+                                                onChange={(content) => setQuotes(quotes.map(q => q.id === quote.id ? { ...q, frase: content } : q))}
+                                                modules={quillModules}
+                                                formats={quillFormats}
+                                            />
+                                        </div>
                                         <div className="flex justify-end gap-2">
                                             <ActionButton icon={X} color="#6B7280" label="Cancelar" onClick={() => setIsEditingQuote(null)} />
                                             <ActionButton icon={Save} color="#2C67B0" label="Guardar" onClick={() => handleUpdateQuote(quote.id, quote)} />
@@ -363,13 +391,21 @@ export default function QuienesSomos() {
                 </div>
             </section>
 
-            <style>{`
+             <style>{`
         @keyframes fade-in-up {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in-up {
           animation: fade-in-up 0.4s ease-out forwards;
+        }
+        .ql-container {
+          min-height: 120px;
+          font-family: inherit;
+        }
+        .ql-editor {
+          min-height: 120px;
+          font-size: 0.875rem;
         }
       `}</style>
         </div>

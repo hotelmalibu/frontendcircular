@@ -113,7 +113,7 @@ export default function FeaturedSection() {
               type: category,
               topic: doc.category_name || (doc.category && typeof doc.category === 'object' ? doc.category.name : doc.category) || "Documento",
               title: doc.name,
-              excerpt: doc.description,
+              excerpt: stripHtml(doc.description),
               image: "", // Documents don't have images
               date: new Date(doc.created_at).toLocaleDateString(),
               slug: `documento-${doc.id}`,

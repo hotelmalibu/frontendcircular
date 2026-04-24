@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import {
   X,
   Upload,
@@ -42,6 +44,21 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
   const [brochureFileName, setBrochureFileName] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'color': [] }, { 'background': [] }],
+      ['link', 'clean'],
+    ],
+  };
+
+  const quillFormats = [
+    'header', 'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'color', 'background', 'link'
+  ];
 
   useEffect(() => {
     if (companyData) {
@@ -322,15 +339,16 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
 
                     <div>
                       <label className={labelClass}>Descripción <span className="text-red-500">*</span></label>
-                      <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleInputChange}
-                        rows={4}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm resize-none"
-                        style={{ "--tw-ring-color": BRAND.lightBlue, borderColor: errors.description ? BRAND.green : '' }}
-                        placeholder="Breve descripción de la actividad económica..."
-                      />
+                      <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+                        <ReactQuill
+                          theme="snow"
+                          value={formData.description}
+                          onChange={(content) => setFormData(prev => ({ ...prev, description: content }))}
+                          modules={quillModules}
+                          formats={quillFormats}
+                          placeholder="Breve descripción de la actividad económica..."
+                        />
+                      </div>
                       {errors.description && <p className="mt-1 text-xs text-orange-500 font-medium">{errors.description}</p>}
                     </div>
 
@@ -562,6 +580,16 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
           </button>
         </div>
       </div>
+      <style>{`
+        .ql-container {
+          min-height: 120px;
+          font-family: inherit;
+        }
+        .ql-editor {
+          min-height: 120px;
+          font-size: 0.875rem;
+        }
+      `}</style>
     </div>,
     document.body
   );

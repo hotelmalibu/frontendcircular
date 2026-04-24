@@ -9,6 +9,7 @@ import {
   FolderOpen
 } from "lucide-react";
 import { getAllCategories, deleteCategory } from "../../../../../api/categoriesApi";
+import { stripHtml } from "../../../../../utils/textUtils";
 import CategoryFormModal from "./CategoryFormModal";
 import ConfirmModal from "../../../../../components/common/ConfirmModal";
 import { toast } from "react-hot-toast";
@@ -220,7 +221,7 @@ export default function CategoryList() {
 
                 {/* Description */}
                 <p className="text-sm text-gray-500 mb-6 flex-grow leading-relaxed line-clamp-3">
-                  {category.description || "Sin descripción disponible..."}
+                  {stripHtml(category.description) || "Sin descripción disponible..."}
                 </p>
 
                 {/* Actions Footer */}
