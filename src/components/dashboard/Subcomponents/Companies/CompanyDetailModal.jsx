@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import DOMPurify from 'dompurify';
 import { X, Edit, Phone, Mail, Globe, MapPin, Package, Clock, ExternalLink, Building, Download } from "lucide-react";
 
 export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
@@ -95,8 +96,11 @@ export default function CompanyDetailModal({ companyData, onClose, onEdit }) {
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Descripción</h3>
             <div className="bg-gray-50 rounded-xl p-4">
-              <div className="text-gray-700 leading-relaxed">
-                <div dangerouslySetInnerHTML={{ __html: companyData.description }} />
+              <div className="prose prose-sm max-w-none">
+                <div 
+                  className="text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(companyData.description || "").replace(/\u00A0|&nbsp;/g, ' ')) }} 
+                />
               </div>
             </div>
             

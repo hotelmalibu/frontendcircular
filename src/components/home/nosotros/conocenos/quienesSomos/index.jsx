@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import DOMPurify from 'dompurify';
 import { Quote, Users, Recycle, Globe, Zap, Leaf, TrendingUp, Handshake, Target } from "lucide-react";
 import LogoVisionCircular from "../../../../../assets/fondosYlogos/Logo.png";
 import aboutUsApi from "../../../../../api/aboutUsApi";
@@ -93,8 +94,8 @@ export default function Index() {
               <div className="h-1 w-28 bg-[#00AB6D] mt-2 rounded-full"></div>
             </div>
 
-            <div className="text-base md:text-lg text-gray-700 leading-relaxed text-justify">
-              <div dangerouslySetInnerHTML={{ __html: data.texto_index }} />
+            <div className="text-base md:text-lg text-gray-700 leading-relaxed text-justify prose prose-emerald max-w-none">
+              <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(data.texto_index || "").replace(/\u00A0|&nbsp;/g, ' ')) }} />
             </div>
           </motion.div>
         </div>
@@ -128,8 +129,8 @@ export default function Index() {
                         <p className="text-xs text-gray-600">{quote.cargo}</p>
                       </div>
                     </div>
-                    <div className="text-gray-700 text-sm italic leading-relaxed">
-                      <div dangerouslySetInnerHTML={{ __html: quote.frase }} />
+                    <div className="text-gray-700 text-sm italic leading-relaxed prose prose-sm max-w-none">
+                      <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(quote.frase || "").replace(/\u00A0|&nbsp;/g, ' ')) }} />
                     </div>
                   </div>
                 );

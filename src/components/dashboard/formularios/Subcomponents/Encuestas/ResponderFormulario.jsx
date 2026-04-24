@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import DOMPurify from 'dompurify';
 import { AuthContext } from "../../../../../context/AuthContext";
 import formsApi from "../../../../../api/formsApi";
 import { toast } from "react-hot-toast";
@@ -451,7 +452,7 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                                             className={`prose max-w-none text-gray-600 ${
                                                 field.options?.size ? field.options.size : 'text-sm'
                                             } ${field.options?.align ? `text-${field.options.align}` : ''} ${field.options?.color ? field.options.color : ''}`}
-                                            dangerouslySetInnerHTML={{ __html: field.label || field.description }} 
+                                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(field.label || field.description || "").replace(/\u00A0|&nbsp;/g, ' ')) }} 
                                         />
                                     </div>
                                 );

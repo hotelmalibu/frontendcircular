@@ -236,7 +236,7 @@ export default function ContentDetailProject() {
                             ADD_ATTR: ['target', 'rel', 'class']
                           })
                         }}
-                        className="news-content ql-editor !p-0 !text-justify [&_*]:!text-justify"
+                        className="news-content ql-editor !p-0 !text-justify [&_*]:!text-justify prose prose-emerald max-w-none"
                       />
                     ) : (
                       <>

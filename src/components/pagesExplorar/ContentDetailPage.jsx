@@ -232,8 +232,8 @@ export default function ContentDetailPage() {
                 {content.body ? (
                   /[<>]/.test(content.body) ? (
                     <div
-                      dangerouslySetInnerHTML={{ __html: content.body }}
-                      className="news-content ql-editor !p-0 !font-sans !text-gray-700 !text-lg !text-justify [&_*]:!text-justify"
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.body, { ADD_ATTR: ['target', 'rel', 'class'] }) }}
+                      className="news-content ql-editor !p-0 !font-sans !text-gray-700 !text-lg !text-justify [&_*]:!text-justify prose prose-emerald max-w-none"
                     />
                   ) : (
                     <div className="space-y-6">

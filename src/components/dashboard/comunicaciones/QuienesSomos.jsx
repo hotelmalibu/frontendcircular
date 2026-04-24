@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactQuill from 'react-quill-new';
+import DOMPurify from 'dompurify';
 import 'react-quill-new/dist/quill.snow.css';
 import {
     Users,
@@ -365,7 +366,7 @@ export default function QuienesSomos() {
                                                     {quote.cargo}
                                                 </span>
                                             </div>
-                                            <p className="text-gray-600 text-sm leading-relaxed italic">"{quote.frase}"</p>
+                                            <div className="text-gray-600 text-sm leading-relaxed italic prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(quote.frase || "").replace(/\u00A0|&nbsp;/g, ' ')) }} />
                                         </div>
                                         <div className="flex md:flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                             <button

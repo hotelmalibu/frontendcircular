@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import DOMPurify from 'dompurify';
 import ReactDOM from 'react-dom';
 import { AuthContext } from '../../context/AuthContext';
 import {
@@ -433,8 +434,8 @@ export default function MapSection() {
                     <Tag size={16} className="text-[#00AB6D]" />
                     Descripción
                   </h3>
-                  <div className="text-gray-600 text-sm leading-relaxed p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    <div dangerouslySetInnerHTML={{ __html: selectedEmpresa.description }} />
+                  <div className="text-gray-600 text-sm leading-relaxed p-4 bg-gray-50 rounded-xl border border-gray-100 prose prose-sm max-w-none">
+                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(selectedEmpresa.description || "").replace(/\u00A0|&nbsp;/g, ' ')) }} />
                   </div>
                   
                   {/* Brochure / Portafolio */}
