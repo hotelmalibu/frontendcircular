@@ -79,8 +79,8 @@ const FormBuilder = ({ formId, onSuccess }) => {
   useEffect(() => {
     // Only set hasChanges after initial load (when loading is false)
     if (!loading && (formMeta.title !== "" || formFields.length > 0)) {
-       // Note: This is a simple check. For better accuracy we'd compare with initial state.
-       // But for a builder, any interaction usually implies modification intent.
+      // Note: This is a simple check. For better accuracy we'd compare with initial state.
+      // But for a builder, any interaction usually implies modification intent.
     }
   }, [formMeta, formFields, loading]);
 
@@ -95,7 +95,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
         // Handle various response patterns: { data: { field_types: [] } }, { field_types: [] }, { data: [] }, or [...]
         const base = response.data || response;
         let list = [];
-        
+
         if (base && base.field_types && Array.isArray(base.field_types)) {
           list = base.field_types;
         } else if (base && base.data && base.data.field_types && Array.isArray(base.data.field_types)) {
@@ -105,22 +105,22 @@ const FormBuilder = ({ formId, onSuccess }) => {
         } else if (Array.isArray(base)) {
           list = base;
         }
-        
+
         console.log("Field types parsed:", list);
-        
+
         // Custom sort to prioritize visual elements (Title, Paragraph)
         const sortedList = list.sort((a, b) => {
           const priority = ['title', 'paragraph'];
           const slugA = (a.slug || '').toLowerCase();
           const slugB = (b.slug || '').toLowerCase();
-          
+
           const indexA = priority.indexOf(slugA);
           const indexB = priority.indexOf(slugB);
-          
+
           if (indexA !== -1 && indexB !== -1) return indexA - indexB;
           if (indexA !== -1) return -1;
           if (indexB !== -1) return 1;
-          
+
           return 0;
         });
 
@@ -141,7 +141,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
         try {
           const response = await formsApi.getForm(formId);
           const form = response.data?.form || response.data || response;
-          
+
           setFormMeta({
             title: form.title || "",
             description: form.description || "",
@@ -228,9 +228,9 @@ const FormBuilder = ({ formId, onSuccess }) => {
     };
 
     if (!newField.field_type_id) {
-       console.error("Attempted to add field without type ID:", fieldType);
-       toast.error("Error: El tipo de campo seleccionado no tiene un ID válido");
-       return;
+      console.error("Attempted to add field without type ID:", fieldType);
+      toast.error("Error: El tipo de campo seleccionado no tiene un ID válido");
+      return;
     }
 
     setFormFields([...formFields, newField]);
@@ -255,7 +255,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
     // Maintain selection if it was the moved field
     if (selectedFieldIndex === index) setSelectedFieldIndex(targetIndex);
     else if (selectedFieldIndex === targetIndex) setSelectedFieldIndex(index);
-    
+
     markChanged();
   };
 
@@ -300,7 +300,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
 
       console.log("Pre-save Payload:", payload);
 
-      const response = formId 
+      const response = formId
         ? await formsApi.updateForm(formId, payload)
         : await formsApi.createForm(payload);
 
@@ -397,7 +397,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
 
   const renderSchemaInput = (key, schema, value, onChange) => {
     const type = typeof schema === 'string' ? schema : schema.type;
-    
+
     const PROPERTY_LABELS = {
       placeholder: "Texto de Ayuda (Placeholder)",
       min: "Valor Mínimo",
@@ -432,67 +432,67 @@ const FormBuilder = ({ formId, onSuccess }) => {
     };
 
     const getPropertyHelp = (key, typeSlug) => {
-        const helpMap = {
-            placeholder: {
-                default: "Texto gris de ejemplo que desaparece al escribir.",
-                example: "Ej: Escribe aquí tu respuesta...",
-                text: "Ej: Nombre completo",
-                email: "Ej: nombre@correo.com",
-                phone: "Ej: 300 123 4567",
-                number: "Ej: 0",
-                url: "Ej: https://sitio.com",
-                date: "Ej: Selecciona una fecha"
-            },
-            min: {
-                default: "Valor mínimo permitido.",
-                example: "Ej: 0",
-                date: "Ej: 2024-01-01"
-            },
-            max: {
-                default: "Valor máximo permitido.",
-                example: "Ej: 100",
-                date: "Ej: 2025-12-31"
-            },
-            minlength: { default: "Mínimo caracteres requeridos.", example: "Ej: 3" },
-            maxlength: { default: "Máximo caracteres permitidos.", example: "Ej: 255" },
-            pattern: { 
-                default: "Regex para validación.",
-                example: "Ej: [A-Za-z]+",
-                phone: "Ej: [0-9]{10}"
-            },
-            step: { default: "Saltos entre números.", example: "Ej: 1 o 0.5" },
-            accept: { default: "Tipos de archivo.", example: "Ej: .pdf,.jpg,.png" },
-            multiple: { default: "Permitir múltiples archivos." },
-            size_limit: { default: "Límite en MB.", example: "Ej: 5" },
-            
-            choices: { default: "Opciones del menú.", example: "Ej: Opción 1" },
-            options: { default: "Opciones a seleccionar.", example: "Ej: Sí" },
-            
-            rows: { default: "Filas de la cuadrícula.", example: "Ej: Calidad del Servicio" },
-            columns: { default: "Columnas de la cuadrícula.", example: "Ej: Bueno" },
-            cols: { default: "Ancho textbox.", example: "Ej: 30" },
-            
-            min_label: { default: "Etiqueta nivel bajo.", example: "Ej: Malo" },
-            max_label: { default: "Etiqueta nivel alto.", example: "Ej: Bueno" },
-            
-            src: { default: "URL Imagen.", example: "Ej: https://imgur.com/image.jpg" },
-            url: { default: "URL YouTube.", example: "Ej: https://youtube.com/watch?v=..." },
-            alt: { default: "Descripción Alt.", example: "Ej: Logo de la empresa" },
-            
-            default: { default: "Valor por defecto.", example: "Ej: N/A" },
-            tag: { default: "Etiqueta HTML.", example: "Ej: h2" },
-            align: { default: "Alineación.", example: "Ej: center" },
-            color: { default: "Clase Color.", example: "Ej: text-blue-500" },
-            size: { default: "Clase Tamaño.", example: "Ej: text-xl" }
-        };
+      const helpMap = {
+        placeholder: {
+          default: "Texto gris de ejemplo que desaparece al escribir.",
+          example: "Ej: Escribe aquí tu respuesta...",
+          text: "Ej: Nombre completo",
+          email: "Ej: nombre@correo.com",
+          phone: "Ej: 300 123 4567",
+          number: "Ej: 0",
+          url: "Ej: https://sitio.com",
+          date: "Ej: Selecciona una fecha"
+        },
+        min: {
+          default: "Valor mínimo permitido.",
+          example: "Ej: 0",
+          date: "Ej: 2024-01-01"
+        },
+        max: {
+          default: "Valor máximo permitido.",
+          example: "Ej: 100",
+          date: "Ej: 2025-12-31"
+        },
+        minlength: { default: "Mínimo caracteres requeridos.", example: "Ej: 3" },
+        maxlength: { default: "Máximo caracteres permitidos.", example: "Ej: 255" },
+        pattern: {
+          default: "Regex para validación.",
+          example: "Ej: [A-Za-z]+",
+          phone: "Ej: [0-9]{10}"
+        },
+        step: { default: "Saltos entre números.", example: "Ej: 1 o 0.5" },
+        accept: { default: "Tipos de archivo.", example: "Ej: .pdf,.jpg,.png" },
+        multiple: { default: "Permitir múltiples archivos." },
+        size_limit: { default: "Límite en MB.", example: "Ej: 5" },
 
-        const keyLower = key.toLowerCase();
-        if (!helpMap[keyLower]) return null;
-        
-        const config = helpMap[keyLower];
-        const specific = config[typeSlug] || config.default;
-        // If specific is an object (rarely needed but good for safety), standardise
-        return typeof specific === 'string' ? { text: specific, example: config.example || "" } : specific;
+        choices: { default: "Opciones del menú.", example: "Ej: Opción 1" },
+        options: { default: "Opciones a seleccionar.", example: "Ej: Sí" },
+
+        rows: { default: "Filas de la cuadrícula.", example: "Ej: Calidad del Servicio" },
+        columns: { default: "Columnas de la cuadrícula.", example: "Ej: Bueno" },
+        cols: { default: "Ancho textbox.", example: "Ej: 30" },
+
+        min_label: { default: "Etiqueta nivel bajo.", example: "Ej: Malo" },
+        max_label: { default: "Etiqueta nivel alto.", example: "Ej: Bueno" },
+
+        src: { default: "URL Imagen.", example: "Ej: https://imgur.com/image.jpg" },
+        url: { default: "URL YouTube.", example: "Ej: https://youtube.com/watch?v=..." },
+        alt: { default: "Descripción Alt.", example: "Ej: Logo de la empresa" },
+
+        default: { default: "Valor por defecto.", example: "Ej: N/A" },
+        tag: { default: "Etiqueta HTML.", example: "Ej: h2" },
+        align: { default: "Alineación.", example: "Ej: center" },
+        color: { default: "Clase Color.", example: "Ej: text-blue-500" },
+        size: { default: "Clase Tamaño.", example: "Ej: text-xl" }
+      };
+
+      const keyLower = key.toLowerCase();
+      if (!helpMap[keyLower]) return null;
+
+      const config = helpMap[keyLower];
+      const specific = config[typeSlug] || config.default;
+      // If specific is an object (rarely needed but good for safety), standardise
+      return typeof specific === 'string' ? { text: specific, example: config.example || "" } : specific;
     };
 
     const label = PROPERTY_LABELS[key.toLowerCase()] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -523,10 +523,10 @@ const FormBuilder = ({ formId, onSuccess }) => {
       return (
         <div key={key} className="pt-2">
           <div className="flex justify-between items-center mb-3">
-             <label className="block text-xs font-bold text-gray-500 uppercase">{label}</label>
-             {helpText && <span title={helpText} className="cursor-help text-xs">💡</span>}
+            <label className="block text-xs font-bold text-gray-500 uppercase">{label}</label>
+            {helpText && <span title={helpText} className="cursor-help text-xs">💡</span>}
           </div>
-          
+
           <div className="space-y-3">
             {choices.map((choice, cIdx) => (
               <div key={cIdx} className="flex gap-2">
@@ -560,9 +560,9 @@ const FormBuilder = ({ formId, onSuccess }) => {
               + Añadir Opción
             </button>
             {helpText && (
-                <p className="mt-1 text-[10px] text-gray-400 font-medium leading-tight ml-1">
-                    💡 {helpText}
-                </p>
+              <p className="mt-1 text-[10px] text-gray-400 font-medium leading-tight ml-1">
+                💡 {helpText}
+              </p>
             )}
           </div>
         </div>
@@ -580,9 +580,9 @@ const FormBuilder = ({ formId, onSuccess }) => {
           placeholder={placeholderText}
         />
         {helpText && (
-            <p className="mt-1.5 text-[10px] text-gray-400 font-medium leading-tight">
-                💡 {helpText}
-            </p>
+          <p className="mt-1.5 text-[10px] text-gray-400 font-medium leading-tight">
+            💡 {helpText}
+          </p>
         )}
       </div>
     );
@@ -592,16 +592,15 @@ const FormBuilder = ({ formId, onSuccess }) => {
   const selectedField = selectedFieldIndex !== null ? formFields[selectedFieldIndex] : null;
 
   const editorContent = (
-    <div className={`flex flex-col bg-gray-50 overflow-hidden transition-all duration-300 ${
-      isFullscreen 
-        ? "fixed inset-0 z-[9999] h-screen w-screen" 
+    <div className={`flex flex-col bg-gray-50 overflow-hidden transition-all duration-300 ${isFullscreen
+        ? "fixed inset-0 z-[9999] h-screen w-screen"
         : "h-[calc(100vh-150px)] md:h-[calc(100vh-120px)]"
-    }`}>
+      }`}>
       {/* Top Header/Actions */}
       <div className="bg-white border-b px-6 py-3 flex justify-between items-center shadow-sm relative z-20">
         <div className="flex items-center gap-4">
           {/* Close Button */}
-          <button 
+          <button
             onClick={handleClose}
             className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-xl transition-all mr-2"
             title="Cerrar editor"
@@ -623,16 +622,15 @@ const FormBuilder = ({ formId, onSuccess }) => {
           {/* Fullscreen Toggle */}
           <button
             onClick={() => setIsFullscreen(!isFullscreen)}
-            className={`p-2.5 rounded-xl border transition-all ${
-              isFullscreen 
-                ? "bg-blue-50 text-blue-600 border-blue-200" 
+            className={`p-2.5 rounded-xl border transition-all ${isFullscreen
+                ? "bg-blue-50 text-blue-600 border-blue-200"
                 : "bg-white text-gray-400 border-gray-100 hover:border-blue-100 hover:text-blue-500"
-            }`}
+              }`}
             title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
           >
             {isFullscreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
           </button>
-          
+
           <div className="w-px h-6 bg-gray-100 mx-1 hidden sm:block"></div>
 
           <button
@@ -658,19 +656,19 @@ const FormBuilder = ({ formId, onSuccess }) => {
 
       {/* Mobile Tabs */}
       <div className="md:hidden flex border-b bg-white">
-        <button 
+        <button
           onClick={() => setActiveTab("palette")}
           className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${activeTab === "palette" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400"}`}
         >
           Elementos
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab("canvas")}
           className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${activeTab === "canvas" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400"}`}
         >
           Lienzo
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab("properties")}
           className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${activeTab === "properties" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400"}`}
         >
@@ -682,10 +680,10 @@ const FormBuilder = ({ formId, onSuccess }) => {
         {/* Loading Overlay */}
         {loading && (
           <div className="absolute inset-0 z-[100] bg-white/60 backdrop-blur-sm flex items-center justify-center">
-             <div className="flex flex-col items-center gap-4">
-               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004b72]"></div>
-               <p className="text-gray-500 font-medium animate-pulse">Cargando formulario...</p>
-             </div>
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004b72]"></div>
+              <p className="text-gray-500 font-medium animate-pulse">Cargando formulario...</p>
+            </div>
           </div>
         )}
 
@@ -715,7 +713,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
         {/* Center: Canvas */}
         <div className={`${activeTab === "canvas" ? "block" : "hidden md:block"} flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar bg-gray-100/50`}>
           <div className="max-w-3xl mx-auto space-y-6">
-              <div className="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 ring-1 ring-gray-200/50">
+            <div className="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-gray-100 ring-1 ring-gray-200/50">
               <input
                 type="text"
                 value={formMeta.title}
@@ -845,155 +843,155 @@ const FormBuilder = ({ formId, onSuccess }) => {
                   <h4 className="text-base md:text-lg font-semibold text-gray-800">{field.label || "Sin Etiqueta"}</h4>
                   {field.description && <p className="text-sm text-gray-500 mt-1">{field.description}</p>}
 
-                   <div className="mt-4 pointer-events-none opacity-80 overflow-x-auto">
+                  <div className="mt-4 pointer-events-none opacity-80 overflow-x-auto">
                     {(() => {
-                        const slug = field.type_slug || "";
-                        const options = field.options || {};
- 
-                        if (slug === 'grid' || slug === 'checkbox_grid') {
-                            const rows = options.rows || ["Fila 1", "Fila 2"];
-                            const cols = options.columns || ["Col 1", "Col 2", "Col 3"];
-                            return (
-                                <div className="min-w-[400px]">
-                                    <table className="w-full text-xs text-gray-500">
-                                        <thead>
-                                            <tr>
-                                                <th className="p-2"></th>
-                                                {cols.map((c, i) => <th key={i} className="p-2 font-bold text-center">{typeof c === 'string' ? c : (c.label || `Col ${i+1}`)}</th>)}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {rows.map((r, ri) => (
-                                                <tr key={ri} className={ri % 2 === 0 ? 'bg-gray-50/50' : ''}>
-                                                    <td className="p-2 font-medium">{typeof r === 'string' ? r : (r.label || `Fila ${ri+1}`)}</td>
-                                                    {cols.map((c, ci) => (
-                                                        <td key={ci} className="p-2 text-center">
-                                                            <div className={`w-4 h-4 mx-auto border border-gray-300 ${slug === 'grid' ? 'rounded-full' : 'rounded'}`}></div>
-                                                        </td>
-                                                    ))}
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            );
-                        }
+                      const slug = field.type_slug || "";
+                      const options = field.options || {};
 
-                        if (slug === 'section') {
-                            return (
-                                <div className="flex items-center gap-4 py-4">
-                                    <div className="h-px bg-blue-200 flex-1 relative">
-                                        <div className="absolute right-0 -top-1.5 w-3 h-3 rotate-45 border-t border-r border-blue-200 bg-white"></div>
-                                    </div>
-                                    <span className="text-xs font-black text-blue-400 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100">Nueva Página</span>
-                                    <div className="h-px bg-blue-200 flex-1 relative">
-                                        <div className="absolute left-0 -top-1.5 w-3 h-3 -rotate-135 border-t border-r border-blue-200 bg-white"></div>
-                                    </div>
-                                </div>
-                            );
-                        }
-
-                        if (slug === 'title') {
-                            const Tag = options.tag || 'h2';
-                            return (
-                                <div className={`text-gray-800 ${options.align === 'center' ? 'text-center' : options.align === 'right' ? 'text-right' : 'text-left'}`}>
-                                    {/* Visual preview of the tag size */}
-                                    <div className={`font-bold ${Tag === 'h1' ? 'text-3xl' : Tag === 'h3' ? 'text-xl' : 'text-2xl'}`}>
-                                        {field.label || "Título de la Sección"}
-                                    </div>
-                                    {field.description && <p className="text-gray-500 mt-2">{field.description}</p>}
-                                </div>
-                            );
-                        }
-
-                        if (slug === 'image') {
-                            return (
-                                <div className="flex justify-center bg-gray-50 rounded-xl border border-dashed border-gray-300 p-4 min-h-[150px] items-center">
-                                    {options.src ? (
-                                        <img src={options.src} alt={options.alt || ""} className="max-h-[300px] object-contain rounded-lg shadow-sm" />
-                                    ) : (
-                                        <div className="text-center text-gray-400">
-                                            <Upload className="mx-auto mb-2 opacity-50" size={32} />
-                                            <p className="text-xs">Configura la URL de la imagen en propiedades</p>
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        }
-
-                        if (slug === 'video') {
-                            return (
-                                <div className="flex justify-center bg-gray-900 rounded-xl overflow-hidden aspect-video items-center relative">
-                                    {options.url ? (
-                                        <iframe 
-                                            width="100%" 
-                                            height="100%" 
-                                            src={`https://www.youtube.com/embed/${options.url.includes('v=') ? options.url.split('v=')[1].split('&')[0] : options.url.split('/').pop()}`}
-                                            title="YouTube video player" 
-                                            frameBorder="0" 
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                            allowFullScreen
-                                            className="absolute inset-0 z-10"
-                                        ></iframe>
-                                    ) : (
-                                        <div className="text-center text-gray-500 z-10 relative">
-                                            <div className="w-12 h-12 rounded-full border-2 border-gray-600 flex items-center justify-center mx-auto mb-2">
-                                                <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-gray-600 border-b-[6px] border-b-transparent ml-1"></div>
-                                            </div>
-                                            <p className="text-xs">Configura la URL de YouTube</p>
-                                        </div>
-                                    )}
-                                    {/* Placeholder background only visible if no video */}
-                                    {!options.url && <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-black opacity-50"></div>}
-                                </div>
-                            );
-                        }
-
-                        if (slug === 'linear_scale') {
-                            const min = parseInt(options.min || 1);
-                            const max = parseInt(options.max || 5);
-                            return (
-                                <div className="flex items-end justify-between gap-4 pt-4 px-2">
-                                    <span className="text-xs font-bold text-gray-400 mb-2">{options.min_label || min}</span>
-                                    <div className="flex-1 flex justify-between items-center px-4">
-                                        {Array.from({ length: max - min + 1 }, (_, i) => i + min).map(val => (
-                                            <div key={val} className="flex flex-col items-center gap-2">
-                                                <span className="text-xs font-bold text-gray-500">{val}</span>
-                                                <div className="w-5 h-5 rounded-full border-2 border-gray-300"></div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <span className="text-xs font-bold text-gray-400 mb-2">{options.max_label || max}</span>
-                                </div>
-                            );
-                        }
-
-                        if (['radio', 'checkbox', 'select'].includes(slug) && (options.options || options.choices)) {
-                            const items = options.options || options.choices || [];
-                            return (
-                                <div className="space-y-2">
-                                    {items.length > 0 ? items.map((opt, i) => (
-                                        <div key={i} className="flex items-center gap-3 p-2 border border-gray-100 rounded-lg">
-                                            {slug === 'checkbox' && <div className="w-4 h-4 rounded border border-gray-300"></div>}
-                                            {slug === 'radio' && <div className="w-4 h-4 rounded-full border border-gray-300"></div>}
-                                            {slug === 'select' && <div className="text-[10px] text-gray-400 font-bold border border-gray-200 px-1 rounded">1</div>}
-                                            <span className="text-sm text-gray-600">{opt.label || `Opción ${i + 1}`}</span>
-                                        </div>
-                                    )) : (
-                                        <div className="text-xs text-red-400 italic bg-red-50 p-2 rounded">
-                                            Sin opciones definidas. Añádelas en el panel de propiedades.
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        }
-
-                        // Default Text/Inputs
+                      if (slug === 'grid' || slug === 'checkbox_grid') {
+                        const rows = options.rows || ["Fila 1", "Fila 2"];
+                        const cols = options.columns || ["Col 1", "Col 2", "Col 3"];
                         return (
-                            <div className="w-full h-10 bg-gray-50 border border-gray-200 rounded-xl px-4 flex items-center text-gray-400 text-sm">
-                                {field.placeholder || (slug === 'date' ? 'dd/mm/aaaa' : slug === 'time' ? '--:--' : 'Respuesta...')}
-                            </div>
+                          <div className="min-w-[400px]">
+                            <table className="w-full text-xs text-gray-500">
+                              <thead>
+                                <tr>
+                                  <th className="p-2"></th>
+                                  {cols.map((c, i) => <th key={i} className="p-2 font-bold text-center">{typeof c === 'string' ? c : (c.label || `Col ${i + 1}`)}</th>)}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {rows.map((r, ri) => (
+                                  <tr key={ri} className={ri % 2 === 0 ? 'bg-gray-50/50' : ''}>
+                                    <td className="p-2 font-medium">{typeof r === 'string' ? r : (r.label || `Fila ${ri + 1}`)}</td>
+                                    {cols.map((c, ci) => (
+                                      <td key={ci} className="p-2 text-center">
+                                        <div className={`w-4 h-4 mx-auto border border-gray-300 ${slug === 'grid' ? 'rounded-full' : 'rounded'}`}></div>
+                                      </td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         );
+                      }
+
+                      if (slug === 'section') {
+                        return (
+                          <div className="flex items-center gap-4 py-4">
+                            <div className="h-px bg-blue-200 flex-1 relative">
+                              <div className="absolute right-0 -top-1.5 w-3 h-3 rotate-45 border-t border-r border-blue-200 bg-white"></div>
+                            </div>
+                            <span className="text-xs font-black text-blue-400 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100">Nueva Página</span>
+                            <div className="h-px bg-blue-200 flex-1 relative">
+                              <div className="absolute left-0 -top-1.5 w-3 h-3 -rotate-135 border-t border-r border-blue-200 bg-white"></div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (slug === 'title') {
+                        const Tag = options.tag || 'h2';
+                        return (
+                          <div className={`text-gray-800 ${options.align === 'center' ? 'text-center' : options.align === 'right' ? 'text-right' : 'text-left'}`}>
+                            {/* Visual preview of the tag size */}
+                            <div className={`font-bold ${Tag === 'h1' ? 'text-3xl' : Tag === 'h3' ? 'text-xl' : 'text-2xl'}`}>
+                              {field.label || "Título de la Sección"}
+                            </div>
+                            {field.description && <p className="text-gray-500 mt-2">{field.description}</p>}
+                          </div>
+                        );
+                      }
+
+                      if (slug === 'image') {
+                        return (
+                          <div className="flex justify-center bg-gray-50 rounded-xl border border-dashed border-gray-300 p-4 min-h-[150px] items-center">
+                            {options.src ? (
+                              <img src={options.src} alt={options.alt || ""} className="max-h-[300px] object-contain rounded-lg shadow-sm" />
+                            ) : (
+                              <div className="text-center text-gray-400">
+                                <Upload className="mx-auto mb-2 opacity-50" size={32} />
+                                <p className="text-xs">Configura la URL de la imagen en propiedades</p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      if (slug === 'video') {
+                        return (
+                          <div className="flex justify-center bg-gray-900 rounded-xl overflow-hidden aspect-video items-center relative">
+                            {options.url ? (
+                              <iframe
+                                width="100%"
+                                height="100%"
+                                src={`https://www.youtube.com/embed/${options.url.includes('v=') ? options.url.split('v=')[1].split('&')[0] : options.url.split('/').pop()}`}
+                                title="YouTube video player"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="absolute inset-0 z-10"
+                              ></iframe>
+                            ) : (
+                              <div className="text-center text-gray-500 z-10 relative">
+                                <div className="w-12 h-12 rounded-full border-2 border-gray-600 flex items-center justify-center mx-auto mb-2">
+                                  <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-gray-600 border-b-[6px] border-b-transparent ml-1"></div>
+                                </div>
+                                <p className="text-xs">Configura la URL de YouTube</p>
+                              </div>
+                            )}
+                            {/* Placeholder background only visible if no video */}
+                            {!options.url && <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-black opacity-50"></div>}
+                          </div>
+                        );
+                      }
+
+                      if (slug === 'linear_scale') {
+                        const min = parseInt(options.min || 1);
+                        const max = parseInt(options.max || 5);
+                        return (
+                          <div className="flex items-end justify-between gap-4 pt-4 px-2">
+                            <span className="text-xs font-bold text-gray-400 mb-2">{options.min_label || min}</span>
+                            <div className="flex-1 flex justify-between items-center px-4">
+                              {Array.from({ length: max - min + 1 }, (_, i) => i + min).map(val => (
+                                <div key={val} className="flex flex-col items-center gap-2">
+                                  <span className="text-xs font-bold text-gray-500">{val}</span>
+                                  <div className="w-5 h-5 rounded-full border-2 border-gray-300"></div>
+                                </div>
+                              ))}
+                            </div>
+                            <span className="text-xs font-bold text-gray-400 mb-2">{options.max_label || max}</span>
+                          </div>
+                        );
+                      }
+
+                      if (['radio', 'checkbox', 'select'].includes(slug) && (options.options || options.choices)) {
+                        const items = options.options || options.choices || [];
+                        return (
+                          <div className="space-y-2">
+                            {items.length > 0 ? items.map((opt, i) => (
+                              <div key={i} className="flex items-center gap-3 p-2 border border-gray-100 rounded-lg">
+                                {slug === 'checkbox' && <div className="w-4 h-4 rounded border border-gray-300"></div>}
+                                {slug === 'radio' && <div className="w-4 h-4 rounded-full border border-gray-300"></div>}
+                                {slug === 'select' && <div className="text-[10px] text-gray-400 font-bold border border-gray-200 px-1 rounded">1</div>}
+                                <span className="text-sm text-gray-600">{opt.label || `Opción ${i + 1}`}</span>
+                              </div>
+                            )) : (
+                              <div className="text-xs text-red-400 italic bg-red-50 p-2 rounded">
+                                Sin opciones definidas. Añádelas en el panel de propiedades.
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      // Default Text/Inputs
+                      return (
+                        <div className="w-full h-10 bg-gray-50 border border-gray-200 rounded-xl px-4 flex items-center text-gray-400 text-sm">
+                          {field.placeholder || (slug === 'date' ? 'dd/mm/aaaa' : slug === 'time' ? '--:--' : 'Respuesta...')}
+                        </div>
+                      );
                     })()}
                   </div>
 

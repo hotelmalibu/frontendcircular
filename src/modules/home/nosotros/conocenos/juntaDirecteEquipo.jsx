@@ -25,10 +25,10 @@ import groupPhoto from "../../../../assets/imgEquipo/group_photo.jpg";
 
 // --- HERRAMIENTA DE RUTAS DE IMAGEN ---
 const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith('http') && !path.includes('localhost')) return path;
-    const cleanPath = path.replace(/^(https?:\/\/localhost(:\d+)?\/)?(storage\/)?/, '');
-    return `https://api-ecocircular.creativostecnologicosit.com/storage/${cleanPath}`;
+  if (!path) return null;
+  if (path.startsWith('http') && !path.includes('localhost')) return path;
+  const cleanPath = path.replace(/^(https?:\/\/localhost(:\d+)?\/)?(storage\/)?/, '');
+  return `https://api-ecocircular.creativostecnologicosit.com/storage/${cleanPath}`;
 };
 
 // --- CONSTANTES DE ESTILO ---

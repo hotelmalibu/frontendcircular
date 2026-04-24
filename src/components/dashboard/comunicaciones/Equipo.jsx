@@ -11,6 +11,7 @@ import {
     Image as ImageIcon
 } from "lucide-react";
 import teamApi from "../../../api/teamApi";
+import { getImageProxyUrl } from "../../../utils/imageUtils";
 import { toast } from "react-hot-toast";
 import ConfirmModal from "../../modals/ConfirmModal";
 
@@ -40,11 +41,11 @@ const STYLE_OPTIONS = [
 
 const getImageUrl = (path) => {
     if (!path) return null;
-    if (path.startsWith('http') && !path.includes('localhost')) return path;
-
-    // Extraer solo la parte final si por error viene con localhost
+    if (path.startsWith('http') && !path.includes('localhost')) {
+        return getImageProxyUrl(path);
+    }
     const cleanPath = path.replace(/^(https?:\/\/localhost(:\d+)?\/)?(storage\/)?/, '');
-    return `https://api-ecocircular.creativostecnologicosit.com/storage/${cleanPath}`;
+    return getImageProxyUrl(`https://api-ecocircular.creativostecnologicosit.com/storage/${cleanPath}`);
 };
 
 export default function Equipo() {

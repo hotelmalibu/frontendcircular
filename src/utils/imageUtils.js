@@ -36,7 +36,7 @@ export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
 
   // Determine the absolute URL
   let absoluteImageUrl = imageUrl;
-  
+
   // 1. Handle filenames without paths (NEWS... or COVER...)
   if (imageUrl.startsWith('NEWS')) {
     absoluteImageUrl = `${API_DOMAIN}/storage/news/${imageUrl}`;
@@ -63,16 +63,16 @@ export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
 
     const proxy = CORS_PROXIES[proxyIndex] || CORS_PROXIES[0];
     let finalUrl = `${proxy}${encodeURIComponent(absoluteImageUrl)}`;
-    
+
     // Append Weserv specific parameters if using Weserv (index 0)
     if (proxy.includes('weserv.nl')) {
       if (options.width) finalUrl += `&w=${options.width}`;
       if (options.height) finalUrl += `&h=${options.height}`;
       if (options.quality) finalUrl += `&q=${options.quality}`;
       if (options.output) finalUrl += `&output=${options.output}`;
-      else finalUrl += `&output=webp`; 
+      else finalUrl += `&output=webp`;
     }
-    
+
     return finalUrl;
   }
 
