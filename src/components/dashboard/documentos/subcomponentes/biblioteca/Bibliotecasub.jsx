@@ -16,7 +16,7 @@ import {
   AlertCircle,
   Trash2
 } from "lucide-react";
-import { createDocument, getDocuments, updateDocument, deleteDocument } from "../../../../../api/documentsApi";
+import { createDocument, getDocuments, updateDocument, deleteDocument, getDocumentTypes } from "../../../../../api/documentsApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
 import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 import { toast } from "react-hot-toast";
@@ -39,10 +39,13 @@ export default function Bibliotecasub() {
   const [documents, setDocuments] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [documentTypes, setDocumentTypes] = useState([]);
+  const [typesLoading, setTypesLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
+    document_type_id: "",
     category_id: "",
     name: "",
     description: "",
@@ -108,6 +111,30 @@ export default function Bibliotecasub() {
     }
   }, []);
 
+  const loadTypes = useCallback(async () => {
+    try {
+      setTypesLoading(true);
+      const response = await getDocumentTypes();
+      let typesArray = [];
+
+      if (response?.data?.items && Array.isArray(response.data.items)) {
+        typesArray = response.data.items;
+      } else if (Array.isArray(response)) {
+        typesArray = response;
+      } else if (response?.data && Array.isArray(response.data)) {
+        typesArray = response.data;
+      } else {
+        typesArray = response ? [response] : [];
+      }
+
+      setDocumentTypes(typesArray);
+    } catch (err) {
+      console.error("Error loading document types:", err);
+      setDocumentTypes([]);
+    } finally {
+      setTypesLoading(false);
+    }
+  }, []);
   const fetchDocuments = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -205,6 +232,7 @@ export default function Bibliotecasub() {
     }
 
     setFormData({
+      document_type_id: document.document_type_id || "",
       category_id: document.category_id || "",
       name: document.name,
       description: document.description || "",
@@ -244,6 +272,7 @@ export default function Bibliotecasub() {
 
   const openUploadModal = () => {
     setFormData({
+      document_type_id: "",
       category_id: "",
       name: "",
       description: "",
@@ -260,7 +289,8 @@ export default function Bibliotecasub() {
 
   useEffect(() => {
     loadCategories();
-  }, [loadCategories]);
+    loadTypes();
+  }, [loadCategories, loadTypes]);
 
   useEffect(() => {
     fetchDocuments();
@@ -289,8 +319,12 @@ export default function Bibliotecasub() {
 
     try {
       const submitData = new FormData();
-      // Set a default document_type_id (hidden from user but required by backend)
-      submitData.append('document_type_id', 1);
+
+      if (!formData.document_type_id) {
+        throw new Error("El tipo de documento es obligatorio");
+      }
+      submitData.append('document_type_id', formData.document_type_id);
+
       if (formData.category_id) {
         submitData.append('category_id', formData.category_id);
       }
@@ -322,6 +356,7 @@ export default function Bibliotecasub() {
       // Clear form only if creating
       if (!isEditMode) {
         setFormData({
+          document_type_id: "",
           category_id: "",
           name: "",
           description: "",
@@ -344,7 +379,17 @@ export default function Bibliotecasub() {
 
     } catch (error) {
       console.error(`Error ${isEditMode ? 'updating' : 'creating'} document:`, error);
-      const errorMessage = error.response?.data?.message || error.message || "Error desconocido";
+      let errorMessage = error.response?.data?.message || error.message || "Error desconocido";
+
+      // Extract detailed validation errors if they exist (common in Laravel/PHP APIs)
+      if (error.response?.data?.errors) {
+        const validationErrors = error.response.data.errors;
+        const details = Object.entries(validationErrors)
+          .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+          .join(' | ');
+        errorMessage += ` - Detalles: ${details}`;
+      }
+
       setSubmitMessage(`Error al ${isEditMode ? 'actualizar' : 'crear'} el documento: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
@@ -596,8 +641,25 @@ export default function Bibliotecasub() {
 
             <form onSubmit={handleSubmit} className="space-y-5 overflow-y-auto px-2 pb-2">
 
-              {/* Row 1: Category, Version, Status (3 Cols) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Row 1: Tipo & Categoría */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo de Documento *</label>
+                  <select
+                    name="document_type_id"
+                    value={formData.document_type_id}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm transition-all"
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    disabled={typesLoading}
+                  >
+                    <option value="">{typesLoading ? "Cargando..." : "-- Seleccione Tipo --"}</option>
+                    {documentTypes.map(type => (
+                      <option key={type.id} value={type.id}>{type.name}</option>
+                    ))}
+                  </select>
+                </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Categoría</label>
                   <select
@@ -614,6 +676,23 @@ export default function Bibliotecasub() {
                     ))}
                   </select>
                 </div>
+              </div>
+
+              {/* Row 2: Nombre & Versión */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre del Archivo *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm"
+                    style={{ "--tw-ring-color": BRAND.lightBlue }}
+                    placeholder="Ej: Política de Sostenibilidad 2025"
+                  />
+                </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Versión *</label>
                   <input
@@ -627,6 +706,10 @@ export default function Bibliotecasub() {
                     placeholder="Ej: 1.0"
                   />
                 </div>
+              </div>
+
+              {/* Row 3: Estado & Expiración */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Estado *</label>
                   <select
@@ -643,23 +726,6 @@ export default function Bibliotecasub() {
                     <option value="approved">Aprobado</option>
                   </select>
                 </div>
-              </div>
-
-              {/* Row 2: Name (2 Cols) & Expiration (1 Col) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre del Archivo *</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm"
-                    style={{ "--tw-ring-color": BRAND.lightBlue }}
-                    placeholder="Ej: Política de Sostenibilidad 2025"
-                  />
-                </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Expiración</label>
                   <input
@@ -673,7 +739,7 @@ export default function Bibliotecasub() {
                 </div>
               </div>
 
-              {/* Row 3: Description */}
+              {/* Row 4: Description */}
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Descripción</label>
                 <textarea

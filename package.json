@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://127.0.0.1:8000",
+  "proxy": "https://api-ecocircular.creativostecnologicosit.com",
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^38.0.0",
     "@fontsource/montserrat": "^5.2.8",
