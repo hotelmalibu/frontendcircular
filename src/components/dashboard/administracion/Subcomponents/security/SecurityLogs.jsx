@@ -111,7 +111,8 @@ export default function SecurityLogs() {
                         <input
                             type="text"
                             placeholder="Buscar alertas..."
-                            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 outline-none"
+                            style={{ "--tw-ring-color": "#2C67B0" }}
                             value={searchTerm}
                             onChange={(e) => {
                                 setSearchTerm(e.target.value);
@@ -161,16 +162,18 @@ export default function SecurityLogs() {
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
                                                     {log.type === 'critical' ? (
-                                                        <ShieldAlert className="text-red-500" size={18} />
+                                                        <ShieldAlert style={{ color: "#2C67B0" }} size={18} />
                                                     ) : log.type === 'warning' ? (
-                                                        <ShieldAlert className="text-orange-500" size={18} />
+                                                        <ShieldAlert style={{ color: "#B1D357" }} size={18} />
                                                     ) : (
-                                                        <ShieldCheck className="text-blue-500" size={18} />
+                                                        <ShieldCheck style={{ color: "#00AB6D" }} size={18} />
                                                     )}
-                                                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${log.type === 'critical' ? 'bg-red-50 text-red-600' :
-                                                        log.type === 'warning' ? 'bg-orange-50 text-orange-600' :
-                                                            'bg-blue-50 text-blue-600'
-                                                        }`}>
+                                                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full`}
+                                                        style={{ 
+                                                            backgroundColor: log.type === 'critical' ? "#2C67B020" : log.type === 'warning' ? "#B1D35720" : "#00AB6D20",
+                                                            color: log.type === 'critical' ? "#2C67B0" : log.type === 'warning' ? "#B1D357" : "#00AB6D"
+                                                        }}
+                                                    >
                                                         {log.type}
                                                     </span>
                                                 </div>

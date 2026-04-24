@@ -24,13 +24,9 @@ import DeleteConfirmationModal from "./DeleteConfirmationModal";
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
   blue: "#2C67B0",       // Azul Principal
-  darkBlue: "#005380",   // Azul Logo/Profundo
   lightBlue: "#7FB8D9",  // Azul Claro
-  green: "#B1D357",      // Verde Principal (Claro)
-  darkGreen: "#8CB200",  // Verde Secundario
-  orange: "#E15200",     // Naranja (Alertas)
-  red: "#DC2626",        // Rojo estándar (Eliminar)
-  gray: "#6B7280",
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
 };
 
 export default function CompaniesList() {
@@ -215,7 +211,7 @@ export default function CompaniesList() {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
         {/* Encabezado de Sección */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
+          <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.blue }}>
             <Building className="text-blue-400" size={32} />
             Directorio Circularmente
           </h1>
@@ -226,7 +222,7 @@ export default function CompaniesList() {
         <button
           onClick={handleCreate}
           className="w-full lg:w-auto flex items-center justify-center gap-2 px-6 py-3 text-white rounded-xl shadow-md hover:shadow-lg transition-all font-bold text-sm transform active:scale-95"
-          style={{ backgroundColor: BRAND.darkGreen }}
+          style={{ backgroundColor: BRAND.green }}
         >
           <Plus size={20} />
           Registrar Empresa
@@ -256,7 +252,7 @@ export default function CompaniesList() {
       {/* Mensaje de Error */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-700">
-          <AlertCircle size={20} className="flex-shrink-0" style={{ color: BRAND.orange }} />
+          <AlertCircle size={20} className="flex-shrink-0" style={{ color: BRAND.blue }} />
           <span>{error}</span>
         </div>
       )}
@@ -373,7 +369,7 @@ export default function CompaniesList() {
                     onClick={() => handleEdit(item)}
                     className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
                     title="Editar"
-                    style={{ color: BRAND.darkGreen }}
+                    style={{ color: BRAND.lime }}
                   >
                     <Edit size={18} />
                   </button>
@@ -381,7 +377,7 @@ export default function CompaniesList() {
                     onClick={() => handleDeleteClick(item)}
                     className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition"
                     title="Eliminar"
-                    style={{ color: BRAND.orange }}
+                    style={{ color: BRAND.lightBlue }}
                   >
                     <Trash2 size={18} />
                   </button>

@@ -29,16 +29,12 @@ import { toast } from "react-hot-toast";
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
   blue: "#2C67B0",       // Azul Principal
-  darkBlue: "#005380",   // Azul Logo/Profundo
   lightBlue: "#7FB8D9",  // Azul Claro
-  green: "#B1D357",      // Verde Principal
-  darkGreen: "#8CB200",  // Verde Secundario
-  orange: "#E15200",     // Naranja (Alertas)
-  purple: "#9E1981",     // Morado (Acentos)
-  gray: "#6B7280",
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
 };
 
-const CHART_COLORS = [BRAND.blue, BRAND.green, BRAND.purple, BRAND.orange, BRAND.lightBlue, BRAND.darkGreen];
+const CHART_COLORS = [BRAND.blue, BRAND.green, BRAND.lime, BRAND.lightBlue];
 
 export default function DashboardGraficos() {
   const [stats, setStats] = useState(null);
@@ -74,28 +70,28 @@ export default function DashboardGraficos() {
       value: stats?.total_submissions || 0,
       icono: <FileCheck size={22} />,
       bgIcon: "bg-[#B1D357]/15",
-      color: BRAND.darkGreen
+      color: BRAND.green
     },
     {
       title: "Formularios Publicados",
       value: stats?.published_forms || 0,
       icono: <TrendingUp size={22} />,
-      bgIcon: "bg-[#9E1981]/10",
-      color: BRAND.purple
+      bgIcon: `bg-[${BRAND.lightBlue}]/10`,
+      color: BRAND.lightBlue
     },
     {
       title: "Borradores",
       value: stats?.draft_forms || 0,
       icono: <History size={22} />,
-      bgIcon: "bg-[#7FB8D9]/20",
-      color: BRAND.darkBlue
+      bgIcon: `bg-[${BRAND.blue}]/20`,
+      color: BRAND.blue
     }
   ], [stats]);
 
   if (loading && !stats) {
      return (
         <div className="flex flex-col items-center justify-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005380]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: BRAND.blue }}></div>
             <p className="mt-4 text-gray-500 font-medium">Cargando estadísticas...</p>
         </div>
      );
@@ -107,7 +103,7 @@ export default function DashboardGraficos() {
       {/* Header Dashboard */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-black tracking-tight flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
+          <h1 className="text-3xl font-black tracking-tight flex items-center gap-3" style={{ color: BRAND.blue }}>
             <LayoutDashboard className="text-blue-500" size={32} />
             Dashboard de Gestión
           </h1>
@@ -117,7 +113,7 @@ export default function DashboardGraficos() {
            onClick={fetchStats}
            className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-95"
         >
-            <Calendar size={16} className="text-[#B1D357]" />
+            <Calendar size={16} style={{ color: BRAND.lime }} />
             Actualizar Datos
         </button>
       </div>
@@ -128,10 +124,10 @@ export default function DashboardGraficos() {
           <div key={idx} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-500 decoration-[#B1D357] decoration-2 transition-all">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-500" style={{ textDecorationColor: BRAND.lime, textDecorationLine: 'underline', textDecorationThickness: '2px' }}>
                   {card.title}
                 </p>
-                <h3 className="text-3xl font-black mt-2 leading-none" style={{ color: BRAND.darkBlue }}>
+                <h3 className="text-3xl font-black mt-2 leading-none" style={{ color: BRAND.blue }}>
                   {card.value.toLocaleString()}
                 </h3>
               </div>

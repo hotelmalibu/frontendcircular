@@ -43,11 +43,11 @@ export default function SecurityAlertModal({ alert, onClose, onMarkAsViewed }) {
     const getTypeStyles = () => {
         switch (alert.type) {
             case 'critical':
-                return { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-100', icon: 'text-red-600', gradient: 'from-red-500 to-red-700' };
+                return { bg: 'bg-blue-50', text: 'text-[#2C67B0]', border: 'border-[#2C67B0]10', icon: 'text-[#2C67B0]', gradient: 'from-[#2C67B0] to-[#1E4D8A]' };
             case 'warning':
-                return { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100', icon: 'text-amber-600', gradient: 'from-amber-400 to-orange-500' };
+                return { bg: 'bg-lime-50', text: 'text-[#B1D357]', border: 'border-[#B1D357]10', icon: 'text-[#B1D357]', gradient: 'from-[#B1D357] to-[#8FA83E]' };
             default:
-                return { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100', icon: 'text-blue-600', gradient: 'from-[#2C67B0] to-[#005380]' };
+                return { bg: 'bg-blue-50', text: 'text-[#2C67B0]', border: 'border-[#2C67B0]10', icon: 'text-[#2C67B0]', gradient: 'from-[#2C67B0] to-[#7FB8D9]' };
         }
     };
 
@@ -105,7 +105,9 @@ export default function SecurityAlertModal({ alert, onClose, onMarkAsViewed }) {
                                 <User size={14} /> Usuario Implicado
                             </h3>
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
+                                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl"
+                                    style={{ backgroundColor: "#2C67B020", color: "#2C67B0" }}
+                                >
                                     {alert.user_email ? alert.user_email.charAt(0).toUpperCase() : '?'}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -126,7 +128,9 @@ export default function SecurityAlertModal({ alert, onClose, onMarkAsViewed }) {
                                 <Globe size={14} /> Red y Ubicación
                             </h3>
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                                <div className="w-12 h-12 rounded-full flex items-center justify-center"
+                                    style={{ backgroundColor: "#B1D35720", color: "#B1D357" }}
+                                >
                                     <MapPin size={24} />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -165,9 +169,14 @@ export default function SecurityAlertModal({ alert, onClose, onMarkAsViewed }) {
                                     </div>
                                     <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 flex justify-between items-center">
                                          <span className="text-xs font-medium text-gray-500">Estado</span>
-                                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${alert.is_viewed ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full`}
+                                            style={{ 
+                                                backgroundColor: alert.is_viewed ? "#00AB6D20" : "#2C67B020", 
+                                                color: alert.is_viewed ? "#00AB6D" : "#2C67B0" 
+                                            }}
+                                          >
                                             {alert.is_viewed ? 'Revisado' : 'Nuevo'}
-                                         </span>
+                                          </span>
                                     </div>
                                 </div>
                             </div>

@@ -22,6 +22,14 @@ import {
   Clock,
 } from "lucide-react";
 
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  lightBlue: "#7FB8D9",  // Azul Claro
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
+};
+
 export default function DashboardIntegracion() {
   const metrics = [
     {
@@ -29,42 +37,42 @@ export default function DashboardIntegracion() {
       title: "APIs Activas",
       value: "8/10",
       sub: "+2 esta semana",
-      icon: <Server className="w-5 h-5 text-emerald-600" />,
+      icon: <Server className="w-5 h-5" style={{ color: BRAND.green }} />,
     },
     {
       key: "latency",
       title: "Latencia Promedio",
       value: "245ms",
       sub: "-12% vs ayer",
-      icon: <Zap className="w-5 h-5 text-yellow-500" />,
+      icon: <Zap className="w-5 h-5" style={{ color: BRAND.lime }} />,
     },
     {
       key: "uptime",
       title: "Uptime General",
       value: "98.7%",
       sub: "+0.3% mensual",
-      icon: <CheckCircle className="w-5 h-5 text-blue-500" />,
+      icon: <CheckCircle className="w-5 h-5" style={{ color: BRAND.blue }} />,
     },
     {
       key: "data",
       title: "Datos Transferidos",
       value: "2.3GB",
       sub: "Hoy",
-      icon: <UploadCloud className="w-5 h-5 text-cyan-500" />,
+      icon: <UploadCloud className="w-5 h-5" style={{ color: BRAND.lightBlue }} />,
     },
     {
       key: "webhooks",
       title: "Webhooks Activos",
       value: "15",
       sub: "Funcionando correctamente",
-      icon: <Database className="w-5 h-5 text-indigo-500" />,
+      icon: <Database className="w-5 h-5" style={{ color: BRAND.blue }} />,
     },
     {
       key: "errors",
       title: "Errores Críticos",
       value: "3",
       sub: "Resueltos automáticamente",
-      icon: <AlertTriangle className="w-5 h-5 text-rose-500" />,
+      icon: <AlertTriangle className="w-5 h-5" style={{ color: BRAND.lightBlue }} />,
     },
   ];
 
@@ -73,21 +81,21 @@ export default function DashboardIntegracion() {
       id: 1,
       title: "Instagram API - rate limit",
       description: "Límite de API alcanzado - Servicio suspendido temporalmente",
-      color: "border-l-4 border-red-400 bg-red-50",
+      color: "border-l-4 border-[#2C67B0] bg-blue-50",
       note: "Resolución estimada: 1 hora",
     },
     {
       id: 2,
       title: "Sistema ANDI - latencia alta",
       description: "Tiempo de respuesta superior a 5 segundos",
-      color: "border-l-4 border-yellow-400 bg-yellow-50",
+      color: "border-l-4 border-[#B1D357] bg-lime-50",
       note: "Investigar conexiones",
     },
     {
       id: 3,
       title: "Plataforma Trazabilidad - certificado expira",
       description: "Certificado SSL expira en 30 días",
-      color: "border-l-4 border-blue-400 bg-blue-50",
+      color: "border-l-4 border-[#7FB8D9] bg-sky-50",
       note: "Programar renovación",
     },
   ];
@@ -110,7 +118,7 @@ export default function DashboardIntegracion() {
     { name: "Líneas Base 2", requests: 300 },
   ];
 
-  const barColors = ["#059669", "#10B981", "#34D399", "#4ADE80", "#6EE7B7", "#A7F3D0"];
+  const barColors = [BRAND.blue, BRAND.green, BRAND.lime, BRAND.lightBlue, "#B1D357", "#2C67B0"];
 
   const apis = [
     {
@@ -160,13 +168,13 @@ export default function DashboardIntegracion() {
       {/* ENCABEZADO */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800">Módulo de Integraciones</h1>
+          <h1 className="text-2xl font-semibold text-gray-800" style={{ color: BRAND.blue }}>Módulo de Integraciones</h1>
           <p className="text-sm text-gray-500">
             Conexiones y sincronización con sistemas externos
           </p>
         </div>
         <div className="flex gap-3 items-center">
-          <button className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-md text-sm font-medium">
+          <button className="px-4 py-2 rounded-md text-sm font-medium" style={{ backgroundColor: `${BRAND.green}20`, color: BRAND.green }}>
             8/10 APIs Activas
           </button>
           <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-md text-sm">
@@ -180,7 +188,7 @@ export default function DashboardIntegracion() {
         {metrics.map((m) => (
           <div
             key={m.key}
-            className="bg-white rounded-xl shadow-[0_4px_14px_rgba(16,185,129,0.25)] border border-gray-200 p-4 flex flex-col justify-between transition hover:shadow-[0_4px_16px_rgba(16,185,129,0.35)]"
+            className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col justify-between transition hover:shadow-md"
           >
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gray-50 rounded-md">{m.icon}</div>
@@ -232,9 +240,9 @@ export default function DashboardIntegracion() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="API Línea Base" stroke="#4F46E5" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="SMS Gateway" stroke="#10B981" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="Sistema ANDI" stroke="#F59E0B" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="API Línea Base" stroke={BRAND.blue} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="SMS Gateway" stroke={BRAND.green} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="Sistema ANDI" stroke={BRAND.lime} strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

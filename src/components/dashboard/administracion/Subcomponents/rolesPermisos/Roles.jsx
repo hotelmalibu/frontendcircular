@@ -18,13 +18,9 @@ import ConfirmModal from "../../../../../components/common/ConfirmModal";
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
   blue: "#2C67B0",       // Azul Principal
-  darkBlue: "#005380",   // Azul Logo/Profundo
   lightBlue: "#7FB8D9",  // Azul Claro
-  green: "#B1D357",      // Verde Principal (Claro)
-  darkGreen: "#8CB200",  // Verde Secundario
-  orange: "#E15200",     // Naranja (Alertas)
-  yellow: "#E8AD00",     // Amarillo
-  gray: "#6B7280",
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
 };
 
 export default function Roles() {
@@ -210,7 +206,7 @@ export default function Roles() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-64 p-4 text-center">
-        <AlertCircle size={48} style={{ color: BRAND.orange }} className="mb-4" />
+        <AlertCircle size={48} style={{ color: BRAND.lime }} className="mb-4" />
         <p className="text-gray-800 font-semibold text-lg">{error}</p>
         <button onClick={fetchData} className="mt-4 text-blue-600 hover:underline">Intentar de nuevo</button>
       </div>
@@ -226,7 +222,7 @@ export default function Roles() {
       {/* Encabezado */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
+          <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: BRAND.blue }}>
             <Shield className="text-blue-400" size={32} />
             Gestión de Roles
           </h1>
@@ -303,7 +299,7 @@ export default function Roles() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-hidden animate-fadeIn mx-2 sm:mx-4">
 
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center flex-shrink-0" style={{ backgroundColor: BRAND.darkBlue }}>
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center flex-shrink-0" style={{ backgroundColor: BRAND.blue }}>
               <h2 className="text-lg font-bold text-white uppercase tracking-wider">
                 {currentRole ? "Editar Rol" : "Nuevo Rol"}
               </h2>
@@ -370,10 +366,12 @@ export default function Roles() {
 
                     if (isAfiliadoRole) {
                         return (
-                           <div className="flex-1 min-h-[300px] lg:min-h-0 bg-orange-50/50 rounded-2xl border border-orange-100 p-8 flex flex-col items-center justify-center text-center">
-                              <AlertCircle size={48} className="text-orange-300 mb-4" />
-                              <h4 className="text-orange-800 font-bold mb-2">Permisos Restringidos</h4>
-                              <p className="text-sm text-orange-600 max-w-xs leading-relaxed">
+                           <div className="flex-1 min-h-[300px] lg:min-h-0 rounded-2xl border p-8 flex flex-col items-center justify-center text-center"
+                                style={{ backgroundColor: `${BRAND.lime}10`, borderColor: `${BRAND.lime}40` }}
+                           >
+                              <AlertCircle size={48} className="mb-4" style={{ color: BRAND.lime }} />
+                              <h4 className="font-bold mb-2" style={{ color: BRAND.blue }}>Permisos Restringidos</h4>
+                              <p className="text-sm max-w-xs leading-relaxed" style={{ color: BRAND.blue }}>
                                 El rol de <strong>Afiliado</strong> tiene permisos gestionados automáticamente por el sistema. No se permite la edición manual de sus accesos.
                               </p>
                            </div>
@@ -402,7 +400,7 @@ export default function Roles() {
                                       {formData.permissions.includes(perm.id) ? <CheckSquare size={18} /> : <Square size={18} />}
                                     </div>
                                     <div className="flex flex-col overflow-hidden">
-                                      <p className={`text-sm font-bold truncate ${formData.permissions.includes(perm.id) ? "text-blue-800" : "text-gray-700"}`}>
+                                      <p className="text-sm font-bold truncate transition-colors" style={{ color: formData.permissions.includes(perm.id) ? BRAND.blue : "inherit" }}>
                                         {perm.name}
                                       </p>
                                       {perm.description && (

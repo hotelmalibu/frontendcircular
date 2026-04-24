@@ -15,6 +15,14 @@ import {
 import aboutUsApi from "../../../api/aboutUsApi";
 import { toast } from "react-hot-toast";
 
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  lightBlue: "#7FB8D9",  // Azul Claro
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
+};
+
 // --- BOTONES ESTILIZADOS ---
 const ActionButton = ({ onClick, icon: Icon, color, label, disabled }) => (
     <button
@@ -144,7 +152,7 @@ export default function QuienesSomos() {
                         <FileText size={24} />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold text-[#005380]">Contenido Principal e Impacto</h2>
+                        <h2 className="text-xl font-bold" style={{ color: BRAND.blue }}>Contenido Principal e Impacto</h2>
                         <p className="text-sm text-gray-500">Edita el texto de bienvenida y las métricas de impacto</p>
                     </div>
                 </div>
@@ -155,7 +163,8 @@ export default function QuienesSomos() {
                         <textarea
                             value={aboutUs.texto_index}
                             onChange={(e) => setAboutUs({ ...aboutUs, texto_index: e.target.value })}
-                            className="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 min-h-[150px] text-gray-700"
+                            className="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 outline-none transition-all duration-200 min-h-[150px] text-gray-700"
+                            style={{ "--tw-ring-color": BRAND.blue }}
                             placeholder="Escribe el texto descriptivo aquí..."
                             required
                         />
@@ -171,7 +180,8 @@ export default function QuienesSomos() {
                                 type="number"
                                 value={aboutUs.toneladas}
                                 onChange={(e) => setAboutUs({ ...aboutUs, toneladas: parseInt(e.target.value) || 0 })}
-                                className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2"
+                                style={{ "--tw-ring-color": BRAND.blue }}
                             />
                         </div>
                         <div className="space-y-2">
@@ -213,7 +223,8 @@ export default function QuienesSomos() {
                         <button
                             type="submit"
                             disabled={savings}
-                            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#2C67B0] text-white font-bold hover:bg-[#005380] transition-all duration-200 shadow-lg shadow-blue-200 disabled:opacity-50"
+                            className="flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold transition-all duration-200 shadow-lg shadow-blue-200 disabled:opacity-50 hover:opacity-90"
+                            style={{ backgroundColor: BRAND.blue }}
                         >
                             <Save size={20} />
                             {savings ? "Guardando..." : "Guardar Cambios"}
@@ -230,13 +241,14 @@ export default function QuienesSomos() {
                             <Users size={24} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-[#005380]">Voces de Nuestros Líderes</h2>
+                            <h2 className="text-xl font-bold" style={{ color: BRAND.blue }}>Voces de Nuestros Líderes</h2>
                             <p className="text-sm text-gray-500">Gestiona las frases y testimonios de los líderes</p>
                         </div>
                     </div>
                     <button
                         onClick={() => setShowAddQuote(true)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#B1D357] text-[#005380] font-bold hover:bg-[#9cb84d] transition-all duration-200 shadow-md shadow-green-100"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all duration-200 shadow-md shadow-green-100 hover:opacity-90"
+                        style={{ backgroundColor: BRAND.lime, color: BRAND.blue }}
                     >
                         <Plus size={20} />
                         Agregar Frase
@@ -318,8 +330,10 @@ export default function QuienesSomos() {
                                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2">
-                                                <span className="font-bold text-[#1E305D]">{quote.nombre}</span>
-                                                <span className="text-xs text-[#00AB6D] bg-[#E8F5E9] px-2 py-0.5 rounded-full uppercase tracking-tighter font-semibold">
+                                                <span className="font-bold" style={{ color: BRAND.blue }}>{quote.nombre}</span>
+                                                <span className="text-xs px-2 py-0.5 rounded-full uppercase tracking-tighter font-semibold"
+                                                    style={{ backgroundColor: `${BRAND.green}15`, color: BRAND.green }}
+                                                >
                                                     {quote.cargo}
                                                 </span>
                                             </div>

@@ -26,13 +26,9 @@ import ConfirmModal from "../../../../common/ConfirmModal";
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
   blue: "#2C67B0",       // Azul Principal
-  darkBlue: "#005380",   // Azul Logo/Profundo
   lightBlue: "#7FB8D9",  // Azul Claro
-  green: "#B1D357",      // Verde Principal (Claro)
-  darkGreen: "#8CB200",  // Verde Secundario
-  orange: "#E15200",     // Naranja (Alertas)
-  yellow: "#E8AD00",     // Amarillo
-  gray: "#6B7280",
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
 };
 
 export default function Table() {
@@ -281,7 +277,7 @@ export default function Table() {
       {/* Encabezado */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900" style={{ color: BRAND.darkBlue }}>
+          <h1 className="text-3xl font-bold" style={{ color: BRAND.blue }}>
             Usuarios Registrados
           </h1>
           <p className="text-gray-500 mt-1">Gestión de acceso y roles de la plataforma</p>
@@ -349,7 +345,9 @@ export default function Table() {
                       >
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
+                              style={{ backgroundColor: `${BRAND.blue}15`, color: BRAND.blue }}
+                            >
                               {user.name ? user.name.charAt(0).toUpperCase() : "?"}
                             </div>
                             <div>
@@ -374,9 +372,10 @@ export default function Table() {
                         <td className="py-4 px-6 text-right">
                           <div className="flex items-center justify-end gap-2 transition-all">
                             <button
-                              onClick={() => openEditModal(user)}
-                              className="p-2 rounded-xl text-blue-600 bg-blue-50 border border-blue-100 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm"
-                              title="Editar usuario"
+                                onClick={() => openEditModal(user)}
+                                className="p-2 rounded-xl transition-all shadow-sm border border-transparent hover:opacity-80"
+                                style={{ backgroundColor: `${BRAND.blue}15`, color: BRAND.blue, borderColor: `${BRAND.blue}20` }}
+                                title="Editar usuario"
                             >
                               <Edit size={18} />
                             </button>
@@ -423,7 +422,7 @@ export default function Table() {
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-hidden animate-fadeIn mx-2 sm:mx-4">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center flex-shrink-0" style={{ backgroundColor: BRAND.darkBlue }}>
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center flex-shrink-0" style={{ backgroundColor: BRAND.blue }}>
               <h3 className="text-lg font-bold text-white uppercase tracking-wider">
                 {currentUser ? "Editar Usuario" : "Nuevo Usuario"}
               </h3>
@@ -581,11 +580,16 @@ export default function Table() {
                                   key={perm.id} 
                                   className={`flex items-center gap-3 p-3 rounded-xl transition-all border cursor-pointer group shadow-sm ${
                                     isInherited 
-                                      ? "bg-blue-50/30 border-blue-100 opacity-80 cursor-default" 
+                                      ? "opacity-80 cursor-default" 
                                       : isDirect
-                                        ? "bg-white border-blue-200 ring-1 ring-blue-50" 
+                                        ? "bg-white ring-1 shadow-md" 
                                         : "bg-white border-transparent hover:border-gray-200"
                                   }`}
+                                  style={{ 
+                                    backgroundColor: isInherited ? `${BRAND.blue}10` : undefined,
+                                    borderColor: isInherited ? `${BRAND.blue}20` : (isDirect ? BRAND.blue : undefined),
+                                    "--tw-ring-color": isDirect ? `${BRAND.blue}20` : undefined
+                                  }}
                                 >
                                   <div className="flex-shrink-0">
                                     <input
@@ -598,11 +602,11 @@ export default function Table() {
                                   </div>
                                   <div className="flex flex-col overflow-hidden">
                                     <div className="flex items-center gap-2">
-                                      <span className={`text-sm font-bold truncate ${isInherited ? 'text-blue-700' : 'text-gray-700 group-hover:text-blue-600'}`}>
+                                      <span className="text-sm font-bold truncate group-hover:opacity-80 transition-opacity" style={{ color: isInherited ? BRAND.blue : "inherit" }}>
                                         {perm.name}
                                       </span>
                                       {isInherited && (
-                                        <span className="text-[9px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-md font-black uppercase">Del Rol</span>
+                                        <span className="text-[9px] px-1.5 py-0.5 rounded-md font-black uppercase" style={{ backgroundColor: `${BRAND.blue}20`, color: BRAND.blue }}>Del Rol</span>
                                       )}
                                     </div>
                                     <span className="text-[10px] text-gray-400 font-mono uppercase">

@@ -25,14 +25,9 @@ import { getDocuments } from "../../../../../api/documentsApi";
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
   blue: "#2C67B0",       // Azul Principal
-  darkBlue: "#005380",   // Azul Logo/Profundo
   lightBlue: "#7FB8D9",  // Azul Claro
-  green: "#B1D357",      // Verde Principal (Claro)
-  darkGreen: "#8CB200",  // Verde Secundario
-  orange: "#E15200",     // Naranja
-  yellow: "#E8AD00",     // Amarillo
-  gray: "#6B7280",       // Gris neutro
-  lightGray: "#F3F4F6",  // Fondo claro
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
 };
 
 // Document type mapping
@@ -48,13 +43,13 @@ const documentTypes = [
 const getStatusStyles = (status) => {
   switch (status) {
     case "approved":
-      return { bg: "#E9F5E9", text: BRAND.darkGreen, icon: <CheckCircle2 size={14} />, label: "Aprobado" };
+      return { bg: "#E9F5E9", text: BRAND.green, icon: <CheckCircle2 size={14} />, label: "Aprobado" };
     case "pending_review":
-      return { bg: "#EFF6FF", text: BRAND.orange, icon: <Clock size={14} />, label: "Pendiente" };
+      return { bg: "#EFF6FF", text: BRAND.lightBlue, icon: <Clock size={14} />, label: "Pendiente" };
     case "draft":
-      return { bg: "#FFFBEB", text: BRAND.yellow, icon: <AlertCircle size={14} />, label: "Borrador" };
+      return { bg: "#FFFBEB", text: BRAND.lime, icon: <AlertCircle size={14} />, label: "Borrador" };
     case "expired":
-      return { bg: "#F3F4F6", text: BRAND.gray, icon: <AlertCircle size={14} />, label: "Expirado" };
+      return { bg: "#F3F4F6", text: "#6B7280", icon: <AlertCircle size={14} />, label: "Expirado" };
     default:
       return { bg: "#F3F4F6", text: BRAND.gray, icon: null, label: status };
   }
@@ -125,10 +120,10 @@ export default function Dashboardsub() {
         });
 
         const statusMapping = {
-          'approved': { name: 'Aprobado', color: BRAND.darkGreen },
-          'draft': { name: 'Borrador', color: BRAND.yellow },
-          'pending_review': { name: 'Pendiente Revisión', color: BRAND.orange },
-          'expired': { name: 'Expirado', color: BRAND.gray }
+          'approved': { name: 'Aprobado', color: BRAND.green },
+          'draft': { name: 'Borrador', color: BRAND.lime },
+          'pending_review': { name: 'Pendiente Revisión', color: BRAND.lightBlue },
+          'expired': { name: 'Expirado', color: "#6B7280" }
         };
 
         const statusChartData = Object.entries(statusCounts).map(([key, value]) => ({
@@ -198,19 +193,19 @@ export default function Dashboardsub() {
       title: "Nuevos esta Semana",
       value: loading ? "..." : stats.thisWeek.toString(),
       icon: <FileText size={24} color="#FFF" />,
-      bg: BRAND.darkGreen
+      bg: BRAND.green
     },
     {
       title: "Pendientes Revisión",
       value: loading ? "..." : stats.pendingReview.toString(),
       icon: <Clock size={24} color="#FFF" />,
-      bg: BRAND.orange
+      bg: BRAND.lightBlue
     },
     {
       title: "Aprobados",
       value: loading ? "..." : stats.approved.toString(),
       icon: <CheckCircle2 size={24} color="#FFF" />,
-      bg: BRAND.darkBlue
+      bg: BRAND.blue
     },
   ];
 
@@ -232,7 +227,7 @@ export default function Dashboardsub() {
 
       {/* Título de la sección */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold" style={{ color: BRAND.darkBlue }}>
+        <h2 className="text-2xl font-bold" style={{ color: BRAND.blue }}>
           Gestión Documental
         </h2>
         <p className="text-gray-500 text-sm">Resumen de archivos y actividad reciente</p>
@@ -242,7 +237,7 @@ export default function Dashboardsub() {
 
         {/* Estadísticas Generales */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
+          <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: BRAND.blue }}>
             <Files size={20} className="text-gray-400" /> Métricas Clave
           </h2>
           <div className="grid grid-cols-2 gap-4">
@@ -269,7 +264,7 @@ export default function Dashboardsub() {
 
         {/* Distribución por Estado (Pie Chart) */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold mb-2 text-center" style={{ color: BRAND.darkBlue }}>
+          <h2 className="text-lg font-bold mb-2 text-center" style={{ color: BRAND.blue }}>
             Estado de Documentos
           </h2>
           {loading || statusData.length === 0 ? (
@@ -313,7 +308,7 @@ export default function Dashboardsub() {
 
         {/* Documentos por Mes (Bar Chart) */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold mb-4 text-center" style={{ color: BRAND.darkBlue }}>
+          <h2 className="text-lg font-bold mb-4 text-center" style={{ color: BRAND.blue }}>
             Documentos Subidos por Mes
           </h2>
           {loading || monthlyData.length === 0 ? (
@@ -343,7 +338,7 @@ export default function Dashboardsub() {
                   />
                   <Bar
                     dataKey="value"
-                    fill={BRAND.darkGreen}
+                    fill={BRAND.green}
                     radius={[4, 4, 0, 0]}
                     barSize={30}
                   />
@@ -356,7 +351,7 @@ export default function Dashboardsub() {
         {/* Documentos Recientes */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold" style={{ color: BRAND.darkBlue }}>
+            <h2 className="text-lg font-bold" style={{ color: BRAND.blue }}>
               Archivos Recientes
             </h2>
             <button className="text-sm font-medium hover:underline" style={{ color: BRAND.blue }}>

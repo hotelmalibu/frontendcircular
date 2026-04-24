@@ -24,6 +24,14 @@ import {
   LayoutGrid
 } from "lucide-react";
 
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  lightBlue: "#7FB8D9",  // Azul Claro
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
+};
+
 const DEFAULT_FIELD_TYPES = [
   { name: 'Texto', slug: 'text', description: 'Campo de texto simple', component: 'text-input' },
   { name: 'Email', slug: 'email', description: 'Campo de correo electrónico', component: 'email-input' },
@@ -576,7 +584,8 @@ const FormBuilder = ({ formId, onSuccess }) => {
           type={type === 'integer' || type === 'numeric' ? 'number' : 'text'}
           value={value || ""}
           onChange={(e) => onChange(type === 'integer' || type === 'numeric' ? (e.target.value === "" ? "" : parseFloat(e.target.value)) : e.target.value)}
-          className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+          className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 outline-none transition-all text-sm"
+          style={{ "--tw-ring-color": BRAND.blue }}
           placeholder={placeholderText}
         />
         {helpText && (
@@ -645,7 +654,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
           <button
             onClick={() => handleSave(true)}
             disabled={saving}
-            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-[#004b72] text-white rounded-xl hover:bg-[#003a58] transition-all font-semibold shadow-md text-sm md:text-base"
+            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-[#2C67B0] text-white rounded-xl hover:opacity-90 transition-all font-semibold shadow-md text-sm md:text-base"
           >
             <Send size={18} />
             <span className="hidden sm:inline">Publicar</span>
@@ -658,19 +667,31 @@ const FormBuilder = ({ formId, onSuccess }) => {
       <div className="md:hidden flex border-b bg-white">
         <button
           onClick={() => setActiveTab("palette")}
-          className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${activeTab === "palette" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400"}`}
+          className="flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-all"
+          style={{ 
+            color: activeTab === "palette" ? BRAND.blue : "#9ca3af",
+            borderBottom: activeTab === "palette" ? `2px solid ${BRAND.blue}` : "none"
+          }}
         >
           Elementos
         </button>
         <button
           onClick={() => setActiveTab("canvas")}
-          className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${activeTab === "canvas" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400"}`}
+          className="flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-all"
+          style={{ 
+            color: activeTab === "canvas" ? BRAND.blue : "#9ca3af",
+            borderBottom: activeTab === "canvas" ? `2px solid ${BRAND.blue}` : "none"
+          }}
         >
           Lienzo
         </button>
         <button
           onClick={() => setActiveTab("properties")}
-          className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${activeTab === "properties" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400"}`}
+          className="flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-all"
+          style={{ 
+            color: activeTab === "properties" ? BRAND.blue : "#9ca3af",
+            borderBottom: activeTab === "properties" ? `2px solid ${BRAND.blue}` : "none"
+          }}
         >
           Propiedades {selectedField && "•"}
         </button>
@@ -680,10 +701,17 @@ const FormBuilder = ({ formId, onSuccess }) => {
         {/* Loading Overlay */}
         {loading && (
           <div className="absolute inset-0 z-[100] bg-white/60 backdrop-blur-sm flex items-center justify-center">
+<<<<<<< HEAD
             <div className="flex flex-col items-center gap-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004b72]"></div>
               <p className="text-gray-500 font-medium animate-pulse">Cargando formulario...</p>
             </div>
+=======
+             <div className="flex flex-col items-center gap-4">
+               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2C67B0]"></div>
+               <p className="text-gray-500 font-medium animate-pulse">Cargando formulario...</p>
+             </div>
+>>>>>>> e49a5b4694fc58138336aa1f9a87eff1139aa0d9
           </div>
         )}
 
@@ -695,7 +723,10 @@ const FormBuilder = ({ formId, onSuccess }) => {
               <button
                 key={type.id || type.slug}
                 onClick={() => addField(type)}
-                className="w-full flex items-center gap-3 p-3 bg-gray-50 hover:bg-blue-50 hover:text-blue-600 border border-transparent hover:border-blue-100 rounded-xl transition-all group"
+                className="w-full flex items-center gap-3 p-3 bg-gray-50 border border-transparent rounded-xl transition-all group hover:opacity-80"
+                style={{ 
+                  color: "inherit"
+                }}
               >
                 <div className="p-2 bg-white rounded-lg shadow-sm group-hover:shadow-md transition-all">
                   {getIconForType(type)}
@@ -772,13 +803,14 @@ const FormBuilder = ({ formId, onSuccess }) => {
                         setFormMeta({ ...formMeta, category: e.target.value });
                         markChanged();
                       }}
-                      className="border-none p-0 pr-6 focus:ring-0 font-bold bg-transparent text-blue-600 cursor-pointer appearance-none relative z-10"
+                      className="border-none p-0 pr-6 focus:ring-0 font-bold bg-transparent cursor-pointer appearance-none relative z-10"
+                      style={{ color: BRAND.blue }}
                     >
                       <option value="encuesta">Encuesta</option>
                       <option value="normativo">Normativo</option>
                       <option value="periodico">Periódico</option>
                     </select>
-                    <ChevronDown size={14} className="absolute right-0 text-blue-600 pointer-events-none" />
+                    <ChevronDown size={14} className="absolute right-0 pointer-events-none" style={{ color: BRAND.blue }} />
                   </div>
                 </div>
               </div>
@@ -794,16 +826,20 @@ const FormBuilder = ({ formId, onSuccess }) => {
                     if (window.innerWidth < 768) setActiveTab("properties");
                   }}
                   className={`group relative bg-white p-4 md:p-6 rounded-2xl shadow-sm border transition-all cursor-pointer ${selectedFieldIndex === idx
-                    ? "border-blue-500 ring-2 ring-blue-500/10 shadow-md"
+                    ? "shadow-md"
                     : "border-gray-200 hover:border-gray-300"
                     }`}
+                  style={{ 
+                    borderColor: selectedFieldIndex === idx ? BRAND.blue : undefined,
+                    boxShadow: selectedFieldIndex === idx ? `0 0 0 2px ${BRAND.blue}1A` : undefined
+                  }}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-3">
-                      <div className="text-blue-500 bg-blue-50 p-1.5 rounded-lg">
+                      <div className="p-1.5 rounded-lg" style={{ backgroundColor: `${BRAND.blue}15`, color: BRAND.blue }}>
                         {getIconForType({ slug: field.type_slug, name: field.type_name })}
                       </div>
-                      <span className="text-xs font-bold text-blue-600 uppercase tracking-tighter">{field.type_name}</span>
+                      <span className="text-xs font-bold uppercase tracking-tighter" style={{ color: BRAND.blue }}>{field.type_name}</span>
                     </div>
                     <div className="flex gap-1 md:gap-2">
                       <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all">
@@ -1037,7 +1073,8 @@ const FormBuilder = ({ formId, onSuccess }) => {
                   type="text"
                   value={selectedField.label}
                   onChange={(e) => updateField(selectedFieldIndex, { label: e.target.value })}
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 outline-none transition-all text-sm"
+                  style={{ "--tw-ring-color": BRAND.blue }}
                 />
               </div>
 
