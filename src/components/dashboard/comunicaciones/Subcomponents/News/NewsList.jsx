@@ -23,13 +23,9 @@ import ConfirmModal from "../../../../../components/common/ConfirmModal"; import
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
   blue: "#2C67B0",       // Azul Principal
-  darkBlue: "#005380",   // Azul Logo/Profundo
   lightBlue: "#7FB8D9",  // Azul Claro
-  green: "#B1D357",      // Verde Principal (Claro)
-  darkGreen: "#8CB200",  // Verde Secundario
-  orange: "#E15200",     // Naranja (Alertas)
-  yellow: "#E8AD00",     // Amarillo
-  gray: "#6B7280",
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
 };
 
 // Utility function to strip HTML tags and decode entities
@@ -201,9 +197,9 @@ export default function NewsList() {
       <div
         className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border"
         style={{
-          backgroundColor: isPublished ? '#F0FDF4' : '#FFFBEB',
-          color: isPublished ? BRAND.darkGreen : BRAND.yellow,
-          borderColor: isPublished ? 'transparent' : 'transparent'
+          backgroundColor: isPublished ? `${BRAND.green}10` : `${BRAND.lightBlue}10`,
+          color: isPublished ? BRAND.green : BRAND.blue,
+          borderColor: isPublished ? `${BRAND.green}20` : `${BRAND.lightBlue}20`
         }}
       >
         {isPublished ? <CheckCircle size={12} /> : <Clock size={12} />}
@@ -237,7 +233,7 @@ export default function NewsList() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: BRAND.darkBlue }}>Gestión de Noticias</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: BRAND.blue }}>Gestión de Noticias</h1>
           <p className="text-gray-500 mt-1">Administra el contenido y novedades de la plataforma</p>
         </div>
         <button
@@ -284,7 +280,7 @@ export default function NewsList() {
       {/* Error Display */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-700">
-          <AlertCircle size={20} style={{ color: BRAND.orange }} />
+          <AlertCircle size={20} style={{ color: BRAND.blue }} />
           <span>{error}</span>
         </div>
       )}
@@ -309,7 +305,7 @@ export default function NewsList() {
                 {/* Borde Superior de Acento */}
                 <div
                   className="h-1.5 w-full absolute top-0 left-0"
-                  style={{ backgroundColor: item.type === 'news' ? BRAND.blue : BRAND.darkGreen }}
+                  style={{ backgroundColor: item.type === 'news' ? BRAND.blue : BRAND.green }}
                 ></div>
 
                 <div className="p-5 flex-1 flex flex-col">
@@ -391,7 +387,7 @@ export default function NewsList() {
                     onClick={() => handleEdit(item)}
                     className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
                     title="Editar"
-                    style={{ color: BRAND.darkGreen }}
+                    style={{ color: BRAND.green }}
                   >
                     <Edit size={18} />
                   </button>
@@ -399,7 +395,7 @@ export default function NewsList() {
                     onClick={() => handleDelete(item)}
                     className="p-1 rounded-lg hover:bg-white hover:shadow-sm transition"
                     title="Eliminar"
-                    style={{ color: BRAND.orange }}
+                    style={{ color: BRAND.blue }}
                   >
                     <Trash2 size={18} />
                   </button>

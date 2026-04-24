@@ -13,56 +13,64 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  lightBlue: "#7FB8D9",  // Azul Claro
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
+};
+
 export default function RedesSociales() {
   const redes = [
     {
       id: 1,
       nombre: "Facebook",
       estado: "Conectado",
-      iconColor: "bg-blue-500",
+      iconColor: `bg-[${BRAND.blue}]`,
       seguidores: 1247,
       publicaciones: 15,
       engagement: "5.2%",
       webhook: true,
       oauth: "14/12/2025",
-      estadoColor: "text-emerald-600",
+      estadoColor: "text-[#00AB6D]",
     },
     {
       id: 2,
       nombre: "Twitter",
       estado: "Conectado",
-      iconColor: "bg-sky-400",
+      iconColor: `bg-[${BRAND.lightBlue}]`,
       seguidores: 834,
       publicaciones: 23,
       engagement: "N/A",
       webhook: true,
       oauth: "19/1/2026",
-      estadoColor: "text-emerald-600",
+      estadoColor: "text-[#00AB6D]",
     },
     {
       id: 3,
       nombre: "LinkedIn",
       estado: "Conectado",
-      iconColor: "bg-rose-400",
+      iconColor: `bg-[${BRAND.green}]`,
       seguidores: 1156,
       publicaciones: 8,
       engagement: "N/A",
       webhook: false,
       oauth: "29/11/2025",
-      estadoColor: "text-emerald-600",
+      estadoColor: "text-[#00AB6D]",
     },
     {
       id: 4,
       nombre: "Instagram",
       estado: "Limitado",
-      iconColor: "bg-pink-500",
+      iconColor: `bg-[${BRAND.lime}]`,
       seguidores: 2341,
       publicaciones: 12,
       engagement: "7.8%",
       webhook: false,
       oauth: "14/10/2025",
       alerta: "API rate limit exceeded",
-      estadoColor: "text-orange-500",
+      estadoColor: "text-[#B1D357]",
     },
   ];
 
@@ -73,7 +81,7 @@ export default function RedesSociales() {
     { name: "Instagram", value: 25 },
   ];
 
-  const COLORS = ["#3b82f6", "#0ea5e9", "#0284c7", "#ec4899"];
+  const COLORS = [BRAND.blue, BRAND.lightBlue, BRAND.green, BRAND.lime];
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -88,10 +96,10 @@ export default function RedesSociales() {
           </p>
         </div>
         <div className="flex gap-3 items-center">
-          <button className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2">
+          <button className="px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2" style={{ backgroundColor: `${BRAND.green}20`, color: BRAND.green }}>
             <CheckCircle className="w-4 h-4" /> 8/10 APIs Activas
           </button>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+          <button className="text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90" style={{ backgroundColor: BRAND.blue }}>
             + Conectar red social
           </button>
         </div>
@@ -120,28 +128,28 @@ export default function RedesSociales() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center mt-4 mb-2">
               <div>
                 <p className="text-xs text-gray-500">Seguidores</p>
-                <p className="font-semibold text-lg text-sky-600">
+                <p className="font-semibold text-lg" style={{ color: BRAND.blue }}>
                   {red.seguidores}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Publicaciones</p>
-                <p className="font-semibold text-lg text-emerald-600">
+                <p className="font-semibold text-lg" style={{ color: BRAND.green }}>
                   {red.publicaciones}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Engagement</p>
-                <p className="font-semibold text-lg text-pink-500">
+                <p className="font-semibold text-lg" style={{ color: BRAND.lightBlue }}>
                   {red.engagement}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Webhook</p>
                 {red.webhook ? (
-                  <CheckCircle className="w-4 h-4 mx-auto text-emerald-500" />
+                  <CheckCircle className="w-4 h-4 mx-auto" style={{ color: BRAND.green }} />
                 ) : (
-                  <AlertTriangle className="w-4 h-4 mx-auto text-rose-500" />
+                  <AlertTriangle className="w-4 h-4 mx-auto" style={{ color: BRAND.lime }} />
                 )}
               </div>
             </div>
@@ -165,7 +173,7 @@ export default function RedesSociales() {
               <button className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-sm flex items-center gap-1 border border-gray-200">
                 <Settings className="w-4 h-4 text-gray-600" /> Configurar
               </button>
-              <button className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-md text-sm flex items-center gap-1">
+              <button className="px-3 py-1.5 text-white rounded-md text-sm flex items-center gap-1 hover:opacity-90 transition-opacity" style={{ backgroundColor: BRAND.lightBlue }}>
                 <RefreshCw className="w-4 h-4" /> Renovar
               </button>
             </div>

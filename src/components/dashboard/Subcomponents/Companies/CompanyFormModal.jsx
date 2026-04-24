@@ -21,13 +21,9 @@ import { createCompany, updateCompany } from "../../../../api/companiesApi";
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
   blue: "#2C67B0",       // Azul Principal
-  darkBlue: "#005380",   // Azul Logo/Profundo
   lightBlue: "#7FB8D9",  // Azul Claro
-  green: "#B1D357",      // Verde Principal (Claro)
-  darkGreen: "#8CB200",  // Verde Secundario
-  orange: "#E15200",     // Naranja (Alertas)
-  yellow: "#E8AD00",     // Amarillo
-  gray: "#6B7280",
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
 };
 
 const EMPTY_CONTACT = { contact_name: "", email: "", phone: "" };
@@ -230,11 +226,11 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
   const labelClass = "block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1";
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-[9999] bg-[#005380] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9999] bg-[#2C67B0] bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden animate-fadeIn max-h-[90vh] flex flex-col">
 
         {/* Header */}
-        <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100" style={{ backgroundColor: BRAND.darkBlue }}>
+        <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100" style={{ backgroundColor: BRAND.blue }}>
           <div className="flex items-center gap-3">
             <div className="p-2 bg-white/10 rounded-lg text-white">
               <Building size={20} />
@@ -318,7 +314,7 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
                           onChange={handleInputChange}
                           placeholder="Ej: EcoEmpresa S.A.S"
                           className={inputWithIconClass}
-                          style={{ borderColor: errors.name ? BRAND.orange : '' }}
+                          style={{ borderColor: errors.name ? BRAND.green : '' }}
                         />
                       </div>
                       {errors.name && <p className="mt-1 text-xs text-orange-500 font-medium">{errors.name}</p>}
@@ -332,7 +328,7 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
                         onChange={handleInputChange}
                         rows={4}
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none transition-all text-sm resize-none"
-                        style={{ "--tw-ring-color": BRAND.lightBlue, borderColor: errors.description ? BRAND.orange : '' }}
+                        style={{ "--tw-ring-color": BRAND.lightBlue, borderColor: errors.description ? BRAND.green : '' }}
                         placeholder="Breve descripción de la actividad económica..."
                       />
                       {errors.description && <p className="mt-1 text-xs text-orange-500 font-medium">{errors.description}</p>}
@@ -381,13 +377,13 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <div className="flex items-center justify-between mb-4 border-b pb-2">
                   <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                    <User size={16} style={{ color: BRAND.green }} /> Personas de Contacto
+                  <User size={16} style={{ color: BRAND.lime }} /> Personas de Contacto
                   </h3>
                   <button
                     type="button"
                     onClick={addContact}
                     className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-all hover:shadow-sm"
-                    style={{ backgroundColor: `${BRAND.green}20`, color: BRAND.darkGreen }}
+                    style={{ backgroundColor: `${BRAND.lime}20`, color: BRAND.green }}
                   >
                     <UserPlus size={14} />
                     Agregar Contacto
@@ -509,7 +505,7 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
                         onChange={handleInputChange}
                         placeholder="https://www.empresa.com"
                         className={inputWithIconClass}
-                        style={{ borderColor: errors.website_url ? BRAND.orange : '' }}
+                        style={{ borderColor: errors.website_url ? BRAND.green : '' }}
                       />
                     </div>
                     {errors.website_url && <p className="mt-1 text-xs text-orange-500 font-medium">{errors.website_url}</p>}

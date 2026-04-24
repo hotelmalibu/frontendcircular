@@ -5,6 +5,14 @@ import UndexAfiliado from "./subcomponentes/UndexAfiliado";
 import { ShieldCheck, Bell, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
+// --- PALETA DE COLORES VISIÓN CIRCULAR ---
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  lightBlue: "#7FB8D9",  // Azul Claro
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
+};
+
 export default function Index() {
   const { user } = useContext(AuthContext);
   const [pendingUsersCount, setPendingUsersCount] = useState(0);
@@ -107,13 +115,13 @@ export default function Index() {
       <>
         <div className="flex flex-col lg:flex-row items-center lg:items-start lg:justify-between w-full max-w-7xl mb-8 p-6 lg:p-8 bg-white rounded-3xl border border-gray-100 shadow-sm gap-6 animate-fade-in-up">
           <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 text-center lg:text-left">
-            <div className="bg-blue-50 p-3 rounded-2xl text-blue-500 shadow-sm flex-shrink-0">
+            <div className="p-3 rounded-2xl shadow-sm flex-shrink-0" style={{ backgroundColor: `${BRAND.blue}15`, color: BRAND.blue }}>
               <ShieldCheck size={40} />
             </div>
             <div>
               <h2 className="text-2xl font-black text-gray-900 tracking-tight">Panel de Control</h2>
               <p className="text-gray-500 text-sm font-medium">
-                Hola, <span className="text-blue-600 font-bold">{user?.name}</span>. Tienes acceso a los siguientes módulos y notificaciones:
+                Hola, <span className="font-bold" style={{ color: BRAND.blue }}>{user?.name}</span>. Tienes acceso a los siguientes módulos y notificaciones:
               </p>
             </div>
           </div>
@@ -135,14 +143,17 @@ export default function Index() {
             return (
               <div 
                 key={permSlug}
-                className="group flex flex-col p-6 bg-gray-50 rounded-2xl border border-gray-100 transition-all hover:bg-white hover:shadow-xl hover:border-blue-100 text-left relative overflow-hidden"
+                className="group flex flex-col p-6 bg-gray-50 rounded-2xl border border-gray-100 transition-all hover:bg-white hover:shadow-xl text-left relative overflow-hidden"
+                style={{ "--hover-border": BRAND.blue }}
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-blue-500 shadow-sm border border-gray-100 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                  <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm border border-gray-100 group-hover:text-white transition-all duration-300" 
+                    style={{ color: BRAND.blue }}
+                  >
                     <ShieldCheck size={24} />
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-sm font-black text-gray-800 tracking-wider group-hover:text-blue-700 transition-colors">
+                    <h4 className="text-sm font-black text-gray-800 tracking-wider transition-colors" style={{ color: "inherit" }}>
                       {meta.title}
                     </h4>
                   </div>
@@ -165,14 +176,14 @@ export default function Index() {
                       </div>
                     ))}
                     {meta.link && (
-                      <Link to={meta.link} className="self-end mt-2 p-2 rounded-lg bg-white text-blue-500 hover:bg-blue-600 hover:text-white shadow-sm transition-all">
+                      <Link to={meta.link} className="self-end mt-2 p-2 rounded-lg bg-white shadow-sm transition-all hover:opacity-80" style={{ color: BRAND.blue }}>
                         <ArrowRight size={16} />
                       </Link>
                     )}
                   </div>
                 ) : (
                   meta.link && (
-                    <Link to={meta.link} className="mt-auto flex items-center gap-1.5 text-xs font-bold text-blue-500 hover:text-blue-700 transition-colors group/link">
+                    <Link to={meta.link} className="mt-auto flex items-center gap-1.5 text-xs font-bold transition-colors group/link hover:opacity-80" style={{ color: BRAND.blue }}>
                       Ir a la sección <ArrowRight size={12} className="group-hover/link:translate-x-1 transition-transform" />
                     </Link>
                   )

@@ -25,14 +25,10 @@ import { getAllProjects } from "../../../../../api/projectsApi";
 import { getDocuments } from "../../../../../api/documentsApi";
 
 const BRAND = {
-  blue: "#2C67B0",
-  darkBlue: "#005380",
-  lightBlue: "#7FB8D9",
-  green: "#B1D357",
-  darkGreen: "#8CB200",
-  orange: "#E15200",
-  yellow: "#E8AD00",
-  gray: "#6B7280",
+  blue: "#2C67B0",       // Azul Principal
+  lightBlue: "#7FB8D9",  // Azul Claro
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
 };
 
 export default function DashboardContenido() {
@@ -134,18 +130,18 @@ export default function DashboardContenido() {
   const getStatusColor = (type) => {
     switch (type) {
       case "Noticia": return BRAND.blue;
-      case "Evento": return BRAND.darkGreen;
-      case "Proyecto": return BRAND.orange;
-      case "Documento": return BRAND.yellow;
-      default: return BRAND.gray;
+      case "Evento": return BRAND.green;
+      case "Proyecto": return BRAND.lime;
+      case "Documento": return BRAND.lightBlue;
+      default: return "#9ca3af";
     }
   };
 
   const metricItems = [
     { title: "Noticias Publicadas", value: metrics.news, Icon: PenTool, color: BRAND.blue },
-    { title: "Eventos Programados", value: metrics.events, Icon: Calendar, color: BRAND.darkGreen },
-    { title: "Proyectos Activos", value: metrics.projects, Icon: Briefcase, color: BRAND.orange },
-    { title: "Documentos Subidos", value: metrics.documents, Icon: FileText, color: BRAND.yellow },
+    { title: "Evento Programados", value: metrics.events, Icon: Calendar, color: BRAND.green },
+    { title: "Proyectos Activos", value: metrics.projects, Icon: Briefcase, color: BRAND.lime },
+    { title: "Documentos Subidos", value: metrics.documents, Icon: FileText, color: BRAND.lightBlue },
   ];
 
   if (loading) {
@@ -180,7 +176,7 @@ export default function DashboardContenido() {
       {/* 2. Bar Chart (Category Stats) */}
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
         <div className="mb-8">
-          <h3 className="text-xl font-bold flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
+          <h3 className="text-xl font-bold flex items-center gap-3" style={{ color: BRAND.blue }}>
             <BarChart2 size={24} className="text-gray-400" /> Estadísticas por Categoría (Reciente)
           </h3>
           <p className="text-sm text-gray-500 mt-1">Distribución de los últimos 50 contenidos por temática</p>
@@ -202,7 +198,7 @@ export default function DashboardContenido() {
                     stroke="#6B7280"
                     style={{ fontSize: "14px", fontWeight: "700" }}
                     width={220}
-                    tick={{ fill: BRAND.darkBlue }}
+                    tick={{ fill: BRAND.blue }}
                   />
                   <Tooltip
                     contentStyle={{ backgroundColor: "#fff", border: "1px solid #E5E7EB", borderRadius: "12px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}
@@ -211,14 +207,14 @@ export default function DashboardContenido() {
                   <Bar dataKey="Noticias" fill={BRAND.blue} radius={[0, 6, 6, 0]} barSize={35}>
                     <LabelList dataKey="Noticias" position="right" style={{ fill: BRAND.blue, fontSize: '12px', fontWeight: 'bold' }} />
                   </Bar>
-                  <Bar dataKey="Eventos" fill={BRAND.darkGreen} radius={[0, 6, 6, 0]} barSize={35}>
-                    <LabelList dataKey="Eventos" position="right" style={{ fill: BRAND.darkGreen, fontSize: '12px', fontWeight: 'bold' }} />
+                  <Bar dataKey="Eventos" fill={BRAND.green} radius={[0, 6, 6, 0]} barSize={35}>
+                    <LabelList dataKey="Eventos" position="right" style={{ fill: BRAND.green, fontSize: '12px', fontWeight: 'bold' }} />
                   </Bar>
-                  <Bar dataKey="Proyectos" fill={BRAND.orange} radius={[0, 6, 6, 0]} barSize={35}>
-                    <LabelList dataKey="Proyectos" position="right" style={{ fill: BRAND.orange, fontSize: '12px', fontWeight: 'bold' }} />
+                  <Bar dataKey="Proyectos" fill={BRAND.lime} radius={[0, 6, 6, 0]} barSize={35}>
+                    <LabelList dataKey="Proyectos" position="right" style={{ fill: BRAND.lime, fontSize: '12px', fontWeight: 'bold' }} />
                   </Bar>
-                  <Bar dataKey="Documentos" fill={BRAND.yellow} radius={[0, 6, 6, 0]} barSize={35}>
-                    <LabelList dataKey="Documentos" position="right" style={{ fill: BRAND.yellow, fontSize: '12px', fontWeight: 'bold' }} />
+                  <Bar dataKey="Documentos" fill={BRAND.lightBlue} radius={[0, 6, 6, 0]} barSize={35}>
+                    <LabelList dataKey="Documentos" position="right" style={{ fill: BRAND.lightBlue, fontSize: '12px', fontWeight: 'bold' }} />
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
@@ -233,7 +229,7 @@ export default function DashboardContenido() {
         {/* 3. Pie Chart (Content Distribution) */}
         <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
           <div className="mb-6">
-            <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
+            <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.blue }}>
               <PieIcon size={20} className="text-gray-400" /> Mix de Contenidos
             </h3>
             <p className="text-xs text-gray-500 mt-1">Proporción por tipo de contenido</p>
@@ -252,7 +248,7 @@ export default function DashboardContenido() {
                     dataKey="value"
                   >
                     {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={[BRAND.blue, BRAND.darkGreen, BRAND.orange, BRAND.yellow][index % 4]} />
+                      <Cell key={`cell-${index}`} fill={[BRAND.blue, BRAND.green, BRAND.lime, BRAND.lightBlue][index % 4]} />
                     ))}
                   </Pie>
                   <Tooltip
@@ -272,7 +268,7 @@ export default function DashboardContenido() {
         <div className="lg:col-span-2 bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
           <div className="mb-6 flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
+              <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: BRAND.blue }}>
                 <Activity size={20} className="text-gray-400" /> Actividad Reciente
               </h3>
               <p className="text-xs text-gray-500 mt-1">Últimos contenidos creados en la plataforma</p>

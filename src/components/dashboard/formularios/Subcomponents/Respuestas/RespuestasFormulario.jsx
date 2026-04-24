@@ -24,7 +24,14 @@ import {
 import formsApi from "../../../../../api/formsApi";
 import toast from "react-hot-toast";
 
-const BRAND_COLORS = ['#005380', '#B1D357', '#003a5a', '#c2df7a', '#0070ad', '#86a836', '#002538', '#d9ecab'];
+const BRAND = {
+  blue: "#2C67B0",       // Azul Principal
+  lightBlue: "#7FB8D9",  // Azul Claro
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
+};
+
+const BRAND_COLORS = [BRAND.blue, BRAND.lime, BRAND.lightBlue, BRAND.green];
 
 // --- Compact & Responsive Components ---
 
@@ -55,7 +62,7 @@ const Pagination = ({ meta, onPageChange }) => {
                         let p = current_page <= 3 ? i + 1 : (current_page >= last_page - 2 ? last_page - 4 + i : current_page - 2 + i);
                         if (p <= 0 || p > last_page) return null;
                         return (
-                            <button key={p} onClick={() => onPageChange(p)} className={`w-7 h-7 rounded-lg text-[10px] md:text-xs font-bold transition-all ${current_page === p ? 'bg-[#005380] text-white' : 'text-gray-400 hover:bg-gray-100'}`}>{p}</button>
+                            <button key={p} onClick={() => onPageChange(p)} className={`w-7 h-7 rounded-lg text-[10px] md:text-xs font-bold transition-all ${current_page === p ? 'bg-[#2C67B0] text-white' : 'text-gray-400 hover:bg-gray-100'}`}>{p}</button>
                         );
                     })}
                 </div>
@@ -72,7 +79,7 @@ const FieldWidget = ({ field, value, type, fileUrl }) => {
     if (fileUrl || (type === 'file' && value && isFileUrl(value))) {
         const url = fileUrl || value;
         return (
-            <a href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#005380] text-white rounded-lg text-[10px] md:text-xs font-bold uppercase hover:bg-black transition-all shadow-sm mt-1">
+            <a href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#2C67B0] text-white rounded-lg text-[10px] md:text-xs font-bold uppercase hover:bg-black transition-all shadow-sm mt-1">
                 <FileText size={14} /> Ver Adjunto <ExternalLink size={10} className="opacity-50" />
             </a>
         );
@@ -94,7 +101,7 @@ const FieldWidget = ({ field, value, type, fileUrl }) => {
                         {Object.entries(data).map(([key, val], idx) => (
                             <div key={idx} className="flex items-center gap-2 text-[10px] md:text-[11px] text-left">
                                 <span className="font-bold text-gray-400 uppercase">{key.replace(/_/g, ' ')}:</span>
-                                <span className="text-[#005380] font-medium">{String(val)}</span>
+                                <span className="text-[#2C67B0] font-medium">{String(val)}</span>
                             </div>
                         ))}
                     </div>
@@ -117,7 +124,7 @@ const FieldWidget = ({ field, value, type, fileUrl }) => {
                         return (
                             <div key={i} className="grid grid-cols-2 px-3 py-1.5 border-b border-gray-50 last:border-0 hover:bg-gray-50/30 transition-colors text-left">
                                 <span className="font-medium text-gray-600 truncate mr-2">{row.label}</span>
-                                <span className={labels.length > 0 ? "text-[#005380] font-bold" : "text-gray-300"}>{labels.join(", ") || '-'}</span>
+                                <span className={labels.length > 0 ? "text-[#2C67B0] font-bold" : "text-gray-300"}>{labels.join(", ") || '-'}</span>
                             </div>
                         );
                     })}
@@ -133,11 +140,11 @@ const FieldWidget = ({ field, value, type, fileUrl }) => {
     const options = field?.options?.choices || field?.options?.options || [];
     if (options.length > 0) {
         const choice = options.find(c => String(c.value) === String(value));
-        if (choice) return <span className="text-[#005380] font-bold text-[11px] md:text-sm mt-1 block text-left">{choice.label}</span>;
+        if (choice) return <span className="text-[#2C67B0] font-bold text-[11px] md:text-sm mt-1 block text-left">{choice.label}</span>;
     }
 
     if (type === 'checkbox' && (value === "true" || value === true || value === "1" || value === 1)) return <span className="text-[#B1D357] font-black text-[10px] md:text-xs uppercase mt-1 block text-left">✓ Seleccionado</span>;
-    if (Array.isArray(value)) return <div className="flex flex-wrap gap-1 mt-1.5 text-left">{value.map((v, i) => <span key={i} className="px-2 py-0.5 bg-blue-50 text-[#005380] rounded-md font-bold text-[9px] md:text-[10px] uppercase border border-blue-100">{v}</span>)}</div>;
+    if (Array.isArray(value)) return <div className="flex flex-wrap gap-1 mt-1.5 text-left">{value.map((v, i) => <span key={i} className="px-2 py-0.5 bg-blue-50 text-[#2C67B0] rounded-md font-bold text-[9px] md:text-[10px] uppercase border border-blue-100">{v}</span>)}</div>;
     
     return <span className="text-gray-600 font-medium text-[11px] md:text-sm leading-relaxed block mt-1 whitespace-pre-wrap text-left w-full">{String(value || "Sin respuesta")}</span>;
 };
@@ -186,8 +193,8 @@ const SummaryTab = ({ analytics }) => {
                             <XAxis dataKey="name" tick={{ fontSize: 8 }} interval={0} angle={-30} textAnchor="end" />
                             <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 8 }} />
                             <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ fontSize: '10px', borderRadius: '8px', border: 'none' }} />
-                            <Bar dataKey="value" fill="#005380" radius={[2, 2, 0, 0]} barSize={14} isAnimationActive={false}>
-                                {field.data.map((_, index) => <Cell key={index} fill={index % 2 === 0 ? '#005380' : '#B1D357'} />)}
+                            <Bar dataKey="value" fill="#2C67B0" radius={[2, 2, 0, 0]} barSize={14} isAnimationActive={false}>
+                                {field.data.map((_, index) => <Cell key={index} fill={index % 2 === 0 ? '#2C67B0' : '#B1D357'} />)}
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
@@ -214,7 +221,7 @@ const SummaryTab = ({ analytics }) => {
                         return (
                             <div key={i} className="bg-gray-50/50 px-2.5 py-1.5 rounded-lg text-[10px] md:text-xs text-gray-500 border border-gray-100/50 truncate hover:bg-white transition-colors text-left w-full">
                                 {isUrl ? (
-                                    <a href={String(resp)} target="_blank" rel="noreferrer" className="text-[#005380] font-bold flex items-center gap-1"><FileText size={10}/> Ver Archivo</a>
+                                    <a href={String(resp)} target="_blank" rel="noreferrer" className="text-[#2C67B0] font-bold flex items-center gap-1"><FileText size={10}/> Ver Archivo</a>
                                 ) : String(resp)}
                             </div>
                         );
@@ -226,7 +233,7 @@ const SummaryTab = ({ analytics }) => {
 
     return (
         <div className="animate-fadeIn space-y-4 pb-10 w-full">
-            <div className="bg-[#005380] px-6 py-4 rounded-xl flex items-center justify-between text-white shadow-md w-full">
+            <div className="bg-[#2C67B0] px-6 py-4 rounded-xl flex items-center justify-between text-white shadow-md w-full">
                 <div className="flex items-center gap-4">
                     <h2 className="text-xl md:text-2xl font-black">{analytics.total_submissions}</h2>
                     <div>
@@ -270,8 +277,8 @@ const QuestionTab = ({ analytics, responses, onPageChange, paginationMeta }) => 
                     {analytics.fields.map((f, i) => <option key={i} value={i}>{i+1}. {f.label}</option>)}
                 </select>
                 <div className="flex gap-1 justify-center">
-                    <button onClick={() => setSelectedIdx(p => p-1)} disabled={selectedIdx === 0} className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400 disabled:opacity-20 hover:text-[#005380] border border-gray-100 transition-all"><ChevronLeft size={18} /></button>
-                    <button onClick={() => setSelectedIdx(p => p+1)} disabled={selectedIdx === analytics.fields.length - 1} className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400 disabled:opacity-20 hover:text-[#005380] border border-gray-100 transition-all"><ChevronRight size={18} /></button>
+                    <button onClick={() => setSelectedIdx(p => p-1)} disabled={selectedIdx === 0} className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400 disabled:opacity-20 hover:text-[#2C67B0] border border-gray-100 transition-all"><ChevronLeft size={18} /></button>
+                    <button onClick={() => setSelectedIdx(p => p+1)} disabled={selectedIdx === analytics.fields.length - 1} className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400 disabled:opacity-20 hover:text-[#2C67B0] border border-gray-100 transition-all"><ChevronRight size={18} /></button>
                 </div>
             </div>
 
@@ -310,15 +317,15 @@ const IndividualTab = ({ responses, paginationMeta, onPageChange }) => {
         <div className="max-w-3xl mx-auto space-y-4 animate-fadeIn pb-10 w-full">
             <div className="bg-white p-3 rounded-xl border border-gray-100 flex items-center justify-between shadow-md">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-50 text-[#005380] rounded-lg flex items-center justify-center font-black text-[10px] md:text-xs">
+                    <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-50 text-[#2C67B0] rounded-lg flex items-center justify-center font-black text-[10px] md:text-xs">
                         #{safeIdx + 1}
                     </div>
                     <div className="text-xs md:text-sm font-black text-gray-800 uppercase tracking-tighter">Detalle de Respuesta Individual</div>
                 </div>
                 <div className="flex gap-2">
-                    <button onClick={() => setIdx(p => p-1)} disabled={safeIdx === 0} className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400 disabled:opacity-20 hover:text-[#005380] border border-gray-100 transition-all"><ChevronLeft size={20} /></button>
+                    <button onClick={() => setIdx(p => p-1)} disabled={safeIdx === 0} className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400 disabled:opacity-20 hover:text-[#2C67B0] border border-gray-100 transition-all"><ChevronLeft size={20} /></button>
                     <span className="flex items-center px-4 bg-gray-50 rounded-lg text-[10px] md:text-xs font-bold text-gray-500">{safeIdx + 1} / {responses.length}</span>
-                    <button onClick={() => setIdx(p => p+1)} disabled={safeIdx === responses.length - 1} className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400 disabled:opacity-20 hover:text-[#005380] border border-gray-100 transition-all"><ChevronRight size={20} /></button>
+                    <button onClick={() => setIdx(p => p+1)} disabled={safeIdx === responses.length - 1} className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-lg text-gray-400 disabled:opacity-20 hover:text-[#2C67B0] border border-gray-100 transition-all"><ChevronRight size={20} /></button>
                 </div>
             </div>
 
@@ -328,7 +335,7 @@ const IndividualTab = ({ responses, paginationMeta, onPageChange }) => {
                         <h4 className="text-sm md:text-base font-black text-gray-800 uppercase tracking-widest text-left">Resumen del Envío</h4>
                         <div className="text-[10px] md:text-xs text-gray-400 mt-1 flex items-center gap-1.5 font-medium"><Clock size={12} /> {new Date(res.submitted_at).toLocaleString()}</div>
                     </div>
-                    <div className="text-[10px] md:text-xs font-black text-[#005380] bg-white border border-blue-50 px-4 py-1.5 rounded-full shadow-sm">ID: {res.id.toString().slice(-8).toUpperCase()}</div>
+                    <div className="text-[10px] md:text-xs font-black text-[#2C67B0] bg-white border border-blue-50 px-4 py-1.5 rounded-full shadow-sm">ID: {res.id.toString().slice(-8).toUpperCase()}</div>
                 </div>
                 <div className="p-6 md:p-10 space-y-8 text-left w-full">
                     {res.field_submissions?.map((s, i) => {
@@ -337,7 +344,7 @@ const IndividualTab = ({ responses, paginationMeta, onPageChange }) => {
                         if (['title', 'paragraph', 'section', 'divider', 'spacer', 'image', 'video', 'header', 'rich_text'].includes(type)) return null;
                         return (
                             <div key={i} className="group border-l-2 border-transparent hover:border-[#B1D357] pl-4 transition-all text-left w-full">
-                                <label className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-1.5 group-hover:text-[#005380] transition-colors text-left">{f.label || "Campo"}</label>
+                                <label className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-1.5 group-hover:text-[#2C67B0] transition-colors text-left">{f.label || "Campo"}</label>
                                 <FieldWidget field={f} value={s.value} type={type} fileUrl={s.file_url} />
                             </div>
                         );
@@ -394,19 +401,19 @@ const ResponseManagement = ({ formId: initialFormId, onBack }) => {
       <div className="max-w-7xl mx-auto p-4 md:p-10 animate-fadeIn w-full">
           <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-16 w-full">
             <div className="border-l-4 border-[#B1D357] pl-5 text-left">
-                 <h3 className="text-3xl md:text-5xl font-black text-[#005380] tracking-tighter text-left">Centro de Inteligencia</h3>
+                 <h3 className="text-3xl md:text-5xl font-black text-[#2C67B0] tracking-tighter text-left">Centro de Inteligencia</h3>
                  <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-[0.4em] mt-2 text-left">Gestión avanzada de ecos de datos</p>
             </div>
             <div className="relative w-full md:w-96">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={20} />
-              <input type="text" placeholder="Buscar formulario..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-12 pr-5 py-4 bg-white border border-gray-100 rounded-xl outline-none shadow-sm text-sm md:text-base font-bold placeholder:text-gray-200 focus:border-[#005380] transition-all" />
+              <input type="text" placeholder="Buscar formulario..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-12 pr-5 py-4 bg-white border border-gray-100 rounded-xl outline-none shadow-sm text-sm md:text-base font-bold placeholder:text-gray-200 focus:border-[#2C67B0] transition-all" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
               {loading ? [1,2,3,4,8].map(i => <Skeleton key={i} className="h-36" />) : filtered.map(f => (
-                <button key={f.id} onClick={() => setFormId(f.id)} className="bg-white p-6 md:p-8 rounded-2xl border border-gray-100 hover:border-[#005380] hover:-translate-y-1.5 transition-all text-left group shadow-sm hover:shadow-xl hover:shadow-blue-900/5">
-                    <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-[#005380] mb-5 group-hover:bg-[#005380] group-hover:text-white transition-all transform group-hover:rotate-6"><FileText size={24} /></div>
+                <button key={f.id} onClick={() => setFormId(f.id)} className="bg-white p-6 md:p-8 rounded-2xl border border-gray-100 hover:border-[#2C67B0] hover:-translate-y-1.5 transition-all text-left group shadow-sm hover:shadow-xl hover:shadow-blue-900/5">
+                    <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-[#2C67B0] mb-5 group-hover:bg-[#2C67B0] group-hover:text-white transition-all transform group-hover:rotate-6"><FileText size={24} /></div>
                     <h4 className="text-sm md:text-base font-black text-gray-800 leading-tight mb-3 line-clamp-2 text-left">{f.title}</h4>
                     <div className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#B1D357] rounded-full" /><p className="text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-widest">{f.submissions_count || 0} Respuestas</p></div>
                 </button>
@@ -421,7 +428,7 @@ const ResponseManagement = ({ formId: initialFormId, onBack }) => {
        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 flex flex-col min-h-[90vh] overflow-hidden w-full">
             <div className="px-3 py-3 md:px-8 md:py-4 border-b border-gray-50 flex flex-col md:flex-row justify-between items-center gap-4 bg-white sticky top-0 z-30 shadow-sm w-full">
                 <div className="flex items-center gap-3 w-full md:w-auto min-w-0">
-                    <button onClick={() => { if(initialFormId) onBack?.(); else { setFormId(null); setAnalytics(null); setResponses([]); } }} className="w-9 h-9 md:w-11 md:h-11 flex items-center justify-center bg-gray-50 rounded-xl text-gray-400 hover:text-[#005380] hover:bg-white border border-gray-100 transition-all shadow-sm shrink-0"><ArrowLeft size={20} /></button>
+                    <button onClick={() => { if(initialFormId) onBack?.(); else { setFormId(null); setAnalytics(null); setResponses([]); } }} className="w-9 h-9 md:w-11 md:h-11 flex items-center justify-center bg-gray-50 rounded-xl text-gray-400 hover:text-[#2C67B0] hover:bg-white border border-gray-100 transition-all shadow-sm shrink-0"><ArrowLeft size={20} /></button>
                     <div className="text-left overflow-hidden">
                         <div className="flex items-center gap-2 mb-0.5"><span className="w-1.5 h-1.5 bg-[#B1D357] rounded-full animate-pulse shrink-0" /><span className="text-[8px] md:text-[10px] font-black text-gray-300 uppercase tracking-widest truncate">Dashboard Inteligente</span></div>
                         <h3 className="text-base md:text-lg font-black text-gray-800 tracking-tight leading-none text-left truncate max-w-[150px] md:max-w-[250px]">{analytics?.title || "Cargando..."}</h3>
@@ -434,7 +441,7 @@ const ResponseManagement = ({ formId: initialFormId, onBack }) => {
                         { id: 'question', icon: MessageSquare, label: 'Preguntas' },
                         { id: 'individual', icon: User, label: 'Individual' }
                     ].map((t) => (
-                        <button key={t.id} onClick={() => setTab(t.id)} className={`flex items-center gap-2 px-3 md:px-5 py-2 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${tab === t.id ? 'bg-[#005380] text-white shadow-md scale-[1.02]' : 'text-gray-400 hover:text-gray-600'}`}>
+                        <button key={t.id} onClick={() => setTab(t.id)} className={`flex items-center gap-2 px-3 md:px-5 py-2 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${tab === t.id ? 'bg-[#2C67B0] text-white shadow-md scale-[1.02]' : 'text-gray-400 hover:text-gray-600'}`}>
                             <t.icon size={14} className="shrink-0" />
                             <span>{t.label}</span>
                         </button>
@@ -451,7 +458,7 @@ const ResponseManagement = ({ formId: initialFormId, onBack }) => {
             <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar bg-gray-50/20 text-left w-full h-full">
                 {loading && responses.length === 0 ? (
                     <div className="flex flex-col justify-center items-center py-40">
-                        <div className="w-14 h-14 border-4 border-[#005380]/10 border-t-[#005380] rounded-full animate-spin" />
+                        <div className="w-14 h-14 border-4 border-[#2C67B0]/10 border-t-[#2C67B0] rounded-full animate-spin" />
                         <p className="mt-6 text-gray-300 font-bold text-[10px] md:text-xs uppercase tracking-[0.3em] animate-pulse">Sincronizando información...</p>
                     </div>
                 ) : (

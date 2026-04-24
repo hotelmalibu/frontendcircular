@@ -28,17 +28,12 @@ import QuienesSomos from "../../comunicaciones/QuienesSomos";
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
   blue: "#2C67B0",       // Azul Principal
-  darkBlue: "#005380",   // Azul Logo/Profundo
   lightBlue: "#7FB8D9",  // Azul Claro
-  green: "#B1D357",      // Verde Principal (Claro)
-  darkGreen: "#8CB200",  // Verde Secundario
-  orange: "#E15200",     // Naranja (Alertas Críticas)
-  yellow: "#E8AD00",     // Amarillo (Advertencias)
-  purple: "#9E1981",     // Morado (Acentos)
-  gray: "#6B7280",
+  lime: "#B1D357",       // Verde Lima
+  green: "#00AB6D",      // Verde Principal
 };
 
-const COLORS = [BRAND.blue, BRAND.green, BRAND.purple, BRAND.orange, BRAND.lightBlue, BRAND.darkGreen];
+const COLORS = [BRAND.blue, BRAND.green, BRAND.lime, BRAND.lightBlue];
 
 export default function Undexsub() {
 
@@ -183,30 +178,26 @@ export default function Undexsub() {
     {
       titulo: "Usuarios Totales",
       valor: dashboardStats.totalUsers,
-      iconColor: BRAND.green,
-      bgIcon: "bg-[#B1D357]/20",
-      icono: <Activity color={BRAND.darkGreen} size={24} />,
+      icono: <Activity color={BRAND.green} size={24} />,
+      bgIcon: `bg-[${BRAND.green}]15`,
     },
     {
       titulo: "Sesiones Activas",
       valor: dashboardStats.activeSessions,
-      iconColor: BRAND.blue,
-      bgIcon: "bg-[#2C67B0]/10",
       icono: <Bell color={BRAND.blue} size={24} />,
+      bgIcon: `bg-[${BRAND.blue}]15`,
     },
     {
       titulo: "Alertas Críticas",
       valor: dashboardStats.criticalAlerts,
-      iconColor: BRAND.orange,
-      bgIcon: "bg-[#E15200]/10",
-      icono: <AlertTriangle color={BRAND.orange} size={24} />,
+      icono: <AlertTriangle color={BRAND.lime} size={24} />,
+      bgIcon: `bg-[${BRAND.lime}]15`,
     },
     {
       titulo: "Accesos Bloqueados",
       valor: dashboardStats.blockedAccesses,
-      iconColor: BRAND.purple,
-      bgIcon: "bg-[#9E1981]/10",
-      icono: <AlertOctagon color={BRAND.purple} size={24} />,
+      icono: <AlertOctagon color={BRAND.lightBlue} size={24} />,
+      bgIcon: `bg-[${BRAND.lightBlue}]15`,
     },
   ];
 
@@ -216,7 +207,7 @@ export default function Undexsub() {
       {/* Header Superior */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 px-2">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: BRAND.darkBlue }}>
+          <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: BRAND.blue }}>
             Resumen de Actividad
           </h1>
           <p className="text-gray-500 mt-1 font-medium">Visualización de métricas clave y seguridad</p>
@@ -235,7 +226,7 @@ export default function Undexsub() {
                 <p className="text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-500 transition-colors">
                   {item.titulo}
                 </p>
-                <h3 className="text-3xl font-black mt-2 leading-none" style={{ color: BRAND.darkBlue }}>
+                <h3 className="text-3xl font-black mt-2 leading-none" style={{ color: BRAND.blue }}>
                   {item.valor}
                 </h3>
               </div>
@@ -251,8 +242,8 @@ export default function Undexsub() {
         {/* Columna Izquierda (2/3) - Alertas */}
         <div className="lg:col-span-2 flex flex-col gap-8">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full">
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
-              <Shield style={{ color: BRAND.orange }} /> Centro de Alertas
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: BRAND.blue }}>
+              <Shield style={{ color: BRAND.lime }} /> Centro de Alertas
             </h2>
             <div className="space-y-3">
               {alertas.length > 0 ? (
@@ -269,8 +260,8 @@ export default function Undexsub() {
                       <span
                         className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
                         style={{
-                          color: alerta.tipo === "crítica" ? BRAND.orange : alerta.tipo === "advertencia" ? BRAND.yellow : BRAND.blue,
-                          backgroundColor: alerta.tipo === "crítica" ? '#FFF5EB' : alerta.tipo === "advertencia" ? '#FFFBEB' : '#EFF6FF'
+                          color: BRAND.blue,
+                          backgroundColor: `${BRAND.blue}15`
                         }}
                       >
                         {alerta.tipo}
@@ -292,7 +283,7 @@ export default function Undexsub() {
         {/* Columna Derecha (1/3) - Distribución de Usuarios */}
         <div className="lg:col-span-1 flex flex-col gap-8">
           <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm h-full flex flex-col">
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: BRAND.blue }}>
               <Users size={20} className="text-[#B1D357]" /> Usuarios por Rol
             </h3>
             <div className="flex-1 min-h-[250px] relative">
@@ -325,7 +316,7 @@ export default function Undexsub() {
       {/* Sección Inferior - Crecimiento de Usuarios (Gráfica de Barras) */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-          <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: BRAND.darkBlue }}>
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: BRAND.blue }}>
             <BarChartIcon className="text-blue-500" /> Crecimiento de Usuarios
           </h2>
           <div className="text-sm text-gray-400">
@@ -372,7 +363,7 @@ export default function Undexsub() {
       {/* Sección: Gestión de Quiénes Somos */}
       <div className="mt-12 pt-12 border-t border-gray-200">
         <div className="mb-8">
-          <h2 className="text-2xl font-black flex items-center gap-3" style={{ color: BRAND.darkBlue }}>
+          <h2 className="text-2xl font-black flex items-center gap-3" style={{ color: BRAND.blue }}>
             <Activity className="text-green-500" size={28} />
             Gestión de Contenido: Quiénes Somos
           </h2>
