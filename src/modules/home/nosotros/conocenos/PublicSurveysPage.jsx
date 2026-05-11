@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../../../../context/AuthContext";
 import formsApi from "../../../../api/formsApi";
 import { toast } from "react-hot-toast";
+import { decodeHtmlEntities, stripHtml } from "../../../../utils/textUtils";
+
 import {
   Play,
   FileText
@@ -182,10 +184,10 @@ export default function PublicSurveysPage() {
                     {/* Title & Desc */}
                     <div className="flex-1 mb-6">
                        <h3 className="text-lg font-black text-[#005380] mb-2 group-hover:text-[#2C67B0] transition-colors leading-tight line-clamp-2">
-                          {form.title}
+                          {decodeHtmlEntities(form.title)}
                        </h3>
                        <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2">
-                          {form.description || "Iniciativa técnica disponible para consulta."}
+                          {stripHtml(form.description) || "Iniciativa técnica disponible para consulta."}
                        </p>
                     </div>
 

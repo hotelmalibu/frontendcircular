@@ -6,7 +6,8 @@ import { Search, ChevronDown, FilterX } from "lucide-react";
 import { contentTypeConfig } from "../../data/mockContent";
 import { getAllNews } from "../../api/newsApi";
 import { getAllCategories } from "../../api/categoriesApi";
-import { stripHtml } from "../../utils/textUtils";
+import { stripHtml, decodeHtmlEntities } from "../../utils/textUtils";
+
 import explorarHeroImage from "../../assets/explorar-hero.jpg";
 
 export default function ExplorePage() {
@@ -47,8 +48,9 @@ export default function ExplorePage() {
           id: n.id || n._id || Math.random(),
           type: "Noticias",
           category: catName,
-          title: n.title || n.name || "Sin título",
+          title: decodeHtmlEntities(n.title || n.name || "Sin título"),
           excerpt: stripHtml(n.description || n.excerpt),
+
           image: fixUrl(
             (n.upload_file && n.upload_file.url) ||
             n.image ||

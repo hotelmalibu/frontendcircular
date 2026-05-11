@@ -21,6 +21,9 @@ import {
 
 import { getProjectById } from "../../api/projectsApi";
 import { getImageProxyUrl } from "../../utils/imageUtils";
+import { decodeHtmlEntities } from "../../utils/textUtils";
+
+
 
 // Import specific category images
 import imgFortalecimiento from "../../assets/home/Proyectos/Fortalecimiento.png";
@@ -56,9 +59,33 @@ export default function ContentDetailProject() {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const url = window.location.href;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }).catch(() => fallbackCopy(url));
+    } else {
+      fallbackCopy(url);
+    }
+  };
+
+  const fallbackCopy = (text) => {
+    try {
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.focus();
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.warn('No se pudo copiar al portapapeles:', err);
+    }
   };
 
   useEffect(() => {
@@ -90,8 +117,9 @@ export default function ContentDetailProject() {
           author: projectData.author || "Autor Desconocido",
           classification: projectData.classification_type_label || projectData.classification_type?.label,
           projectType: projectData.project_type_label || projectData.project_type?.label || projectData.project_type?.name,
-          description: String(projectData.content || projectData.description || projectData.body || "Sin descripción disponible").replace(/\u00A0|&nbsp;/g, ' '),
+          description: projectData.content || projectData.description || projectData.body || "Sin descripción disponible",
           uploadFile: projectData.upload_file,
+
           stats: projectData.stats || []
         };
 
@@ -142,8 +170,10 @@ export default function ContentDetailProject() {
   // Social share URLs
   const currentUrl = window.location.href;
   const encodedUrl = encodeURIComponent(currentUrl);
-  const encodedTitle = encodeURIComponent(project?.title || '');
-  const encodedTextAndUrl = encodeURIComponent(`${project?.title || ''} ${currentUrl}`);
+  const decodedTitle = decodeHtmlEntities(project?.title || '');
+  const encodedTitle = encodeURIComponent(decodedTitle);
+  const encodedTextAndUrl = encodeURIComponent(`${decodedTitle} ${currentUrl}`);
+
 
   // NOTE: Facebook sharing won't show a preview if the URL is "localhost".
   // To test that it works, you can temporarily replace 'encodedUrl' with encodeURIComponent('https://www.google.com')
@@ -181,8 +211,9 @@ export default function ContentDetailProject() {
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] drop-shadow-2xl max-w-5xl tracking-tight">
-              {project.title}
+              {decodeHtmlEntities(project.title)}
             </h1>
+
           </div>
         </div>
 
@@ -209,8 +240,9 @@ export default function ContentDetailProject() {
               <div className="p-8 md:p-12 overflow-visible">
                 {/* Título de la noticia (Tamaño moderado dentro del card) */}
                 <h2 className="text-3xl md:text-4xl font-extrabold text-[#1E305D] mb-4 leading-tight">
-                  {project.title}
+                  {decodeHtmlEntities(project.title)}
                 </h2>
+
 
                 {/* Sección de Autor más visible */}
                 <div className="flex items-center gap-4 mb-10 pb-8 border-b border-gray-100">

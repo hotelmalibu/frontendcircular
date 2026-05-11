@@ -6,6 +6,9 @@ import { allContentData } from '../../data/mockContent';
 import { AuthContext } from '../../context/AuthContext';
 import { getAllNews, getNewsById } from '../../api/newsApi';
 import DefaultLoader from '../../components/common/DefaultLoader';
+import { decodeHtmlEntities } from '../../utils/textUtils';
+
+
 
 
 export default function ContentDetailPage() {
@@ -15,9 +18,33 @@ export default function ContentDetailPage() {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const url = window.location.href;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }).catch(() => fallbackCopy(url));
+    } else {
+      fallbackCopy(url);
+    }
+  };
+
+  const fallbackCopy = (text) => {
+    try {
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.focus();
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.warn('No se pudo copiar al portapapeles:', err);
+    }
   };
 
   // Try to find content in static mock first, or fetch from API when needed
@@ -86,9 +113,10 @@ export default function ContentDetailPage() {
           // Normalize API object into the shape expected by the detail page
           const mapped = {
             id: found.id || found._id || found.uid,
-            title: found.title || found.name || "Sin título",
+            title: decodeHtmlEntities(found.title || found.name || "Sin título"),
             excerpt: found.description || found.content || "",
             body: found.content || found.description || found.body || "",
+
             image: (() => {
               const API_BASE = 'https://api-ecocircular.creativostecnologicosit.com';
               let rawUrl = (found.upload_file && found.upload_file.url) || found.image || '';
@@ -108,10 +136,8 @@ export default function ContentDetailPage() {
             status: found.status || "",
           };
 
-          // Normalizar espacios de no-ruptura que vienen de la API para permitir saltos de línea correctos
-          if (mapped.body) {
-            mapped.body = String(mapped.body).replace(/\u00A0|&nbsp;/g, ' ');
-          }
+
+
 
           // Sanitize body HTML
           if (mapped.body && /[<>]/.test(mapped.body)) {
@@ -164,10 +190,11 @@ export default function ContentDetailPage() {
   // --- SOCIAL SHARE URLS ---
   const currentUrl = window.location.href;
   const rawTitle = content?.title || '';
-
   const encodedUrl = encodeURIComponent(currentUrl);
-  const encodedTitle = encodeURIComponent(rawTitle);
-  const encodedTextAndUrl = encodeURIComponent(`${rawTitle} ${currentUrl}`);
+  const decodedTitle = decodeHtmlEntities(rawTitle);
+  const encodedTitle = encodeURIComponent(decodedTitle);
+  const encodedTextAndUrl = encodeURIComponent(`${decodedTitle} ${currentUrl}`);
+
 
   const facebookShareUrl = `https://www.facebook.com/sharer.php?u=${encodedUrl}`;
   const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
@@ -265,8 +292,9 @@ export default function ContentDetailPage() {
                     <SidebarItem
                       icon={Layers}
                       label="Tópico / Categoría"
-                      value={content.topic}
+                      value={decodeHtmlEntities(content.topic)}
                     />
+
                     <SidebarItem
                       icon={Check}
                       label="Tipo de contenido"

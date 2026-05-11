@@ -6,6 +6,8 @@ import { getImageProxyUrl } from "../../../../../utils/imageUtils.js";
 import { getAllProjects } from "../../../../../api/projectsApi.js";
 import { getProjectTypes } from "../../../../../api/projectTypesApi.js";
 import { getAllCategories } from "../../../../../api/categoriesApi.js";
+import { stripHtml, decodeHtmlEntities } from "../../../../../utils/textUtils.js";
+
 
 // Import specific category images
 import imgFortalecimiento from "../../../../../assets/home/Proyectos/Fortalecimiento.png";
@@ -47,10 +49,12 @@ const SkeletonCard = () => (
 );
 
 const ProjectCard = ({ p, i }) => {
-  const plainDescription = p.description ? p.description.replace(/<[^>]*>?/gm, "") : (p.descripcion || "");
+  const plainDescription = stripHtml(p.description || p.descripcion || "");
+
 
   // Lógica de fallback de imagen por categoría
-  const catName = p.category_name || p.category?.name || "";
+  const catName = decodeHtmlEntities(p.category_name || p.category?.name || "");
+
   const categoryFallback = CATEGORY_IMAGES[catName] || "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400";
 
   const imageUrl = p.cover_image?.url || p.cover_image_url || p.img || categoryFallback;
@@ -86,7 +90,7 @@ const ProjectCard = ({ p, i }) => {
         <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
           <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-[#2B65AC] font-bold text-[10px] rounded-full shadow-sm border border-gray-100 uppercase tracking-wider">
             <MapPin className="w-2.5 h-2.5" />
-            {p.classification_type?.label || p.categoria || "Proyecto"}
+            {decodeHtmlEntities(p.classification_type?.label || p.categoria || "Proyecto")}
           </span>
         </div>
       </Link>
@@ -94,7 +98,7 @@ const ProjectCard = ({ p, i }) => {
       <div className="p-5 flex flex-col flex-1">
         <Link to={`/proyectos/${p.id}`} className="mb-4 flex-1 block group">
           <h3 className="text-lg font-bold text-[#1E305D] leading-tight mb-2 group-hover:text-[#00AB6D] transition-colors duration-300">
-            {p.title || p.titulo}
+            {decodeHtmlEntities(p.title || p.titulo)}
           </h3>
           <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 font-medium">
             {plainDescription}
@@ -225,92 +229,154 @@ export default function ProyectosYAlianzas() {
       {/* CONTENIDO PRINCIPAL */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-20 mt-12">
 
-        {/* BUSCADOR */}
-        <div className="max-w-2xl mx-auto mb-10">
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className={`w-5 h-5 transition-colors duration-300 ${searchQuery ? "text-[#2B65AC]" : "text-gray-400"}`} />
-            </div>
-            <input
-              type="text"
-              placeholder="Buscar proyectos por nombre..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-12 py-4 bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl shadow-sm focus:ring-4 focus:ring-[#2B65AC]/10 focus:border-[#2B65AC] outline-none transition-all duration-300 text-gray-700 font-medium placeholder:text-gray-400"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-red-500 transition-colors"
-                title="Limpiar búsqueda"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            )}
-          </div>
-        </div>
+        {/* ── PANEL DE FILTROS UNIFICADO ── */}
+        <div className="mb-10">
 
-        {/* FILTRO DE CATEGORÍAS GLOBALES */}
-        <div className="mb-12">
-          <div className="flex items-center gap-2 mb-6 justify-center">
-            <Filter className="w-4 h-4 text-[#2B65AC]" />
-            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Filtrar por Categoría</span>
-          </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            {isLoading ? (
-              [...Array(4)].map((_, i) => (
-                <div key={i} className="h-10 w-32 bg-gray-100 animate-pulse rounded-full"></div>
-              ))
-            ) : (
-              categories.map((cat) => (
-                <motion.button
-                  key={cat.id}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleCategoryChange(cat)}
-                  className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-300 shadow-sm border ${activeCategory.id === cat.id
-                    ? "bg-[#2B65AC] text-white border-[#2B65AC] shadow-md"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-[#2B65AC] hover:text-[#2B65AC]"
-                    }`}
+          {/* Buscador */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className={`w-5 h-5 transition-colors duration-300 ${searchQuery ? "text-[#2B65AC]" : "text-gray-400"}`} />
+              </div>
+              <input
+                type="text"
+                placeholder="Buscar proyectos por nombre..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-12 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm focus:ring-4 focus:ring-[#2B65AC]/10 focus:border-[#2B65AC] outline-none transition-all duration-300 text-gray-700 font-medium placeholder:text-gray-400"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-red-500 transition-colors"
+                  title="Limpiar búsqueda"
                 >
-                  {cat.name}
-                </motion.button>
-              ))
-            )}
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Etiqueta + chips de categoría */}
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-[#2B65AC]" />
+              <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Filtrar por Categoría</span>
+              {activeCategory.id !== "all" && (
+                <button
+                  onClick={() => handleCategoryChange({ id: "all", name: "Todos" })}
+                  className="ml-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-50 text-red-500 text-[10px] font-black uppercase tracking-widest border border-red-100 hover:bg-red-100 transition-colors"
+                >
+                  <X className="w-2.5 h-2.5" /> Limpiar
+                </button>
+              )}
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-2.5">
+              {isLoading ? (
+                [...Array(5)].map((_, i) => (
+                  <div key={i} className="h-10 w-32 bg-gray-100 animate-pulse rounded-full" />
+                ))
+              ) : (
+                categories.map((cat) => {
+                  const isActive = activeCategory.id === cat.id;
+                  const catImg = CATEGORY_IMAGES[cat.name];
+                  const count = cat.id === "all"
+                    ? allProjects.length
+                    : allProjects.filter(p => p.category_id === cat.id).length;
+
+                  return (
+                    <motion.button
+                      key={cat.id}
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => handleCategoryChange(cat)}
+                      className={`relative inline-flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full font-bold text-sm transition-all duration-300 border ${
+                        isActive
+                          ? "bg-[#1E305D] text-white border-[#1E305D] shadow-lg shadow-[#1E305D]/20"
+                          : "bg-white text-gray-600 border-gray-200 hover:border-[#2B65AC] hover:text-[#2B65AC] hover:shadow-sm"
+                      }`}
+                    >
+                      {catImg && (
+                        <span className={`w-6 h-6 rounded-full overflow-hidden flex-shrink-0 ${isActive ? "ring-2 ring-white/40" : "ring-1 ring-gray-100"}`}>
+                          <img src={catImg} alt={cat.name} className="w-full h-full object-cover" />
+                        </span>
+                      )}
+                      <span>{decodeHtmlEntities(cat.name)}</span>
+                      <span className={`ml-0.5 text-[10px] font-black px-1.5 py-0.5 rounded-full ${
+                        isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
+                      }`}>
+                        {count}
+                      </span>
+                    </motion.button>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
 
-        {/* SELECTOR DE SECCIÓN (SOLO SI ES FORTALECIMIENTO) */}
+        {/* SELECTOR TERRITORIAL / SECTORIAL (solo para Fortalecimiento) */}
         <AnimatePresence>
           {isFortalecimiento && !isLoading && (
             <motion.div
-              initial={{ opacity: 0, height: 0, y: -20 }}
+              initial={{ opacity: 0, height: 0, y: -10 }}
               animate={{ opacity: 1, height: "auto", y: 0 }}
-              exit={{ opacity: 0, height: 0, y: -20 }}
-              className="flex justify-center items-center mb-12 overflow-hidden"
+              exit={{ opacity: 0, height: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="flex justify-center items-center mb-10 overflow-hidden"
             >
-              <div className="bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 flex gap-1 w-full sm:w-auto">
+              <div className="bg-[#1E305D]/5 p-1 rounded-2xl flex gap-1 border border-[#1E305D]/10">
                 <button
                   onClick={() => handleSectionChange("territorial")}
-                  className={`flex-1 sm:flex-none px-8 py-3 rounded-xl font-bold text-sm transition-all duration-500 flex items-center justify-center gap-2 ${activeSection === "territorial"
-                    ? "bg-[#2B65AC] text-white shadow-lg"
-                    : "text-gray-500 hover:bg-gray-50"
-                    }`}
+                  className={`px-7 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center gap-2 ${
+                    activeSection === "territorial"
+                      ? "bg-[#2B65AC] text-white shadow-md"
+                      : "text-[#1E305D]/60 hover:bg-white hover:text-[#1E305D]"
+                  }`}
                 >
                   <Globe className="w-4 h-4" />
                   Territoriales
                 </button>
                 <button
                   onClick={() => handleSectionChange("sectorial")}
-                  className={`flex-1 sm:flex-none px-8 py-3 rounded-xl font-bold text-sm transition-all duration-500 flex items-center justify-center gap-2 ${activeSection === "sectorial"
-                    ? "bg-[#00AB6D] text-white shadow-lg"
-                    : "text-gray-500 hover:bg-gray-50"
-                    }`}
+                  className={`px-7 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center gap-2 ${
+                    activeSection === "sectorial"
+                      ? "bg-[#00AB6D] text-white shadow-md"
+                      : "text-[#1E305D]/60 hover:bg-white hover:text-[#1E305D]"
+                  }`}
                 >
                   <Briefcase className="w-4 h-4" />
                   Sectoriales
                 </button>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Contador de resultados */}
+        <AnimatePresence>
+          {!isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center justify-between mb-6 px-1"
+            >
+              <p className="text-sm text-gray-500 font-medium">
+                <span className="font-black text-[#1E305D]">{filteredProjects.length}</span>
+                {" "}proyecto{filteredProjects.length !== 1 ? "s" : ""} encontrado{filteredProjects.length !== 1 ? "s" : ""}
+                {activeCategory.id !== "all" && (
+                  <span className="text-gray-400"> en <span className="font-bold text-[#2B65AC]">{decodeHtmlEntities(activeCategory.name)}</span></span>
+                )}
+              </p>
+              {(searchQuery || activeCategory.id !== "all") && (
+                <button
+                  onClick={() => { setSearchQuery(""); handleCategoryChange({ id: "all", name: "Todos" }); }}
+                  className="text-xs font-bold text-gray-400 hover:text-red-500 flex items-center gap-1 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" /> Limpiar todo
+                </button>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

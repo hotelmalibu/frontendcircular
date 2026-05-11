@@ -195,6 +195,20 @@
   color: #4b5563;
 }
 
+/* --- NEUTRALIZE INLINE STYLES FROM QUILL EDITOR (background highlights, colors) --- */
+/* Prevents yellow or colored highlights from appearing on the public frontend */
+.news-content [style*="background-color"],
+.news-content * [style*="background-color"] {
+  background-color: transparent !important;
+}
+
+/* Allow color on links and headings but strip arbitrary inline text colors on paragraphs */
+.news-content p[style*="color"],
+.news-content span[style*="color"],
+.news-content li[style*="color"] {
+  color: inherit !important;
+}
+
 
 /* --- UTILS: NAVBAR SPACING --- */
 .page-top-padding {
