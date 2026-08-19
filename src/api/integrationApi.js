@@ -6,9 +6,9 @@ import axios from "axios";
  * Header: X-API-Key
  */
 const INTEGRATION_API_URL = "https://api.andi.bocetos.co/integration/dashboard";
-const DEFAULT_API_KEY = "sk_vision_2zgIH5vZtCTYQPZLYrSahGdw0LFPFvnT";
+const DEFAULT_API_KEY = "sk_vision_czfxsFOugdMIynMj3gcYmmIEHgyxyk3T";
 
-export const getIntegrationDashboard = async (year = 2024, apiKey = DEFAULT_API_KEY) => {
+export const getIntegrationDashboard = async (year = 2025, apiKey = DEFAULT_API_KEY) => {
   const config = {
     headers: {
       "X-API-Key": apiKey,
