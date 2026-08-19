@@ -19,14 +19,14 @@ import ImpactSection from "../../../../components/home/nosotros/conocenos/quiene
 const DATA_LINEAS = [
   {
     id: "cadenas",
-    title: "Fortalecimiento de las cadenas de valor",
+    title: "Fortalecimiento de cadenas de valor",
     shortTitle: "Cadenas de Valor",
-    description: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales.",
+    description: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales de aprovechamiento mediante la generación de valor entre actores de la cadena para el cumplimiento normativo en REP, aportando a estrategias corporativas.",
     detailedIntro: "Modelo de articulación y encadenamientos para la optimización de ecosistemas locales de aprovechamiento mediante la generación de valor entre actores de la cadena para el cumplimiento normativo en REP, aportando a estrategias corporativas.",
     articulation: "A través de la articulación de la cadena de valor de residuos aprovechables, garantizamos el cumplimiento de la normatividad vigente, por medio de proyectos territoriales, sectoriales y de inclusión social y productiva.",
     projects: ["Vinculación con proyectores territoriales y sectoriales"],
     img: imgCadenas,
-    colorAcento: "#86B13D", // Greenish
+    colorAcento: "#8cb200", // Greenish
     boxTitle: "¿Qué hacemos?",
     boxText: "Articular los actores de la cadena.",
     iconSvg: (
@@ -39,7 +39,7 @@ const DATA_LINEAS = [
     id: "inclusion",
     title: "Inclusión social y productiva",
     shortTitle: "Inclusión Social",
-    detailedIntro: "La línea de Inclusión Social y Productiva de Visión Circular ANDI impulsa estrategias orientadas a cerrar brechas productivas y sociales, generando impacto en la competitividad, los ingresos y el bienestar de los actores de la cadena de envases y empaques.",
+    detailedIntro: "Cierre de brechas de las organizaciones de recicladores y transformadores para fortalecer su competitividad y promover una transición justa hacia modelos de negocio circulares.",
     articulation: "A través del modelo de inclusión social y productiva, se desarrollan programas y proyectos con dos objetivos: Mejorar la competitividad y promover la transición justa y los empleos verdes en toda la cadena.",
     projects: [
       "Ruta de la productividad",
@@ -47,7 +47,7 @@ const DATA_LINEAS = [
       "Transición justa, empleos verdes"
     ],
     img: imgInclusion,
-    colorAcento: "#E15200",
+    colorAcento: "#DF0000",
     boxTitle: "Cierre de Brechas",
     boxText: "Fortalecimiento de la competitividad en organizaciones de recicladores y transformadores.",
     iconSvg: (
@@ -58,9 +58,9 @@ const DATA_LINEAS = [
   },
   {
     id: "innovacion",
-    title: "Innovación para el cierre de ciclo de envases",
+    title: "Innovación para el cierre del ciclo de envases y empaques",
     shortTitle: "Innovación",
-    detailedIntro: "Nuestra hoja de ruta ha guiado cada acción perfeccionando metodologías y criterios de selección para garantizar que cada iniciativa tenga un impacto tangible alineado con nuestra visión de sostenibilidad.",
+    detailedIntro: "Investigación aplicada y desarrollo experimental enfocados en dinamizar el ecosistema de Ciencia, Tecnología e Innovación (CTeI), para el cierre de ciclo de envases, empaques y PUSU, basados en modelos de negocio circulares.",
     articulationNode: (
       <div className="space-y-4">
         <p className="font-medium text-white/90">Desde 2023 hemos realizado dos convocatorias para activar el ecosistema de innovación, cofinanciando proyectos de investigación aplicada.</p>
@@ -92,7 +92,7 @@ const DATA_LINEAS = [
   },
   {
     id: "proyectos",
-    title: "Proyectos estratégicos",
+    title: "Proyectos estratégicos y territoriales",
     shortTitle: "Territoriales",
     detailedIntro: "Estrategias para impulsar modelos circulares mediante procesos de generación de capacidades territoriales y sectoriales que generen impactos económicos, sociales y ambientales.",
     articulation: "Los proyectos estratégicos en territorios marino-costeros buscan focalizar acciones desde la REP para crear modelos que consoliden ecosistemas territoriales de economía circular reales.",
@@ -100,7 +100,7 @@ const DATA_LINEAS = [
       "Magdalena Arriba", "Cartagena y Bolívar", "Puerto Circular Barranquilla"
     ],
     img: imgProyectos,
-    colorAcento: "#2C67B0", // Blue
+    colorAcento: "#2b65ac", // Blue
     boxTitle: "Enfoque Territorial",
     boxText: "Acciones enfocadas en zonas marino-costeras con visión de impacto triple.",
     iconSvg: (
@@ -111,15 +111,15 @@ const DATA_LINEAS = [
   },
   {
     id: "consumo",
-    title: "Consumo responsable y pedagogía",
+    title: "Consumo responsable y pedagogía al consumidor",
     shortTitle: "Pedagogía",
-    detailedIntro: "Buscamos sensibilizar y promover el cambio de hábitos, fomentando la correcta separación en la fuente como condición clave.",
+    detailedIntro: "Sensibilizar y contribuir al cambio de hábitos y comportamiento del consumidor fomentando la correcta separación en la fuente.",
     articulation: "Activamos el rol del consumidor desde distintos entornos facilitando prácticas sostenibles mediante acciones pedagógicas y mensajes claros.",
     projects: [
       "Evolución Circular", "Tienda a tienda", "Separo en casa"
     ],
     img: imgConsumo,
-    colorAcento: "#F1B708", // Yellow
+    colorAcento: "#e8ad00", // Yellow
     boxTitle: "Cambio de Hábitos",
     boxText: "Promover la separación en la fuente mediante sensibilización ciudadana.",
     iconSvg: (
@@ -216,7 +216,9 @@ export default function LineasEstrategicasPage() {
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute -bottom-2 md:-bottom-4 w-12 h-1 bg-[#B1D357] rounded-full"
+                    className="absolute -bottom-2 md:-bottom-4 w-12 h-1 rounded-full shadow-sm"
+                    style={{ backgroundColor: item.colorAcento }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 )}
               </button>
