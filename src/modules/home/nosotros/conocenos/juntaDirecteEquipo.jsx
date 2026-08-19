@@ -196,6 +196,14 @@ export default function TeamOrgChart() {
       </div>
 
       <div className="w-full max-w-[1600px] mx-auto px-6 md:px-12">
+        {/* Junta Directiva Separada */}
+          <div className="text-center mb-12 pt-8 border-t border-gray-100">
+            <h3 className="text-[#1E305D] text-xl font-black uppercase tracking-[0.2em]">
+              Asamblea de Productores
+            </h3>
+            <div className="h-1.5 w-16 bg-[#1E305D] mx-auto mt-4 rounded-full" />
+          </div>
+
 
         {/* CABECERA GOBERNANZA - Separación visual */}
         <div className="mb-16">
@@ -206,20 +214,18 @@ export default function TeamOrgChart() {
             </div>
             <div className="h-12 w-[1px] bg-gray-300 hidden md:block" />
             <div className="text-center md:text-left">
-              <h2 className="text-[#1E305D] font-black text-2xl md:text-3xl uppercase tracking-tighter leading-none mb-1">
-                Asamblea de Productores
-              </h2>
               <p className="text-gray-700 text-base md:text-lg lg:text-xl font-semibold leading-relaxed max-w-3xl">
-                Más de 380 empresas hacen parte de un colectivo líder que impulsa la economía circular en el país.
+                Más de 380 empresas hacen parte del colectivo líder que impulsa la economía circular en el país.
               </p>
             </div>
           </div>
 
           {/* Junta Directiva Separada */}
-          <div className="mb-6 pl-2">
-            <h3 className="text-[#1E305D] text-lg font-black border-b-2 border-[#1E305D] inline-block pb-1 uppercase tracking-tight">
+          <div className="text-center mb-12 pt-8 border-t border-gray-100">
+            <h3 className="text-[#1E305D] text-xl font-black uppercase tracking-[0.2em]">
               Junta Directiva
             </h3>
+            <div className="h-1.5 w-16 bg-[#1E305D] mx-auto mt-4 rounded-full" />
           </div>
 
           {/* Logos de la Junta Directiva (Compacts & Cleans) */}
