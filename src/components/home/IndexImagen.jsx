@@ -475,15 +475,13 @@ export default function IndexImagen() {
 
             {/* Nuevo botón: Únase a Visión Circular (Solo si no hay usuario) */}
             {!user && (
-              <a
-                href="https://ecocircular.creativostecnologicosit.com/encuestas/01kf9vjyyz000n6hqzmcnr4nx0"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/unirse"
                 className="flex items-center justify-center gap-2 w-full px-8 py-3 rounded-full font-bold text-sm uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 bg-white text-[#2C67B0] hover:bg-gray-100 border-2 border-[#2C67B0]/10"
               >
                 Únase a Visión Circular
                 <ArrowRight size={18} />
-              </a>
+              </Link>
             )}
           </div>
         </div>
