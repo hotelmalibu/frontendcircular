@@ -235,7 +235,7 @@ function MegaMenuDropdown({
     };
   }, []);
 
-  const textColorClass = showWhiteText ? "text-white" : "text-gray-700";
+  const textColorClass = showWhiteText ? "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" : "text-gray-700";
 
   if (path) {
     return (
@@ -939,7 +939,11 @@ export default function Navbar({ onMenuClick }) {
             <img
               src={currentLogo}
               alt="Visión Circular"
-              className="h-12 md:h-[80px] w-auto object-contain"
+              className={`h-12 md:h-[80px] w-auto object-contain transition-all duration-300 ${
+                showWhiteText
+                  ? "filter drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]"
+                  : ""
+              }`}
             />
           </Link>
         </div>

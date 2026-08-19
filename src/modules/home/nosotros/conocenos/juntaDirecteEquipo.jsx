@@ -175,14 +175,17 @@ export default function TeamOrgChart() {
           alt="Equipo Visión Circular"
           className="w-full h-full object-cover object-center"
         />
+        {/* Degradado superior para asegurar contraste y legibilidad   del Navbar y Logo sobre cualquier foto */}
+        <div className="absolute inset-x-0 top-0 h-44 md:h-56 bg-gradient-to-b from-black/60 via-black/20 to-transparent pointer-events-none z-[1]" />
+
         {/* Degradado y Textos al pie de la imagen */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1E305D] via-transparent to-transparent flex flex-col justify-end items-center text-center pb-24 px-6">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1E305D] via-transparent to-transparent flex flex-col justify-end items-center text-center pb-24 px-6 z-[2]">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-white text-4xl md:text-5xl lg:text-5xl font-extrabold leading-tight mb-3 drop-shadow-xl"
           >
-            Nuestra Gente, Nuestra Visión
+            EL EQUIPO QUE IMPULSA LA ECONOMÍA CIRCULAR
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -190,7 +193,7 @@ export default function TeamOrgChart() {
             transition={{ delay: 0.2 }}
             className="text-white/90 text-base md:text-lg max-w-3xl mx-auto leading-relaxed font-medium drop-shadow-lg"
           >
-            Un equipo impulsado por la pasión y el compromiso para liderar la transformación hacia un país plenamente circular y sostenible.
+           Articulamos actores, conocimiento y soluciones para hacer de la economía circular una realidad en el país.
           </motion.p>
         </div>
       </div>
