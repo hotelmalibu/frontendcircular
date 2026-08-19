@@ -716,32 +716,32 @@ export default function Navbar({ onMenuClick }) {
             { label: "Portafolio de proyectos", path: "/proyectos-activos" },
             {
               label: "Líneas Estratégicas",
-              path: null,
+              path: "/lineas-estrategicas",
               subItems: [
                 {
-                  label: "Fortalecimiento",
-                  path: null,
+                  label: "Fortalecimiento de cadenas de valor",
+                  path: "/lineas-estrategicas#cadenas",
                   projects: getProjectsByLineSubstr("Fortalecimiento")
                 },
                 {
-                  label: "Consumo Responsable",
-                  path: null,
-                  projects: getProjectsByLineSubstr("Consumo")
-                },
-                {
-                  label: "Inclusión",
-                  path: null,
+                  label: "Inclusión social y productiva",
+                  path: "/lineas-estrategicas#inclusion",
                   projects: getProjectsByLineSubstr("Inclusión")
                 },
                 {
-                  label: "Proyectos Estratégicos",
-                  path: null,
+                  label: "Innovación para el cierre del ciclo de envases y empaques",
+                  path: "/lineas-estrategicas#innovacion",
+                  projects: getProjectsByLineSubstr("Innovación")
+                },
+                {
+                  label: "Proyectos estratégicos y territoriales",
+                  path: "/lineas-estrategicas#proyectos",
                   projects: getProjectsByLineSubstr("Proyectos")
                 },
                 {
-                  label: "Innovación",
-                  path: null,
-                  projects: getProjectsByLineSubstr("Innovación")
+                  label: "Consumo responsable y pedagogía al consumidor",
+                  path: "/lineas-estrategicas#consumo",
+                  projects: getProjectsByLineSubstr("Consumo")
                 },
               ],
             },
