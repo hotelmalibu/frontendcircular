@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   MoreVertical,
   AlertCircle
+} from "lucide-react";
 import { getDocuments, getDocumentTypes } from "../../../../../api/documentsApi";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
