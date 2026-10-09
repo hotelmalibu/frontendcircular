@@ -87,7 +87,7 @@ export default function VerifyEmail() {
                         <p className="text-gray-600 mb-8">{message}</p>
                         
                         <button 
-                            onClick={() => navigate(isAuthenticated ? "/profile" : "/login")}
+                            onClick={() => navigate(isAuthenticated ? "/perfil" : "/login")}
                             className="flex items-center justify-center gap-2 bg-[#2C67B0] hover:bg-[#005380] text-white px-6 py-3 rounded-xl font-bold transition-all w-full"
                         >
                             {isAuthenticated ? "Ir a mi Perfil" : "Ir al Login"} <ArrowRight size={18} />

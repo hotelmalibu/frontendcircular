@@ -41,7 +41,7 @@ export default function Sidebar() {
     },
     { 
       name: "Circularmente", 
-      path: "/companies", 
+      path: "/empresas", 
       icon: <Building size={24} />,
       permission: "view.circularmente" 
     },

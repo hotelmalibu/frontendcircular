@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useContext } from "react";
-import { Routes, Route, Outlet, useLocation } from "react-router-dom";
+import { Routes, Route, Outlet, useLocation, Navigate } from "react-router-dom";
 import { AuthContext } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
@@ -41,6 +41,10 @@ const ProyectosActivos = lazy(() => import("./modules/home/nuestrosTrabajos/proy
 const LineasEstrategicasPage = lazy(() => import("./modules/home/nuestrosTrabajos/lineasEstrategicas/index"));
 const VisionCircularFormPage = lazy(() => import("./components/pagesProyectos/VisionCircularFormPage"));
 
+// Public - Legales
+const Terminos = lazy(() => import("./modules/home/Terminos"));
+const Privacidad = lazy(() => import("./modules/home/Privacidad"));
+
 // Dashboard (Protected)
 const Dashboard = lazy(() => import("./modules/dashboard/Dashboard"));
 const Documentos = lazy(() => import("./modules/dashboard/Documentos"));
@@ -67,6 +71,7 @@ const MainLayout = () => {
   // Rutas internas del dashboard donde NO se muestra el footer
   const internalPaths = [
     "/documentos",
+    "/empresas",
     "/companies",
     "/seguimiento",
     "/formularios",
@@ -80,9 +85,11 @@ const MainLayout = () => {
     location.pathname === p || location.pathname.startsWith(p + "/")
   );
 
-  // En /dashboard y /profile: solo mostrar footer si es afiliado
+  // En /dashboard, /perfil y /profile: solo mostrar footer si es afiliado
   const isDashboardOrProfile =
     location.pathname === "/dashboard" ||
+    location.pathname === "/perfil" ||
+    location.pathname.startsWith("/perfil/") ||
     location.pathname === "/profile" ||
     location.pathname.startsWith("/profile/");
 
@@ -97,16 +104,20 @@ const MainLayout = () => {
   // Determinar si la página actual usa un Navbar transparente/hero que NO necesita padding superior
   const transparentPaths = [
     "/circularmente",
+    "/junta-directiva-equipo",
     "/juntaDirecteEquipo",
     "/valores",
     "/lineas-estrategicas",
     "/informes-anuales",
     "/encuestas",
+    "/quienes-somos",
     "/quines-somos",
     "/alianzas",
     "/resoluciones",
     "/planes",
+    "/politicas",
     "/polticas",
+    "/proyectos",
     "/proyectos-activos",
     "/login",
     "/register",
@@ -141,7 +152,7 @@ export default function App() {
           {/* Pages with Navbar and Footer */}
           {/* Rutas con Navbar y Footer (Públicas y Privadas generales) */}
           <Route element={<MainLayout />}>
-            {/* Rutas públicas */}
+            {/* Rutas públicas canónicas */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -149,39 +160,55 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/circularmente" element={<Circularmente />} />
-            <Route path="/quines-somos" element={<QuienesSomos />} />
+            <Route path="/quienes-somos" element={<QuienesSomos />} />
             <Route path="/alianzas" element={<Alianzas />} />
 
             <Route path="/valores" element={<Valores />} />
-            <Route path="/juntaDirecteEquipo" element={<JuantaDirectiva />} />
+            <Route path="/junta-directiva-equipo" element={<JuantaDirectiva />} />
             <Route path="/informes-anuales" element={<InformesAnuales />} />
             <Route path="/planes" element={<Planes />} />
-            <Route path="/polticas" element={<Politicas />} />
+            <Route path="/politicas" element={<Politicas />} />
             <Route path="/resoluciones" element={<Resoluciones />} />
-            <Route path="/proyectos-activos" element={<ProyectosActivos />} />
+            <Route path="/proyectos" element={<ProyectosActivos />} />
             <Route path="/lineas-estrategicas" element={<LineasEstrategicasPage />} />
             <Route path="/encuestas" element={<PublicSurveysPage />} />
             <Route path="/unirse" element={<VisionCircularFormPage />} />
 
+            {/* Rutas legales */}
+            <Route path="/terminos" element={<Terminos />} />
+            <Route path="/privacidad" element={<Privacidad />} />
+
             {/* Rutas privadas generales */}
             <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-            <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            <Route path="/perfil" element={<PrivateRoute><Profile /></PrivateRoute>} />
 
             {/* Rutas para explorar contenido */}
             <Route path="/explorar" element={<ExplorePage />} />
             <Route path="/contenido/:slug" element={<ContentDetailPage />} />
             <Route path="/proyectos/:id" element={<ContentDetailProject />} />
+
+            {/* Redirecciones de compatibilidad retroactiva dentro de MainLayout */}
+            <Route path="/quines-somos" element={<Navigate to="/quienes-somos" replace />} />
+            <Route path="/polticas" element={<Navigate to="/politicas" replace />} />
+            <Route path="/juntaDirecteEquipo" element={<Navigate to="/junta-directiva-equipo" replace />} />
+            <Route path="/proyectos-activos" element={<Navigate to="/proyectos" replace />} />
+            <Route path="/profile" element={<Navigate to="/perfil" replace />} />
+            <Route path="/terms" element={<Navigate to="/terminos" replace />} />
+            <Route path="/privacy" element={<Navigate to="/privacidad" replace />} />
           </Route>
 
-          {/* Dashoard Routes with shared MainLayout to prevent remounts */}
+          {/* Dashboard Routes with shared MainLayout to prevent remounts */}
           <Route element={<MainLayout />}>
             <Route path="/documentos" element={<PrivateRoute permission="view.documents"><Documentos /></PrivateRoute>} />
-            <Route path="/companies" element={<PrivateRoute permission="view.circularmente"><Empresas /></PrivateRoute>} />
+            <Route path="/empresas" element={<PrivateRoute permission="view.circularmente"><Empresas /></PrivateRoute>} />
             <Route path="/formularios" element={<PrivateRoute permission="view.forms"><Formularios /></PrivateRoute>} />
             <Route path="/comunicaciones" element={<PrivateRoute permission="view.communications"><Comunicaciones /></PrivateRoute>} />
             <Route path="/administracion" element={<PrivateRoute permission="view.admin"><Administracion /></PrivateRoute>} />
             <Route path="/soporte" element={<PrivateRoute permission="view.support"><Soporte /></PrivateRoute>} />
             <Route path="/integracion" element={<PrivateRoute adminOnly={true}><Integracion /></PrivateRoute>} />
+
+            {/* Redirección de compatibilidad para empresas */}
+            <Route path="/companies" element={<Navigate to="/empresas" replace />} />
           </Route>
 
           {/* Survey Detail WITHOUT MainLayout to prevent 404 flash */}

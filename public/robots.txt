@@ -1,3 +1,19 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Disallow: /dashboard
+Disallow: /perfil
+Disallow: /profile
+Disallow: /documentos
+Disallow: /empresas
+Disallow: /companies
+Disallow: /formularios
+Disallow: /comunicaciones
+Disallow: /administracion
+Disallow: /soporte
+Disallow: /integracion
+Disallow: /quines-somos
+Disallow: /polticas
+Disallow: /juntaDirecteEquipo
+Disallow: /proyectos-activos
+
+Sitemap: https://andi.visioncircular.com.co/sitemap.xml

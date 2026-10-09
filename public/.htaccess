@@ -1,6 +1,18 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # --- REDIRECCIONES PERMANENTES 301 (MIGRACIÓN DE RUTAS) ---
+  RewriteRule ^quines-somos/?$ /quienes-somos [R=301,L]
+  RewriteRule ^polticas/?$ /politicas [R=301,L]
+  RewriteRule ^juntaDirecteEquipo/?$ /junta-directiva-equipo [R=301,L]
+  RewriteRule ^proyectos-activos/?$ /proyectos [R=301,L]
+  RewriteRule ^companies/?$ /empresas [R=301,L]
+  RewriteRule ^profile/?$ /perfil [R=301,L]
+  RewriteRule ^terms/?$ /terminos [R=301,L]
+  RewriteRule ^privacy/?$ /privacidad [R=301,L]
+
+  # --- ENRUTAMIENTO SPA REACT ROUTER ---
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d

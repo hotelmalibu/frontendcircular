@@ -453,7 +453,7 @@ export default function IndexImagen() {
           <div className={`animate-buttons ${hasLoaded ? 'loaded' : ''} flex flex-col gap-4 w-fit`}>
             <div className="flex flex-wrap gap-4">
               {/* Botón secundario - Contorno limpio */}
-              <Link to="/quines-somos" className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
+              <Link to="/quienes-somos" className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
                 <span className="relative z-10 flex items-center gap-2">
                   {SLIDES[currentSlide]?.button1}
                   <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

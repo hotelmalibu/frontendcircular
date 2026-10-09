@@ -28,7 +28,7 @@ export default function UndexAfiliado() {
             description: "Actualiza tu información personal y de contacto para que el equipo de Visión Circular esté siempre conectado contigo.",
             icon: <User size={20} />,
             color: BRAND.blue,
-            link: "/profile"
+            link: "/perfil"
         },
         {
             title: "Biblioteca Digital",

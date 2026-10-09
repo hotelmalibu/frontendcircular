@@ -496,7 +496,7 @@ function ProfileDropdown({ user, logout, showWhiteText }) {
         </div>
         <div className="py-1">
           <Link
-            to="/profile"
+            to="/perfil"
             className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
           >
             <User size={16} className="text-gray-400" /> Mi Perfil
@@ -577,6 +577,7 @@ export default function Navbar({ onMenuClick }) {
   const internalPaths = [
     "/dashboard",
     "/documentos",
+    "/empresas",
     "/companies",
     "/seguimiento",
     "/formularios",
@@ -584,6 +585,7 @@ export default function Navbar({ onMenuClick }) {
     "/administracion",
     "/soporte",
     "/integracion",
+    "/perfil",
     "/profile",
   ];
   const isInternalPage =
@@ -591,10 +593,12 @@ export default function Navbar({ onMenuClick }) {
 
   const isAuthPage = [
     "/login",
+    "/quienes-somos",
     "/quines-somos",
     "/alianzas",
     "/resoluciones",
     "/planes",
+    "/politicas",
     "/polticas",
     "/register",
     "/forgot-password",
@@ -609,6 +613,7 @@ export default function Navbar({ onMenuClick }) {
 
   const transparentPaths = [
     "/circularmente",
+    "/junta-directiva-equipo",
     "/juntaDirecteEquipo",
     "/valores",
     "/lineas-estrategicas",
@@ -688,9 +693,9 @@ export default function Navbar({ onMenuClick }) {
         {
           title: "Conócenos",
           items: [
-            { label: "Razón y propósito", path: "/quines-somos" },
+            { label: "Razón y propósito", path: "/quienes-somos" },
             { label: "Ética y transparencia", path: "/valores" },
-            { label: "Junta Directiva - Equipo", path: "/juntaDirecteEquipo" },
+            { label: "Junta Directiva - Equipo", path: "/junta-directiva-equipo" },
             { label: "Líneas Estratégicas", path: "/lineas-estrategicas" },
             { label: "Informes", path: "/informes-anuales" },
             { label: "Encuestas", path: "/encuestas" },
@@ -702,7 +707,7 @@ export default function Navbar({ onMenuClick }) {
           items: [
             { label: "Resoluciones", path: "/resoluciones" },
             { label: "Planes", path: "/planes" },
-            { label: "Políticas", path: "/polticas" },
+            { label: "Políticas", path: "/politicas" },
           ],
         },
       ],
@@ -713,7 +718,7 @@ export default function Navbar({ onMenuClick }) {
         {
           title: "Proyectos y alianzas",
           items: [
-            { label: "Portafolio de proyectos", path: "/proyectos-activos" },
+            { label: "Portafolio de proyectos", path: "/proyectos" },
             {
               label: "Líneas Estratégicas",
               path: "/lineas-estrategicas",
@@ -1232,7 +1237,7 @@ export default function Navbar({ onMenuClick }) {
                         path: "/documentos",
                         icon: FileText,
                       },
-                      { name: "Circularmente", path: "/companies", icon: Building },
+                      { name: "Circularmente", path: "/empresas", icon: Building },
                       {
                         name: "Formularios",
                         path: "/formularios",

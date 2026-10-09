@@ -1,12 +1,22 @@
 import axios from "axios";
 
-// Base URL for API requests; adjust if backend runs elsewhere
-// Use relative path in development to trigger the proxy in package.json
-// Use absolute path in production
-const API_BASE = process.env.NODE_ENV === 'development'
-  ? "/api"
-  : "https://api-ecocircular.creativostecnologicosit.com/api";
+// ==============================================================================
+// CONFIGURACIÓN DE CONEXIÓN CON EL BACKEND (API)
+// ==============================================================================
+// Cambia a 'true' para usar tu Laravel local, o 'false' para usar el servidor remoto
+const USE_LOCAL = true;
 
+// URLs configurables
+const LOCAL_API_URL = "http://127.0.0.1:8000/api"; // Tu servidor local con 'php artisan serve'
+// const LOCAL_API_URL = "http://plataformaeconomiacircular.test/api"; // Alternativa con Laragon VirtualHost
+const REMOTE_API_URL = "https://api-ecocircular.creativostecnologicosit.com/api";
+
+const API_BASE = process.env.REACT_APP_API_URL || (
+  USE_LOCAL
+    ? LOCAL_API_URL
+    : (process.env.NODE_ENV === 'development' ? "/api" : REMOTE_API_URL)
+);
+// ==============================================================================
 
 const api = axios.create({
   baseURL: API_BASE,

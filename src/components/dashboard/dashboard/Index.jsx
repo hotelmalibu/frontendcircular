@@ -78,7 +78,7 @@ export default function Index() {
     'view.circularmente': {
       title: 'CIRCULARMENTE',
       desc: 'Visualización de empresas y encadenamientos.',
-      link: '/companies'
+      link: '/empresas'
     },
     'view.forms': {
       title: 'FORMULARIOS',
