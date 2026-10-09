@@ -306,16 +306,26 @@ function MinimalistCard({ item, onOpenPdf }) {
     // If it's a raw document with a specific file path
     if (item.source === 'document' && item.documentData) {
       e.preventDefault();
-      const fileUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${item.documentData.upload_file.path}`;
-      onOpenPdf(fileUrl);
+      const uploadFile = item.documentData.upload_file;
+      const filePath = uploadFile?.path || uploadFile?.url || item.documentData.file_path;
+      if (filePath) {
+        const fileUrl = filePath.startsWith('http')
+          ? filePath
+          : `https://api-ecocircular.creativostecnologicosit.com/storage/${filePath.replace(/^\/+/, '')}`;
+        onOpenPdf(fileUrl);
+      }
     }
     // If it's a project with a specific file path or object
     else if (item.source === 'project' && (item.projectData?.upload_file || item.projectData?.file)) {
       e.preventDefault();
       const fileData = item.projectData.upload_file || item.projectData.file;
-      const filePath = typeof fileData === 'object' ? fileData.path : fileData;
-      const fileUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${filePath}`;
-      onOpenPdf(fileUrl);
+      const filePath = typeof fileData === 'object' ? (fileData.path || fileData.url) : fileData;
+      if (filePath) {
+        const fileUrl = String(filePath).startsWith('http')
+          ? filePath
+          : `https://api-ecocircular.creativostecnologicosit.com/storage/${String(filePath).replace(/^\/+/, '')}`;
+        onOpenPdf(fileUrl);
+      }
     }
   };
 

@@ -41,6 +41,7 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
   });
   const [contacts, setContacts] = useState([{ ...EMPTY_CONTACT }]);
   const [logoPreview, setLogoPreview] = useState(null);
+  const [existingBrochureUrl, setExistingBrochureUrl] = useState(null);
   const [brochureFileName, setBrochureFileName] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -73,8 +74,10 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
 
       // Show existing brochure filename if we have the url
       if (companyData.brochure_url) {
-        setBrochureFileName("Brochure actual (click para reemplazar)");
+        setExistingBrochureUrl(companyData.brochure_url);
+        setBrochureFileName(null);
       } else {
+        setExistingBrochureUrl(null);
         setBrochureFileName(null);
       }
 
@@ -178,7 +181,8 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
 
   const removeBrochure = () => {
     setFormData(prev => ({ ...prev, brochure_file: null }));
-    setBrochureFileName(companyData?.brochure_url ? "Brochure actual eliminado. Guarde para confirmar." : null);
+    setBrochureFileName(null);
+    setExistingBrochureUrl(null);
     setErrors(prev => ({ ...prev, brochure_file: "" }));
   };
 
@@ -210,8 +214,8 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
       submitData.append('description', formData.description);
       if (formData.address) submitData.append('address', formData.address);
       if (formData.website_url) submitData.append('website_url', formData.website_url);
-      if (formData.logo) submitData.append('logo', formData.logo);
-      if (formData.brochure_file) submitData.append('brochure_file', formData.brochure_file);
+      if (formData.logo instanceof File) submitData.append('logo', formData.logo);
+      if (formData.brochure_file instanceof File) submitData.append('brochure_file', formData.brochure_file);
 
       // Send contacts as JSON string
       const validContacts = contacts.filter(c => c.contact_name || c.email || c.phone);
@@ -353,22 +357,61 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
                     </div>
 
                     <div>
-                      <label className={labelClass}>Portafolio / Brochure</label>
+                      <label className={labelClass}>Portafolio / Brochure (PDF)</label>
                       <div className="relative">
                         {brochureFileName ? (
-                          <div className="flex items-center justify-between p-3 border border-gray-200 rounded-xl bg-gray-50">
+                          <div className="flex items-center justify-between p-3 border border-emerald-200 rounded-xl bg-emerald-50/60">
                             <div className="flex items-center gap-2 truncate">
-                              <FileText className="text-gray-400 flex-shrink-0" size={16} />
-                              <span className="text-sm text-gray-700 truncate font-medium">{brochureFileName}</span>
+                              <FileText className="text-emerald-600 flex-shrink-0" size={16} />
+                              <span className="text-sm text-emerald-950 truncate font-semibold">
+                                Nuevo archivo: {brochureFileName}
+                              </span>
                             </div>
                             <button
                               type="button"
-                              onClick={removeBrochure}
-                              className="p-1 hover:bg-gray-200 rounded-md text-red-500 transition-colors"
-                              title="Remover Brochure"
+                              onClick={() => {
+                                setFormData(prev => ({ ...prev, brochure_file: null }));
+                                setBrochureFileName(null);
+                              }}
+                              className="p-1 hover:bg-emerald-100 rounded-md text-red-500 transition-colors"
+                              title="Descartar este archivo"
                             >
                               <X size={16} />
                             </button>
+                          </div>
+                        ) : existingBrochureUrl ? (
+                          <div className="p-3 border border-blue-200 rounded-xl bg-blue-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 truncate">
+                              <FileText className="text-[#2C67B0] flex-shrink-0" size={16} />
+                              <span className="text-sm text-gray-800 truncate font-medium">Brochure guardado actualmente</span>
+                              <a
+                                href={existingBrochureUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-[#2C67B0] hover:underline font-bold ml-1 flex-shrink-0"
+                              >
+                                (Ver PDF)
+                              </a>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <label className="text-xs font-semibold px-2.5 py-1.5 bg-white text-[#2C67B0] hover:bg-blue-100 rounded-lg cursor-pointer transition-colors border border-blue-200 shadow-sm">
+                                Reemplazar PDF
+                                <input
+                                  type="file"
+                                  accept="application/pdf,image/*"
+                                  onChange={handleBrochureChange}
+                                  className="hidden"
+                                />
+                              </label>
+                              <button
+                                type="button"
+                                onClick={removeBrochure}
+                                className="p-1.5 hover:bg-red-50 rounded-lg text-red-500 transition-colors border border-transparent hover:border-red-200"
+                                title="Eliminar brochure actual"
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
                           </div>
                         ) : (
                           <div className="border border-dashed border-gray-300 rounded-xl p-3 flex items-center justify-center bg-gray-50 hover:bg-blue-50 hover:border-blue-300 transition-all cursor-pointer relative group">

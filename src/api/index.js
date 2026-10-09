@@ -3,8 +3,9 @@ import axios from "axios";
 // ==============================================================================
 // CONFIGURACIÓN DE CONEXIÓN CON EL BACKEND (API)
 // ==============================================================================
-// Cambia a 'true' para usar tu Laravel local, o 'false' para usar el servidor remoto
-const USE_LOCAL = true;
+// Cambia a 'true' para usar tu Laravel local (cuando tengas 'php artisan serve' con MySQL listo),
+// o 'false' (por defecto) para usar el servidor oficial en producción/remoto
+const USE_LOCAL = false;
 
 // URLs configurables
 const LOCAL_API_URL = "http://127.0.0.1:8000/api"; // Tu servidor local con 'php artisan serve'

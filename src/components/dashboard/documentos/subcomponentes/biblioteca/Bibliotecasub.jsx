@@ -37,13 +37,21 @@ const BRAND = {
   gray: "#6B7280",
 };
 
+const DEFAULT_DOCUMENT_TYPES = [
+  { id: "1", name: "Normas y Políticas" },
+  { id: "2", name: "Formatos" },
+  { id: "3", name: "Actas" },
+  { id: "4", name: "Pesajes" },
+  { id: "5", name: "Contratos" }
+];
+
 export default function Bibliotecasub() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [documents, setDocuments] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [documentTypes, setDocumentTypes] = useState([]);
-  const [typesLoading, setTypesLoading] = useState(true);
+  const [documentTypes, setDocumentTypes] = useState(DEFAULT_DOCUMENT_TYPES);
+  const [typesLoading, setTypesLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -145,10 +153,14 @@ export default function Bibliotecasub() {
         typesArray = response ? [response] : [];
       }
 
-      setDocumentTypes(typesArray);
+      if (typesArray.length > 0) {
+        setDocumentTypes(typesArray);
+      } else {
+        setDocumentTypes(DEFAULT_DOCUMENT_TYPES);
+      }
     } catch (err) {
-      console.error("Error loading document types:", err);
-      setDocumentTypes([]);
+      console.warn("Error loading document types from API, using default list:", err);
+      setDocumentTypes(DEFAULT_DOCUMENT_TYPES);
     } finally {
       setTypesLoading(false);
     }
@@ -163,6 +175,10 @@ export default function Bibliotecasub() {
         page: pagination.current_page,
         per_page: pagination.per_page
       };
+
+      if (filters.document_type_id) {
+        params.document_type_id = filters.document_type_id;
+      }
 
       const [docsResponse, approvedRes, pendingRes] = await Promise.all([
         getDocuments(params),
@@ -472,7 +488,7 @@ export default function Bibliotecasub() {
       {/* Filtros y Búsqueda */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-          <div className="md:col-span-6 relative">
+          <div className="md:col-span-5 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
@@ -485,7 +501,21 @@ export default function Bibliotecasub() {
             />
           </div>
 
-          <div className="md:col-span-5">
+          <div className="md:col-span-4">
+            <select
+              name="document_type_id"
+              value={filters.document_type_id || ""}
+              onChange={handleFilterChange}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent outline-none text-sm bg-white cursor-pointer"
+            >
+              <option value="">Todos los tipos de documento</option>
+              {documentTypes.map(type => (
+                <option key={type.id} value={type.id}>{type.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="md:col-span-3">
             <select
               name="sort_by"
               value={filters.sort_by}
@@ -496,16 +526,6 @@ export default function Bibliotecasub() {
               <option value="name">Nombre</option>
               <option value="size">Tamaño</option>
             </select>
-          </div>
-
-          <div className="md:col-span-1 flex justify-end">
-            <button
-              type="button"
-              aria-label="Filtrar"
-              className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-blue-600 transition"
-            >
-              <Filter size={20} />
-            </button>
           </div>
         </div>
       </div>
