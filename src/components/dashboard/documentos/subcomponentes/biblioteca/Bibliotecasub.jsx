@@ -37,21 +37,13 @@ const BRAND = {
   gray: "#6B7280",
 };
 
-const DEFAULT_DOCUMENT_TYPES = [
-  { id: "1", name: "Normas y Políticas" },
-  { id: "2", name: "Formatos" },
-  { id: "3", name: "Actas" },
-  { id: "4", name: "Pesajes" },
-  { id: "5", name: "Contratos" }
-];
-
 export default function Bibliotecasub() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [documents, setDocuments] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [documentTypes, setDocumentTypes] = useState(DEFAULT_DOCUMENT_TYPES);
-  const [typesLoading, setTypesLoading] = useState(false);
+  const [documentTypes, setDocumentTypes] = useState([]);
+  const [typesLoading, setTypesLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -153,14 +145,10 @@ export default function Bibliotecasub() {
         typesArray = response ? [response] : [];
       }
 
-      if (typesArray.length > 0) {
-        setDocumentTypes(typesArray);
-      } else {
-        setDocumentTypes(DEFAULT_DOCUMENT_TYPES);
-      }
+      setDocumentTypes(typesArray);
     } catch (err) {
-      console.warn("Error loading document types from API, using default list:", err);
-      setDocumentTypes(DEFAULT_DOCUMENT_TYPES);
+      console.error("Error loading document types from API:", err);
+      setDocumentTypes([]);
     } finally {
       setTypesLoading(false);
     }

@@ -149,24 +149,11 @@ const ImpactSection = () => {
           }
         }
       } catch (err) {
-        console.warn("Using baseline territorial data due to connection notice:", err);
+        console.error("Error al consultar el dashboard de impacto territorial de la API:", err);
         if (isMounted) {
-          // Graceful fallback with verified official data so the map never appears broken
-          setDashboardData({
-            totalToneladasTrazadasAnioAnterior: selectedYear === 2024 ? 53815.3 : 68355.5,
-            totalGestoresVinculados: selectedYear === 2024 ? 66 : 89,
-            totalTransformadoresVinculados: selectedYear === 2024 ? 16 : 17,
-            totalMunicipiosCubiertos: selectedYear === 2024 ? 175 : 165,
-            anioConsultado: selectedYear,
-            coberturaRegiones: [
-              { region: "ANDINA", municipios: 105, toneladas: 55567.6, gestores: 62, transformadores: 11 },
-              { region: "CARIBE", municipios: 14, toneladas: 7616.5, gestores: 16, transformadores: 1 },
-              { region: "PACIFICA", municipios: 26, toneladas: 5145.8, gestores: 8, transformadores: 5 },
-              { region: "ORINOQUIA", municipios: 14, toneladas: 25.1, gestores: 1, transformadores: 0 },
-              { region: "AMAZONIA", municipios: 5, toneladas: 0.0, gestores: 1, transformadores: 0 },
-              { region: "INSULAR", municipios: 1, toneladas: 0.3, gestores: 1, transformadores: 0 }
-            ]
-          });
+          const msg = err.response?.data?.message || "No se pudo sincronizar la información del mapa con la API";
+          setError(msg);
+          setDashboardData(null);
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -242,12 +229,13 @@ const ImpactSection = () => {
         {/* HEADER COMPACTO CON TEXTOS EXACTOS SOLICITADOS */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
           <div className="text-left max-w-3xl">
-            <span className="text-[#2C67B0] font-bold text-xs uppercase tracking-[0.25em] mb-1.5 block">
+            <span className="text-[#2C67B0] font-bold text-xs uppercase tracking-[0.3em] mb-1.5 block font-display">
               Presencia Nacional
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1E305D] tracking-tight mb-2">
-              Nuestro Impacto <span className="text-[#00AB6D]">Territorial</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1E305D] tracking-tight mb-2 font-display" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+              Nuestro Impacto <span className="text-[#B1D357]">Territorial</span>
             </h2>
+            <div className="w-20 h-1 bg-[#B1D357] rounded-full my-2" />
             <p className="text-gray-500 text-sm md:text-base leading-relaxed font-light">
               Articulamos acciones estratégicas en las regiones clave para consolidar nodos de economía circular escalables y sostenibles.
             </p>

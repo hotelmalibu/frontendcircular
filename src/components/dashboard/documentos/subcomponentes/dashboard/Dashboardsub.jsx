@@ -19,8 +19,7 @@ import {
   CheckCircle2,
   MoreVertical,
   AlertCircle
-} from "lucide-react";
-import { getDocuments } from "../../../../../api/documentsApi";
+import { getDocuments, getDocumentTypes } from "../../../../../api/documentsApi";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -29,15 +28,6 @@ const BRAND = {
   lime: "#B1D357",       // Verde Lima
   green: "#00AB6D",      // Verde Principal
 };
-
-// Document type mapping
-const documentTypes = [
-  { id: "1", name: "Normas y Políticas" },
-  { id: "2", name: "Formatos" },
-  { id: "3", name: "Actas" },
-  { id: "4", name: "Pesajes" },
-  { id: "5", name: "Contratos" }
-];
 
 // Función auxiliar para obtener estilos según el estado
 const getStatusStyles = (status) => {
@@ -57,6 +47,7 @@ const getStatusStyles = (status) => {
 
 export default function Dashboardsub() {
   const [loading, setLoading] = useState(true);
+  const [documentTypes, setDocumentTypes] = useState([]);
   const [stats, setStats] = useState({
     total: 0,
     thisWeek: 0,
@@ -73,12 +64,13 @@ export default function Dashboardsub() {
         setLoading(true);
         // Realizar peticiones ligeras (per_page: 1) solo para obtener totales de los metadatos
         // Esto evita descargar todos los documentos innecesariamente
-        const [resTotal, resPending, resApproved, resDefault, resStats] = await Promise.all([
+        const [resTotal, resPending, resApproved, resDefault, resStats, resTypes] = await Promise.all([
           getDocuments({ per_page: 1 }).catch(() => ({ data: { total: 0 } })),
           getDocuments({ per_page: 1, status: 'pending_review' }).catch(() => ({ data: { total: 0 } })),
           getDocuments({ per_page: 1, status: 'approved' }).catch(() => ({ data: { total: 0 } })),
           getDocuments({ per_page: 5 }).catch(() => ({ data: [] })), // Solo los 5 más recientes para la tabla
-          getDocuments({ per_page: 200 }).catch(() => ({ data: [] })) // Muestra ampliada para gráficas
+          getDocuments({ per_page: 200 }).catch(() => ({ data: [] })), // Muestra ampliada para gráficas
+          getDocumentTypes().catch(() => ({ data: [] }))
         ]);
 
         const extractTotal = (res) => {
@@ -89,6 +81,10 @@ export default function Dashboardsub() {
         const total = extractTotal(resTotal);
         const pendingReview = extractTotal(resPending);
         const approved = extractTotal(resApproved);
+
+        // Tipos de documento cargados dinámicamente desde la API
+        const typesList = resTypes?.data?.items || (Array.isArray(resTypes?.data) ? resTypes.data : []) || (Array.isArray(resTypes) ? resTypes : []);
+        setDocumentTypes(typesList);
         
         // Calcular "esta semana" de forma real basada en la muestra ampliada
         const oneWeekAgo = new Date();
@@ -134,11 +130,11 @@ export default function Dashboardsub() {
 
         setStatusData(statusChartData);
 
-        // Calculate type distribution
+        // Calculate type distribution dinámicamente con la API
         const typeCounts = {};
         docsForStats.forEach(doc => {
           const typeId = doc.document_type_id;
-          const typeName = documentTypes.find(t => t.id === typeId)?.name || `Tipo ${typeId}`;
+          const typeName = typesList.find(t => String(t.id) === String(typeId))?.name || `Tipo ${typeId}`;
           typeCounts[typeName] = (typeCounts[typeName] || 0) + 1;
         });
 
@@ -366,7 +362,7 @@ export default function Dashboardsub() {
               <div className="text-center py-8 text-gray-400">No hay documentos recientes</div>
             ) : (
               recentDocs.map((doc, index) => {
-                const docType = documentTypes.find(t => t.id === doc.document_type_id);
+                const docType = documentTypes.find(t => String(t.id) === String(doc.document_type_id));
                 const statusStyle = getStatusStyles(doc.status);
                 return (
                   <div
