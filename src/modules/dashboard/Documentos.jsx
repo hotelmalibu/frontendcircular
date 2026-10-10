@@ -1,14 +1,17 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
 import Biblioteca from "../../components/dashboard/documentos/Biblioteca";
 import Dashboard from "../../components/dashboard/documentos/Dashboard";
+import MarcoNormativoManager from "../../components/home/nosotros/marcoNormativo/MarcoNormativoManager";
 
 import {
   FileText,
   LayoutDashboard,
   Library,
-  UserX
+  UserX,
+  Scale
 } from "lucide-react";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -22,12 +25,45 @@ const BRAND = {
 
 export default function Documentos() {
   const { user } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState("Dashboard");
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const tabParam = searchParams.get("tab");
+  const sectionParam = searchParams.get("section") || "resoluciones";
+
+  // Acceso exclusivo para administradores al Gestor de Marco Normativo
+  const isAdmin = Boolean(
+    user && (
+      user.role?.toLowerCase() === "admin" ||
+      user.role_slug?.toLowerCase() === "admin" ||
+      user.role?.toLowerCase() === "administrador" ||
+      user.role_slug?.toLowerCase() === "administrador" ||
+      user.is_admin === true ||
+      (Array.isArray(user.roles) && user.roles.some((r) => (r.slug || r.name || "").toLowerCase().includes("admin")))
+    )
+  );
+
+  const [activeTab, setActiveTab] = useState(() => {
+    if (tabParam === "MarcoNormativo" && isAdmin) return "MarcoNormativo";
+    if (tabParam === "Biblioteca") return "Biblioteca";
+    return "Dashboard";
+  });
+
+  useEffect(() => {
+    if (tabParam) {
+      if (tabParam === "MarcoNormativo" && isAdmin) {
+        setActiveTab("MarcoNormativo");
+      } else if (tabParam === "Biblioteca") {
+        setActiveTab("Biblioteca");
+      } else if (tabParam === "Dashboard") {
+        setActiveTab("Dashboard");
+      }
+    }
+  }, [tabParam, isAdmin]);
 
   const tabs = [
     { name: "Dashboard", label: "Vista General", icon: <LayoutDashboard size={18} />, component: <Dashboard /> },
-
     { name: "Biblioteca", label: "Biblioteca Digital", icon: <Library size={18} />, component: <Biblioteca /> },
+    ...(isAdmin ? [{ name: "MarcoNormativo", label: "Marco Normativo", icon: <Scale size={18} />, component: <MarcoNormativoManager initialSection={sectionParam} /> }] : [])
   ];
 
   return (

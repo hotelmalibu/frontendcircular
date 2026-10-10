@@ -28,10 +28,9 @@ export const getScheduleById = async (id) => {
 // Create new schedule/event
 export const createSchedule = async (scheduleData) => {
   try {
+    const isFormData = scheduleData instanceof FormData;
     const response = await api.post(SCHEDULE_BASE_URL, scheduleData, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' },
     });
     return response.data;
   } catch (error) {
@@ -43,6 +42,18 @@ export const createSchedule = async (scheduleData) => {
 // Update schedule/event
 export const updateSchedule = async (id, scheduleData) => {
   try {
+    if (scheduleData instanceof FormData) {
+      if (!scheduleData.has('_method')) {
+        scheduleData.append('_method', 'PUT');
+      }
+      const response = await api.post(`${SCHEDULE_BASE_URL}/${id}`, scheduleData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    }
+
     const response = await api.put(`${SCHEDULE_BASE_URL}/${id}`, scheduleData, {
       headers: {
         'Content-Type': 'application/json',

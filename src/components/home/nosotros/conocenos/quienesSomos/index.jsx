@@ -16,6 +16,7 @@ import {
 import LogoVisionCircular from "../../../../../assets/fondosYlogos/Logo.png";
 import aboutUsApi from "../../../../../api/aboutUsApi";
 import { getIntegrationDashboard } from "../../../../../api/integrationApi";
+import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 
 const formatNumber = (num, decimals = 0) => {
   if (num === null || num === undefined || isNaN(num)) return "0";
@@ -86,7 +87,7 @@ export default function Index() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00AB6D]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B1D357]"></div>
       </div>
     );
   }
@@ -126,7 +127,7 @@ export default function Index() {
                 className="w-full h-[340px] object-contain p-8 transition-transform duration-500 group-hover:scale-105"
               />
             </div>
-            <div className="absolute -bottom-2 -right-2 bg-[#00AB6D] text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
+            <div className="absolute -bottom-2 -right-2 bg-[#B1D357] text-[#1E305D] px-3 py-1 rounded-full text-xs font-black shadow-md">
               Más de 5 años impulsando la circularidad
             </div>
           </motion.div>
@@ -172,15 +173,33 @@ export default function Index() {
                 return (
                   <div
                     key={quote.id || index}
-                    className="bg-white p-4 rounded-lg shadow-md border border-[#00AB6D]/20 text-left hover:shadow-lg transition-shadow duration-300"
+                    className="bg-white p-4 rounded-xl shadow-md border border-gray-100 text-left hover:border-[#B1D357] hover:shadow-lg transition-all duration-300"
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="bg-[#E8F5E9] p-2 rounded-full">
-                        <Icon size={20} className="text-[#00AB6D]" />
-                      </div>
+                    <div className="flex items-center gap-3 mb-3">
+                      {(() => {
+                        const rawPhoto = quote.photo_url || quote.photo || quote.upload_file?.url || quote.upload_file;
+                        const photoUrl = rawPhoto ? getImageProxyUrl(rawPhoto, { width: 120, quality: 85 }) : null;
+                        if (photoUrl) {
+                          return (
+                            <img
+                              src={photoUrl}
+                              alt={quote.nombre}
+                              className="w-12 h-12 rounded-full object-cover border-2 border-[#B1D357] shadow-sm flex-shrink-0"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          );
+                        }
+                        return (
+                          <div className="bg-[#B1D357]/20 p-2.5 rounded-full flex-shrink-0">
+                            <Icon size={20} className="text-[#1E305D]" />
+                          </div>
+                        );
+                      })()}
                       <div>
-                        <p className="font-bold text-[#1E305D] text-base">{quote.nombre}</p>
-                        <p className="text-xs text-gray-600">{quote.cargo}</p>
+                        <p className="font-bold text-[#1E305D] text-base leading-tight">{quote.nombre}</p>
+                        <p className="text-xs text-gray-600 mt-0.5">{quote.cargo}</p>
                       </div>
                     </div>
                     <div className="text-gray-700 text-sm italic leading-relaxed prose prose-sm max-w-none">
@@ -198,7 +217,7 @@ export default function Index() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.3 }}
-          className="bg-gradient-to-r from-[#2C67B0] to-[#00AB6D] rounded-2xl p-6 md:p-8 text-white shadow-xl"
+          className="bg-gradient-to-r from-[#1E305D] to-[#2C67B0] rounded-2xl p-6 md:p-8 text-white shadow-xl"
         >
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">

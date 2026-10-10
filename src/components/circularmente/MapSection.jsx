@@ -11,7 +11,7 @@ import {
 import { motion } from 'framer-motion';
 import fondoMapa from '../../assets/fondosYlogos/fondo_mapaC.jpg';
 import { getAllCompanies } from "../../api/companiesApi";
-import { stripHtml } from "../../utils/textUtils";
+import { stripHtml, decodeHtmlEntities } from "../../utils/textUtils";
 
 // --- FUZZY SEARCH ---
 const fuzzySearch = (searchTerm, text) => {
@@ -435,7 +435,7 @@ export default function MapSection() {
                     Descripción
                   </h3>
                   <div className="text-gray-600 text-sm leading-relaxed p-4 bg-gray-50 rounded-xl border border-gray-100 prose prose-sm max-w-none">
-                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(selectedEmpresa.description || "").replace(/\u00A0|&nbsp;/g, ' ')) }} />
+                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(decodeHtmlEntities(String(selectedEmpresa.description || "")).replace(/\u00A0|&nbsp;/g, ' ')) }} />
                   </div>
                   
                   {/* Brochure / Portafolio */}

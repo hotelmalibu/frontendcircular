@@ -1,5 +1,6 @@
 import React from "react";
 import DOMPurify from 'dompurify';
+import { getImageProxyUrl } from "../../utils/imageUtils";
 import {
   X,
   Calendar,
@@ -176,6 +177,27 @@ export default function EventDetailModal({ eventData, onClose }) {
 
               {/* Columna Principal */}
               <div className="lg:col-span-2 space-y-8">
+
+                {/* Flyer o Banner Oficial del Evento */}
+                {(() => {
+                  const rawImg = eventData.flyer_url || eventData.banner_url || eventData.photo_url || eventData.upload_file?.url || eventData.upload_file || eventData.flyer || eventData.image;
+                  const imgUrl = rawImg ? getImageProxyUrl(rawImg, { width: 1200, quality: 90 }) : null;
+                  if (!imgUrl) return null;
+                  return (
+                    <div className="rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-white">
+                      <img
+                        src={imgUrl}
+                        alt={eventData.title}
+                        className="w-full h-auto max-h-[500px] object-contain mx-auto bg-gray-50/50"
+                        onError={(e) => {
+                          if (e.currentTarget?.parentElement) {
+                            e.currentTarget.parentElement.style.display = 'none';
+                          }
+                        }}
+                      />
+                    </div>
+                  );
+                })()}
 
                 {/* Descripción */}
                 <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100">

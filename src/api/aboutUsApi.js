@@ -35,7 +35,10 @@ export const getAllLeaderQuotes = async () => {
  * Create a new leader quote
  */
 export const createLeaderQuote = async (data) => {
-    const response = await api.post(LEADER_QUOTES_ENDPOINT, data);
+    const isFormData = data instanceof FormData;
+    const response = await api.post(LEADER_QUOTES_ENDPOINT, data, {
+        headers: isFormData ? { "Content-Type": "multipart/form-data" } : {}
+    });
     return response.data;
 };
 
@@ -43,6 +46,15 @@ export const createLeaderQuote = async (data) => {
  * Update a leader quote
  */
 export const updateLeaderQuote = async (id, data) => {
+    if (data instanceof FormData) {
+        if (!data.has('_method')) {
+            data.append('_method', 'PUT');
+        }
+        const response = await api.post(`${LEADER_QUOTES_ENDPOINT}/${id}`, data, {
+            headers: { "Content-Type": "multipart/form-data" }
+        });
+        return response.data;
+    }
     const response = await api.put(`${LEADER_QUOTES_ENDPOINT}/${id}`, data);
     return response.data;
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 // --- IMPORTACIONES DE LIBRERÍAS ---
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -6,22 +6,16 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
   Package, ShoppingCart, Factory, Truck, Box, FileText, PackageOpen,
-  Target, MapPin, Lightbulb, GraduationCap, GlassWater, Recycle
+  Target, MapPin, Lightbulb, GraduationCap, GlassWater, Recycle, Download
 } from 'lucide-react';
+import { getResolucionesNormativas, INITIAL_RESOLUCIONES } from "../../../../services/marcoNormativoService";
 
-
-
-// PDFs (se mantienen)
-import pdf1407 from "../../../../assets/marconormativo/resoluciones/resolucion-1407-de-2018.pdf";
-import pdf1342 from "../../../../assets/marconormativo/resoluciones/resolucion-1342-de-2020.pdf";
-import pdf0803 from "../../../../assets/marconormativo/resoluciones/RES.-0803-DE-24-JUN-2024-REDUCCION-GRADUAL-DE-PRODUCCION-Y-CONSUMO-CIERTOS-PRODUCTOS-PLASTICOS-4 (1).pdf";
-
-// Colores del manual de marca
+// Colores del manual de marca oficial
 const COLOR_AZUL_PRINCIPAL = '#1E305D';
 const COLOR_AZUL_SECUNDARIO = '#2C67B0';
-const COLOR_VERDE_PRINCIPAL = '#00AB6D';
-const COLOR_GRIS_TEXTO = '#333333';
-const COLOR_BARRA_START = '#00AB6D';
+const COLOR_VERDE_PRINCIPAL = '#B1D357';
+const COLOR_GRIS_TEXTO = '#1E305D';
+const COLOR_BARRA_START = '#B1D357';
 const COLOR_BARRA_END = '#808E59';
 
 
@@ -69,17 +63,31 @@ const customLeafletIcon = L.divIcon({
 
 
 export default function Index() {
+  const [resolucionesList, setResolucionesList] = useState(INITIAL_RESOLUCIONES);
 
-  const handleLinkHover = (e, isHovering) => {
-    e.target.style.color = isHovering ? COLOR_VERDE_PRINCIPAL : COLOR_AZUL_SECUNDARIO;
-  };
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await getResolucionesNormativas();
+        setResolucionesList(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.warn("Error cargando resoluciones:", err);
+        setResolucionesList([]);
+      }
+    };
+
+    loadData();
+
+    const handleUpdate = () => loadData();
+    window.addEventListener("normativasUpdated", handleUpdate);
+    return () => window.removeEventListener("normativasUpdated", handleUpdate);
+  }, []);
 
   return (
     <div className="mt-24 font-sans min-h-screen" style={{ color: '#e6e6e6ff' }}>
 
 
       <div className="px-6 py-10 max-w-6xl mx-auto">
-
         <h1 className="text-4xl font-sans font-extrabold text-center mb-12 uppercase" style={{ color: COLOR_AZUL_PRINCIPAL }}>
           Marco Normativo
         </h1>
@@ -349,66 +357,91 @@ export default function Index() {
         </section>
 
 
-        {/* Contenedor de los Links a PDF (Sin cambios) */}
-        <div className="text-center max-w-3xl mx-auto p-10 bg-white rounded-2xl shadow-xl space-y-8">
-          <h2
-            className="text-3xl md:text-4xl font-sans font-bold"
-            style={{ color: COLOR_AZUL_PRINCIPAL }}
-          >
-            Descarga de Documentos Oficiales
-          </h2>
-
-          <div className="space-y-6">
-            {[
-              {
-                year: '1407 de 2018',
-                file: pdf1407,
-                desc:
-                  'Regula la gestión de residuos de envases y empaques de papel, cartón, plástico, vidrio y metal. Obliga a los productores a implementar planes para su recolección y reciclaje, promoviendo la economía circular en Colombia.'
-              },
-              {
-                year: '1342 de 2020',
-                file: pdf1342,
-                desc:
-                  'Modifica la Resolución 1407 de 2018, ajustando plazos, definiciones y responsabilidades. Busca fortalecer el cumplimiento ambiental y mejorar la gestión de residuos de envases y empaques.'
-              },
-              {
-                year: '0803 de 2024',
-                file: pdf0803,
-                desc:
-                  'Reglamenta la Ley 2232 de 2022 para reducir gradualmente los plásticos de un solo uso. Promueve materiales alternativos y el uso de contenido reciclado para proteger el ambiente.'
-              }
-            ].map((res, index) => (
-              <div
-                key={index}
-                className="p-6 border border-gray-100 rounded-xl hover:shadow-md transition-all duration-300 text-left bg-gray-50 hover:bg-gray-100"
-              >
-                <h3
-                  className="text-2xl font-semibold mb-2"
-                  style={{ color: COLOR_AZUL_PRINCIPAL }}
-                >
-                  Resolución {res.year}
-                </h3>
-                <p className="text-gray-700 mb-4 leading-relaxed text-justify">
-                  {res.desc}
-                </p>
-                <a
-                  href={res.file}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block text-white px-5 py-2 rounded-lg font-medium transition-all duration-300"
-                  style={{
-                    backgroundColor: COLOR_AZUL_PRINCIPAL,
-                    boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                  }}
-                  onMouseEnter={(e) => handleLinkHover(e, true)}
-                  onMouseLeave={(e) => handleLinkHover(e, false)}
-                >
-                  Ver Documento
-                </a>
-              </div>
-            ))}
+        {/* Contenedor de Resoluciones en Formato Grid (Estilo Noticias) */}
+        <div className="mt-16">
+          <div className="text-center max-w-3xl mx-auto mb-10">
+            <span className="bg-[#B1D357] text-[#1E305D] text-xs font-black uppercase px-4 py-1.5 rounded-full tracking-wider shadow-sm">
+              Repositorio Regulatorio
+            </span>
+            <h2
+              className="text-3xl md:text-4xl font-sans font-extrabold mt-3"
+              style={{ color: COLOR_AZUL_PRINCIPAL }}
+            >
+              Resoluciones Oficiales
+            </h2>
+            <p className="text-gray-600 text-sm mt-2">
+              Descarga y consulta las resoluciones ministeriales oficiales sobre gestión de envases, empaques y plásticos.
+            </p>
           </div>
+
+          {resolucionesList.length === 0 ? (
+            <div className="py-16 text-center border-2 border-dashed border-gray-200 rounded-3xl bg-white max-w-xl mx-auto p-8 shadow-sm">
+              <FileText size={48} className="text-gray-300 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-[#1E305D]">No hay resoluciones registradas</h3>
+              <p className="text-xs text-gray-500 mt-1">Actualmente no se han publicado resoluciones.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {resolucionesList.map((res, index) => {
+                const bannerImg = res.banner || res.image || res.cover;
+                return (
+                  <div
+                    key={res.id || index}
+                    className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col group"
+                  >
+                    {/* Portada / Banner superior si existe */}
+                    {bannerImg ? (
+                      <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+                        <img
+                          src={bannerImg}
+                          alt={res.title}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute top-3 left-3 bg-[#B1D357] text-[#1E305D] text-[11px] font-black uppercase px-3 py-1 rounded-full shadow-md">
+                          {res.year || "Resolución"}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="px-6 pt-6 pb-1 flex items-center justify-between">
+                        <span className="bg-[#B1D357] text-[#1E305D] text-[11px] font-black uppercase px-3 py-1 rounded-full shadow-sm">
+                          {res.year || "Resolución"}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Cuerpo de la tarjeta */}
+                    <div className="p-6 flex flex-col flex-1">
+                      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1 truncate">
+                        {res.entity || "Ministerio de Ambiente y Desarrollo Sostenible"}
+                      </p>
+                      <h3
+                        className="text-xl font-bold leading-snug mb-3 line-clamp-2"
+                        style={{ color: COLOR_AZUL_PRINCIPAL }}
+                      >
+                        {res.title || `Resolución ${res.year}`}
+                      </h3>
+                      <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3 flex-1 text-justify">
+                        {res.desc}
+                      </p>
+
+                      {/* Botón de Descarga */}
+                      {res.file && (
+                        <a
+                          href={res.file}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full py-3 px-4 rounded-xl font-black text-xs uppercase tracking-wider text-center flex items-center justify-center gap-2 shadow-sm transition-all duration-300 bg-[#B1D357] text-[#1E305D] hover:bg-[#9cb84d] hover:shadow-md active:scale-95 mt-auto"
+                        >
+                          <Download size={16} />
+                          Descargar Documento
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="h-10"></div>

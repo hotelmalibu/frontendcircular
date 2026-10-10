@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import DOMPurify from 'dompurify';
+import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 import {
   X,
   Edit,
@@ -200,6 +201,27 @@ export default function EventDetailModal({ eventData, onClose, onEdit }) {
             {getStatusBadge(eventData.status)}
             {getEventStatusBadge()}
           </div>
+
+          {/* Flyer o Banner del Evento */}
+          {(() => {
+            const rawImg = eventData.flyer_url || eventData.banner_url || eventData.photo_url || eventData.upload_file?.url || eventData.upload_file || eventData.flyer || eventData.image;
+            const imgUrl = rawImg ? getImageProxyUrl(rawImg, { width: 1000, quality: 90 }) : null;
+            if (!imgUrl) return null;
+            return (
+              <div className="mb-6 rounded-2xl overflow-hidden border border-gray-200 shadow-sm max-h-96 bg-gray-100 flex items-center justify-center">
+                <img
+                  src={imgUrl}
+                  alt={eventData.title}
+                  className="w-full h-auto max-h-96 object-contain"
+                  onError={(e) => {
+                    if (e.currentTarget?.parentElement) {
+                      e.currentTarget.parentElement.style.display = 'none';
+                    }
+                  }}
+                />
+              </div>
+            );
+          })()}
 
           {/* Title */}
           <h1 className="text-3xl font-bold text-gray-900 mb-4">

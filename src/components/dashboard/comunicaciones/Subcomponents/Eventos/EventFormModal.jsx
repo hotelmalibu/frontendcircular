@@ -13,10 +13,13 @@ import {
   Link as LinkIcon,
   AlertCircle,
   Type,
-  AlignLeft
+  AlignLeft,
+  Image as ImageIcon,
+  Upload
 } from "lucide-react";
 import { createSchedule, updateSchedule } from "../../../../../api/scheduleApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
+import { extractFormErrors } from "../../../../../utils/errorUtils";
 import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -50,6 +53,8 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     max_attendees: "",
     published_at: null,
     status: "published",
+    file: null,
+    preview: null,
   });
 
   const [loading, setLoading] = useState(false);
@@ -57,19 +62,11 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
 
-
-  // ... (Lógica de inicialización y carga de datos se mantiene igual)
   useEffect(() => {
     if (isEditing && eventData) {
       const description = eventData.description || "";
       const catId = (eventData.category && typeof eventData.category === 'object') ? (eventData.category?.id || "") : (eventData.category_id || "");
-
-      console.log("EventFormModal - Loading Data:", {
-        isEditing,
-        descriptionLength: description.length,
-        category_id: catId,
-        rawCategory: eventData.category
-      });
+      const existingFlyer = eventData.flyer_url || eventData.banner_url || eventData.photo_url || eventData.upload_file?.url || null;
 
       const newFormData = {
         title: eventData.title || "",
@@ -89,12 +86,13 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         max_attendees: eventData.max_attendees ? eventData.max_attendees.toString() : "",
         published_at: eventData.published_at ? formatDateForInput(eventData.published_at) : null,
         status: eventData.status || "draft",
+        file: null,
+        preview: existingFlyer,
       };
 
       setFormData(newFormData);
     }
   }, [eventData, isEditing]);
-
 
   const loadCategories = React.useCallback(async () => {
     try {
@@ -125,7 +123,6 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     loadCategories();
   }, [loadCategories]);
 
-
   const modules = {
     toolbar: [
       [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
@@ -135,7 +132,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'ordered' }, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['link'],
+      ['link', 'image'],
       ['clean']
     ],
   };
@@ -146,7 +143,8 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     'color', 'background',
     'list',
     'align',
-    'link'
+    'link',
+    'image'
   ];
 
   const handleEditorChange = (content) => {
@@ -156,7 +154,33 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     }
   };
 
-  // ... (Helpers de fecha y validación se mantienen igual)
+  const handleFlyerChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast.error("El flyer o banner debe ser una imagen válida (JPG, PNG, WEBP).");
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("El tamaño del flyer no debe exceder 10MB.");
+        return;
+      }
+      setFormData(prev => ({
+        ...prev,
+        file: file,
+        preview: URL.createObjectURL(file)
+      }));
+    }
+  };
+
+  const handleRemoveFlyer = () => {
+    setFormData(prev => ({
+      ...prev,
+      file: null,
+      preview: null
+    }));
+  };
+
   const formatDateTimeForInput = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -171,9 +195,6 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (name === 'category_id') {
-      console.log("EventFormModal - Category ID Selected:", value);
-    }
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
@@ -189,7 +210,6 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     if (!formData.title.trim()) newErrors.title = "El título es requerido";
     if (!formData.status) newErrors.status = "El estado es requerido";
 
-    // Validar descripción (ReactQuill puede devolver <p><br></p> cuando está vacío)
     const descriptionText = formData.description.replace(/<[^>]*>/g, '').trim();
     if (!descriptionText || descriptionText === "") {
       newErrors.description = "La descripción es requerida";
@@ -237,40 +257,48 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
         ? toIsoDateTime(new Date())
         : (formData.published_at ? toIsoDateTime(formData.published_at) : null);
 
-      const dataToSend = {
-        title: formData.title,
-        description: formData.description || "",
-        category_id: formData.category_id || null,
-        event_type: formData.event_type,
-        start_datetime: toIsoDateTime(formData.start_datetime),
-        end_datetime: toIsoDateTime(formData.end_datetime),
-        is_all_day: formData.is_all_day,
-        timezone: formData.timezone,
-        meeting_link: formData.meeting_link || "",
-        requires_registration: formData.requires_registration,
-        status: formData.status,
-      };
+      const dataToSend = new FormData();
+      dataToSend.append('title', formData.title.trim());
+      dataToSend.append('description', formData.description || "");
+      if (formData.category_id) {
+        dataToSend.append('category_id', formData.category_id);
+      }
+      dataToSend.append('event_type', formData.event_type);
+      if (formData.start_datetime) {
+        dataToSend.append('start_datetime', toIsoDateTime(formData.start_datetime));
+      }
+      if (formData.end_datetime) {
+        dataToSend.append('end_datetime', toIsoDateTime(formData.end_datetime));
+      }
+      dataToSend.append('is_all_day', formData.is_all_day ? '1' : '0');
+      dataToSend.append('timezone', formData.timezone || 'America/Bogota');
+      dataToSend.append('requires_registration', formData.requires_registration ? '1' : '0');
+      dataToSend.append('status', formData.status);
 
-      // Only add location fields if they have values (to avoid validation errors)
+      if (formData.meeting_link && formData.meeting_link.trim()) {
+        dataToSend.append('meeting_link', formData.meeting_link.trim());
+      }
       if (formData.location_name && formData.location_name.trim()) {
-        dataToSend.location_name = formData.location_name.trim();
+        dataToSend.append('location_name', formData.location_name.trim());
       }
       if (formData.location_address && formData.location_address.trim()) {
-        dataToSend.location_address = formData.location_address.trim();
+        dataToSend.append('location_address', formData.location_address.trim());
       }
       if (formData.latitude && formData.latitude.toString().trim()) {
-        dataToSend.latitude = parseFloat(formData.latitude);
+        dataToSend.append('latitude', formData.latitude);
       }
       if (formData.longitude && formData.longitude.toString().trim()) {
-        dataToSend.longitude = parseFloat(formData.longitude);
+        dataToSend.append('longitude', formData.longitude);
       }
       if (formData.max_attendees && formData.max_attendees.toString().trim()) {
-        dataToSend.max_attendees = parseInt(formData.max_attendees);
+        dataToSend.append('max_attendees', formData.max_attendees);
+      }
+      if (publishedAt) {
+        dataToSend.append('published_at', publishedAt);
       }
 
-      // Only add published_at if status is published or if it already has a value
-      if (formData.status === 'published' || publishedAt) {
-        dataToSend.published_at = publishedAt;
+      if (formData.file) {
+        dataToSend.append('file', formData.file);
       }
 
       if (isEditing && eventData?.id) {
@@ -282,9 +310,24 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       onSuccess();
     } catch (err) {
       console.error("Error saving event:", err);
-      let errorMessage = "Error desconocido";
-      if (err.response?.data?.message) errorMessage = err.response.data.message;
-      toast.error(`Error: ${errorMessage}`);
+      const { message, missingFields, details, rawErrors } = extractFormErrors(err);
+
+      if (rawErrors && typeof rawErrors === 'object') {
+        const mapped = {};
+        Object.keys(rawErrors).forEach((key) => {
+          const val = rawErrors[key];
+          mapped[key] = Array.isArray(val) ? val.join(" ") : String(val);
+        });
+        setErrors((prev) => ({ ...prev, ...mapped }));
+      }
+
+      if (missingFields.length > 0) {
+        toast.error(`${message}: ${missingFields.join(", ")}`);
+      } else if (details.length > 0) {
+        toast.error(`${message}:\n${details.join("\n")}`);
+      } else {
+        toast.error(message || "Error al guardar el evento");
+      }
     } finally {
       setLoading(false);
     }
@@ -359,6 +402,64 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
                     />
                   </div>
                   {errors.description && <p className="mt-1 text-xs font-medium flex items-center gap-1" style={{ color: BRAND.orange }}><AlertCircle size={12} /> {errors.description}</p>}
+                </div>
+              </div>
+
+              {/* SECCIÓN 2: Flyer o Banner del Evento (Imagen) */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                  <ImageIcon size={16} style={{ color: BRAND.green }} /> Flyer o Banner del Evento (Imagen)
+                </h3>
+
+                <div className="space-y-4">
+                  {formData.preview ? (
+                    <div className="relative rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 group max-h-72 flex items-center justify-center">
+                      <img
+                        src={formData.preview}
+                        alt="Preview Flyer"
+                        className="w-full h-56 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                        <label className="cursor-pointer px-4 py-2 bg-white/95 text-gray-800 rounded-xl text-xs font-bold hover:bg-white transition shadow cursor-pointer">
+                          Cambiar imagen
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFlyerChange}
+                            className="hidden"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={handleRemoveFlyer}
+                          className="px-4 py-2 bg-red-600/90 text-white rounded-xl text-xs font-bold hover:bg-red-600 transition shadow cursor-pointer"
+                        >
+                          Quitar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="border-2 border-dashed border-gray-200 hover:border-blue-400 bg-gray-50 hover:bg-blue-50/20 rounded-2xl p-7 flex flex-col items-center justify-center cursor-pointer transition-all">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm mb-3 text-blue-500">
+                        <Upload size={24} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-700 mb-1">
+                        Subir Flyer o Banner del Evento
+                      </span>
+                      <span className="text-xs text-gray-400 text-center max-w-xs">
+                        Haz clic para seleccionar o arrastra una imagen (JPG, PNG, WEBP, máx. 10MB)
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFlyerChange}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                  <p className="text-xs text-gray-400">
+                    Esta imagen se mostrará como portada o afiche oficial en la agenda de eventos y en los detalles.
+                  </p>
                 </div>
               </div>
 

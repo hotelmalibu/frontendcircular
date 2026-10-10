@@ -1,14 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { Search, Filter, Download, Eye, Edit, FileText } from "lucide-react";
 
 export default function Buscadorsub() {
-  const [filtros, setFiltros] = useState({
-    tipo: [],
-    estado: "",
-    desde: "",
-    hasta: "",
-    palabra: "",
-  });
 
   const documentos = [
     {

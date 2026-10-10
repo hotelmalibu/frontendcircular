@@ -35,7 +35,7 @@ export default function Circularmente() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="bg-[#f4f8f7] text-[#0b1a2b] rounded-2xl shadow-md p-10 mx-auto my-10 max-w-4xl text-center"
           >
-            <h3 className="text-2xl font-bold text-[#00AB6D] mb-2">
+            <h3 className="text-2xl font-bold text-[#006F63] mb-2">
               Región {selectedRegion.nombre}
             </h3>
             <p className="text-gray-700 mb-4">
@@ -44,7 +44,7 @@ export default function Circularmente() {
             </p>
             <button
               onClick={() => setSelectedRegion(null)}
-              className="bg-[#006F63] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#00AB6D] transition-all"
+              className="bg-[#006F63] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#005a51] transition-all"
             >
               Cerrar
             </button>
@@ -65,7 +65,7 @@ export default function Circularmente() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="bg-gradient-to-br from-[#006F63] to-[#00AB6D] rounded-[2rem] p-12 shadow-2xl text-white relative overflow-hidden"
+            className="bg-gradient-to-br from-[#006F63] to-[#004e46] rounded-[2rem] p-12 shadow-2xl text-white relative overflow-hidden"
           >
             {/* Círculos decorativos */}
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>

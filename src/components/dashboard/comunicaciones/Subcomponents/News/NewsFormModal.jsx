@@ -20,7 +20,9 @@ import {
   Clock
 } from "lucide-react";
 import { createNews, updateNews } from "../../../../../api/newsApi";
-import { getAllCategories } from "../../../../../api/categoriesApi"; import { toast } from "react-hot-toast";
+import { getAllCategories } from "../../../../../api/categoriesApi";
+import { extractFormErrors } from "../../../../../utils/errorUtils";
+import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -127,7 +129,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'ordered' }, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['link'],
+      ['link', 'image'],
       ['clean']
     ],
   };
@@ -138,7 +140,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
     'color', 'background',
     'list',
     'align',
-    'link'
+    'link',
+    'image'
   ];
 
   const handleEditorChange = (content) => {
@@ -298,25 +301,14 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       onSuccess();
     } catch (err) {
       console.error("Error saving news:", err);
-      console.log("Full error response:", err.response?.data);
-
-      let errorMessage = "Ocurrió un error al guardar la noticia.";
-      if (err.response?.data) {
-        const data = err.response.data;
-        if (data.message) errorMessage = data.message;
-
-        // If there are specific validation errors, show them
-        if (data.errors && typeof data.errors === 'object') {
-          const detailedErrors = Object.entries(data.errors)
-            .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
-            .join('\n');
-          errorMessage += `\n\nErrores de validación:\n${detailedErrors}`;
-        }
-      } else if (err.message) {
-        errorMessage = err.message;
+      const { message, missingFields, details } = extractFormErrors(err);
+      if (missingFields.length > 0) {
+        toast.error(`${message}: ${missingFields.join(", ")}`);
+      } else if (details.length > 0) {
+        toast.error(`${message}:\n${details.join("\n")}`);
+      } else {
+        toast.error(message || "Ocurrió un error al guardar la noticia.");
       }
-
-      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

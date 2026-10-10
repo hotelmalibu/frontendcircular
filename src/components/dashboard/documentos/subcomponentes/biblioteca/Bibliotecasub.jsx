@@ -11,7 +11,6 @@ import {
   X,
   Eye,
   Search,
-  Filter,
   FolderOpen,
   CheckCircle2,
   Clock,
@@ -22,6 +21,7 @@ import { createDocument, getDocuments, updateDocument, deleteDocument, getDocume
 import { getAllCategories } from "../../../../../api/categoriesApi";
 import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 import { stripHtml } from "../../../../../utils/textUtils";
+import { extractFormErrors } from "../../../../../utils/errorUtils";
 import { toast } from "react-hot-toast";
 import ConfirmModal from "../../../../common/ConfirmModal";
 
@@ -58,6 +58,7 @@ export default function Bibliotecasub() {
     file: null,
     currentFileName: "" // Track current file name in edit mode
   });
+  const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -144,6 +145,12 @@ export default function Bibliotecasub() {
       } else {
         typesArray = response ? [response] : [];
       }
+
+      // Filtrar para quitar "Normas y Políticas" de la Biblioteca Digital
+      typesArray = typesArray.filter(t => {
+        const name = (typeof t === 'string' ? t : (t?.name || t?.title || t?.nombre || "")).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return !name.includes("norma") && !name.includes("politica");
+      });
 
       setDocumentTypes(typesArray);
     } catch (err) {
@@ -304,6 +311,7 @@ export default function Bibliotecasub() {
       file: null,
       currentFileName: ""
     });
+    setFormErrors({});
     setEditingId(null);
     setIsEditMode(false);
     setIsUploadModalOpen(true);
@@ -324,6 +332,9 @@ export default function Bibliotecasub() {
       ...prev,
       [name]: value
     }));
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: "" }));
+    }
   };
 
   const handleFileChange = (e) => {
@@ -332,26 +343,53 @@ export default function Bibliotecasub() {
       ...prev,
       file: file
     }));
+    if (formErrors.file) {
+      setFormErrors(prev => ({ ...prev, file: "" }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitMessage("");
+    setFormErrors({});
 
     try {
-      const submitData = new FormData();
-
+      const localErrors = {};
       if (!formData.document_type_id) {
-        throw new Error("El tipo de documento es obligatorio");
+        localErrors.document_type_id = "El tipo de documento es obligatorio";
       }
+      if (!formData.name?.trim()) {
+        localErrors.name = "El nombre del documento es obligatorio";
+      }
+      if (!formData.version?.trim()) {
+        localErrors.version = "La versión del documento es obligatoria";
+      }
+      if (!formData.status) {
+        localErrors.status = "El estado del documento es obligatorio";
+      }
+      if (!isEditMode && !formData.file) {
+        localErrors.file = "Debe adjuntar un archivo al documento";
+      }
+
+      if (Object.keys(localErrors).length > 0) {
+        setFormErrors(localErrors);
+        const missingLabels = Object.values(localErrors).join(" | ");
+        const friendlyMsg = `Por favor complete los campos obligatorios: ${missingLabels}`;
+        setSubmitMessage(friendlyMsg);
+        toast.error(friendlyMsg);
+        setIsSubmitting(false);
+        return;
+      }
+
+      const submitData = new FormData();
       submitData.append('document_type_id', formData.document_type_id);
 
       if (formData.category_id) {
         submitData.append('category_id', formData.category_id);
       }
       submitData.append('name', formData.name);
-      submitData.append('description', formData.description);
+      submitData.append('description', formData.description || "");
       submitData.append('version', formData.version);
       if (formData.expires_at) {
         submitData.append('expires_at', formData.expires_at);
@@ -365,15 +403,12 @@ export default function Bibliotecasub() {
       if (isEditMode) {
         await updateDocument(editingId, submitData);
         setSubmitMessage("Documento actualizado correctamente");
+        toast.success("Documento actualizado correctamente");
       } else {
-        if (!formData.file) {
-          throw new Error("El archivo es obligatorio para nuevos documentos");
-        }
         await createDocument(submitData);
         setSubmitMessage("Documento creado correctamente");
+        toast.success("Documento creado correctamente");
       }
-
-      console.log(`Document ${isEditMode ? 'updated' : 'created'}`);
 
       // Clear form only if creating
       if (!isEditMode) {
@@ -397,22 +432,17 @@ export default function Bibliotecasub() {
         setSubmitMessage("");
         setIsEditMode(false);
         setEditingId(null);
-      }, 2000);
+      }, 1500);
 
     } catch (error) {
       console.error(`Error ${isEditMode ? 'updating' : 'creating'} document:`, error);
-      let errorMessage = error.response?.data?.message || error.message || "Error desconocido";
-
-      // Extract detailed validation errors if they exist (common in Laravel/PHP APIs)
-      if (error.response?.data?.errors) {
-        const validationErrors = error.response.data.errors;
-        const details = Object.entries(validationErrors)
-          .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
-          .join(' | ');
-        errorMessage += ` - Detalles: ${details}`;
-      }
-
-      setSubmitMessage(`Error al ${isEditMode ? 'actualizar' : 'crear'} el documento: ${errorMessage}`);
+      const { message, fieldErrors } = extractFormErrors(
+        error,
+        `Error al ${isEditMode ? 'actualizar' : 'crear'} el documento`
+      );
+      setFormErrors(fieldErrors);
+      setSubmitMessage(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -670,13 +700,16 @@ export default function Bibliotecasub() {
               {/* Row 1: Tipo & Categoría */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo de Documento *</label>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                    Tipo de Documento *
+                  </label>
                   <select
                     name="document_type_id"
                     value={formData.document_type_id}
                     onChange={handleInputChange}
-                    required
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm transition-all"
+                    className={`w-full border rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm transition-all ${
+                      formErrors.document_type_id ? "border-red-500 bg-red-50/30" : "border-gray-300"
+                    }`}
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
                     disabled={typesLoading}
                   >
@@ -685,6 +718,11 @@ export default function Bibliotecasub() {
                       <option key={type.id} value={type.id}>{type.name}</option>
                     ))}
                   </select>
+                  {formErrors.document_type_id && (
+                    <p className="text-xs text-red-500 mt-1 font-medium flex items-center gap-1">
+                      <AlertCircle size={12} /> {formErrors.document_type_id}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Categoría</label>
@@ -692,7 +730,9 @@ export default function Bibliotecasub() {
                     name="category_id"
                     value={formData.category_id}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm transition-all"
+                    className={`w-full border rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm transition-all ${
+                      formErrors.category_id ? "border-red-500 bg-red-50/30" : "border-gray-300"
+                    }`}
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
                     disabled={categoriesLoading}
                   >
@@ -701,49 +741,73 @@ export default function Bibliotecasub() {
                       <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
                   </select>
+                  {formErrors.category_id && (
+                    <p className="text-xs text-red-500 mt-1 font-medium flex items-center gap-1">
+                      <AlertCircle size={12} /> {formErrors.category_id}
+                    </p>
+                  )}
                 </div>
               </div>
 
               {/* Row 2: Nombre & Versión */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre del Archivo *</label>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                    Nombre del Archivo *
+                  </label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    required
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm"
+                    className={`w-full border rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm ${
+                      formErrors.name ? "border-red-500 bg-red-50/30" : "border-gray-300"
+                    }`}
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
                     placeholder="Ej: Política de Sostenibilidad 2025"
                   />
+                  {formErrors.name && (
+                    <p className="text-xs text-red-500 mt-1 font-medium flex items-center gap-1">
+                      <AlertCircle size={12} /> {formErrors.name}
+                    </p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Versión *</label>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                    Versión *
+                  </label>
                   <input
                     type="text"
                     name="version"
                     value={formData.version}
                     onChange={handleInputChange}
-                    required
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm"
+                    className={`w-full border rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm ${
+                      formErrors.version ? "border-red-500 bg-red-50/30" : "border-gray-300"
+                    }`}
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
                     placeholder="Ej: 1.0"
                   />
+                  {formErrors.version && (
+                    <p className="text-xs text-red-500 mt-1 font-medium flex items-center gap-1">
+                      <AlertCircle size={12} /> {formErrors.version}
+                    </p>
+                  )}
                 </div>
               </div>
 
               {/* Row 3: Estado & Expiración */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Estado *</label>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                    Estado *
+                  </label>
                   <select
                     name="status"
                     value={formData.status}
                     onChange={handleInputChange}
-                    required
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm"
+                    className={`w-full border rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm ${
+                      formErrors.status ? "border-red-500 bg-red-50/30" : "border-gray-300"
+                    }`}
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
                   >
                     <option value="">Seleccionar...</option>
@@ -751,6 +815,11 @@ export default function Bibliotecasub() {
                     <option value="pending_review">Pendiente de Revisión</option>
                     <option value="approved">Aprobado</option>
                   </select>
+                  {formErrors.status && (
+                    <p className="text-xs text-red-500 mt-1 font-medium flex items-center gap-1">
+                      <AlertCircle size={12} /> {formErrors.status}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Expiración</label>
@@ -759,58 +828,97 @@ export default function Bibliotecasub() {
                     name="expires_at"
                     value={formData.expires_at}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm"
+                    className={`w-full border rounded-xl px-3 py-2 focus:ring-2 focus:border-transparent outline-none text-sm ${
+                      formErrors.expires_at ? "border-red-500 bg-red-50/30" : "border-gray-300"
+                    }`}
                     style={{ "--tw-ring-color": BRAND.lightBlue }}
                   />
+                  {formErrors.expires_at && (
+                    <p className="text-xs text-red-500 mt-1 font-medium flex items-center gap-1">
+                      <AlertCircle size={12} /> {formErrors.expires_at}
+                    </p>
+                  )}
                 </div>
               </div>
 
               {/* Row 4: Description */}
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Descripción</label>
-                <div className="bg-white rounded-xl overflow-hidden border border-gray-300">
+                <div className={`bg-white rounded-xl overflow-hidden border ${
+                  formErrors.description ? "border-red-500" : "border-gray-300"
+                }`}>
                   <ReactQuill
                     theme="snow"
                     value={formData.description}
-                    onChange={(content) => setFormData(prev => ({ ...prev, description: content }))}
+                    onChange={(content) => {
+                      setFormData(prev => ({ ...prev, description: content }));
+                      if (formErrors.description) setFormErrors(prev => ({ ...prev, description: "" }));
+                    }}
                     modules={quillModules}
                     formats={quillFormats}
                     placeholder="Breve descripción del contenido..."
                   />
                 </div>
+                {formErrors.description && (
+                  <p className="text-xs text-red-500 mt-1 font-medium flex items-center gap-1">
+                    <AlertCircle size={12} /> {formErrors.description}
+                  </p>
+                )}
               </div>
 
               {/* Row 4: File Upload (Compact) */}
-              <div className="bg-gray-50 p-3 rounded-xl border border-dashed border-gray-300 text-center hover:bg-blue-50/30 hover:border-blue-300 transition-colors">
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  required={!isEditMode}
-                  id="file-upload"
-                  className="hidden"
-                />
-                <label htmlFor="file-upload" className="cursor-pointer flex items-center justify-center gap-4">
-                  <div className="p-2 bg-blue-100 text-blue-600 rounded-full">
-                    <Upload size={20} />
-                  </div>
-                  <div className="text-left">
-                    <span className="block text-sm font-medium text-gray-700">
-                      {formData.file ? formData.file.name : (isEditMode && formData.currentFileName ? `Archivo actual: ${formData.currentFileName}` : "Seleccionar archivo")}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {isEditMode ? "Dejar vacío para mantener el archivo actual" : "PDF, Imágenes o Word (Máx 10MB)"}
-                    </span>
-                  </div>
-                </label>
+              <div>
+                <div className={`bg-gray-50 p-3 rounded-xl border border-dashed text-center hover:bg-blue-50/30 hover:border-blue-300 transition-colors ${
+                  formErrors.file ? "border-red-500 bg-red-50/20" : "border-gray-300"
+                }`}>
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    id="file-upload"
+                    className="hidden"
+                  />
+                  <label htmlFor="file-upload" className="cursor-pointer flex items-center justify-center gap-4">
+                    <div className={`p-2 rounded-full ${formErrors.file ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"}`}>
+                      <Upload size={20} />
+                    </div>
+                    <div className="text-left">
+                      <span className="block text-sm font-medium text-gray-700">
+                        {formData.file ? formData.file.name : (isEditMode && formData.currentFileName ? `Archivo actual: ${formData.currentFileName}` : "Seleccionar archivo")}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {isEditMode ? "Dejar vacío para mantener el archivo actual" : "PDF, Imágenes o Word (Máx 10MB)"}
+                      </span>
+                    </div>
+                  </label>
+                </div>
+                {formErrors.file && (
+                  <p className="text-xs text-red-500 mt-1 font-medium flex items-center gap-1">
+                    <AlertCircle size={12} /> {formErrors.file}
+                  </p>
+                )}
               </div>
 
               {submitMessage && (
-                <div className={`p-3 rounded-xl text-sm flex items-center gap-2 ${submitMessage.includes("Error")
-                  ? "bg-red-50 text-red-700 border border-red-200"
-                  : "bg-green-50 text-green-700 border border-green-200"
-                  }`}>
-                  {submitMessage.includes("Error") ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
-                  {submitMessage}
+                <div className={`p-4 rounded-xl text-sm ${
+                  submitMessage.includes("Error") || submitMessage.includes("Faltan") || submitMessage.includes("obligatorios")
+                    ? "bg-red-50 text-red-800 border border-red-200"
+                    : "bg-green-50 text-green-700 border border-green-200"
+                }`}>
+                  <div className="font-semibold flex items-center gap-2 mb-1">
+                    {submitMessage.includes("Error") || submitMessage.includes("Faltan") || submitMessage.includes("obligatorios") ? (
+                      <AlertCircle size={18} className="text-red-600 flex-shrink-0" />
+                    ) : (
+                      <CheckCircle2 size={18} className="text-green-600 flex-shrink-0" />
+                    )}
+                    <span>{submitMessage.split('\n')[0]}</span>
+                  </div>
+                  {submitMessage.split('\n').length > 1 && (
+                    <ul className="mt-2 space-y-1 pl-6 list-disc text-xs text-red-700">
+                      {submitMessage.split('\n').slice(1).map((line, idx) => (
+                        <li key={idx}>{line.replace(/^•\s*/, '')}</li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               )}
 

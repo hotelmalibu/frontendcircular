@@ -17,7 +17,17 @@ const CORS_PROXIES = [
  * @returns {string} - Proxy URL or original URL
  */
 export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
-  if (!imageUrl || typeof imageUrl !== 'string') return imageUrl || '';
+  // If it's an object with url or path property
+  if (imageUrl && typeof imageUrl === 'object') {
+    imageUrl = imageUrl.url || imageUrl.path || imageUrl.directUrl || '';
+  }
+
+  if (!imageUrl || typeof imageUrl !== 'string') return '';
+
+  // Data URLs or blobs shouldn't be modified or proxied
+  if (imageUrl.startsWith('data:') || imageUrl.startsWith('blob:')) {
+    return imageUrl;
+  }
 
   let proxyIndex = 0;
   let options = {};
@@ -35,22 +45,26 @@ export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
   const API_DOMAIN = 'https://api-ecocircular.creativostecnologicosit.com';
 
   // Determine the absolute URL
-  let absoluteImageUrl = imageUrl;
+  let absoluteImageUrl = imageUrl.trim();
+
+  // Fix Laravel default APP_URL=http://localhost pointing to local port 80
+  if (absoluteImageUrl.startsWith('http://localhost/storage') || absoluteImageUrl.startsWith('https://localhost/storage')) {
+    absoluteImageUrl = absoluteImageUrl.replace('https://localhost', API_DOMAIN).replace('http://localhost', API_DOMAIN);
+  }
 
   // 1. Handle filenames without paths (NEWS... or COVER...)
-  if (imageUrl.startsWith('NEWS')) {
-    absoluteImageUrl = `${API_DOMAIN}/storage/news/${imageUrl}`;
-  } else if (imageUrl.startsWith('COVER')) {
-    absoluteImageUrl = `${API_DOMAIN}/storage/projects/covers/${imageUrl}`;
+  if (absoluteImageUrl.startsWith('NEWS')) {
+    absoluteImageUrl = `${API_DOMAIN}/storage/news/${absoluteImageUrl}`;
+  } else if (absoluteImageUrl.startsWith('COVER')) {
+    absoluteImageUrl = `${API_DOMAIN}/storage/projects/covers/${absoluteImageUrl}`;
   }
   // 2. Handle relative paths starting with /
-  else if (imageUrl.startsWith('/')) {
-    absoluteImageUrl = `${API_DOMAIN}${imageUrl}`;
+  else if (absoluteImageUrl.startsWith('/')) {
+    absoluteImageUrl = `${API_DOMAIN}${absoluteImageUrl}`;
   }
-  // 3. Handle absolute URLs already containing our domain or other domains
-  else if (!imageUrl.startsWith('http')) {
-    // Fallback for any other string that doesn't look like a URL
-    absoluteImageUrl = `${API_DOMAIN}/storage/${imageUrl}`;
+  // 3. Handle relative paths that don't start with http
+  else if (!absoluteImageUrl.startsWith('http://') && !absoluteImageUrl.startsWith('https://')) {
+    absoluteImageUrl = `${API_DOMAIN}/storage/${absoluteImageUrl}`;
   }
 
   // If the image is from our API domain

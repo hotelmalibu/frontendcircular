@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ShieldCheck, FileText } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
 
 export default function Terminos() {
   return (
@@ -56,7 +56,7 @@ export default function Terminos() {
             <h2 className="text-lg font-bold text-gray-800">5. Contacto</h2>
             <p>
               Para consultas relacionadas con estos términos, puede comunicarse a través del correo electrónico oficial:{" "}
-              <a href="mailto:info@ecocircular.gov.co" className="text-[#00AB6D] font-semibold hover:underline">
+              <a href="mailto:info@ecocircular.gov.co" className="text-[#2C67B0] font-semibold hover:underline">
                 info@ecocircular.gov.co
               </a>.
             </p>

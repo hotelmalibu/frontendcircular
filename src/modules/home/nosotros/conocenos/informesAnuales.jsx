@@ -215,9 +215,9 @@ export default function InformesAnuales() {
                 placeholder="Buscar documento..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-6 pr-16 py-4 rounded-full text-gray-900 text-base shadow-xl focus:outline-none focus:ring-4 focus:ring-[#00AB6D]/50 transition-all placeholder-gray-500"
+                className="w-full pl-6 pr-16 py-4 rounded-full text-gray-900 text-base shadow-xl focus:outline-none focus:ring-4 focus:ring-[#B1D357]/60 transition-all placeholder-gray-500"
               />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 bg-[#00AB6D] text-white rounded-full hover:bg-[#008F5B] transition-colors shadow-md">
+              <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 bg-[#B1D357] text-[#1E305D] rounded-full hover:bg-[#9cb84d] transition-colors shadow-md">
                 <Search size={20} />
               </button>
             </div>
@@ -270,7 +270,7 @@ export default function InformesAnuales() {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-bold text-[#1E305D] flex items-center gap-2">
-                <FileText size={20} className="text-[#00AB6D]" />
+                <FileText size={20} className="text-[#1E305D]" />
                 Visualizador de Documentos
               </h3>
               <button
@@ -388,7 +388,7 @@ function MinimalistCard({ item, onOpenPdf }) {
           <span>{item.topic}</span>
         </div>
 
-        <h3 className="text-lg font-bold text-[#1E305D] leading-snug mb-3 group-hover:text-[#00AB6D] transition-colors line-clamp-2">
+        <h3 className="text-lg font-bold text-[#1E305D] leading-snug mb-3 group-hover:text-[#2C67B0] transition-colors line-clamp-2">
           {item.title}
         </h3>
 
@@ -397,8 +397,8 @@ function MinimalistCard({ item, onOpenPdf }) {
         </p>
 
         {/* Action hint */}
-        <div className="mt-4 flex items-center text-[#00AB6D] text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
-          {(item.source === 'document' || (item.source === 'project' && (item.projectData?.upload_file || item.projectData?.file))) ? 'Ver Documento' : 'Leer más'} <ArrowRight size={16} className="ml-1" />
+        <div className="mt-4 flex items-center text-[#1E305D] font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
+          {(item.source === 'document' || (item.source === 'project' && (item.projectData?.upload_file || item.projectData?.file))) ? 'Ver Documento' : 'Leer más'} <ArrowRight size={16} className="ml-1 text-[#B1D357]" />
         </div>
       </div>
     </Link>

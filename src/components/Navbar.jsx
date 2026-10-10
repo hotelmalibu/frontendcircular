@@ -535,6 +535,17 @@ export default function Navbar({ onMenuClick }) {
   // eslint-disable-next-line no-unused-vars
   const [scrollDirection, setScrollDirection] = useState("up");
 
+  const isAdmin = Boolean(
+    user && (
+      user.role?.toLowerCase() === "admin" ||
+      user.role_slug?.toLowerCase() === "admin" ||
+      user.role?.toLowerCase() === "administrador" ||
+      user.role_slug?.toLowerCase() === "administrador" ||
+      user.is_admin === true ||
+      (Array.isArray(user.roles) && user.roles.some((r) => (r.slug || r.name || "").toLowerCase().includes("admin")))
+    )
+  );
+
   // --- DATOS DINÁMICOS ---
   const [projectsList, setProjectsList] = useState([]);
 
@@ -770,12 +781,6 @@ export default function Navbar({ onMenuClick }) {
   const [showAlertMenu, setShowAlertMenu] = useState(false);
   const notifRef = useRef(null);
   const alertRef = useRef(null);
-
-  const isAdmin =
-    user &&
-    (user.role?.toLowerCase() === "admin" ||
-      user.role_slug?.toLowerCase() === "admin" ||
-      user.role?.toLowerCase() === "administrador");
 
   const isAfiliado =
     user &&

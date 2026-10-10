@@ -24,7 +24,9 @@ import { getAllCategories } from "../../../../../api/categoriesApi";
 import DOMPurify from 'dompurify';
 import EventFormModal from "./EventFormModal";
 import EventDetailModal from "./EventDetailModal";
-import ConfirmModal from "../../../../../components/common/ConfirmModal";import { toast } from "react-hot-toast";
+import ConfirmModal from "../../../../../components/common/ConfirmModal";
+import { toast } from "react-hot-toast";
+import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 const BRAND = {
@@ -393,9 +395,31 @@ export default function EventList() {
             >
               {/* Borde Superior de Color */}
               <div
-                className="h-1.5 w-full absolute top-0 left-0"
+                className="h-1.5 w-full absolute top-0 left-0 z-10"
                 style={{ backgroundColor: item.event_type === 'remote' ? BRAND.blue : BRAND.darkGreen }}
               ></div>
+
+              {/* Flyer o Banner del Evento */}
+              {(() => {
+                const rawImg = item.flyer_url || item.banner_url || item.photo_url || item.upload_file?.url || item.upload_file || item.flyer || item.image;
+                const imgUrl = rawImg ? getImageProxyUrl(rawImg, { width: 500, quality: 80 }) : null;
+                if (!imgUrl) return null;
+                return (
+                  <div className="h-36 w-full overflow-hidden rounded-t-2xl relative bg-gray-100 flex-shrink-0">
+                    <img
+                      src={imgUrl}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        if (e.currentTarget?.parentElement) {
+                          e.currentTarget.parentElement.style.display = 'none';
+                        }
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none"></div>
+                  </div>
+                );
+              })()}
 
               <div className="p-5 flex-1 flex flex-col">
                 {/* Header: Fecha y Badges */}

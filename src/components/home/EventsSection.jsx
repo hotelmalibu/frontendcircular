@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { getAllSchedules } from "../../api/scheduleApi";
 import EventDetailModal from "./EventDetailModal";
+import { getImageProxyUrl } from "../../utils/imageUtils";
 
 
 
@@ -257,6 +258,27 @@ export default function EventsSection() {
                           className="bg-white rounded-xl p-4 shadow-sm hover:shadow-lg border border-gray-100 hover:border-green-200 transition-all duration-200 cursor-pointer h-full relative overflow-hidden group/card flex flex-col"
                         >
                           <div className={`absolute left-0 top-0 bottom-0 w-1 ${status.text === "En curso" ? "bg-green-500" : status.text === "Próximo" ? "bg-blue-500" : "bg-gray-300"}`}></div>
+
+                          {(() => {
+                            const rawImg = event.flyer_url || event.banner_url || event.photo_url || event.upload_file?.url || event.upload_file || event.flyer || event.image;
+                            const imgUrl = rawImg ? getImageProxyUrl(rawImg, { width: 600, quality: 85 }) : null;
+                            if (!imgUrl) return null;
+                            return (
+                              <div className="h-36 -mx-4 -mt-4 mb-3 overflow-hidden bg-gray-100 relative">
+                                <img
+                                  src={imgUrl}
+                                  alt={event.title}
+                                  className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-300"
+                                  onError={(e) => {
+                                    if (e.currentTarget?.parentElement) {
+                                      e.currentTarget.parentElement.style.display = 'none';
+                                    }
+                                  }}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none"></div>
+                              </div>
+                            );
+                          })()}
 
                           <div className="flex justify-between items-start gap-3 mb-3 pl-2">
                              <div className="flex flex-col items-center justify-center bg-gray-50 rounded-lg p-2 min-w-[60px] border border-gray-100">

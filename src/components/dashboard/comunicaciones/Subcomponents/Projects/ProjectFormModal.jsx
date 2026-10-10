@@ -22,6 +22,7 @@ import { createProject, updateProject } from "../../../../../api/projectsApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
 import { getProjectTypes } from "../../../../../api/projectTypesApi";
 import { getClassificationTypes } from "../../../../../api/classificationTypesApi";
+import { extractFormErrors } from "../../../../../utils/errorUtils";
 import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -47,7 +48,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'ordered' }, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['link'],
+      ['link', 'image'],
       ['clean']
     ],
   };
@@ -58,7 +59,8 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
     'color', 'background',
     'list',
     'align',
-    'link'
+    'link',
+    'image'
   ];
 
   const [formData, setFormData] = useState({
@@ -434,19 +436,24 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
       onSuccess();
     } catch (err) {
       console.error("Error saving project:", err);
-      let errorMessage = "Error al guardar el proyecto";
-      if (err.response?.data?.message) errorMessage = err.response.data.message;
+      const { message, missingFields, details, rawErrors } = extractFormErrors(err);
 
-      if (err.response?.data?.errors) {
-        const serverErrors = err.response.data.errors;
+      if (rawErrors && typeof rawErrors === 'object') {
         const mapped = {};
-        Object.keys(serverErrors).forEach((key) => {
-          const val = serverErrors[key];
+        Object.keys(rawErrors).forEach((key) => {
+          const val = rawErrors[key];
           mapped[key] = Array.isArray(val) ? val.join(" ") : String(val);
         });
         setErrors((prev) => ({ ...prev, ...mapped }));
       }
-      toast.error(`Error: ${errorMessage}`);
+
+      if (missingFields.length > 0) {
+        toast.error(`${message}: ${missingFields.join(", ")}`);
+      } else if (details.length > 0) {
+        toast.error(`${message}:\n${details.join("\n")}`);
+      } else {
+        toast.error(message || "Error al guardar el proyecto");
+      }
     } finally {
       setLoading(false);
     }

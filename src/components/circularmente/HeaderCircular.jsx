@@ -73,7 +73,7 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
 
               <button
                 onClick={() => navigate("/register")}
-                className="group border-2 border-white justify-center text-white px-12 py-4 rounded-xl font-bold hover:bg-white hover:text-[#00AB6D] hover:scale-105 transition-all duration-300 flex items-center gap-2 backdrop-blur-sm w-64"
+                className="group border-2 border-white justify-center text-white px-12 py-4 rounded-xl font-bold hover:bg-white hover:text-[#007f4f] hover:scale-105 transition-all duration-300 flex items-center gap-2 backdrop-blur-sm w-64"
               >
                 Registrarse
                 <ArrowRight
@@ -99,7 +99,7 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
           {/* 🔹 Botón de Contacto */}
           <a
             href="mailto:gsabogal@andi.com.co"
-            className="group bg-[#00AB6D] text-white px-12 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 w-64"
+            className="group bg-[#B1D357] text-[#1E305D] px-12 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:bg-[#9cb84d] hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 w-64"
           >
             Contactar
             <Mail size={18} className="group-hover:rotate-12 transition-transform" />

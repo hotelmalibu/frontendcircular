@@ -14,11 +14,11 @@ export default function Privacidad() {
         </Link>
 
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-green-50 text-[#00AB6D] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-[#B1D357]/20 text-[#1E305D] flex items-center justify-center">
             <ShieldCheck size={24} />
           </div>
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900">Política de Privacidad y Tratamiento de Datos</h1>
+            <h1 className="text-3xl font-extrabold text-[#1E305D]">Política de Privacidad y Tratamiento de Datos</h1>
             <p className="text-sm text-gray-500">En cumplimiento de la Ley 1581 de 2012 (Habeas Data) de Colombia</p>
           </div>
         </div>
@@ -55,7 +55,7 @@ export default function Privacidad() {
             <h2 className="text-lg font-bold text-gray-800">4. Canales para Ejercer sus Derechos</h2>
             <p>
               Para ejercer sus derechos de Habeas Data, puede escribir a{" "}
-              <a href="mailto:info@ecocircular.gov.co" className="text-[#00AB6D] font-semibold hover:underline">
+              <a href="mailto:info@ecocircular.gov.co" className="text-[#2C67B0] font-semibold hover:underline">
                 info@ecocircular.gov.co
               </a> indicando en el asunto "Solicitud de Tratamiento de Datos Personales".
             </p>

@@ -140,12 +140,38 @@
   display: list-item !important;
 }
 
-/* --- IMAGES --- */
-.news-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 0.75rem;
-  margin: 1.5rem 0;
+/* --- IMAGES & INLINE PHOTOS ACROSS NARRATIVES --- */
+.news-content img,
+.project-content img,
+.event-content img,
+.prose img,
+.ql-editor img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 0.875rem;
+  margin: 1.5rem auto;
+  display: block;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.ql-editor img {
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+}
+
+.ql-editor img:hover {
+  border-color: #2C67B0;
+}
+
+.ql-editor .ql-align-center img {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ql-editor .ql-align-right img {
+  margin-left: auto;
+  margin-right: 0;
 }
 
 /* --- RICH TEXT FORMATTING --- */
