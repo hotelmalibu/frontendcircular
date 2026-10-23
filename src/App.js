@@ -55,6 +55,7 @@ const Administracion = lazy(() => import("./modules/dashboard/Administracion"));
 const Soporte = lazy(() => import("./modules/dashboard/Soporte"));
 const Integracion = lazy(() => import("./modules/dashboard/Integracion"));
 const Profile = lazy(() => import("./modules/dashboard/Profile"));
+const Banners = lazy(() => import("./modules/dashboard/Banners"));
 
 // Explorar & Projects
 const ExplorePage = lazy(() => import("./components/pagesExplorar/ExplorePage"));
@@ -79,6 +80,7 @@ const MainLayout = () => {
     "/administracion",
     "/soporte",
     "/integracion",
+    "/banners",
   ];
 
   const isInternalRoute = internalPaths.some((p) =>
@@ -204,6 +206,7 @@ export default function App() {
             <Route path="/formularios" element={<PrivateRoute permission="view.forms"><Formularios /></PrivateRoute>} />
             <Route path="/comunicaciones" element={<PrivateRoute permission="view.communications"><Comunicaciones /></PrivateRoute>} />
             <Route path="/administracion" element={<PrivateRoute permission="view.admin"><Administracion /></PrivateRoute>} />
+            <Route path="/banners" element={<PrivateRoute permission="view.banners"><Banners /></PrivateRoute>} />
             <Route path="/soporte" element={<PrivateRoute permission="view.support"><Soporte /></PrivateRoute>} />
             <Route path="/integracion" element={<PrivateRoute adminOnly={true}><Integracion /></PrivateRoute>} />
 

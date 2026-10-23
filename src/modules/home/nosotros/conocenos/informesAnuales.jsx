@@ -7,12 +7,23 @@ import { getDocuments } from "../../../../api/documentsApi";
 import { getAllProjects } from "../../../../api/projectsApi";
 import { stripHtml } from "../../../../utils/textUtils";
 import { getImageProxyUrl } from "../../../../utils/imageUtils.js";
+import bannerService, { subscribeToBannerUpdates } from "../../../../services/bannerService";
 
 export default function InformesAnuales() {
   const [searchQuery, setSearchQuery] = useState("");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pdfVisible, setPdfVisible] = useState(null); // URL or null
+  const [banner, setBanner] = useState(() => bannerService.getBanner("informes"));
+
+  useEffect(() => {
+    const unsubscribe = subscribeToBannerUpdates((detail) => {
+      if (!detail || detail.pageKey === "informes" || detail.all) {
+        setBanner(bannerService.getBanner("informes"));
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   // Load data logic similar to FeaturedSection
   useEffect(() => {
@@ -195,7 +206,7 @@ export default function InformesAnuales() {
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat scale-105"
           style={{
-            backgroundImage: `url("https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2070&auto=format&fit=crop")`, // Placeholder generic office/doc image if needed, or re-use existing
+            backgroundImage: `url(${banner?.image || "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2070&auto=format&fit=crop"})`,
             filter: "brightness(0.4)"
           }}
         ></div>
@@ -203,10 +214,10 @@ export default function InformesAnuales() {
         <div className="container mx-auto px-4 relative z-10 mt-10">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 fontfamily-montserrat tracking-tight drop-shadow-lg">
-              Informes Anuales y Documentos
+              {banner?.title || "Informes Anuales y Documentos"}
             </h1>
             <p className="text-lg text-gray-200 mb-8 max-w-2xl mx-auto">
-              Accede a nuestra biblioteca de informes de gestión, balances y documentación de interés público.
+              {banner?.description || "Accede a nuestra biblioteca de informes de gestión, balances y documentación de interés público."}
             </p>
 
             <div className="relative group max-w-xl mx-auto">
@@ -311,19 +322,19 @@ function MinimalistCard({ item, onOpenPdf }) {
       if (filePath) {
         const fileUrl = filePath.startsWith('http')
           ? filePath
-          : `https://api-ecocircular.creativostecnologicosit.com/storage/${filePath.replace(/^\/+/, '')}`;
+          : `${process.env.NODE_ENV === 'development' ? '' : 'https://api-ecocircular.creativostecnologicosit.com'}/storage/${filePath.replace(/^\/+/, '')}`;
         onOpenPdf(fileUrl);
       }
     }
     // If it's a project with a specific file path or object
     else if (item.source === 'project' && (item.projectData?.upload_file || item.projectData?.file)) {
       e.preventDefault();
-      const fileData = item.projectData.upload_file || item.projectData.file;
+      const fileData = item.projectData.upload_file || item.projectData?.file;
       const filePath = typeof fileData === 'object' ? (fileData.path || fileData.url) : fileData;
       if (filePath) {
         const fileUrl = String(filePath).startsWith('http')
           ? filePath
-          : `https://api-ecocircular.creativostecnologicosit.com/storage/${String(filePath).replace(/^\/+/, '')}`;
+          : `${process.env.NODE_ENV === 'development' ? '' : 'https://api-ecocircular.creativostecnologicosit.com'}/storage/${String(filePath).replace(/^\/+/, '')}`;
         onOpenPdf(fileUrl);
       }
     }

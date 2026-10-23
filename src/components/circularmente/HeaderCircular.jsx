@@ -1,15 +1,28 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Mail } from "lucide-react";
 import fondoCircularmente from "../../assets/fondosYlogos/fondo_circularmente.jpg";
 import { useNavigate } from "react-router-dom";
+import bannerService, { subscribeToBannerUpdates } from "../../services/bannerService";
 
 export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) {
   const navigate = useNavigate();
+  const [banner, setBanner] = useState(() => bannerService.getBanner("circularmente"));
+
+  useEffect(() => {
+    const unsubscribe = subscribeToBannerUpdates((detail) => {
+      if (!detail || detail.pageKey === "circularmente" || detail.all) {
+        setBanner(bannerService.getBanner("circularmente"));
+      }
+    });
+    return unsubscribe;
+  }, []);
+
   return (
     <header
       className="relative flex flex-col items-center justify-center text-center h-screen font-[Montserrat] bg-cover bg-center"
       style={{
-        backgroundImage: `url(${fondoCircularmente})`,
+        backgroundImage: `url(${banner?.image || fondoCircularmente})`,
       }}
     >
 
@@ -32,7 +45,7 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
         >
-          Circularmente
+          {banner?.title || "Circularmente"}
         </motion.h1>
 
 
@@ -44,10 +57,10 @@ export default function HeaderCircular({ user, onLoginClick, onRegisterClick }) 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
         >
-          Conecta con transformadores líderes en economía circular.
+          {banner?.subtitle || "Conecta con transformadores líderes en economía circular."}
           <br />
           <span className="font-semibold text-white">
-            La plataforma impulsa la economía circular de envases y empaques.
+            {banner?.description || "La plataforma impulsa la economía circular de envases y empaques."}
           </span>
         </motion.p>
 

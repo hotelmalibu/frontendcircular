@@ -41,11 +41,11 @@ const STYLE_OPTIONS = [
 
 const getImageUrl = (path) => {
     if (!path) return null;
-    if (path.startsWith('http') && !path.includes('localhost')) {
+    if (path.startsWith('http') && !path.includes('localhost') && !path.includes('127.0.0.1')) {
         return getImageProxyUrl(path);
     }
-    const cleanPath = path.replace(/^(https?:\/\/localhost(:\d+)?\/)?(storage\/)?/, '');
-    return getImageProxyUrl(`https://api-ecocircular.creativostecnologicosit.com/storage/${cleanPath}`);
+    const cleanPath = path.replace(/^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/)?(storage\/)?/, '');
+    return getImageProxyUrl(`http://127.0.0.1:8000/storage/${cleanPath}`);
 };
 
 export default function Equipo() {

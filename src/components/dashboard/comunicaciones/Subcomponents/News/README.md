@@ -78,7 +78,7 @@ npm install @ckeditor/ckeditor5-build-classic dompurify
 
 ### Base URL
 ```
-https://api-ecocircular.creativostecnologicosit.com/api
+http://127.0.0.1:8000/api
 ```
 
 ### Endpoints Disponibles

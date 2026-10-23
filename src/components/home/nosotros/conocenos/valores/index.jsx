@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 import {
@@ -11,6 +11,7 @@ import {
   HelpCircle // Added HelpCircle
 } from "lucide-react";
 import HelpdeskModal from "../../../../modals/HelpdeskModal";
+import bannerService, { subscribeToBannerUpdates } from "../../../../../services/bannerService";
 
 // Importar la imagen de fondo generada (Oscura y sin texto)
 import ethicsHero from "../../../../../assets/home/nosotros/conocenos/valores/ethics_hero_dark.jpg";
@@ -105,6 +106,16 @@ const TransparencyCard = ({ item, index }) => {
 
 export default function TransparencyPortal() {
   const [isHelpdeskOpen, setIsHelpdeskOpen] = useState(false);
+  const [banner, setBanner] = useState(() => bannerService.getBanner("etica-transparencia"));
+
+  useEffect(() => {
+    const unsubscribe = subscribeToBannerUpdates((detail) => {
+      if (!detail || detail.pageKey === "etica-transparencia" || detail.all) {
+        setBanner(bannerService.getBanner("etica-transparencia"));
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   return (
     <section className="bg-white font-sans min-h-screen">
@@ -112,7 +123,7 @@ export default function TransparencyPortal() {
       {/* HERO SECTION - REPLICA ESTILO HOME/EQUIPO CON COLORES BRAND */}
       <div className="relative h-[450px] md:h-[600px] w-full overflow-hidden">
         <img 
-          src={ethicsHero} 
+          src={banner?.image || ethicsHero} 
           alt="Portal de Ética y Transparencia" 
           className="w-full h-full object-cover object-center scale-105"
         />
@@ -123,20 +134,22 @@ export default function TransparencyPortal() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center"
           >
-            <span className="px-5 py-1.5 rounded-full bg-[#B1D357]/20 backdrop-blur-md border border-[#B1D357]/30 text-[#B1D357] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-6">
-              Transparencia Institucional
-            </span>
+            {banner?.tag && (
+              <span className="px-5 py-1.5 rounded-full bg-[#B1D357]/20 backdrop-blur-md border border-[#B1D357]/30 text-[#B1D357] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-6">
+                {banner.tag}
+              </span>
+            )}
             <h1 
               className="text-white text-3xl md:text-6xl font-bold leading-tight mb-6 drop-shadow-2xl"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
-              Portal de Ética <br className="hidden md:block" /> y Transparencia
+              {banner?.title || "Portal de Ética y Transparencia"}
             </h1>
             <p 
               className="text-white/90 text-sm md:text-lg max-w-2xl font-medium leading-relaxed tracking-wide drop-shadow-lg px-4"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
-              Nuestra gestión se fundamenta en principios de integridad, responsabilidad y coherencia. Construimos confianza a través de la claridad total en cada proceso.
+              {banner?.description || "Nuestra gestión se fundamenta en principios de integridad, responsabilidad y coherencia. Construimos confianza a través de la claridad total en cada proceso."}
             </p>
           </motion.div>
         </div>

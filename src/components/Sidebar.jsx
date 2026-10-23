@@ -9,6 +9,7 @@ import {
   Settings,
   Building,
   LifeBuoy,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -56,6 +57,12 @@ export default function Sidebar() {
       path: "/comunicaciones", 
       icon: <MessageSquare size={24} />,
       permission: "view.communications" 
+    },
+    { 
+      name: "Banners", 
+      path: "/banners", 
+      icon: <ImageIcon size={24} />,
+      permission: "view.banners" 
     },
     { 
       name: "Soporte", 

@@ -44,7 +44,7 @@ src/
 ```
 
 ## Endpoint de la API
-- **URL Base**: `https://api-ecocircular.creativostecnologicosit.com/api/companies`
+- **URL Base**: `http://127.0.0.1:8000/api/companies`
 - **Métodos**: GET, POST, PUT, DELETE
 - **Autenticación**: Bearer Token
 
@@ -67,7 +67,7 @@ src/
     "size": 50305,
     "extension": "jpeg",
     "path": "companies/logos/COMP692914ed0084a.jpeg",
-    "url": "https://api-ecocircular.creativostecnologicosit.com/storage/companies/logos/COMP692914ed0084a.jpeg"
+    "url": "http://127.0.0.1:8000/storage/companies/logos/COMP692914ed0084a.jpeg"
   },
   "products": [
     {

@@ -229,7 +229,7 @@ export default function Bibliotecasub() {
 
   const handleDownload = (document) => {
     try {
-      const directUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${document.upload_file.path}`;
+      const directUrl = `http://127.0.0.1:8000/storage/${document.upload_file.path}`;
       const proxyUrl = getImageProxyUrl(directUrl);
       console.log("Download URLs:", { direct: directUrl, proxy: proxyUrl });
       window.open(proxyUrl, '_blank');
@@ -241,7 +241,7 @@ export default function Bibliotecasub() {
 
   const handleView = (document) => {
     // Open document in a new browser tab using the proxy URL
-    const directUrl = `https://api-ecocircular.creativostecnologicosit.com/storage/${document.upload_file.path}`;
+    const directUrl = `http://127.0.0.1:8000/storage/${document.upload_file.path}`;
     const proxyUrl = getImageProxyUrl(directUrl);
     window.open(proxyUrl, '_blank');
   };

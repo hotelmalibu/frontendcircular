@@ -138,8 +138,18 @@ export default function Table() {
     try {
       const res = await getPermissions();
       const allPerms = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+      const hasBannersPerm = allPerms.some(p => p.slug === 'view.banners' || p.name?.toLowerCase().includes('banner'));
+      const combined = hasBannersPerm ? allPerms : [
+        ...allPerms,
+        {
+          id: 'view.banners',
+          name: 'Banners y Encabezados',
+          slug: 'view.banners',
+          description: 'Permite gestionar y editar los banners de las páginas principales'
+        }
+      ];
       // Sort alphabetically for better UX
-      setPermissions([...allPerms].sort((a,b) => a.name.localeCompare(b.name)));
+      setPermissions([...combined].sort((a,b) => a.name.localeCompare(b.name)));
     } catch (err) {
       console.error("Error fetching permissions:", err);
     }

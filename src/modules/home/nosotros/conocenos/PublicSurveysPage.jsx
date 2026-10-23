@@ -10,6 +10,7 @@ import {
   Play,
   FileText
 } from "lucide-react";
+import bannerService, { subscribeToBannerUpdates } from "../../../../services/bannerService";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
 // const BRAND = {
@@ -31,6 +32,16 @@ export default function PublicSurveysPage() {
     last_page: 1,
     total: 0
   });
+  const [banner, setBanner] = useState(() => bannerService.getBanner("encuestas"));
+
+  useEffect(() => {
+    const unsubscribe = subscribeToBannerUpdates((detail) => {
+      if (!detail || detail.pageKey === "encuestas" || detail.all) {
+        setBanner(bannerService.getBanner("encuestas"));
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   // BRAND COLORS
   const fetchForms = useCallback(async (page = 1) => {
@@ -79,7 +90,7 @@ export default function PublicSurveysPage() {
         {/* Advanced Background with parallax vibe */}
         <div className="absolute inset-0 z-0">
           <img 
-            src={require("../../../../assets/fondosYlogos/fondo_encuestas.png")} 
+            src={banner?.image || require("../../../../assets/fondosYlogos/fondo_encuestas.png")} 
             alt="Fondo Encuestas" 
             className="w-full h-full object-cover scale-105"
           />
@@ -93,11 +104,11 @@ export default function PublicSurveysPage() {
         {/* Hero Content */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 pt-20 flex flex-col items-center text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight leading-tight">
-            Profundiza más con nosotros
+            {banner?.title || "Profundiza más con nosotros"}
             </h1>
             
             <p className="text-lg text-blue-50/80 leading-relaxed font-medium mb-12 max-w-2xl mx-auto">
-            Un espacio estratégico diseñado para las empresas que desean sumarse al colectivo Visión Circular. Inicia tu proceso de vinculación y participa en la transformación sostenible.
+            {banner?.description || "Un espacio estratégico diseñado para las empresas que desean sumarse al colectivo Visión Circular. Inicia tu proceso de vinculación y participa en la transformación sostenible."}
             </p>
         </div>
       </div>

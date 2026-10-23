@@ -42,7 +42,7 @@ export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
   const isDevelopment = host === 'localhost' || host === '127.0.0.1' || host.includes('.local') || host.includes('.test');
 
   // Base domain for API and storage
-  const API_DOMAIN = 'https://api-ecocircular.creativostecnologicosit.com';
+  const API_DOMAIN = 'http://127.0.0.1:8000';
 
   // Determine the absolute URL
   let absoluteImageUrl = imageUrl.trim();
@@ -67,27 +67,10 @@ export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
     absoluteImageUrl = `${API_DOMAIN}/storage/${absoluteImageUrl}`;
   }
 
-  // If the image is from our API domain
-  if (absoluteImageUrl.includes('api-ecocircular.creativostecnologicosit.com')) {
-    // CRITICAL: In development, direct loading is safer than CORS proxies which often 
-    // trigger SSL_PROTOCOL_ERROR due to certificate or handshake mismatches.
-    if (isDevelopment && !options.useProxyInDev) {
-      return absoluteImageUrl;
-    }
-
-    const proxy = CORS_PROXIES[proxyIndex] || CORS_PROXIES[0];
-    let finalUrl = `${proxy}${encodeURIComponent(absoluteImageUrl)}`;
-
-    // Append Weserv specific parameters if using Weserv (index 0)
-    if (proxy.includes('weserv.nl')) {
-      if (options.width) finalUrl += `&w=${options.width}`;
-      if (options.height) finalUrl += `&h=${options.height}`;
-      if (options.quality) finalUrl += `&q=${options.quality}`;
-      if (options.output) finalUrl += `&output=${options.output}`;
-      else finalUrl += `&output=webp`;
-    }
-
-    return finalUrl;
+  // If the image is from our API domain or local server
+  if (absoluteImageUrl.includes('127.0.0.1:8000') || absoluteImageUrl.includes('localhost:8000')) {
+    // Direct loading for local development
+    return absoluteImageUrl;
   }
 
   return absoluteImageUrl;
@@ -99,11 +82,7 @@ export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
  * @returns {Array} - Array of proxy URLs to try
  */
 export const getImageProxyFallbacks = (imageUrl) => {
-  if (!imageUrl || !imageUrl.includes('api-ecocircular.creativostecnologicosit.com')) {
-    return [imageUrl].filter(Boolean);
-  }
-
-  return CORS_PROXIES.map(proxy => `${proxy}${encodeURIComponent(imageUrl)}`);
+  return [imageUrl].filter(Boolean);
 };
 
 /**
@@ -112,7 +91,7 @@ export const getImageProxyFallbacks = (imageUrl) => {
  * @returns {boolean} - True if URL needs proxy
  */
 export const needsCorsProxy = (imageUrl) => {
-  return imageUrl && imageUrl.includes('api-ecocircular.creativostecnologicosit.com');
+  return false;
 };
 
 /**

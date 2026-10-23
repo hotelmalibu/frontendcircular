@@ -676,7 +676,8 @@ export default function QuienesSomos() {
                                                         </span>
                                                     </div>
                                                     <div
-                                                        className="text-gray-600 text-sm leading-relaxed italic prose prose-sm max-w-none"
+                                                        className="text-gray-600 text-sm leading-relaxed italic prose prose-sm max-w-none text-justify [&_*]:text-justify"
+                                                        style={{ textAlign: "justify" }}
                                                         dangerouslySetInnerHTML={{
                                                             __html: DOMPurify.sanitize(String(quote.frase || "").replace(/\u00A0|&nbsp;/g, ' '))
                                                         }}

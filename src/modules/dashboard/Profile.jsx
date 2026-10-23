@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
 import {
@@ -16,10 +16,12 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
-  RefreshCw
+  RefreshCw,
+  Camera,
+  Trash2
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { updateUser as updateUserInfo } from "../../api/users";
+import { updateUser as updateUserInfo, uploadUserAvatar, deleteUserAvatar } from "../../api/users";
 import PasswordStrengthMeter from "../../components/auth/PasswordStrengthMeter";
 import { changePassword, resendVerification, getCurrentUser } from "../../api/auth";
 
@@ -43,6 +45,8 @@ export default function Profile() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -79,6 +83,138 @@ export default function Profile() {
 
   const nameChanged = formData.name !== (user?.name || "");
   const emailChanged = formData.email !== (user?.email || "");
+
+  // Foto de perfil actual (prioriza user.avatar o almacenamiento persistente)
+  const userAvatar = user?.avatar || (user?.id ? localStorage.getItem(`user_avatar_${user.id}`) : null);
+
+  // Compresor de imagen en el cliente para subidas rápidas y seguras
+  const compressImage = (file, maxWidth = 600, maxHeight = 600, quality = 0.85) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              maxHeight = height;
+            }
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        img.onerror = (err) => reject(err);
+      };
+      reader.onerror = (err) => reject(err);
+    });
+  };
+
+  const handleAvatarSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Por favor selecciona un archivo de imagen válido (JPEG, PNG, WEBP).");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("La imagen no debe superar los 10MB.");
+      return;
+    }
+
+    setUploadingAvatar(true);
+    const loadingToast = toast.loading("Actualizando foto de perfil...");
+
+    try {
+      // 1. Comprimir en el navegador
+      const compressedDataUrl = await compressImage(file, 600, 600, 0.85);
+
+      // 2. Preparar FormData para la API
+      const avatarFormData = new FormData();
+      avatarFormData.append("avatar", file);
+
+      let savedAvatarUrl = compressedDataUrl;
+
+      // 3. Subir a la API
+      try {
+        const res = await uploadUserAvatar(user.id, avatarFormData);
+        if (res.data?.avatar) {
+          savedAvatarUrl = res.data.avatar;
+        }
+      } catch (apiErr) {
+        console.warn("API upload avatar error, usando persistencia local:", apiErr);
+        try {
+          await updateUserInfo(user.id, { avatar: compressedDataUrl });
+        } catch (_) {}
+      }
+
+      // 4. Actualizar estado y almacenamiento
+      if (user?.id) {
+        localStorage.setItem(`user_avatar_${user.id}`, savedAvatarUrl);
+      }
+      updateUser({
+        ...user,
+        avatar: savedAvatarUrl
+      });
+
+      toast.success("Foto de perfil actualizada exitosamente", { id: loadingToast });
+    } catch (err) {
+      console.error("Error al procesar la foto:", err);
+      toast.error("No se pudo actualizar la foto de perfil", { id: loadingToast });
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleRemoveAvatar = async (e) => {
+    e.stopPropagation();
+    if (!userAvatar) return;
+
+    setUploadingAvatar(true);
+    const loadingToast = toast.loading("Eliminando foto de perfil...");
+
+    try {
+      try {
+        await deleteUserAvatar(user.id);
+      } catch (apiErr) {
+        console.warn("API delete avatar error:", apiErr);
+      }
+
+      if (user?.id) {
+        localStorage.removeItem(`user_avatar_${user.id}`);
+      }
+      updateUser({
+        ...user,
+        avatar: null
+      });
+
+      toast.success("Foto de perfil eliminada", { id: loadingToast });
+    } catch (err) {
+      console.error("Error al eliminar foto:", err);
+      toast.error("No se pudo eliminar la foto de perfil", { id: loadingToast });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   // Fallback seguro por si el contexto aún no carga
   const userData = user || {
@@ -233,12 +369,75 @@ export default function Profile() {
               <div className="flex flex-col md:flex-row items-start md:items-end justify-between -mt-16 mb-8 gap-4">
 
                 <div className="flex items-end gap-6">
-                  {/* Avatar */}
+                  {/* Avatar con selector de foto interactivo */}
                   <div className="relative group">
-                    <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-200 flex items-center justify-center text-4xl font-bold text-gray-400 shadow-md overflow-hidden">
-                      {/* Si hubiera imagen: <img src={user.avatar} ... /> */}
-                      {userData.name.charAt(0).toUpperCase()}
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-32 h-32 rounded-full border-4 border-white bg-gradient-to-br from-[#005380] to-[#2C67B0] flex items-center justify-center text-4xl font-bold text-white shadow-lg overflow-hidden cursor-pointer relative transition-all duration-300 group-hover:shadow-xl group-hover:scale-[1.02]"
+                      style={{ backgroundColor: BRAND.blue }}
+                      title="Haz clic para cambiar tu foto de perfil"
+                    >
+                      {userAvatar ? (
+                        <img
+                          src={userAvatar}
+                          alt={userData.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <span>{userData.name.charAt(0).toUpperCase()}</span>
+                      )}
+
+                      {/* Overlay en hover */}
+                      <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col items-center justify-center text-white text-xs font-semibold gap-1 p-2 text-center">
+                        {uploadingAvatar ? (
+                          <Loader2 className="animate-spin text-white" size={24} />
+                        ) : (
+                          <>
+                            <Camera size={22} className="text-white drop-shadow" />
+                            <span className="text-[11px] leading-tight font-medium">Cambiar foto</span>
+                          </>
+                        )}
+                      </div>
                     </div>
+
+                    {/* Botón flotante de cámara */}
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingAvatar}
+                      className="absolute bottom-0 right-0 p-2.5 rounded-full bg-white text-gray-700 shadow-md border border-gray-200 hover:text-[#2C67B0] hover:border-[#2C67B0]/30 hover:scale-110 active:scale-95 transition-all"
+                      title="Cambiar foto de perfil"
+                    >
+                      {uploadingAvatar ? (
+                        <Loader2 className="animate-spin text-[#2C67B0]" size={16} />
+                      ) : (
+                        <Camera size={16} />
+                      )}
+                    </button>
+
+                    {/* Botón flotante para eliminar foto si ya tiene una */}
+                    {userAvatar && !uploadingAvatar && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveAvatar}
+                        className="absolute top-0 right-0 p-1.5 rounded-full bg-white text-red-500 shadow-md border border-gray-200 hover:bg-red-50 hover:text-red-700 hover:scale-110 active:scale-95 transition-all"
+                        title="Eliminar foto de perfil"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+
+                    {/* Input de archivo oculto */}
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleAvatarSelect}
+                      accept="image/jpeg,image/png,image/webp,image/jpg"
+                      className="hidden"
+                    />
                   </div>
 
                   {/* Nombre y Rol */}

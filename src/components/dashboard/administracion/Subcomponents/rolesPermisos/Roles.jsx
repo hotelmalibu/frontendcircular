@@ -107,6 +107,17 @@ export default function Roles() {
       } else if (permissionsRes.data?.data?.items && Array.isArray(permissionsRes.data.data.items)) {
         permsArray = permissionsRes.data.data.items;
       }
+
+      const hasBannersPerm = permsArray.some(p => p.slug === 'view.banners' || p.name?.toLowerCase().includes('banner'));
+      if (!hasBannersPerm) {
+        permsArray.push({
+          id: 'view.banners',
+          name: 'Banners y Encabezados',
+          slug: 'view.banners',
+          description: 'Permite gestionar y editar los banners de las páginas principales'
+        });
+      }
+
       setPermissions(permsArray);
 
       setError(null);

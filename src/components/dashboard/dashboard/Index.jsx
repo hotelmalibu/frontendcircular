@@ -94,6 +94,11 @@ export default function Index() {
       title: 'ADMINISTRACIÓN SISTEMA',
       desc: 'Configuración global y gestión de roles.',
       link: '/administracion'
+    },
+    'view.banners': {
+      title: 'GESTIÓN DE BANNERS',
+      desc: 'Personalización de imágenes y textos de las páginas principales.',
+      link: '/banners'
     }
   };
 

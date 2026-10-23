@@ -2,45 +2,33 @@ import { useState, useEffect, useCallback, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { ArrowRight } from 'lucide-react';
-import fondo1 from '../../assets/home/Carrusel/Index_imagen_1.jpg';
-import fondo3 from '../../assets/home/Carrusel/Index_imagen_3.jpeg';
-import fondo4 from '../../assets/home/Carrusel/Index_imagen_4.png';
-
-const SLIDES = [
-  {
-    image: fondo3,
-    title: 'Impulsando el país hacia',
-    subtitle: 'la economía circular',
-    description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-    button1: 'Sobre nosotros',
-    button2: 'Conoce nuestras estrategias'
-  },
-  {
-    image: fondo1,
-    title: 'Impulsando el país hacia',
-    subtitle: 'la economía circular',
-    description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-    button1: 'Sobre nosotros',
-    button2: 'Conoce nuestras estrategias'
-  },
-  {
-    image: fondo4,
-    title: 'Impulsando el país hacia',
-    subtitle: 'la economía circular',
-    description: 'Articulamos actores y desarrollamos estrategias competitivas que garantizan el cumplimiento normativo y contribuyen a las metas ESG corporativas.',
-    button1: 'Sobre nosotros',
-    button2: 'Conoce nuestras estrategias'
-  }
-];
+import bannerService, { subscribeToBannerUpdates } from '../../services/bannerService';
 
 export default function IndexImagen() {
   const { user } = useContext(AuthContext);
+  const [slides, setSlides] = useState(() => {
+    const banner = bannerService.getBanner('inicio');
+    return banner?.slides?.length > 0 ? banner.slides : [];
+  });
   const [currentSlide, setCurrentSlide] = useState(0);
+
   useEffect(() => {
-    if (currentSlide >= SLIDES.length) {
+    const unsubscribe = subscribeToBannerUpdates((detail) => {
+      if (!detail || detail.pageKey === 'inicio' || detail.all) {
+        const banner = bannerService.getBanner('inicio');
+        if (banner?.slides?.length > 0) {
+          setSlides(banner.slides);
+        }
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (slides.length > 0 && currentSlide >= slides.length) {
       setCurrentSlide(0);
     }
-  }, [currentSlide]);
+  }, [currentSlide, slides.length]);
 
   const [isAutoplay] = useState(true);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -71,7 +59,7 @@ export default function IndexImagen() {
 
     const slideTimer = setInterval(() => {
       setProgress(0);
-      setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
+      setCurrentSlide((prev) => (prev + 1) % (slides.length || 1));
     }, duration * 1000);
 
 
@@ -88,7 +76,7 @@ export default function IndexImagen() {
       clearInterval(slideTimer);
       clearInterval(progressTimer);
     };
-  }, [isAutoplay, currentSlide, getDuration]);
+  }, [isAutoplay, currentSlide, getDuration, slides.length]);
 
 
 
@@ -343,12 +331,12 @@ export default function IndexImagen() {
 
       {/* Fondo con transición suave (crossfade) */}
       <div className="absolute inset-0">
-        {SLIDES.map((s, index) => (
+        {slides.map((s, index) => (
           <div
             key={index}
             className={`carousel-bg carousel-bg-transition ${index === currentSlide ? 'opacity-100' : 'opacity-0'
               }`}
-            style={{ backgroundImage: `url(${s.image})` }}
+            style={{ backgroundImage: `url(${s.image || s.defaultImage})` }}
           ></div>
         ))}
         <div className="absolute inset-0 bg-gradient-to-r from-[#1E305D]/60 via-[#2C67B0]/40 to-transparent z-[1]"></div>
@@ -365,7 +353,7 @@ export default function IndexImagen() {
 
       {/* ========== INDICADORES LATERALES  ========== */}
       <div className="absolute left-2 md:left-12  mt-6 lg:left-6 top-1/2 -translate-y-[125px] z-20 flex flex-col items-center gap-10 md:translate-x-16 translate-x-0">
-        {SLIDES.map((_, index) => (
+        {slides.map((_, index) => (
           <div key={index} className="nav-indicator-item">
             {index === currentSlide ? (
               // CONTADOR - Contenido dentro del círculo
@@ -437,15 +425,15 @@ export default function IndexImagen() {
           {/* Títulos con animación SOLO AL CARGAR */}
           <div className="mb-6">
             <h1 className={`animate-on-load ${hasLoaded ? 'loaded' : ''} text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-2`}>
-              <span className="block whitespace-normal md:whitespace-nowrap">{SLIDES[currentSlide]?.title}</span>
-              <span className="block whitespace-normal md:whitespace-nowrap">{SLIDES[currentSlide]?.subtitle}</span>
+              <span className="block whitespace-normal md:whitespace-nowrap">{slides[currentSlide]?.title}</span>
+              <span className="block whitespace-normal md:whitespace-nowrap">{slides[currentSlide]?.subtitle}</span>
             </h1>
           </div>
 
 
           {/* Descripción */}
           <p className={`animate-on-load ${hasLoaded ? 'loaded' : ''} text-gray-100 text-base md:text-lg max-w-2xl leading-relaxed mb-8`}>
-            {SLIDES[currentSlide]?.description}
+            {slides[currentSlide]?.description}
           </p>
 
 
@@ -453,9 +441,9 @@ export default function IndexImagen() {
           <div className={`animate-buttons ${hasLoaded ? 'loaded' : ''} flex flex-col gap-4 w-fit`}>
             <div className="flex flex-wrap gap-4">
               {/* Botón secundario - Contorno limpio */}
-              <Link to="/quienes-somos" className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
+              <Link to={slides[currentSlide]?.button1_link || "/quienes-somos"} className="btn-secondary group relative px-8 py-3 rounded-full font-semibold text-white bg-transparent transition-all duration-300 hover:scale-105">
                 <span className="relative z-10 flex items-center gap-2">
-                  {SLIDES[currentSlide]?.button1}
+                  {slides[currentSlide]?.button1}
                   <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -463,9 +451,9 @@ export default function IndexImagen() {
               </Link>
 
               {/* Botón primario - */}
-              <Link to="/lineas-estrategicas" className="btn-primary group relative px-8 py-3 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
+              <Link to={slides[currentSlide]?.button2_link || "/lineas-estrategicas"} className="btn-primary group relative px-8 py-3 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
                 <span className="relative z-10 flex items-center gap-2">
-                  {SLIDES[currentSlide]?.button2}
+                  {slides[currentSlide]?.button2}
                   <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>

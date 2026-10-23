@@ -309,7 +309,7 @@ export default function ContentDetailProject() {
                         </div>
                       </div>
                       <a
-                        href={project.uploadFile.path ? `https://api-ecocircular.creativostecnologicosit.com/storage/${project.uploadFile.path}` : project.uploadFile.url}
+                        href={project.uploadFile.path ? `http://127.0.0.1:8000/storage/${project.uploadFile.path}` : project.uploadFile.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-[#00AB6D] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#00965d] active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-[#00AB6D]/20"

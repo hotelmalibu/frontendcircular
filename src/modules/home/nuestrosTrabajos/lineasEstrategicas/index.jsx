@@ -15,6 +15,7 @@ import imgConsumo from "../../../../assets/lineasestrategicas/consumoresponsable
 import imgCadenas from "../../../../assets/lineasestrategicas/cadenasdevalor.png";
 import bannerImg from "../../../../assets/lineasestrategicas/Banner.png";
 import ImpactSection from "../../../../components/home/nosotros/conocenos/quienesSomos/ImpactSection.jsx";
+import bannerService, { subscribeToBannerUpdates } from "../../../../services/bannerService";
 
 const DATA_LINEAS = [
   {
@@ -133,7 +134,17 @@ const DATA_LINEAS = [
 export default function LineasEstrategicasPage() {
   const [selectedLineId, setSelectedLineId] = useState(DATA_LINEAS[0].id);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [banner, setBanner] = useState(() => bannerService.getBanner("lineas-estrategicas"));
   const location = useLocation();
+
+  useEffect(() => {
+    const unsubscribe = subscribeToBannerUpdates((detail) => {
+      if (!detail || detail.pageKey === "lineas-estrategicas" || detail.all) {
+        setBanner(bannerService.getBanner("lineas-estrategicas"));
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     const hash = location.hash.replace("#", "");
@@ -166,7 +177,7 @@ export default function LineasEstrategicasPage() {
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url(${bannerImg})`
+            backgroundImage: banner?.image ? `url(${banner.image})` : `url(${bannerImg})`
           }}
         />
 
@@ -178,10 +189,10 @@ export default function LineasEstrategicasPage() {
             className="max-w-4xl relative z-10"
           >
             <h1 className="text-white text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6 drop-shadow-lg font-display">
-              Líneas Estratégicas
+              {banner?.title || "Líneas Estratégicas"}
             </h1>
             <p className="text-white/95 text-sm md:text-xl max-w-2xl mx-auto leading-relaxed drop-shadow-md font-medium">
-              Estrategias integrales diseñadas para transformar el modelo productivo del país hacia una economía circular.
+              {banner?.description || "Estrategias integrales diseñadas para transformar el modelo productivo del país hacia una economía circular."}
             </p>
           </motion.div>
         </div>

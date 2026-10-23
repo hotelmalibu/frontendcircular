@@ -39,7 +39,7 @@ export default function ExplorePage() {
           if (foundCat) catName = foundCat.name;
         }
 
-        const API_BASE = 'https://api-ecocircular.creativostecnologicosit.com';
+        const API_BASE = 'http://127.0.0.1:8000';
         const fixUrl = (url) => url
           ? url.replace('https://localhost', API_BASE).replace('http://localhost', API_BASE)
           : url;

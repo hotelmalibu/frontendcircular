@@ -22,13 +22,14 @@ import logoWhirlpool from "../../../../assets/LogosJuntaDirectiva/Logo_Whirpool.
 // --- IMPORTS IMÁGENES EQUIPO (Galerías Completas) ---
 import andiLogo from "../../../../assets/imgEquipo/andi.png";
 import groupPhoto from "../../../../assets/imgEquipo/group_photo.jpg";
+import bannerService, { subscribeToBannerUpdates } from "../../../../services/bannerService";
 
 // --- HERRAMIENTA DE RUTAS DE IMAGEN ---
 const getImageUrl = (path) => {
   if (!path) return null;
-  if (path.startsWith('http') && !path.includes('localhost')) return path;
-  const cleanPath = path.replace(/^(https?:\/\/localhost(:\d+)?\/)?(storage\/)?/, '');
-  return `https://api-ecocircular.creativostecnologicosit.com/storage/${cleanPath}`;
+  if (path.startsWith('http') && !path.includes('localhost') && !path.includes('127.0.0.1')) return path;
+  const cleanPath = path.replace(/^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/)?(storage\/)?/, '');
+  return `http://127.0.0.1:8000/storage/${cleanPath}`;
 };
 
 // --- CONSTANTES DE ESTILO ---
@@ -143,6 +144,16 @@ const CompactBoardCard = ({ name, logo, isWhite, position }) => (
 
 export default function TeamOrgChart() {
   const [teamMembers, setTeamMembers] = useState([]);
+  const [banner, setBanner] = useState(() => bannerService.getBanner("junta-equipo"));
+
+  useEffect(() => {
+    const unsubscribe = subscribeToBannerUpdates((detail) => {
+      if (!detail || detail.pageKey === "junta-equipo" || detail.all) {
+        setBanner(bannerService.getBanner("junta-equipo"));
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     const fetchTeam = async () => {
@@ -171,7 +182,7 @@ export default function TeamOrgChart() {
       {/* HERO BANNER */}
       <div className="relative h-[450px] md:h-[650px] w-full overflow-hidden mb-12">
         <img
-          src={groupPhoto}
+          src={banner?.image || groupPhoto}
           alt="Equipo Visión Circular"
           className="w-full h-full object-cover object-center"
         />
@@ -185,7 +196,7 @@ export default function TeamOrgChart() {
             animate={{ opacity: 1, y: 0 }}
             className="text-white text-4xl md:text-5xl lg:text-5xl font-extrabold leading-tight mb-3 drop-shadow-xl"
           >
-            EL EQUIPO QUE IMPULSA LA ECONOMÍA CIRCULAR
+            {banner?.title || "EL EQUIPO QUE IMPULSA LA ECONOMÍA CIRCULAR"}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -193,7 +204,7 @@ export default function TeamOrgChart() {
             transition={{ delay: 0.2 }}
             className="text-white/90 text-base md:text-lg max-w-3xl mx-auto leading-relaxed font-medium drop-shadow-lg"
           >
-           Articulamos actores, conocimiento y soluciones para hacer de la economía circular una realidad en el país.
+           {banner?.description || "Articulamos actores, conocimiento y soluciones para hacer de la economía circular una realidad en el país."}
           </motion.p>
         </div>
       </div>

@@ -118,7 +118,7 @@ export default function ContentDetailPage() {
             body: found.content || found.description || found.body || "",
 
             image: (() => {
-              const API_BASE = 'https://api-ecocircular.creativostecnologicosit.com';
+              const API_BASE = 'http://127.0.0.1:8000';
               let rawUrl = (found.upload_file && found.upload_file.url) || found.image || '';
               // Backend bug: sometimes returns localhost instead of real domain
               if (rawUrl) {

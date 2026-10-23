@@ -167,43 +167,91 @@ export default function Index() {
               <Quote size={24} className="text-[#00AB6D]" />
               Voces de Nuestros Líderes
             </h3>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-5">
               {leaderQuotes.map((quote, index) => {
-                const Icon = getIconForIndex(index);
+                const rawPhoto = quote.photo_url || quote.photo || quote.upload_file?.url || quote.upload_file;
+                const photoUrl = rawPhoto ? getImageProxyUrl(rawPhoto, { width: 400, quality: 90 }) : null;
+
+                if (photoUrl) {
+                  // TARJETA CON IMAGEN: La imagen ocupa desde el borde izquierdo de arriba a abajo
+                  return (
+                    <div
+                      key={quote.id || index}
+                      className="bg-white rounded-2xl shadow-sm border border-gray-100 text-left hover:border-[#B1D357] hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col sm:flex-row items-stretch group"
+                    >
+                      {/* Cuadro Rojo: Imagen fija sin zoom de arriba a abajo */}
+                      <div className="w-full sm:w-44 md:w-48 lg:w-52 h-48 sm:h-auto self-stretch flex-shrink-0 relative overflow-hidden bg-gray-100">
+                        <img
+                          src={photoUrl}
+                          alt={quote.nombre}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                      </div>
+
+                      {/* Cuadro Morado: Todo el texto a la derecha con texto justificado */}
+                      <div className="p-5 sm:p-6 flex-1 min-w-0 flex flex-col justify-center">
+                        <div className="mb-2">
+                          <p className="font-bold text-[#1E305D] text-base md:text-lg leading-tight">
+                            {quote.nombre}
+                          </p>
+                          <p className="text-xs font-semibold text-[#00AB6D] mt-0.5">
+                            {quote.cargo}
+                          </p>
+                        </div>
+                        <div 
+                          className="text-gray-700 text-sm italic leading-relaxed prose prose-sm max-w-none text-justify [&_*]:text-justify"
+                          style={{ textAlign: "justify" }}
+                        >
+                          <div
+                            style={{ textAlign: "justify" }}
+                            dangerouslySetInnerHTML={{
+                              __html: DOMPurify.sanitize(
+                                String(quote.frase || "").replace(/\u00A0|&nbsp;/g, " ")
+                              ),
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // TARJETA SIN IMAGEN: Diseño limpio con texto justificado
                 return (
                   <div
                     key={quote.id || index}
-                    className="bg-white p-4 rounded-xl shadow-md border border-gray-100 text-left hover:border-[#B1D357] hover:shadow-lg transition-all duration-300"
+                    className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100 text-left hover:border-[#B1D357] hover:shadow-md transition-all duration-300 flex flex-col justify-between group"
                   >
-                    <div className="flex items-center gap-3 mb-3">
-                      {(() => {
-                        const rawPhoto = quote.photo_url || quote.photo || quote.upload_file?.url || quote.upload_file;
-                        const photoUrl = rawPhoto ? getImageProxyUrl(rawPhoto, { width: 120, quality: 85 }) : null;
-                        if (photoUrl) {
-                          return (
-                            <img
-                              src={photoUrl}
-                              alt={quote.nombre}
-                              className="w-12 h-12 rounded-full object-cover border-2 border-[#B1D357] shadow-sm flex-shrink-0"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          );
-                        }
-                        return (
-                          <div className="bg-[#B1D357]/20 p-2.5 rounded-full flex-shrink-0">
-                            <Icon size={20} className="text-[#1E305D]" />
-                          </div>
-                        );
-                      })()}
-                      <div>
-                        <p className="font-bold text-[#1E305D] text-base leading-tight">{quote.nombre}</p>
-                        <p className="text-xs text-gray-600 mt-0.5">{quote.cargo}</p>
+                    <div>
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div>
+                          <p className="font-bold text-[#1E305D] text-base md:text-lg leading-tight">
+                            {quote.nombre}
+                          </p>
+                          <p className="text-xs font-semibold text-[#00AB6D] mt-0.5">
+                            {quote.cargo}
+                          </p>
+                        </div>
+                        <div className="p-2 rounded-xl bg-[#B1D357]/15 text-[#00AB6D] flex-shrink-0">
+                          <Quote size={18} />
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-gray-700 text-sm italic leading-relaxed prose prose-sm max-w-none">
-                      <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(quote.frase || "").replace(/\u00A0|&nbsp;/g, ' ')) }} />
+                      <div 
+                        className="text-gray-700 text-sm italic leading-relaxed prose prose-sm max-w-none text-justify [&_*]:text-justify"
+                        style={{ textAlign: "justify" }}
+                      >
+                        <div
+                          style={{ textAlign: "justify" }}
+                          dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(
+                              String(quote.frase || "").replace(/\u00A0|&nbsp;/g, " ")
+                            ),
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 );
