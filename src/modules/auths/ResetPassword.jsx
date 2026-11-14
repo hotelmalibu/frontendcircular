@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Lock, Eye, EyeOff, Loader2, CheckCircle2 } from "lucide-react";
@@ -57,7 +58,7 @@ export default function ResetPassword() {
             });
             setIsSuccess(true);
         } catch (err) {
-            console.error("Error al resetear contraseña:", err);
+            clientLogger.error("Error al resetear contraseña:", err);
             setError(err.response?.data?.message || "No se pudo actualizar la contraseña. Reinténtalo.");
         } finally {
             setIsLoading(false);

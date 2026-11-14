@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 import React, { useState } from "react";
 import { X, Search, Loader2, CheckCircle2, AlertCircle, Clock, MessageSquare, AlertTriangle } from "lucide-react";
 import { getTickets } from "../../api/helpdeskApi";
@@ -48,7 +49,7 @@ export default function TicketStatusModal({ isOpen, onClose }) {
                 setError("ID de Ticket no encontrado. Por favor verifica el código (ej. CIR-000001).");
             }
         } catch (err) {
-            console.error("Error fetching ticket status:", err);
+            clientLogger.error("Error fetching ticket status:", err);
             setError(err.response?.data?.message || "Error al consultar el ticket. Intenta de nuevo.");
         } finally {
             setLoading(false);

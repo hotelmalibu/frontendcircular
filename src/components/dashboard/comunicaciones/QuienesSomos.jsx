@@ -1,3 +1,4 @@
+import clientLogger from '../../../utils/clientLogger';
 import React, { useState, useEffect, useRef } from "react";
 import ReactQuill from 'react-quill-new';
 import DOMPurify from 'dompurify';
@@ -101,7 +102,7 @@ export default function QuienesSomos() {
             setQuotes(Array.isArray(quotesData) ? quotesData : []);
         } catch (error) {
             toast.error("Error al cargar los datos");
-            console.error(error);
+            clientLogger.error(error);
         } finally {
             setLoading(false);
         }

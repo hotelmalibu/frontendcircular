@@ -1,3 +1,4 @@
+import clientLogger from '../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import { getVisionCircularForms, deleteVisionCircularForm } from "../../../api/visionCircularFormsApi";
 import { Trash2, FileText, CheckCircle, XCircle } from "lucide-react";
@@ -22,7 +23,7 @@ export default function VisionCircularFormsModule() {
       const data = await getVisionCircularForms();
       setForms(data);
     } catch (error) {
-      console.error("Error fetching forms:", error);
+      clientLogger.error("Error fetching forms:", error);
       toast.error("Error al cargar los formularios");
     } finally {
       setLoading(false);
@@ -43,7 +44,7 @@ export default function VisionCircularFormsModule() {
           setSelectedForm(null);
         }
       } catch (error) {
-        console.error("Error deleting form:", error);
+        clientLogger.error("Error deleting form:", error);
         toast.error("Error al eliminar el formulario");
       }
     }

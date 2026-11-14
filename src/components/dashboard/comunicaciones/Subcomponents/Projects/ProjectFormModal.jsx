@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import ReactQuill from 'react-quill-new';
@@ -112,7 +113,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
 
       setCategories(categoriesArray);
     } catch (err) {
-      console.error("Error loading categories for projects:", err);
+      clientLogger.error("Error loading categories for projects:", err);
     } finally {
       setCategoriesLoading(false);
     }
@@ -135,7 +136,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
 
       setProjectTypes(typesArray);
     } catch (err) {
-      console.error("Error loading project types:", err);
+      clientLogger.error("Error loading project types:", err);
     } finally {
       setProjectTypesLoading(false);
     }
@@ -157,7 +158,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
 
       setClassificationTypes(typesArray);
     } catch (err) {
-      console.error("Error loading classification types:", err);
+      clientLogger.error("Error loading classification types:", err);
     } finally {
       setClassificationTypesLoading(false);
     }
@@ -175,7 +176,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
       const description = projectData.description || "";
       const catId = (projectData.category && typeof projectData.category === 'object') ? (projectData.category?.id || "") : (projectData.category_id || "");
 
-      console.log("ProjectFormModal - Loading Data:", {
+      clientLogger.log("ProjectFormModal - Loading Data:", {
         isEditing,
         descriptionLength: description.length,
         category_id: catId,
@@ -435,7 +436,7 @@ export default function ProjectFormModal({ projectData, isEditing, onClose, onSu
       }
       onSuccess();
     } catch (err) {
-      console.error("Error saving project:", err);
+      clientLogger.error("Error saving project:", err);
       const { message, missingFields, details, rawErrors } = extractFormErrors(err);
 
       if (rawErrors && typeof rawErrors === 'object') {

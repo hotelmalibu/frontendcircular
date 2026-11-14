@@ -1,3 +1,4 @@
+import clientLogger from '../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import {
     Users,
@@ -39,14 +40,7 @@ const STYLE_OPTIONS = [
     { value: "RED", label: "Coordinador de Proyectos" },
 ];
 
-const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith('http') && !path.includes('localhost') && !path.includes('127.0.0.1')) {
-        return getImageProxyUrl(path);
-    }
-    const cleanPath = path.replace(/^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/)?(storage\/)?/, '');
-    return getImageProxyUrl(`http://127.0.0.1:8000/storage/${cleanPath}`);
-};
+const getImageUrl = (path) => getImageProxyUrl(path) || null;
 
 export default function Equipo() {
     const [loading, setLoading] = useState(true);
@@ -81,7 +75,7 @@ export default function Equipo() {
             setMembers(res || []);
         } catch (error) {
             toast.error("Aún no hay conexión con el servidor (Equipo)");
-            console.error(error);
+            clientLogger.error(error);
         } finally {
             setLoading(false);
         }
@@ -132,7 +126,7 @@ export default function Equipo() {
             toast.success("Miembro de equipo agregado");
             resetForm();
         } catch (error) {
-            console.error(error);
+            clientLogger.error(error);
             const backendError = error.response?.data?.errors;
             if (backendError) {
                 const firstErrorMessage = Object.values(backendError)[0][0];
@@ -162,7 +156,7 @@ export default function Equipo() {
             toast.success("Miembro actualizado");
             resetForm();
         } catch (error) {
-            console.error(error);
+            clientLogger.error(error);
             const backendError = error.response?.data?.errors;
             if (backendError) {
                 const firstErrorMessage = Object.values(backendError)[0][0];
@@ -181,7 +175,7 @@ export default function Equipo() {
             setMembers(members.filter(m => m.id !== id));
             toast.success("Miembro eliminado");
         } catch (error) {
-            console.error(error);
+            clientLogger.error(error);
             toast.error("Error al eliminar el miembro de la base de datos");
         }
     };
@@ -218,7 +212,7 @@ export default function Equipo() {
             await teamApi.updateMembersOrder(reordered.map(m => m.id));
             toast.success("Orden actualizado");
         } catch (error) {
-            console.error(error);
+            clientLogger.error(error);
             toast.error("Error al actualizar el orden en la base de datos");
         }
     };

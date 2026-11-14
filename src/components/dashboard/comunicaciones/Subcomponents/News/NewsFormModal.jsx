@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import ReactQuill from 'react-quill-new';
@@ -66,7 +67,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       const description = newsData.description || "";
       const catId = (newsData.category && typeof newsData.category === 'object') ? (newsData.category?.id || "") : (newsData.category_id || "");
 
-      console.log("NewsFormModal - Loading Data:", {
+      clientLogger.log("NewsFormModal - Loading Data:", {
         isEditing,
         descriptionLength: description.length,
         category_id: catId,
@@ -86,7 +87,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
         status: newsData.status || "published",
         upload_file: newsData.upload_file || null,
       }));
-      console.log("NewsFormModal - Status loaded:", newsData.status);
+      clientLogger.log("NewsFormModal - Status loaded:", newsData.status);
     }
   }, [newsData, isEditing]);
 
@@ -109,7 +110,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       }
       setCategories(categoriesArray);
     } catch (err) {
-      console.error("Error loading categories:", err);
+      clientLogger.error("Error loading categories:", err);
       setCategories([]);
     } finally {
       setCategoriesLoading(false);
@@ -161,7 +162,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'category' || name === 'category_id') {
-      console.log("NewsFormModal - Category Selected (Value):", value);
+      clientLogger.log("NewsFormModal - Category Selected (Value):", value);
     }
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
@@ -286,8 +287,8 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       dataToSend.append('author', formData.author || "");
       dataToSend.append('status', formData.status);
 
-      console.log("NewsFormModal - Status being sent:", formData.status);
-      console.log("NewsFormModal - Submitting dataToSend (category_id):", formData.category_id);
+      clientLogger.log("NewsFormModal - Status being sent:", formData.status);
+      clientLogger.log("NewsFormModal - Submitting dataToSend (category_id):", formData.category_id);
 
       if (formData.start_date) dataToSend.append('start_date', toIsoDate(formData.start_date));
       if (formData.end_date) dataToSend.append('end_date', toIsoDate(formData.end_date));
@@ -300,7 +301,7 @@ export default function NewsFormModal({ newsData, isEditing, onClose, onSuccess 
       }
       onSuccess();
     } catch (err) {
-      console.error("Error saving news:", err);
+      clientLogger.error("Error saving news:", err);
       const { message, missingFields, details } = extractFormErrors(err);
       if (missingFields.length > 0) {
         toast.error(`${message}: ${missingFields.join(", ")}`);

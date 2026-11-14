@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { AuthContext } from "../../../../../context/AuthContext";
 import formsApi from "../../../../../api/formsApi";
@@ -52,7 +53,7 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
       setForms(Array.isArray(list) ? list : []);
       setPagination(paginInfo);
     } catch (error) {
-      console.error("Error fetching forms:", error);
+      clientLogger.error("Error fetching forms:", error);
       toast.error("Error al cargar los formularios");
     } finally {
       setLoading(false);
@@ -76,7 +77,7 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
       toast.success("Formulario publicado correctamente");
       fetchForms();
     } catch (error) {
-      console.error("Error publishing form:", error);
+      clientLogger.error("Error publishing form:", error);
       toast.error("Error al publicar el formulario");
     }
   };
@@ -104,7 +105,7 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
                               toast.success("Formulario eliminado correctamente");
                               fetchForms();
                           } catch (error) {
-                              console.error("Error deleting form:", error);
+                              clientLogger.error("Error deleting form:", error);
                               toast.error("Error al eliminar el formulario");
                           }
                       }}
@@ -135,7 +136,7 @@ const DashboardSurveyAnalysis = ({ onEdit }) => {
       }
       fetchForms();
     } catch (error) {
-      console.error("Error toggling archive status:", error);
+      clientLogger.error("Error toggling archive status:", error);
       toast.error("Error al procesar la solicitud");
     }
   };

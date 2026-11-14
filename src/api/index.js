@@ -1,23 +1,11 @@
 import axios from "axios";
 
-// ==============================================================================
-// CONFIGURACIÓN DE CONEXIÓN CON EL BACKEND (API)
-// ==============================================================================
-// Cambia a 'true' para usar tu Laravel local (cuando tengas 'php artisan serve' con MySQL listo),
-// o 'false' (por defecto) para usar el servidor oficial en producción/remoto
-const USE_LOCAL = true;
-
-// URLs configurables
-const LOCAL_API_URL = "http://127.0.0.1:8000/api"; // Tu servidor local con 'php artisan serve'
-// const LOCAL_API_URL = "http://plataformaeconomiacircular.test/api"; // Alternativa con Laragon VirtualHost
-const REMOTE_API_URL = "https://api-ecocircular.creativostecnologicosit.com/api";
-
+// Only the public API address belongs in frontend configuration. Never include secrets.
+// Development preserves the local Laravel server; production uses an explicit URL or proxy.
 const API_BASE = process.env.REACT_APP_API_URL || (
-  USE_LOCAL
-    ? LOCAL_API_URL
-    : (process.env.NODE_ENV === 'development' ? "/api" : REMOTE_API_URL)
+  process.env.NODE_ENV === 'development' ? "http://127.0.0.1:8000/api" : "/api"
 );
-// ==============================================================================
+export const API_ORIGIN = new URL(API_BASE, window.location.origin).origin;
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -31,6 +19,15 @@ const api = axios.create({
 // Attach Authorization header automatically from localStorage token if present
 api.interceptors.request.use(
   (config) => {
+    const destination = new URL(api.getUri(config), window.location.origin);
+    // Redact existing headers case-insensitively before reading browser storage.
+    if (destination.origin !== API_ORIGIN) {
+      if (typeof config.headers?.delete === 'function') config.headers.delete('Authorization');
+      else Object.keys(config.headers || {}).forEach((key) => {
+        if (key.toLowerCase() === 'authorization') delete config.headers[key];
+      });
+      return config;
+    }
     try {
       // Intentar obtener del persistente o del temporal
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");

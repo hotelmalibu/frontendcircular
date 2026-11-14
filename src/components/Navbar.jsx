@@ -1,3 +1,4 @@
+import clientLogger from '../utils/clientLogger';
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation } from "react-router-dom";
@@ -557,7 +558,7 @@ export default function Navbar({ onMenuClick }) {
         ]);
         setProjectsList(projRes?.data?.items || []);
       } catch (error) {
-        console.error("Error fetching menu data:", error);
+        clientLogger.error("Error fetching menu data:", error);
       }
     };
     fetchMenuData();
@@ -834,10 +835,10 @@ export default function Navbar({ onMenuClick }) {
             // Si el backend provee un total de no leídas lo usamos, si no, el conteo local
             setAlertCount(resAlerts.data?.total_unviewed || resAlerts.total_unviewed || unviewedAlerts.length);
           } catch (e) {
-            console.log("Error in alerts fetching:", e);
+            clientLogger.log("Error in alerts fetching:", e);
           }
         } catch (err) {
-          console.error("Error fetching notif counts:", err);
+          clientLogger.error("Error fetching notif counts:", err);
         }
       };
 

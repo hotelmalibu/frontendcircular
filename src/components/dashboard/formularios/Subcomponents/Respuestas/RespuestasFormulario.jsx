@@ -23,6 +23,7 @@ import {
 } from "recharts";
 import formsApi from "../../../../../api/formsApi";
 import toast from "react-hot-toast";
+import { openDocumentFile } from '../../../../../utils/secureFiles';
 
 const BRAND = {
   blue: "#2C67B0",       // Azul Principal
@@ -79,7 +80,7 @@ const FieldWidget = ({ field, value, type, fileUrl }) => {
     if (fileUrl || (type === 'file' && value && isFileUrl(value))) {
         const url = fileUrl || value;
         return (
-            <a href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#2C67B0] text-white rounded-lg text-[10px] md:text-xs font-bold uppercase hover:bg-black transition-all shadow-sm mt-1">
+            <a href="#adjunto" onClick={(event) => { event.preventDefault(); openDocumentFile(url).catch(() => toast.error('No se pudo descargar el adjunto. Actualiza las respuestas e inténtalo de nuevo.')); }} className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#2C67B0] text-white rounded-lg text-[10px] md:text-xs font-bold uppercase hover:bg-black transition-all shadow-sm mt-1">
                 <FileText size={14} /> Ver Adjunto <ExternalLink size={10} className="opacity-50" />
             </a>
         );
@@ -221,7 +222,7 @@ const SummaryTab = ({ analytics }) => {
                         return (
                             <div key={i} className="bg-gray-50/50 px-2.5 py-1.5 rounded-lg text-[10px] md:text-xs text-gray-500 border border-gray-100/50 truncate hover:bg-white transition-colors text-left w-full">
                                 {isUrl ? (
-                                    <a href={String(resp)} target="_blank" rel="noreferrer" className="text-[#2C67B0] font-bold flex items-center gap-1"><FileText size={10}/> Ver Archivo</a>
+                                    <a href="#archivo" onClick={(event) => { event.preventDefault(); openDocumentFile(String(resp)).catch(() => toast.error('No se pudo abrir el archivo.')); }} className="text-[#2C67B0] font-bold flex items-center gap-1"><FileText size={10}/> Ver Archivo</a>
                                 ) : String(resp)}
                             </div>
                         );

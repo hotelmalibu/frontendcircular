@@ -1,3 +1,4 @@
+import clientLogger from '../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import {
   Plus,
@@ -96,7 +97,7 @@ export default function CompaniesList() {
 
       setCompanies(companiesArray);
     } catch (err) {
-      console.error("Error loading companies:", err);
+      clientLogger.error("Error loading companies:", err);
       setError("Error al conectar con el servidor");
       setCompanies([]);
     } finally {

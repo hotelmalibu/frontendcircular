@@ -1,3 +1,4 @@
+import clientLogger from '../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import { Download } from "lucide-react";
 import { getPlanesNormativas, INITIAL_PLANES } from "../../../../services/marcoNormativoService";
@@ -14,7 +15,7 @@ export default function Planes() {
         const data = await getPlanesNormativas();
         setPlanesList(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.warn("Error cargando planes:", err);
+        clientLogger.warn("Error cargando planes:", err);
         setPlanesList([]);
       }
     };

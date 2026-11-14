@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import {
   Plus,
@@ -119,7 +120,7 @@ export default function EventList() {
       }
       setCategories(categoriesArray);
     } catch (err) {
-      console.error("Error loading categories:", err);
+      clientLogger.error("Error loading categories:", err);
     } finally {
       setCategoriesLoading(false);
     }

@@ -1,3 +1,5 @@
+import clientLogger from '../../utils/clientLogger';
+import { getImageProxyUrl } from '../../utils/imageUtils';
 import React, { useEffect, useState, useContext } from 'react';
 import DOMPurify from 'dompurify';
 import { useParams, Link } from 'react-router-dom';
@@ -43,7 +45,7 @@ export default function ContentDetailPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.warn('No se pudo copiar al portapapeles:', err);
+      clientLogger.warn('No se pudo copiar al portapapeles:', err);
     }
   };
 
@@ -93,15 +95,15 @@ export default function ContentDetailPage() {
           try {
             const byId = await getNewsById(idFromSlug);
             if (byId) found = byId;
-            console.debug('ContentDetailPage: fetched by id', byId);
+            clientLogger.debug('ContentDetailPage: fetched by id', byId);
           } catch (err) {
-            console.warn('ContentDetailPage: getNewsById failed', err);
+            clientLogger.warn('ContentDetailPage: getNewsById failed', err);
           }
         }
 
         if (found && mounted) {
           // Log para depuración: Ver qué campos trae la API realmente
-          console.log("Datos recibidos de la API:", found);
+          clientLogger.log("Datos recibidos de la API:", found);
 
           // If the found content is not published, only allow displaying it for authenticated users.
           if (String(found.status).toLowerCase() !== 'published' && !isAuthenticated) {
@@ -117,17 +119,7 @@ export default function ContentDetailPage() {
             excerpt: found.description || found.content || "",
             body: found.content || found.description || found.body || "",
 
-            image: (() => {
-              const API_BASE = 'http://127.0.0.1:8000';
-              let rawUrl = (found.upload_file && found.upload_file.url) || found.image || '';
-              // Backend bug: sometimes returns localhost instead of real domain
-              if (rawUrl) {
-                rawUrl = rawUrl
-                  .replace('https://localhost', API_BASE)
-                  .replace('http://localhost', API_BASE);
-              }
-              return rawUrl;
-            })(),
+            image: getImageProxyUrl(found.upload_file || found.image || ''),
             date: found.published_at || found.created_at || "",
             type: found.type === 'news' ? 'Noticias' : (found.type || 'Noticias'),
             topic: found.category_name || (found.category && typeof found.category === 'object' ? found.category.name : found.category) || "General",
@@ -160,7 +152,7 @@ export default function ContentDetailPage() {
           setContent(null);
         }
       } catch (err) {
-        console.error('Error fetching news:', err);
+        clientLogger.error('Error fetching news:', err);
         if (mounted) setContent(null);
       } finally {
         if (mounted) setLoading(false);

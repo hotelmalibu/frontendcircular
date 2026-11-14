@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import { getSecurityLogs, markSecurityLogAsViewed } from "../../../../../api/auth";
 import { ShieldAlert, ShieldCheck, ShieldEllipsis, Search, RefreshCw, Eye, ChevronLeft, ChevronRight } from "lucide-react";
@@ -59,7 +60,7 @@ export default function SecurityLogs() {
             setTotalItems(meta.total || items.length);
 
         } catch (err) {
-            console.error("Error fetching security logs:", err);
+            clientLogger.error("Error fetching security logs:", err);
             setLogs([]); 
         } finally {
             setLoading(false);
@@ -72,7 +73,7 @@ export default function SecurityLogs() {
             setLogs(logs.map(log => log.id === id ? { ...log, is_viewed: 1 } : log));
             window.dispatchEvent(new CustomEvent('securityLogReviewed'));
         } catch (err) {
-            console.error("Error marking log as viewed:", err);
+            clientLogger.error("Error marking log as viewed:", err);
             toast.error("No se pudo marcar como revisado.");
         }
     };

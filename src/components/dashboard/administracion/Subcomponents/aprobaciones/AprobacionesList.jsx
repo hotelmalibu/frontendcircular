@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { getUsers, updateUserStatus } from "../../../../../api/auth";
@@ -64,7 +65,7 @@ export default function AprobacionesList() {
       setSolicitudes(items);
       setError(null);
     } catch (err) {
-      console.error("Error fetching approvals:", err);
+      clientLogger.error("Error fetching approvals:", err);
       setError("No se pudieron cargar las solicitudes.");
     } finally {
       setLoading(false);
@@ -74,7 +75,7 @@ export default function AprobacionesList() {
   const handleAction = async (userId, newStatus) => {
     try {
       const res = await updateUserStatus(userId, newStatus);
-      console.log("Status update response:", res.data);
+      clientLogger.log("Status update response:", res.data);
       // Refresh list
       await fetchApprovals();
 
@@ -110,7 +111,7 @@ export default function AprobacionesList() {
       });
 
     } catch (err) {
-      console.error("Error updating status:", err);
+      clientLogger.error("Error updating status:", err);
       setFeedback({
         isOpen: true,
         type: "error",

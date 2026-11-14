@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   PieChart,
@@ -46,7 +47,7 @@ export default function DashboardGraficos() {
       const response = await formsApi.getStats();
       setStats(response.stats);
     } catch (error) {
-      console.error("Error fetching stats:", error);
+      clientLogger.error("Error fetching stats:", error);
       toast.error("Error al cargar las estadísticas");
     } finally {
       setLoading(false);

@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import {
   PenTool,
@@ -119,7 +120,7 @@ export default function DashboardContenido() {
         setRecentActivity(allItems.slice(0, 5));
 
       } catch (error) {
-        console.error("Error fetching statistics:", error);
+        clientLogger.error("Error fetching statistics:", error);
       } finally {
         setLoading(false);
       }

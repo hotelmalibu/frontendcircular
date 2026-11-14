@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Mail, Loader2, CheckCircle2 } from "lucide-react";
@@ -29,7 +30,7 @@ export default function ForgotPassword() {
             await forgotPassword(email.trim());
             setIsSent(true);
         } catch (err) {
-            console.error("Error al enviar enlace:", err);
+            clientLogger.error("Error al enviar enlace:", err);
             setError(err.response?.data?.message || "No se pudo enviar el enlace. Verifica tu correo.");
         } finally {
             setIsLoading(false);

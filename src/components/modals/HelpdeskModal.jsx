@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 import React, { useState, useRef } from "react";
 import { X, Send, Paperclip, Loader2, CheckCircle2, AlertCircle, Copy } from "lucide-react";
 import { createTicket } from "../../api/helpdeskApi";
@@ -48,7 +49,7 @@ export default function HelpdeskModal({ isOpen, onClose }) {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
-            console.error("Error copy to clipboard:", err);
+            clientLogger.error("Error copy to clipboard:", err);
         }
     };
 
@@ -73,7 +74,7 @@ export default function HelpdeskModal({ isOpen, onClose }) {
             setSubmittedTicket(res.data?.data);
             setSuccess(true);
         } catch (err) {
-            console.error("Error creating helpdesk ticket:", err);
+            clientLogger.error("Error creating helpdesk ticket:", err);
             setError(err.response?.data?.message || "Ocurrió un error al enviar el reporte. Por favor, intente de nuevo.");
         } finally {
             setLoading(false);

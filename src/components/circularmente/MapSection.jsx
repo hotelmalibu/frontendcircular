@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 import React, { useState, useEffect, useContext } from 'react';
 import DOMPurify from 'dompurify';
 import ReactDOM from 'react-dom';
@@ -73,7 +74,7 @@ export default function MapSection() {
       setCompanies(companiesArray);
       setEmpresasFiltradas(companiesArray);
     } catch (err) {
-      console.error("Error loading companies:", err);
+      clientLogger.error("Error loading companies:", err);
       setError("No pudimos conectar con el directorio.");
     } finally {
       setLoading(false);

@@ -1,3 +1,4 @@
+import clientLogger from '../utils/clientLogger';
 import { createDocument, getDocumentTypes } from "../api/documentsApi";
 import { getImageProxyUrl } from "../utils/imageUtils";
 
@@ -53,7 +54,7 @@ export const getStoredNormativas = (section) => {
       }
     }
   } catch (e) {
-    console.error("Error leyendo storage de " + section, e);
+    clientLogger.error("Error leyendo storage de " + section, e);
   }
   return [];
 };
@@ -62,7 +63,7 @@ const saveStoredNormativas = (section, items) => {
   try {
     localStorage.setItem(STORAGE_KEYS[section], JSON.stringify(items));
   } catch (e) {
-    console.error("Error guardando storage de " + section, e);
+    clientLogger.error("Error guardando storage de " + section, e);
   }
 };
 
@@ -143,7 +144,7 @@ export const addNormativa = async (section, data) => {
         reader.readAsDataURL(fileImg);
       });
     } catch (e) {
-      console.warn("Error leyendo imagen de portada:", e);
+      clientLogger.warn("Error leyendo imagen de portada:", e);
     }
   } else if (data.bannerUrl) {
     bannerUrl = data.bannerUrl;
@@ -222,7 +223,7 @@ export const updateNormativa = async (section, id, data) => {
           reader.readAsDataURL(fileImg);
         });
       } catch (e) {
-        console.warn("Error leyendo imagen de portada:", e);
+        clientLogger.warn("Error leyendo imagen de portada:", e);
       }
     } else if (data.bannerPreview === null || data.bannerUrl === "" || data.bannerUrl === null) {
       // El usuario quitó explícitamente la imagen

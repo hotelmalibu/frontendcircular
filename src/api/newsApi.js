@@ -1,3 +1,4 @@
+import clientLogger from '../utils/clientLogger';
 import api from "./index";
 
 /**
@@ -76,7 +77,7 @@ export const getPublishedNewsWithImages = async () => {
 
     return detailedNews;
   } catch (error) {
-    console.error("Error getting published news with images:", error);
+    clientLogger.error("Error getting published news with images:", error);
     throw error;
   }
 };

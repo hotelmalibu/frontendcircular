@@ -1,3 +1,5 @@
+import clientLogger from '../../../../utils/clientLogger';
+import { API_ORIGIN } from '../../../../api';
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import teamApi from "../../../../api/teamApi";
@@ -29,7 +31,7 @@ const getImageUrl = (path) => {
   if (!path) return null;
   if (path.startsWith('http') && !path.includes('localhost') && !path.includes('127.0.0.1')) return path;
   const cleanPath = path.replace(/^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/)?(storage\/)?/, '');
-  return `http://127.0.0.1:8000/storage/${cleanPath}`;
+  return `${API_ORIGIN}/storage/${cleanPath}`;
 };
 
 // --- CONSTANTES DE ESTILO ---
@@ -170,7 +172,7 @@ export default function TeamOrgChart() {
           setTeamMembers(mappedMembers);
         }
       } catch (error) {
-        console.error("Error fetching team members:", error);
+        clientLogger.error("Error fetching team members:", error);
       }
     };
     fetchTeam();

@@ -1,3 +1,4 @@
+import clientLogger from '../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import {
   Upload,
@@ -70,7 +71,7 @@ export default function BannerEditor({ pageKey, onSaved }) {
       handleChange("image", compressedDataUrl);
       toast.success("Imagen cargada y optimizada");
     } catch (err) {
-      console.error(err);
+      clientLogger.error(err);
       toast.error("Error al procesar la imagen");
     } finally {
       setIsCompressing(false);
@@ -129,7 +130,7 @@ export default function BannerEditor({ pageKey, onSaved }) {
       toast.success(`Banner de "${banner.name}" actualizado correctamente`);
       if (onSaved) onSaved(updated);
     } catch (err) {
-      console.error(err);
+      clientLogger.error(err);
       toast.error("Error al guardar los cambios");
     } finally {
       setIsSaving(false);

@@ -1,3 +1,4 @@
+import clientLogger from '../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import ReactQuill from 'react-quill-new';
@@ -234,7 +235,7 @@ export default function CompanyFormModal({ companyData, isEditing, onClose, onSu
       }
       onSuccess();
     } catch (error) {
-      console.error("Error saving company:", error);
+      clientLogger.error("Error saving company:", error);
       setErrors({ submit: error.response?.data?.message || "Error al guardar la empresa" });
     } finally {
       setLoading(false);

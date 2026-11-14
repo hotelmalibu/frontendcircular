@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { getRoles, createRole, updateRole, deleteRole, getPermissions, getUsers } from "../../../../../api/auth";
@@ -122,7 +123,7 @@ export default function Roles() {
 
       setError(null);
     } catch (err) {
-      console.error("Error fetching data:", err);
+      clientLogger.error("Error fetching data:", err);
       setError("No se pudieron cargar los datos.");
     } finally {
       setLoading(false);
@@ -175,7 +176,7 @@ export default function Roles() {
       fetchData(); // Reload all
       closeModal();
     } catch (err) {
-      console.error("Error saving role:", err);
+      clientLogger.error("Error saving role:", err);
       toast.error("Error al guardar el rol. Verifica los datos.");
     }
   };
@@ -198,7 +199,7 @@ export default function Roles() {
       fetchData();
       closeDeleteModal();
     } catch (err) {
-      console.error("Error deleting role:", err);
+      clientLogger.error("Error deleting role:", err);
       toast.error("No se pudo eliminar el rol.");
     } finally {
       setIsSaving(false);

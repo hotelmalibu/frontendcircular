@@ -1,6 +1,7 @@
 /**
  * Image utilities for handling CORS and image loading
  */
+import { API_ORIGIN } from '../api';
 
 // List of reliable CORS proxy services
 const CORS_PROXIES = [
@@ -16,7 +17,7 @@ const CORS_PROXIES = [
  * @param {number|Object} optionsOrIndex - Proxy index (number) or Options object { width, height, quality }
  * @returns {string} - Proxy URL or original URL
  */
-export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
+export const getImageProxyUrl = (imageUrl) => {
   // If it's an object with url or path property
   if (imageUrl && typeof imageUrl === 'object') {
     imageUrl = imageUrl.url || imageUrl.path || imageUrl.directUrl || '';
@@ -29,51 +30,30 @@ export const getImageProxyUrl = (imageUrl, optionsOrIndex = 0) => {
     return imageUrl;
   }
 
-  let proxyIndex = 0;
-  let options = {};
+  let value = imageUrl.trim();
+  const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(value);
+  if (hasScheme && !/^https?:\/\//i.test(value)) return '';
 
-  if (typeof optionsOrIndex === 'number') {
-    proxyIndex = optionsOrIndex;
-  } else if (typeof optionsOrIndex === 'object') {
-    options = optionsOrIndex;
+  if (value.startsWith('NEWS')) {
+    value = `/storage/news/${value}`;
+  } else if (value.startsWith('COVER')) {
+    value = `/storage/projects/covers/${value}`;
+  } else if (!hasScheme && !value.startsWith('/')) {
+    value = `/storage/${value.replace(/^storage\//, '')}`;
   }
 
-  const host = window.location.hostname;
-  const isDevelopment = host === 'localhost' || host === '127.0.0.1' || host.includes('.local') || host.includes('.test');
-
-  // Base domain for API and storage
-  const API_DOMAIN = 'http://127.0.0.1:8000';
-
-  // Determine the absolute URL
-  let absoluteImageUrl = imageUrl.trim();
-
-  // Fix Laravel default APP_URL=http://localhost pointing to local port 80
-  if (absoluteImageUrl.startsWith('http://localhost/storage') || absoluteImageUrl.startsWith('https://localhost/storage')) {
-    absoluteImageUrl = absoluteImageUrl.replace('https://localhost', API_DOMAIN).replace('http://localhost', API_DOMAIN);
+  try {
+    const url = new URL(value, `${API_ORIGIN}/`);
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return '';
+    if (['localhost', '127.0.0.1', '[::1]'].includes(url.hostname) && url.origin !== API_ORIGIN) {
+      // Signed links must be issued by Laravel with the correct APP_URL; changing their host invalidates them.
+      if (url.searchParams.has('signature')) return '';
+      return new URL(`${url.pathname}${url.search}${url.hash}`, `${API_ORIGIN}/`).href;
+    }
+    return url.href;
+  } catch {
+    return '';
   }
-
-  // 1. Handle filenames without paths (NEWS... or COVER...)
-  if (absoluteImageUrl.startsWith('NEWS')) {
-    absoluteImageUrl = `${API_DOMAIN}/storage/news/${absoluteImageUrl}`;
-  } else if (absoluteImageUrl.startsWith('COVER')) {
-    absoluteImageUrl = `${API_DOMAIN}/storage/projects/covers/${absoluteImageUrl}`;
-  }
-  // 2. Handle relative paths starting with /
-  else if (absoluteImageUrl.startsWith('/')) {
-    absoluteImageUrl = `${API_DOMAIN}${absoluteImageUrl}`;
-  }
-  // 3. Handle relative paths that don't start with http
-  else if (!absoluteImageUrl.startsWith('http://') && !absoluteImageUrl.startsWith('https://')) {
-    absoluteImageUrl = `${API_DOMAIN}/storage/${absoluteImageUrl}`;
-  }
-
-  // If the image is from our API domain or local server
-  if (absoluteImageUrl.includes('127.0.0.1:8000') || absoluteImageUrl.includes('localhost:8000')) {
-    // Direct loading for local development
-    return absoluteImageUrl;
-  }
-
-  return absoluteImageUrl;
 };
 
 /**

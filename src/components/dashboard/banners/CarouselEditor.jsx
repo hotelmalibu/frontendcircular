@@ -1,3 +1,4 @@
+import clientLogger from '../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import {
   Upload,
@@ -70,7 +71,7 @@ export default function CarouselEditor({ pageKey = "inicio", onSaved }) {
       handleSlideFieldChange("image", compressedDataUrl);
       toast.success("Imagen de diapositiva optimizada y cargada");
     } catch (err) {
-      console.error(err);
+      clientLogger.error(err);
       toast.error("Error al procesar la imagen");
     } finally {
       setIsCompressing(false);
@@ -163,7 +164,7 @@ export default function CarouselEditor({ pageKey = "inicio", onSaved }) {
       toast.success("Carrusel de inicio guardado con éxito");
       if (onSaved) onSaved(updated);
     } catch (err) {
-      console.error(err);
+      clientLogger.error(err);
       toast.error("Error al guardar el carrusel");
     } finally {
       setIsSaving(false);

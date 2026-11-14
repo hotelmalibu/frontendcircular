@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import {
   Plus,
@@ -98,7 +99,7 @@ export default function ProjectList() {
       await getAllCategories();
 
     } catch (err) {
-      console.error("Error loading categories for projects:", err);
+      clientLogger.error("Error loading categories for projects:", err);
     } finally {
       setCategoriesLoading(false);
     }

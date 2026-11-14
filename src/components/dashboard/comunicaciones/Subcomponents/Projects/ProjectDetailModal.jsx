@@ -189,7 +189,7 @@ export default function ProjectDetailModal({ projectData, onClose, onEdit }) {
                   </div>
                 </div>
                 <a
-                  href={`http://127.0.0.1:8000/storage/${projectData.upload_file.path}`}
+                  href={getImageProxyUrl(projectData.upload_file) || undefined}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg transition-all font-bold text-sm transform active:scale-95"

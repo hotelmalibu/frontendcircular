@@ -1,3 +1,4 @@
+import clientLogger from '../../../../utils/clientLogger';
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import ReactDOM from "react-dom";
 import {
@@ -88,7 +89,7 @@ export default function MarcoNormativoManager({ initialSection = "resoluciones" 
       }
       setItems(data);
     } catch (err) {
-      console.error("Error cargando normativas:", err);
+      clientLogger.error("Error cargando normativas:", err);
       toast.error("Error al cargar las normativas");
     } finally {
       setLoading(false);
@@ -188,7 +189,7 @@ export default function MarcoNormativoManager({ initialSection = "resoluciones" 
       setIsModalOpen(false);
       loadSectionData();
     } catch (err) {
-      console.error("Error guardando normativa:", err);
+      clientLogger.error("Error guardando normativa:", err);
       toast.error(err.message || "Error al procesar la solicitud.");
     } finally {
       setSubmitting(false);

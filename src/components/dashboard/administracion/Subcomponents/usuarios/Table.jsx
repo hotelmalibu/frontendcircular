@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -66,7 +67,7 @@ export default function Table() {
     setLoading(true);
     try {
       const res = await getUsers();
-      console.log("Users API Response:", res.data);
+      clientLogger.log("Users API Response:", res.data);
 
       let usersArray = [];
       if (Array.isArray(res.data)) {
@@ -86,7 +87,7 @@ export default function Table() {
       setUsers(usersArray);
       setError(null);
     } catch (err) {
-      console.error("Error fetching users:", err);
+      clientLogger.error("Error fetching users:", err);
       const msg = err.response?.data?.message || err.message || "Error desconocido";
       setError(`Error: ${msg} (Status: ${err.response?.status})`);
     } finally {
@@ -97,7 +98,7 @@ export default function Table() {
   const fetchRoles = async () => {
     try {
       const res = await getRoles();
-      console.log("Roles API Response:", res.data);
+      clientLogger.log("Roles API Response:", res.data);
       
       let rolesArray = [];
       // Case 1: Direct array
@@ -130,7 +131,7 @@ export default function Table() {
 
       setRoles(rolesArray);
     } catch (err) {
-      console.error("Error fetching roles:", err);
+      clientLogger.error("Error fetching roles:", err);
     }
   };
 
@@ -151,7 +152,7 @@ export default function Table() {
       // Sort alphabetically for better UX
       setPermissions([...combined].sort((a,b) => a.name.localeCompare(b.name)));
     } catch (err) {
-      console.error("Error fetching permissions:", err);
+      clientLogger.error("Error fetching permissions:", err);
     }
   };
 
@@ -246,7 +247,7 @@ export default function Table() {
       setIsModalOpen(false);
       fetchUsers(); // Refresh list
     } catch (err) {
-      console.error("Error saving user:", err);
+      clientLogger.error("Error saving user:", err);
       toast.error("Error al guardar usuario: " + (err.response?.data?.message || err.message));
     } finally {
       setSaving(false);
@@ -268,7 +269,7 @@ export default function Table() {
       setIsDeleteModalOpen(false);
       fetchUsers();
     } catch (err) {
-      console.error("Error deleting user:", err);
+      clientLogger.error("Error deleting user:", err);
       toast.error("Error al eliminar usuario");
     } finally {
       setSaving(false);

@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import DOMPurify from 'dompurify';
@@ -84,7 +85,7 @@ export default function ContentDetailProject() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.warn('No se pudo copiar al portapapeles:', err);
+      clientLogger.warn('No se pudo copiar al portapapeles:', err);
     }
   };
 
@@ -125,7 +126,7 @@ export default function ContentDetailProject() {
 
         setProject(mappedProject);
       } catch (err) {
-        console.error("Error fetching project:", err);
+        clientLogger.error("Error fetching project:", err);
         setError(err.response?.data?.message || "Error al cargar el proyecto");
       } finally {
         setLoading(false);
@@ -309,7 +310,7 @@ export default function ContentDetailProject() {
                         </div>
                       </div>
                       <a
-                        href={project.uploadFile.path ? `http://127.0.0.1:8000/storage/${project.uploadFile.path}` : project.uploadFile.url}
+                        href={getImageProxyUrl(project.uploadFile) || undefined}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-[#00AB6D] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#00965d] active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-[#00AB6D]/20"

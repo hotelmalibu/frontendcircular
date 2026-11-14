@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import { useState, useEffect, useCallback } from "react";
 import ReactDOM from "react-dom";
 import ReactQuill from 'react-quill-new';
@@ -19,7 +20,7 @@ import {
 } from "lucide-react";
 import { createDocument, getDocuments, updateDocument, deleteDocument, getDocumentTypes } from "../../../../../api/documentsApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
-import { getImageProxyUrl } from "../../../../../utils/imageUtils";
+import { openDocumentFile, publicDocumentUrl } from "../../../../../utils/secureFiles";
 import { stripHtml } from "../../../../../utils/textUtils";
 import { extractFormErrors } from "../../../../../utils/errorUtils";
 import { toast } from "react-hot-toast";
@@ -123,7 +124,7 @@ export default function Bibliotecasub() {
 
       setCategories(categoriesArray);
     } catch (err) {
-      console.error("Error loading categories:", err);
+      clientLogger.error("Error loading categories:", err);
       setCategories([]);
     } finally {
       setCategoriesLoading(false);
@@ -154,7 +155,7 @@ export default function Bibliotecasub() {
 
       setDocumentTypes(typesArray);
     } catch (err) {
-      console.error("Error loading document types from API:", err);
+      clientLogger.error("Error loading document types from API:", err);
       setDocumentTypes([]);
     } finally {
       setTypesLoading(false);
@@ -220,31 +221,25 @@ export default function Bibliotecasub() {
       }
 
     } catch (error) {
-      console.error("Error fetching data:", error);
+      clientLogger.error("Error fetching data:", error);
       setDocuments([]);
     } finally {
       setIsLoading(false);
     }
   }, [filters, pagination.current_page, pagination.per_page]);
 
-  const handleDownload = (document) => {
+  const handleDownload = async (document) => {
     try {
-      const directUrl = `http://127.0.0.1:8000/storage/${document.upload_file.path}`;
-      const proxyUrl = getImageProxyUrl(directUrl);
-      console.log("Download URLs:", { direct: directUrl, proxy: proxyUrl });
-      window.open(proxyUrl, '_blank');
+      const fileUrl = publicDocumentUrl(document.upload_file);
+      if (!fileUrl) throw new Error('La API debe devolver una URL de descarga del host configurado.');
+      await openDocumentFile(fileUrl, document.upload_file?.original_name || 'documento');
     } catch (error) {
-      console.error("Error downloading document:", error);
+      clientLogger.error("Error downloading document:", error);
       toast.error("Error al descargar el documento");
     }
   };
 
-  const handleView = (document) => {
-    // Open document in a new browser tab using the proxy URL
-    const directUrl = `http://127.0.0.1:8000/storage/${document.upload_file.path}`;
-    const proxyUrl = getImageProxyUrl(directUrl);
-    window.open(proxyUrl, '_blank');
-  };
+  const handleView = handleDownload;
 
   const handleEdit = (document) => {
     // Format date for input[type="date"] which expects YYYY-MM-DD
@@ -256,7 +251,7 @@ export default function Bibliotecasub() {
           formattedDate = date.toISOString().split('T')[0];
         }
       } catch (e) {
-        console.warn("Error parsing date:", e);
+        clientLogger.warn("Error parsing date:", e);
       }
     }
 
@@ -292,7 +287,7 @@ export default function Bibliotecasub() {
       setIsDeleteModalOpen(false);
       setDocumentToDelete(null);
     } catch (error) {
-      console.error("Error deleting document:", error);
+      clientLogger.error("Error deleting document:", error);
       toast.error("Error al eliminar el documento");
     } finally {
       setIsDeleting(false);
@@ -435,7 +430,7 @@ export default function Bibliotecasub() {
       }, 1500);
 
     } catch (error) {
-      console.error(`Error ${isEditMode ? 'updating' : 'creating'} document:`, error);
+      clientLogger.error(`Error ${isEditMode ? 'updating' : 'creating'} document:`, error);
       const { message, fieldErrors } = extractFormErrors(
         error,
         `Error al ${isEditMode ? 'actualizar' : 'crear'} el documento`

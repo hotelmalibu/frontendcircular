@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 import { useContext, useState, useEffect, useRef } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Sidebar from "../../components/Sidebar";
@@ -75,7 +76,7 @@ export default function Profile() {
           updateUser(res.data.user);
         }
       } catch (error) {
-        console.error("Error fetching latest user data:", error);
+        clientLogger.error("Error fetching latest user data:", error);
       }
     };
     fetchLatestUser();
@@ -128,7 +129,7 @@ export default function Profile() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
       toast.error("Por favor selecciona un archivo de imagen válido (JPEG, PNG, WEBP).");
       return;
     }
@@ -149,20 +150,18 @@ export default function Profile() {
       const avatarFormData = new FormData();
       avatarFormData.append("avatar", file);
 
-      let savedAvatarUrl = compressedDataUrl;
+      let savedAvatarUrl;
 
       // 3. Subir a la API
       try {
         const res = await uploadUserAvatar(user.id, avatarFormData);
-        if (res.data?.avatar) {
-          savedAvatarUrl = res.data.avatar;
-        }
+        savedAvatarUrl = res.data?.avatar;
       } catch (apiErr) {
-        console.warn("API upload avatar error, usando persistencia local:", apiErr);
-        try {
-          await updateUserInfo(user.id, { avatar: compressedDataUrl });
-        } catch (_) {}
+        clientLogger.warn("API upload avatar error:", apiErr);
+        const res = await uploadUserAvatar(user.id, { avatar: compressedDataUrl });
+        savedAvatarUrl = res.data?.avatar;
       }
+      if (!savedAvatarUrl) throw new Error('La API no confirmó el archivo guardado.');
 
       // 4. Actualizar estado y almacenamiento
       if (user?.id) {
@@ -175,7 +174,7 @@ export default function Profile() {
 
       toast.success("Foto de perfil actualizada exitosamente", { id: loadingToast });
     } catch (err) {
-      console.error("Error al procesar la foto:", err);
+      clientLogger.error("Error al procesar la foto:", err);
       toast.error("No se pudo actualizar la foto de perfil", { id: loadingToast });
     } finally {
       setUploadingAvatar(false);
@@ -193,11 +192,7 @@ export default function Profile() {
     const loadingToast = toast.loading("Eliminando foto de perfil...");
 
     try {
-      try {
-        await deleteUserAvatar(user.id);
-      } catch (apiErr) {
-        console.warn("API delete avatar error:", apiErr);
-      }
+      await deleteUserAvatar(user.id);
 
       if (user?.id) {
         localStorage.removeItem(`user_avatar_${user.id}`);
@@ -209,7 +204,7 @@ export default function Profile() {
 
       toast.success("Foto de perfil eliminada", { id: loadingToast });
     } catch (err) {
-      console.error("Error al eliminar foto:", err);
+      clientLogger.error("Error al eliminar foto:", err);
       toast.error("No se pudo eliminar la foto de perfil", { id: loadingToast });
     } finally {
       setUploadingAvatar(false);
@@ -309,7 +304,7 @@ export default function Profile() {
       }));
 
     } catch (error) {
-      console.error("Error al actualizar perfil:", error);
+      clientLogger.error("Error al actualizar perfil:", error);
       const errorMsg = error.response?.data?.message || 
         (error.response?.data?.errors ? Object.values(error.response.data.errors)[0][0] : "Error al actualizar el perfil.");
       toast.error(errorMsg);
@@ -324,7 +319,7 @@ export default function Profile() {
       await resendVerification();
       toast.success("Correo de verificación enviado. Revisa tu bandeja de entrada.");
     } catch (error) {
-      console.error("Error al reenviar verificación:", error);
+      clientLogger.error("Error al reenviar verificación:", error);
       toast.error("Error al enviar el correo. Intenta de nuevo más tarde.");
     } finally {
       setResending(false);

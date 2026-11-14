@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import DOMPurify from 'dompurify';
@@ -7,8 +8,6 @@ import {
   Recycle,
   Globe,
   Zap,
-  Handshake,
-  Target,
   Factory,
   Calendar,
   AlertCircle
@@ -46,7 +45,7 @@ export default function Index() {
         setAboutUsData(aboutUsResponse.data);
         setLeaderQuotes(quotesResponse.data);
       } catch (error) {
-        console.error("Error fetching Quienes Somos data:", error);
+        clientLogger.error("Error fetching Quienes Somos data:", error);
       } finally {
         setLoading(false);
       }
@@ -66,7 +65,7 @@ export default function Index() {
         setIntegrationError(response.message);
       }
     } catch (err) {
-      console.error("Error fetching integration dashboard metrics:", err);
+      clientLogger.error("Error fetching integration dashboard metrics:", err);
       const msg = err.response?.data?.message || "No se pudo cargar la información del Dashboard de Integración";
       setIntegrationError(msg);
     } finally {
@@ -77,12 +76,6 @@ export default function Index() {
   useEffect(() => {
     fetchIntegrationData(selectedYear);
   }, [selectedYear]);
-
-  // Icon mapping for leaders
-  const getIconForIndex = (index) => {
-    const icons = [Handshake, Users, Target];
-    return icons[index % icons.length];
-  };
 
   if (loading) {
     return (

@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createVisionCircularForm } from '../../api/visionCircularFormsApi';
@@ -55,7 +56,7 @@ export default function VisionCircularFormPage() {
       }, 3000);
     } catch (err) {
       setError("Ocurrió un error al enviar el formulario. Por favor, inténtelo de nuevo.");
-      console.error(err);
+      clientLogger.error(err);
     } finally {
       setLoading(false);
     }

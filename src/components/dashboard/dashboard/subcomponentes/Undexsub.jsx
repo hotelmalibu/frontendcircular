@@ -1,3 +1,4 @@
+import clientLogger from '../../../../utils/clientLogger';
 import {
   Bell,
   Activity,
@@ -102,7 +103,7 @@ export default function Undexsub() {
       });
 
     } catch (err) {
-      console.error("Error loading dashboard data:", err);
+      clientLogger.error("Error loading dashboard data:", err);
     }
   }, []);
 

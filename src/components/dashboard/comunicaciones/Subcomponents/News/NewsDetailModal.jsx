@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React from "react";
 import ReactDOM from "react-dom";
 import DOMPurify from 'dompurify';
@@ -132,7 +133,7 @@ export default function NewsDetailModal({ newsData, onClose, onEdit }) {
                   alt={newsData.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    console.log("Error loading image:", newsData.upload_file.url);
+                    clientLogger.log("Error loading image:", newsData.upload_file.url);
                     e.target.style.display = 'none';
                   }}
                 />

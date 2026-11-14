@@ -1,3 +1,4 @@
+import clientLogger from '../utils/clientLogger';
 import { createContext, useState, useCallback } from "react";
 
 
@@ -51,7 +52,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("remembered_email");
       }
     } catch (e) {
-      console.error("Error guardando datos de sesión:", e);
+      clientLogger.error("Error guardando datos de sesión:", e);
     }
   }, []);
 
@@ -71,7 +72,7 @@ export const AuthProvider = ({ children }) => {
         sessionStorage.setItem("user", JSON.stringify(mergedUser));
       }
     } catch (e) {
-      console.error("Error actualizando usuario en almacenamiento:", e);
+      clientLogger.error("Error actualizando usuario en almacenamiento:", e);
     }
   }, [user]);
 
@@ -85,7 +86,7 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.removeItem("user");
       sessionStorage.removeItem("token");
     } catch (e) {
-      console.error("Error eliminando de almacenamiento:", e);
+      clientLogger.error("Error eliminando de almacenamiento:", e);
     }
   }, []);
 

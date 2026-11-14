@@ -1,3 +1,4 @@
+import clientLogger from '../utils/clientLogger';
 import api from "./index";
 
 /**
@@ -17,7 +18,7 @@ export const getProjectTypes = async () => {
         // API returns { data: { items: [...], pagination: {...} } }
         return response.data;
     } catch (error) {
-        console.warn("Project types endpoint not found or error, using fallback", error);
+        clientLogger.warn("Project types endpoint not found or error, using fallback", error);
         // Hardcoded fallback matching user provided structure
         return {
             data: {

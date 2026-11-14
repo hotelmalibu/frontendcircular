@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -160,7 +161,7 @@ export default function ProyectosYAlianzas() {
         setSectorialTypeId(sType?.id);
 
       } catch (err) {
-        console.error("Error fetching projects:", err);
+        clientLogger.error("Error fetching projects:", err);
         setError("Error al cargar los proyectos.");
       } finally {
         setIsLoading(false);

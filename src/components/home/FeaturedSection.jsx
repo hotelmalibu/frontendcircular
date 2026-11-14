@@ -1,3 +1,5 @@
+import clientLogger from '../../utils/clientLogger';
+import { getImageProxyUrl } from '../../utils/imageUtils';
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -5,6 +7,7 @@ import { contentTypeConfig } from "../../data/mockContent";
 import { getPublishedNewsWithImages } from "../../api/newsApi";
 import { getDocuments } from "../../api/documentsApi";
 import { stripHtml } from "../../utils/textUtils";
+import { openDocumentFile } from "../../utils/secureFiles";
 
 export default function FeaturedSection() {
   const [newsItems, setNewsItems] = useState([]);
@@ -26,7 +29,7 @@ export default function FeaturedSection() {
         // Fetch both news and documents
         const [newsResponse, documentsResponse] = await Promise.all([
           getPublishedNewsWithImages(),
-          getDocuments()
+          getDocuments({ status: 'approved' })
         ]);
 
         if (!mounted) return;
@@ -71,10 +74,7 @@ export default function FeaturedSection() {
             }
 
             let imageUrl = "";
-            const API_BASE = 'http://127.0.0.1:8000';
-            const fixUrl = (url) => url
-              ? url.replace('https://localhost', API_BASE).replace('http://localhost', API_BASE)
-              : url;
+            const fixUrl = getImageProxyUrl;
 
             if (n.upload_file && n.upload_file.url) {
               imageUrl = fixUrl(n.upload_file.url);
@@ -128,7 +128,7 @@ export default function FeaturedSection() {
         setNewsItems(allItems);
 
       } catch (err) {
-        console.error("Error cargando contenido:", err);
+        clientLogger.error("Error cargando contenido:", err);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -232,8 +232,7 @@ export default function FeaturedSection() {
 
               const handleItemClick = () => {
                 if (item.source === 'document' && item.documentData) {
-                  const fileUrl = `http://127.0.0.1:8000/storage/${item.documentData.upload_file.path}`;
-                  window.open(fileUrl, '_blank');
+                  openDocumentFile(item.documentData.upload_file?.url, item.documentData.upload_file?.original_name || 'documento').catch(() => {});
                 }
               };
 
@@ -267,7 +266,7 @@ export default function FeaturedSection() {
                             alt={item.title}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             onError={(e) => {
-                              console.log("Error loading image:", item.image);
+                              clientLogger.log("Error loading image:", item.image);
                               e.target.style.display = 'none';
                             }}
                           />

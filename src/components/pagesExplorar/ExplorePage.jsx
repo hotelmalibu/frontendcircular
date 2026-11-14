@@ -1,3 +1,5 @@
+import clientLogger from '../../utils/clientLogger';
+import { getImageProxyUrl } from '../../utils/imageUtils';
 // UBICACIÓN: src/pages/ExplorePage.jsx
 import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -39,10 +41,7 @@ export default function ExplorePage() {
           if (foundCat) catName = foundCat.name;
         }
 
-        const API_BASE = 'http://127.0.0.1:8000';
-        const fixUrl = (url) => url
-          ? url.replace('https://localhost', API_BASE).replace('http://localhost', API_BASE)
-          : url;
+        const fixUrl = getImageProxyUrl;
 
         return {
           id: n.id || n._id || Math.random(),
@@ -123,7 +122,7 @@ export default function ExplorePage() {
 
         if (mounted) setNewsItems(newsArray);
       } catch (err) {
-        console.error("Error loading news for ExplorePage:", err);
+        clientLogger.error("Error loading news for ExplorePage:", err);
       } finally {
         if (mounted) setLoadingNews(false);
       }
@@ -148,7 +147,7 @@ export default function ExplorePage() {
 
         if (mounted) setCategories(categoriesArray);
       } catch (err) {
-        console.error("Error loading categories for ExplorePage:", err);
+        clientLogger.error("Error loading categories for ExplorePage:", err);
       } finally {
         // loadingCategories setter removed
       }

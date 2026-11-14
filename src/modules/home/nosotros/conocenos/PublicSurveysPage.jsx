@@ -1,3 +1,4 @@
+import clientLogger from '../../../../utils/clientLogger';
 
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { Link } from "react-router-dom";
@@ -64,7 +65,7 @@ export default function PublicSurveysPage() {
       setForms(Array.isArray(list) ? list : []);
       setPagination(paginInfo);
     } catch (error) {
-      console.error("Error fetching forms:", error);
+      clientLogger.error("Error fetching forms:", error);
       toast.error("Error al cargar las encuestas");
     } finally {
       setTimeout(() => setLoading(false), 300);

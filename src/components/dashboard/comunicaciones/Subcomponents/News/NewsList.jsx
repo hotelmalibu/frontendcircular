@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import {
   Plus,
@@ -96,7 +97,7 @@ export default function NewsList() {
               return newsItem;
             }
           } catch (error) {
-            console.warn(`Failed to get detailed news for ID ${newsItem.id}:`, error);
+            clientLogger.warn(`Failed to get detailed news for ID ${newsItem.id}:`, error);
             return newsItem;
           }
         })

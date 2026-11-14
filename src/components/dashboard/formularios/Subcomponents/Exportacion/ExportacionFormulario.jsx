@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect, useCallback } from "react";
 import { 
   FileSpreadsheet, 
@@ -34,7 +35,7 @@ export default function ExportacionFormulario() {
       setForms(Array.isArray(list) ? list : []);
       setError(null);
     } catch (err) {
-      console.error("Error fetching forms for export:", err);
+      clientLogger.error("Error fetching forms for export:", err);
       setError("No se pudieron cargar los formularios. Por favor, intenta de nuevo.");
       toast.error("Error al cargar formularios");
     } finally {
@@ -226,7 +227,7 @@ export default function ExportacionFormulario() {
 
       toast.success("Excel generado correctamente", { id: toastId });
     } catch (error) {
-      console.error("Error al exportar a Excel:", error);
+      clientLogger.error("Error al exportar a Excel:", error);
       toast.error("Error al generar el archivo Excel. Verifica tu conexión.", { id: toastId });
     }
   };

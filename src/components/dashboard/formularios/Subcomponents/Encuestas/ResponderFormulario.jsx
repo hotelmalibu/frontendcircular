@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect, useContext } from "react";
 import DOMPurify from 'dompurify';
 import { AuthContext } from "../../../../../context/AuthContext";
@@ -64,7 +65,7 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                     return;
                 }
                 
-                console.error("Error fetching form:", error);
+                clientLogger.error("Error fetching form:", error);
                 navigate('/404-not-found', { replace: true });
             } finally {
                 if (formId) setTimeout(() => setLoading(false), 300);
@@ -215,7 +216,7 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
             // Filter out decorative fields (titles, paragraphs, etc.) - These should NEVE be sent to backend
             const decorativeTypes = ['title', 'paragraph', 'divider', 'spacer', 'rich_text', 'section', 'header', 'image', 'video'];
             
-            console.log("Filtering Form Data. Original keys:", Object.keys(formData));
+            clientLogger.log("Filtering Form Data. Original keys:", Object.keys(formData));
 
             const cleanFormData = Object.keys(formData).reduce((acc, key) => {
                 const field = form.fields.find(f => f.name === key);
@@ -233,7 +234,7 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
                 return acc;
             }, {});
 
-            console.log("Clean Form Data keys:", Object.keys(cleanFormData));
+            clientLogger.log("Clean Form Data keys:", Object.keys(cleanFormData));
 
             let payload;
             if (hasFiles) {
@@ -278,8 +279,8 @@ const ResponderFormulario = ({ formId, onCancel, onSuccess, onLoad }) => {
         } catch (error) {
             if (error.response?.data) {
                 console.group("Validation Errors Details");
-                console.error("Status:", error.response.status);
-                console.error("Data:", error.response.data);
+                clientLogger.error("Status:", error.response.status);
+                clientLogger.error("Data:", error.response.data);
                 
                 if (error.response.status === 422 && error.response.data?.errors) {
                     const apiErrors = error.response.data.errors;

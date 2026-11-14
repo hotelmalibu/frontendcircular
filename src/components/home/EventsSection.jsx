@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Calendar,
@@ -65,7 +66,7 @@ export default function EventsSection() {
       setEvents(published);
       setCurrentIndex(0);
     } catch (err) {
-      console.error("Error loading events:", err);
+      clientLogger.error("Error loading events:", err);
       setError("Error al cargar los eventos");
     } finally {
       setLoading(false);

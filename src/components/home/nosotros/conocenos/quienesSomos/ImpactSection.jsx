@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -149,7 +150,7 @@ const ImpactSection = () => {
           }
         }
       } catch (err) {
-        console.error("Error al consultar el dashboard de impacto territorial de la API:", err);
+        clientLogger.error("Error al consultar el dashboard de impacto territorial de la API:", err);
         if (isMounted) {
           const msg = err.response?.data?.message || "No se pudo sincronizar la información del mapa con la API";
           setError(msg);

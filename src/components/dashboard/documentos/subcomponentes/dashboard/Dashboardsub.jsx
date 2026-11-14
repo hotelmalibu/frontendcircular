@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import {
   PieChart,
@@ -170,7 +171,7 @@ export default function Dashboardsub() {
         // Los documentos recientes ya se cargaron en resDefault (línea 85)
 
       } catch (error) {
-        console.error('Error fetching documents:', error);
+        clientLogger.error('Error fetching documents:', error);
       } finally {
         setLoading(false);
       }

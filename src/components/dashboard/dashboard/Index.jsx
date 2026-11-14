@@ -1,3 +1,4 @@
+import clientLogger from '../../../utils/clientLogger';
 import React, { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import Undexsub from "./subcomponentes/Undexsub";
@@ -51,7 +52,7 @@ export default function Index() {
           setPendingUsersCount(pending);
           setSuspendedUsersCount(suspended);
         } catch (e) {
-          console.error("Error al cargar contadores de Dashboard:", e);
+          clientLogger.error("Error al cargar contadores de Dashboard:", e);
         }
       };
 

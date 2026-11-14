@@ -1,3 +1,4 @@
+import clientLogger from '../utils/clientLogger';
 import api from './index';
 
 // Base URL for schedule endpoints
@@ -9,7 +10,7 @@ export const getAllSchedules = async (page = 1, perPage = 15) => {
     const response = await api.get(`${SCHEDULE_BASE_URL}?page=${page}&per_page=${perPage}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching schedules:', error);
+    clientLogger.error('Error fetching schedules:', error);
     throw error;
   }
 };
@@ -20,7 +21,7 @@ export const getScheduleById = async (id) => {
     const response = await api.get(`${SCHEDULE_BASE_URL}/${id}`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching schedule ${id}:`, error);
+    clientLogger.error(`Error fetching schedule ${id}:`, error);
     throw error;
   }
 };
@@ -34,7 +35,7 @@ export const createSchedule = async (scheduleData) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error creating schedule:', error);
+    clientLogger.error('Error creating schedule:', error);
     throw error;
   }
 };
@@ -61,7 +62,7 @@ export const updateSchedule = async (id, scheduleData) => {
     });
     return response.data;
   } catch (error) {
-    console.error(`Error updating schedule ${id}:`, error);
+    clientLogger.error(`Error updating schedule ${id}:`, error);
     throw error;
   }
 };
@@ -72,7 +73,7 @@ export const deleteSchedule = async (id) => {
     const response = await api.delete(`${SCHEDULE_BASE_URL}/${id}`);
     return response.data;
   } catch (error) {
-    console.error(`Error deleting schedule ${id}:`, error);
+    clientLogger.error(`Error deleting schedule ${id}:`, error);
     throw error;
   }
 };
@@ -83,7 +84,7 @@ export const publishSchedule = async (id) => {
     const response = await api.patch(`${SCHEDULE_BASE_URL}/${id}/publish`);
     return response.data;
   } catch (error) {
-    console.error(`Error publishing schedule ${id}:`, error);
+    clientLogger.error(`Error publishing schedule ${id}:`, error);
     throw error;
   }
 };
@@ -94,7 +95,7 @@ export const unpublishSchedule = async (id) => {
     const response = await api.patch(`${SCHEDULE_BASE_URL}/${id}/unpublish`);
     return response.data;
   } catch (error) {
-    console.error(`Error unpublishing schedule ${id}:`, error);
+    clientLogger.error(`Error unpublishing schedule ${id}:`, error);
     throw error;
   }
 };

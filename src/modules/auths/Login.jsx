@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 import { useState, useContext } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
@@ -44,7 +45,7 @@ export default function Login() {
       login(res.data.data.user, res.data.data.token, remember);
       navigate("/dashboard", { replace: true });
     } catch (err) {
-      console.error("Error de inicio de sesión:", err);
+      clientLogger.error("Error de inicio de sesión:", err);
       const message =
         err.response?.data?.message ||
         err.message ||

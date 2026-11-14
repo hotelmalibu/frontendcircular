@@ -1,3 +1,4 @@
+import clientLogger from '../utils/clientLogger';
 import api from "./index";
 
 /**
@@ -23,7 +24,7 @@ export const getAllCompanies = async (page = 1, perPage = 15, sortBy = 'created_
     const response = await api.get(`${COMPANIES_ENDPOINT}?${params.toString()}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching companies:', error);
+    clientLogger.error('Error fetching companies:', error);
     throw error;
   }
 };
@@ -38,7 +39,7 @@ export const getCompanyById = async (companyId) => {
     const response = await api.get(`${COMPANIES_ENDPOINT}/${companyId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching company ${companyId}:`, error);
+    clientLogger.error(`Error fetching company ${companyId}:`, error);
     throw error;
   }
 };
@@ -66,7 +67,7 @@ export const createCompany = async (companyData) => {
       },
     };
 
-    console.log("companiesApi.js - createCompany called with:", {
+    clientLogger.log("companiesApi.js - createCompany called with:", {
       isFormData: companyData instanceof FormData,
       config: config,
       endpoint: COMPANIES_ENDPOINT
@@ -74,28 +75,28 @@ export const createCompany = async (companyData) => {
 
     // Log FormData contents if it's FormData
     if (companyData instanceof FormData) {
-      console.log("FormData contents:");
+      clientLogger.log("FormData contents:");
       for (let [key, value] of companyData.entries()) {
         if (value instanceof File) {
-          console.log(`  ${key}: [File] ${value.name} (${value.size} bytes, ${value.type})`);
+          clientLogger.log(`  ${key}: [File] ${value.name} (${value.size} bytes, ${value.type})`);
         } else {
-          console.log(`  ${key}: ${value}`);
+          clientLogger.log(`  ${key}: ${value}`);
         }
       }
     }
 
-    console.log("🚀 Sending request to:", COMPANIES_ENDPOINT);
-    console.log("📤 Request config:", config);
+    clientLogger.log("🚀 Sending request to:", COMPANIES_ENDPOINT);
+    clientLogger.log("📤 Request config:", config);
     const response = await api.post(COMPANIES_ENDPOINT, companyData, config);
-    console.log("✅ API Response:", response);
+    clientLogger.log("✅ API Response:", response);
     return response.data;
   } catch (error) {
-    console.error("❌ API Error Details:");
-    console.error("  Error object:", error);
-    console.error("  Response:", error.response);
-    console.error("  Response data:", error.response?.data);
-    console.error("  Status:", error.response?.status);
-    console.error("  Status text:", error.response?.statusText);
+    clientLogger.error("❌ API Error Details:");
+    clientLogger.error("  Error object:", error);
+    clientLogger.error("  Response:", error.response);
+    clientLogger.error("  Response data:", error.response?.data);
+    clientLogger.error("  Status:", error.response?.status);
+    clientLogger.error("  Status text:", error.response?.statusText);
     throw error;
   }
 };
@@ -127,7 +128,7 @@ export const updateCompany = async (companyId, companyData) => {
     });
     return response.data;
   } catch (error) {
-    console.error(`Error updating company ${companyId}:`, error);
+    clientLogger.error(`Error updating company ${companyId}:`, error);
     throw error;
   }
 };
@@ -142,7 +143,7 @@ export const deleteCompany = async (companyId) => {
     const response = await api.delete(`${COMPANIES_ENDPOINT}/${companyId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error deleting company ${companyId}:`, error);
+    clientLogger.error(`Error deleting company ${companyId}:`, error);
     throw error;
   }
 };
@@ -162,7 +163,7 @@ export const addProductToCompany = async (companyId, productData) => {
     });
     return response.data;
   } catch (error) {
-    console.error(`Error adding product to company ${companyId}:`, error);
+    clientLogger.error(`Error adding product to company ${companyId}:`, error);
     throw error;
   }
 };
@@ -183,7 +184,7 @@ export const updateCompanyProduct = async (companyId, productId, productData) =>
     });
     return response.data;
   } catch (error) {
-    console.error(`Error updating product ${productId} in company ${companyId}:`, error);
+    clientLogger.error(`Error updating product ${productId} in company ${companyId}:`, error);
     throw error;
   }
 };
@@ -199,7 +200,7 @@ export const deleteCompanyProduct = async (companyId, productId) => {
     const response = await api.delete(`${COMPANIES_ENDPOINT}/${companyId}/products/${productId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error deleting product ${productId} from company ${companyId}:`, error);
+    clientLogger.error(`Error deleting product ${productId} from company ${companyId}:`, error);
     throw error;
   }
 };

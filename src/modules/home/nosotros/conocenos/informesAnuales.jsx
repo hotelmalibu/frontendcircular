@@ -1,9 +1,12 @@
+import clientLogger from '../../../../utils/clientLogger';
+import { publicDocumentUrl } from '../../../../utils/secureFiles';
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Search, ArrowRight, FileText, X } from "lucide-react";
 import { contentTypeConfig } from "../../../../data/mockContent";
 import { getPublishedNewsWithImages } from "../../../../api/newsApi";
 import { getDocuments } from "../../../../api/documentsApi";
+import PDFViewer from "../../../../components/PDFViewer";
 import { getAllProjects } from "../../../../api/projectsApi";
 import { stripHtml } from "../../../../utils/textUtils";
 import { getImageProxyUrl } from "../../../../utils/imageUtils.js";
@@ -33,7 +36,7 @@ export default function InformesAnuales() {
         setLoading(true);
         const [newsResponse, documentsResponse, projectsResponse] = await Promise.all([
           getPublishedNewsWithImages(),
-          getDocuments(),
+          getDocuments({ status: 'approved' }),
           getAllProjects()
         ]);
 
@@ -169,7 +172,7 @@ export default function InformesAnuales() {
         if (mounted) setItems(onlyDocsOfInterest);
 
       } catch (err) {
-        console.error("Error cargando documentos para Informes Anuales:", err);
+        clientLogger.error("Error cargando documentos para Informes Anuales:", err);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -193,7 +196,8 @@ export default function InformesAnuales() {
   }, [items, searchQuery]);
 
   const openPdf = (url) => {
-    if (url) setPdfVisible(url);
+    const allowedUrl = publicDocumentUrl(url);
+    if (allowedUrl) setPdfVisible(allowedUrl);
   };
 
   const closePdf = () => setPdfVisible(null);
@@ -294,11 +298,7 @@ export default function InformesAnuales() {
 
             {/* Content (Iframe) */}
             <div className="flex-1 overflow-hidden bg-gray-50 relative">
-              <iframe
-                src={pdfVisible}
-                className="w-full h-full border-0"
-                title="PDF Viewer"
-              />
+              <PDFViewer file={pdfVisible} />
             </div>
           </div>
         </div>
@@ -318,25 +318,15 @@ function MinimalistCard({ item, onOpenPdf }) {
     if (item.source === 'document' && item.documentData) {
       e.preventDefault();
       const uploadFile = item.documentData.upload_file;
-      const filePath = uploadFile?.path || uploadFile?.url || item.documentData.file_path;
-      if (filePath) {
-        const fileUrl = filePath.startsWith('http')
-          ? filePath
-          : `${process.env.NODE_ENV === 'development' ? '' : 'https://api-ecocircular.creativostecnologicosit.com'}/storage/${filePath.replace(/^\/+/, '')}`;
-        onOpenPdf(fileUrl);
-      }
+      const fileUrl = publicDocumentUrl(uploadFile || item.documentData.file_path);
+      if (fileUrl) onOpenPdf(fileUrl);
     }
     // If it's a project with a specific file path or object
     else if (item.source === 'project' && (item.projectData?.upload_file || item.projectData?.file)) {
       e.preventDefault();
       const fileData = item.projectData.upload_file || item.projectData?.file;
-      const filePath = typeof fileData === 'object' ? (fileData.path || fileData.url) : fileData;
-      if (filePath) {
-        const fileUrl = String(filePath).startsWith('http')
-          ? filePath
-          : `${process.env.NODE_ENV === 'development' ? '' : 'https://api-ecocircular.creativostecnologicosit.com'}/storage/${String(filePath).replace(/^\/+/, '')}`;
-        onOpenPdf(fileUrl);
-      }
+      const fileUrl = publicDocumentUrl(fileData);
+      if (fileUrl) onOpenPdf(fileUrl);
     }
   };
 

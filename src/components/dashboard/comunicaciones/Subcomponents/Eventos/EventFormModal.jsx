@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import ReactQuill from 'react-quill-new';
@@ -112,7 +113,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       }
       setCategories(categoriesArray);
     } catch (err) {
-      console.error("Error loading categories:", err);
+      clientLogger.error("Error loading categories:", err);
       setCategories([]);
     } finally {
       setCategoriesLoading(false);
@@ -309,7 +310,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
       }
       onSuccess();
     } catch (err) {
-      console.error("Error saving event:", err);
+      clientLogger.error("Error saving event:", err);
       const { message, missingFields, details, rawErrors } = extractFormErrors(err);
 
       if (rawErrors && typeof rawErrors === 'object') {

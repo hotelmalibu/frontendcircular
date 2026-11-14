@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { X, ShieldAlert, User, MapPin, Calendar, Monitor, Copy, Check, Terminal, Globe } from "lucide-react";
@@ -14,7 +15,7 @@ const CopyButton = ({ text, label }) => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
-            console.error("Failed to copy:", err);
+            clientLogger.error("Failed to copy:", err);
         }
     };
 

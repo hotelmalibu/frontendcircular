@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 import { getTickets, updateTicket, deleteTicket } from "../../../../../api/helpdeskApi";
 import { toast } from "react-hot-toast";
+import SecureAttachment from "../../../../common/SecureAttachment";
 
 const BRAND = {
     blue: "#2C67B0",
@@ -103,7 +105,7 @@ export default function HelpdeskTable() {
             }
             setError(null);
         } catch (err) {
-            console.error("Error fetching tickets:", err);
+            clientLogger.error("Error fetching tickets:", err);
             setError("No se pudieron cargar los tickets de soporte.");
         } finally {
             setLoading(false);
@@ -128,7 +130,7 @@ export default function HelpdeskTable() {
             setIsManageModalOpen(false);
             fetchTickets();
         } catch (err) {
-            console.error("Error updating ticket:", err);
+            clientLogger.error("Error updating ticket:", err);
             toast.error("Error al actualizar el ticket");
         } finally {
             setSaving(false);
@@ -144,7 +146,7 @@ export default function HelpdeskTable() {
             setIsDeleteModalOpen(false);
             fetchTickets();
         } catch (err) {
-            console.error("Error deleting ticket:", err);
+            clientLogger.error("Error deleting ticket:", err);
             toast.error("Error al eliminar el ticket");
         } finally {
             setSaving(false);
@@ -365,18 +367,7 @@ export default function HelpdeskTable() {
                                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest block mb-3">Evidencia Adjunta</label>
                                     <div className="grid grid-cols-2 gap-4">
                                         {currentTicket.images.map((img) => (
-                                            <a
-                                                key={img.id}
-                                                href={img.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="group relative h-40 rounded-2xl overflow-hidden border border-gray-200 hover:border-[#2C67B0] transition-all"
-                                            >
-                                                <img src={img.url} alt="Evidencia" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                                    <Eye className="text-white" size={32} />
-                                                </div>
-                                            </a>
+                                            <SecureAttachment key={img.id} file={img} />
                                         ))}
                                     </div>
                                 </div>

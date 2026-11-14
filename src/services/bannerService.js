@@ -1,3 +1,4 @@
+import clientLogger from '../utils/clientLogger';
 import fondo1 from "../assets/home/Carrusel/Index_imagen_1.jpg";
 import fondo3 from "../assets/home/Carrusel/Index_imagen_3.jpeg";
 import fondo4 from "../assets/home/Carrusel/Index_imagen_4.png";
@@ -224,7 +225,7 @@ export const getAllBanners = () => {
 
     return merged;
   } catch (error) {
-    console.warn("Error reading banners from storage, using defaults:", error);
+    clientLogger.warn("Error reading banners from storage, using defaults:", error);
     return { ...DEFAULT_BANNERS };
   }
 };
@@ -267,7 +268,7 @@ export const saveBanner = (pageKey, bannerData) => {
 
     return all[pageKey];
   } catch (error) {
-    console.error("Error saving banner:", error);
+    clientLogger.error("Error saving banner:", error);
     throw error;
   }
 };
@@ -292,7 +293,7 @@ export const resetBanner = (pageKey) => {
     }
     return all[pageKey];
   } catch (error) {
-    console.error("Error resetting banner:", error);
+    clientLogger.error("Error resetting banner:", error);
     throw error;
   }
 };
@@ -312,7 +313,7 @@ export const resetAllBanners = () => {
     }
     return { ...DEFAULT_BANNERS };
   } catch (error) {
-    console.error("Error resetting all banners:", error);
+    clientLogger.error("Error resetting all banners:", error);
     throw error;
   }
 };

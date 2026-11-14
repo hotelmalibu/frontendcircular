@@ -1,6 +1,23 @@
+Options -Indexes
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "no-referrer"
+  Header always set Permissions-Policy "camera=(), microphone=(), payment=()"
+  Header always set Content-Security-Policy "base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'"
+  Header always set Strict-Transport-Security "max-age=31536000" "expr=%{HTTPS} == 'on'"
+  Header always unset X-Powered-By
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # Block accidental publication of repository/config/backup files and source maps.
+  RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L,NC]
+  RewriteRule \.(?:map|log|sql|bak|old|orig|save|env|ini|ya?ml|zip|tar|7z|rar|php|phtml|phar)$ - [F,L,NC]
+  RewriteRule ^(?:package(?:-lock)?\.json|composer\.(?:json|lock)|web\.config|(?:README|SECURITY)(?:\.[^/]+)?)$ - [F,L,NC]
 
   # --- REDIRECCIONES PERMANENTES 301 (MIGRACIÓN DE RUTAS) ---
   RewriteRule ^quines-somos/?$ /quienes-somos [R=301,L]

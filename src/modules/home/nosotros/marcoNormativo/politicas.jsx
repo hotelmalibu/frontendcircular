@@ -1,3 +1,4 @@
+import clientLogger from '../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import { Download } from "lucide-react";
 import { getPoliticasNormativas, INITIAL_POLITICAS } from "../../../../services/marcoNormativoService";
@@ -14,7 +15,7 @@ export default function Politicas() {
         const data = await getPoliticasNormativas();
         setPoliticasList(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.warn("Error cargando políticas:", err);
+        clientLogger.warn("Error cargando políticas:", err);
         setPoliticasList([]);
       }
     };

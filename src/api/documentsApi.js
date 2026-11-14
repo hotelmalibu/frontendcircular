@@ -1,3 +1,4 @@
+import clientLogger from '../utils/clientLogger';
 import api from "./index";
 
 /**
@@ -52,7 +53,7 @@ export const createDocument = async (documentData) => {
     const response = await api.post(DOCUMENTS_ENDPOINT, documentData);
     return response.data;
   } catch (error) {
-    console.error("Error creating document:", error);
+    clientLogger.error("Error creating document:", error);
     throw error;
   }
 };
@@ -79,7 +80,7 @@ export const updateDocument = async (id, documentData) => {
     const response = await api.post(`${DOCUMENTS_ENDPOINT}/${id}`, documentData);
     return response.data;
   } catch (error) {
-    console.error("Error updating document:", error);
+    clientLogger.error("Error updating document:", error);
     throw error;
   }
 };
@@ -94,7 +95,7 @@ export const deleteDocument = async (id) => {
     const response = await api.delete(`${DOCUMENTS_ENDPOINT}/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error deleting document:", error);
+    clientLogger.error("Error deleting document:", error);
     throw error;
   }
 };

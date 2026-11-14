@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import ReactQuill from 'react-quill-new';
@@ -91,9 +92,9 @@ export default function CategoryFormModal({ categoryData, isEditing, onClose, on
       }
       onSuccess();
     } catch (err) {
-      console.error("Error saving category:", err);
+      clientLogger.error("Error saving category:", err);
       if (err.response?.data?.message) {
-        // console.error("Server error:", err.response.data.message);
+        // clientLogger.error("Server error:", err.response.data.message);
       }
 
       if (err.response?.data?.errors) {

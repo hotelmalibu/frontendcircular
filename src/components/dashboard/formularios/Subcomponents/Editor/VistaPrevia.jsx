@@ -1,3 +1,4 @@
+import clientLogger from '../../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import formsApi from "../../../../../api/formsApi";
@@ -114,7 +115,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
           list = base;
         }
 
-        console.log("Field types parsed:", list);
+        clientLogger.log("Field types parsed:", list);
 
         // Custom sort to prioritize visual elements (Title, Paragraph)
         const sortedList = list.sort((a, b) => {
@@ -134,7 +135,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
 
         setFieldTypes(sortedList.length > 0 ? sortedList : DEFAULT_FIELD_TYPES);
       } catch (error) {
-        console.error("Error fetching field types, using defaults:", error);
+        clientLogger.error("Error fetching field types, using defaults:", error);
         // Fallback to defaults on error
         setFieldTypes(DEFAULT_FIELD_TYPES);
       }
@@ -180,7 +181,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
             setFormFields(mappedFields);
           }
         } catch (error) {
-          console.error("Error fetching form details:", error);
+          clientLogger.error("Error fetching form details:", error);
           toast.error("Error al cargar los detalles del formulario");
         } finally {
           setLoading(false);
@@ -236,7 +237,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
     };
 
     if (!newField.field_type_id) {
-      console.error("Attempted to add field without type ID:", fieldType);
+      clientLogger.error("Attempted to add field without type ID:", fieldType);
       toast.error("Error: El tipo de campo seleccionado no tiene un ID válido");
       return;
     }
@@ -291,7 +292,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
       // Validate that all fields have a field_type_id
       const invalidFields = formFields.filter(f => !f.field_type_id);
       if (invalidFields.length > 0) {
-        console.error("Cannot save: fields missing field_type_id", invalidFields);
+        clientLogger.error("Cannot save: fields missing field_type_id", invalidFields);
         toast.error("Error: Algunos campos no tienen un tipo válido configurado");
         setSaving(false);
         return;
@@ -306,7 +307,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
         fields: cleanFields
       };
 
-      console.log("Pre-save Payload:", payload);
+      clientLogger.log("Pre-save Payload:", payload);
 
       const response = formId
         ? await formsApi.updateForm(formId, payload)
@@ -317,7 +318,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
       const responseId = body.id || (body.data && body.data.id) || body.form?.id;
 
       if (!responseId && !formId) {
-        console.error("Could not extract form ID from response:", body);
+        clientLogger.error("Could not extract form ID from response:", body);
         throw new Error("No se pudo obtener el ID del formulario");
       }
 
@@ -336,7 +337,7 @@ const FormBuilder = ({ formId, onSuccess }) => {
         }, 1500); // Small delay so user sees the toast
       }
     } catch (error) {
-      console.error("Error saving form:", error);
+      clientLogger.error("Error saving form:", error);
 
       const responseData = error.response?.data;
       if (responseData?.errors) {

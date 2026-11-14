@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 
 import { useEffect, useState, useContext } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -50,14 +51,14 @@ export default function VerifyEmail() {
                             updateUser(res.data.user);
                         }
                     } catch (e) {
-                        console.error("Error refreshing user data after verification:", e);
+                        clientLogger.error("Error refreshing user data after verification:", e);
                     }
                 }
 
                 setStatus("success");
                 setMessage("¡Tu correo ha sido verificado exitosamente!");
             } catch (error) {
-                console.error("Verification error:", error);
+                clientLogger.error("Verification error:", error);
                 setStatus("error");
                 setMessage(error.response?.data?.message || "Hubo un problema al verificar tu correo.");
             }

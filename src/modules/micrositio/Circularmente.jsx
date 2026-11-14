@@ -1,3 +1,4 @@
+import clientLogger from '../../utils/clientLogger';
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import HeaderCircular from "../../components/circularmente/HeaderCircular";
@@ -11,7 +12,7 @@ export default function Circularmente() {
   const [selectedRegion, setSelectedRegion] = useState(null);
 
   const handleRegionSelect = (region) => {
-    console.log("Región seleccionada:", region);
+    clientLogger.log("Región seleccionada:", region);
     setSelectedRegion(region);
   };
 

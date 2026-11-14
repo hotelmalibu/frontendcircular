@@ -1,3 +1,4 @@
+import clientLogger from '../../../../utils/clientLogger';
 import React, { useState, useEffect } from "react";
 // --- IMPORTACIONES DE LIBRERÍAS ---
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -71,7 +72,7 @@ export default function Index() {
         const data = await getResolucionesNormativas();
         setResolucionesList(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.warn("Error cargando resoluciones:", err);
+        clientLogger.warn("Error cargando resoluciones:", err);
         setResolucionesList([]);
       }
     };
