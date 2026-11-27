@@ -201,7 +201,7 @@ export default function QuienesSomos() {
             cargo: quote.cargo || "",
             frase: quote.frase || "",
             file: null,
-            preview: quote.photo_url || quote.upload_file?.url || null
+            preview: getImageProxyUrl(quote.photo_url || quote.photo || quote.upload_file) || null
         });
     };
 
@@ -523,7 +523,7 @@ export default function QuienesSomos() {
                     ) : (
                         quotes.map((quote) => {
                             const isEditing = isEditingQuote === quote.id;
-                            const rawPhoto = quote.photo_url || quote.upload_file?.url || quote.photo;
+                            const rawPhoto = quote.photo_url || quote.photo || quote.upload_file;
                             const photoSrc = rawPhoto ? getImageProxyUrl(rawPhoto) : null;
 
                             return (

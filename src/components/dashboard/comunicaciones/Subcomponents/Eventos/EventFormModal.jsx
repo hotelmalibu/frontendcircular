@@ -21,6 +21,7 @@ import {
 import { createSchedule, updateSchedule } from "../../../../../api/scheduleApi";
 import { getAllCategories } from "../../../../../api/categoriesApi";
 import { extractFormErrors } from "../../../../../utils/errorUtils";
+import { getImageProxyUrl } from "../../../../../utils/imageUtils";
 import { toast } from "react-hot-toast";
 
 // --- PALETA DE COLORES VISIÓN CIRCULAR ---
@@ -67,7 +68,7 @@ export default function EventFormModal({ eventData, isEditing, onClose, onSucces
     if (isEditing && eventData) {
       const description = eventData.description || "";
       const catId = (eventData.category && typeof eventData.category === 'object') ? (eventData.category?.id || "") : (eventData.category_id || "");
-      const existingFlyer = eventData.flyer_url || eventData.banner_url || eventData.photo_url || eventData.upload_file?.url || null;
+      const existingFlyer = getImageProxyUrl(eventData.flyer_url || eventData.banner_url || eventData.photo_url || eventData.upload_file || eventData.flyer || eventData.image) || null;
 
       const newFormData = {
         title: eventData.title || "",
